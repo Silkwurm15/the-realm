@@ -40,7 +40,7 @@
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes ring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.15);opacity:.15}}
 .mk.quest{--c:#62c8ff;--bg:#0f2f4d}.mk.chest{--c:#ffc24a;--bg:#3a2506}.mk.nature{--c:#7be37a;--bg:#12301a}.mk.boss{--c:#ff5a4d;--bg:#3a0f0d}.mk.rift{--c:#b184ff;--bg:#24123f}
 .mk.boss .badge{width:42px;height:42px;left:7px;box-shadow:0 0 22px var(--c),0 0 0 3px #0a0907aa}
-.mk{transition:opacity .3s,filter .3s}.mk.far{opacity:.5;filter:grayscale(.65)}.calm .mk .float,.calm .mk .ground{animation:none}
+.mk{transition:opacity .3s,filter .3s}.mk.far{opacity:.5;filter:grayscale(.65)}
 /* Player */
 .pl{width:80px;height:92px;position:absolute;top:0;left:0;pointer-events:none}.pl .disc{position:absolute;left:5px;bottom:-6px;width:70px;height:30px;border-radius:50%;border:2px solid #66e1f2;background:radial-gradient(ellipse,#55c9ff66,#55c9ff10 70%);box-shadow:0 0 18px #48bfffaa,inset 0 0 12px #48bfff88}.pl .col{position:absolute;left:50%;bottom:8px;width:5px;height:84px;transform:translateX(-50%);background:linear-gradient(to top,#6fdcff,transparent);opacity:.55;filter:blur(1.5px)}.pl svg{position:absolute;left:22px;bottom:6px;width:36px;height:62px;filter:drop-shadow(0 3px 4px #000)}
 
@@ -75,9 +75,16 @@
 .qcard:not([data-act=""]){cursor:pointer}.qcard.rdy{border-color:#7be37a;box-shadow:0 0 12px #7be37a55}.qcard:active{transform:scale(.99)}#mText{white-space:pre-line}
 @media(min-width:700px){.qpanel{top:84px;left:50%;right:auto;width:min(700px,90vw);transform:translateX(-50%)}}
 </style></head><body>
+<div id="auth"><div class="ab"><div class="at">THE REALM</div><div class="as">Sign in to begin your adventure</div>
+<button id="aGoogle" class="ag">Continue with Google</button><div class="ad"><span>or</span></div>
+<input id="aEmail" type="email" placeholder="Email" autocomplete="email"><input id="aPass" type="password" placeholder="Password (8+ characters)" autocomplete="current-password">
+<div class="ar"><button id="aIn">Sign in</button><button id="aUp" class="alt">Create account</button></div>
+<div id="aForgot" class="al">Forgot password?</div><div id="aMsg" class="am"></div></div></div>
+<style>#auth{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 50% 30%,#2a2214,#080a08 70%);color:#ead8ac;font-family:Georgia,serif}#auth .ab{width:100%;max-width:360px;padding:26px 22px;border:1px solid #b99a52;border-radius:6px;background:linear-gradient(135deg,#251d12,#0e0c09);box-shadow:0 14px 50px #000c,inset 0 0 0 3px #1b140b}#auth .at{text-align:center;font-size:28px;font-weight:700;letter-spacing:5px;color:#f0d58e}#auth .as{text-align:center;margin:6px 0 20px;font-size:13px;color:#c8b894}#auth button,#auth input{width:100%;box-sizing:border-box;padding:13px;margin:0 0 10px;border-radius:4px;font:16px Georgia,serif}#auth input{border:1px solid #6b5a33;background:#0b0a08;color:#ffeccb}#auth button{border:1px solid #d6b866;background:linear-gradient(#5a4725,#33280f);color:#fff0c6;font-weight:700;cursor:pointer}#auth button.alt{background:#15110a}#auth button:disabled{opacity:.5}#auth .ag{background:#f4f1ea;color:#222;border-color:#fff}#auth .ad{text-align:center;margin:2px 0 12px;font-size:12px;color:#8d7d57}#auth .ar{display:flex;gap:8px}#auth .ar button{margin:0}#auth .al{text-align:center;margin-top:14px;font-size:13px;color:#d6b866;text-decoration:underline;cursor:pointer}#auth .am{min-height:18px;margin-top:12px;text-align:center;font-size:13px;color:#c8b894}#auth .am.bad{color:#ff8a7a}</style>
+
 <div id="map" aria-label="Real-world exploration map"></div><div class="map-arcane-wash" aria-hidden="true"></div><div class="haze" aria-hidden="true"></div><div class="shade" aria-hidden="true"></div>
 
-<div class="hud topbar"><div class="panel profile"><div class="portrait" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="tun" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8a6a3c"/><stop offset="1" stop-color="#2b1e10"/></linearGradient><linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f3d3aa"/><stop offset="1" stop-color="#c58f62"/></linearGradient></defs><path d="M5 64 9 51Q13 44 25 42H39Q51 44 55 51L59 64Z" fill="url(#tun)" stroke="#c8a65c" stroke-width="1.2"/><path d="M26 42 32 51 38 42" fill="none" stroke="#d0ad61" stroke-width="1.3"/><rect x="27" y="34" width="10" height="10" rx="3" fill="#b9885c"/><ellipse cx="20.6" cy="26" rx="1.9" ry="3.1" fill="#d9aa7c"/><ellipse cx="43.4" cy="26" rx="1.9" ry="3.1" fill="#d9aa7c"/><ellipse cx="32" cy="25" rx="11" ry="13" fill="url(#skin)"/><path d="M20.5 24C18.5 10 29 5.5 36 7.5 45 9.5 46.5 18 43.5 24 42 18 38 15 32 15 26 15 22 18 20.5 24Z" fill="#4a3220" stroke="#2d1d10" stroke-width=".6"/><ellipse cx="27.5" cy="26" rx="2" ry="1.4" fill="#fff"/><ellipse cx="36.5" cy="26" rx="2" ry="1.4" fill="#fff"/><circle cx="27.7" cy="26" r="1" fill="#3b2a1a"/><circle cx="36.7" cy="26" r="1" fill="#3b2a1a"/><path d="M24.5 22.4 30.2 21.6M33.8 21.6 39.5 22.4" stroke="#3a2616" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M32 27 30.9 31.6 33.2 31.6" stroke="#a8764c" fill="none" stroke-width="1" stroke-linecap="round"/><path d="M28.4 34.2Q32 36.4 35.6 34.2" stroke="#8a4a3a" fill="none" stroke-width="1.2" stroke-linecap="round"/><path d="M12 58 24 47M52 58 40 47" stroke="#d0ad61" stroke-width="1.1" fill="none"/></svg></div><div class="profile-info"><div class="eyebrow">The Realm · Adventurer</div><div class="player-name">Adventurer</div><div class="xptext">1,250 / 4,800 XP</div><div class="xpbar"><div class="xpfill"></div></div></div><div class="level">12</div></div><button class="panel iconbtn" id="menuButton" aria-label="Open menu">⚙</button></div>
+<div class="hud topbar"><div class="panel profile"><div class="portrait" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="cloak" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#77704f"/><stop offset=".45" stop-color="#302b22"/><stop offset="1" stop-color="#090908"/></linearGradient><linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d2b78b"/><stop offset="1" stop-color="#6d5035"/></linearGradient></defs><path d="M8 64 12 37 18 16 31 5 45 13 54 38 60 64Z" fill="url(#cloak)" stroke="#c8a65c" stroke-width="1.3"/><path d="M17 29 20 15 32 8 45 17 48 31 41 25 33 20 24 26Z" fill="#171511"/><path d="M24 23 32 17 41 23 42 37 35 46 27 39Z" fill="url(#face)"/><path d="M23 27 31 25 40 28 39 32 32 30 25 32Z" fill="#17130e"/><path d="M24 23 32 16 42 23 48 33 40 29 32 24 24 29 17 34Z" fill="#201d17" stroke="#a88a4c" stroke-width="1"/><path d="M27 40 33 45 40 39 45 53 20 53Z" fill="#17140f"/><path d="M15 57 25 47 33 53 42 47 52 58" fill="none" stroke="#d0ad61" stroke-width="1.2"/></svg></div><div class="profile-info"><div class="eyebrow">The Realm · Adventurer</div><div class="player-name">Adventurer</div><div class="xptext">1,250 / 4,800 XP</div><div class="xpbar"><div class="xpfill"></div></div></div><div class="level">12</div></div><button class="panel iconbtn" id="menuButton" aria-label="Open menu">⚙</button></div>
 
 
 <div class="hud compass" id="compass" aria-label="Compass — tap to face north"><svg class="needle" id="needle" viewBox="0 0 26 26"><path d="M13 2 18 13H8Z" fill="#e5483d"/><path d="M13 24 8 13h10Z" fill="#e8d7a4"/></svg></div>
@@ -85,13 +92,12 @@
 
 <div class="qpanel" id="qpanel"></div>
 <div class="bottom-nav"><div class="nav-item active" data-tab="Map"><div class="nav-icon">⌖</div><div class="nav-label">Map</div></div><div class="nav-item" data-tab="Quests"><div class="nav-icon">▤<span class="nav-dot"></span></div><div class="nav-label">Quests</div></div><div class="nav-item" data-tab="Champions"><div class="nav-icon">⚔</div><div class="nav-label">Champions</div></div><div class="nav-item" data-tab="Shop"><div class="nav-icon">♢</div><div class="nav-label">Shop</div></div><div class="nav-item" data-tab="Character"><div class="nav-icon">♟</div><div class="nav-label">Character</div></div><div class="nav-item" data-tab="Settings"><div class="nav-icon">⚙</div><div class="nav-label">Settings</div></div></div>
-<div class="panel menu" id="menu"><button data-action="Inventory">🎒 &nbsp; Inventory</button><button data-action="Settings">⚙ &nbsp; Settings</button><button data-action="Help & Safety">🛡 &nbsp; Help &amp; Safety</button><button data-action="Sign Out">🚪 &nbsp; Sign Out</button><button data-action="Close">✕ &nbsp; Close Menu</button></div><div class="toast" id="toast" role="status"></div><div class="toolfar" id="toolFar" role="status"></div>
+<div class="panel menu" id="menu"><button data-action="Inventory">🎒 &nbsp; Inventory</button><button data-action="Settings">⚙ &nbsp; Settings</button><button data-action="Help & Safety">🛡 &nbsp; Help &amp; Safety</button><button data-action="Close">✕ &nbsp; Close Menu</button></div><div class="toast" id="toast" role="status"></div><div class="toolfar" id="toolFar" role="status"></div>
 <div class="modal" id="modal" role="alertdialog" aria-modal="true"><div class="panel modal-card"><div class="m-icon" id="mIcon"></div><h2 id="mTitle"></h2><p id="mText"></p><button class="m-btn" id="mPrimary"></button><button class="m-btn ghost" id="mSecondary"></button></div></div>
 
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" crossorigin=""></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin=""></script>
 <script>
-(()=>{'use strict';
+window.startRealm=()=>{'use strict';
 const $=id=>document.getElementById(id);
 const FALLBACK=[-89.0940,42.2711]; // [lng,lat]
 const START={zoom:16.6,pitch:62,bearing:-18};
@@ -152,7 +158,7 @@ let gesturing=false;
 ['touchend','touchcancel','pointerup','pointercancel'].forEach(ev=>window.addEventListener(ev,e=>{if(!e.touches||e.touches.length===0)setTimeout(()=>{gesturing=false},120)},{passive:true}));
 map.getCanvasContainer().style.touchAction='none';
 map.on('styleimagemissing',e=>{const f=PATTERNS[e.id];if(f&&!map.hasImage(e.id))map.addImage(e.id,f(),{pixelRatio:2})});
-let bootPending=false,errShown=false;map.on('error',e=>{console.error(e&&e.error||e);if(!errShown){errShown=true;const m=(e&&e.error&&e.error.message)||'unknown error';toast('Map problem: '+m.slice(0,140))}});
+let errShown=false;map.on('error',e=>{console.error(e&&e.error||e);if(!errShown){errShown=true;const m=(e&&e.error&&e.error.message)||'unknown error';toast('Map problem: '+m.slice(0,140))}});
 
 /* ---------- Game layers ---------- */
 const RANGE=150; // meters: radius of the circle around the player (diameter = 2 x RANGE)
@@ -180,14 +186,14 @@ const POI={
  boss:{icon:'💀',title:()=>'Dark Lair',text:'A powerful foe lurks within. Prepare yourself before you strike.',go:'Challenge'}};
 function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(d>RANGE){tooFar(d);return}
- if((it.t==='chest'||it.t==='boss'||it.t==='rift')&&S.hero.hp<=0){toast('You are downed. Rest, or use a Resurrect Potion.');return}
+ if((it.t==='chest'||it.t==='boss')&&S.hero.hp<=0){toast('You are downed. Rest, or use a Resurrect Potion.');return}
  const c=POI[it.t];
- showModal('poi',{icon:c.icon,title:c.title(it),text:ft(d)+' away. '+c.text+(it.exp?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':''),primary:c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));const i=items.indexOf(it);if(it.used)return;it.used=true;if(it.key){S.taken[it.key]=it.exp;save()}if(markers[i])markers[i].remove();ev(it.t);if(it.t!=='boss')bump(it.t);if(it.t==='chest'||it.t==='boss')lootFrom(it);else if(it.t==='nature')gatherNature(it);else if(it.t==='quest'||it.t==='rift')startEncounter(it);else toast(c.go+' ✓')},secondary:'Close',onSecondary:()=>hideModal('poi')})}
+ showModal('poi',{icon:c.icon,title:c.title(it),text:ft(d)+' away. '+c.text+(it.exp?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+' (Sample marker, not a live event yet.)',primary:c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));const i=items.indexOf(it);if(it.used)return;it.used=true;if(it.key){S.taken[it.key]=it.exp;save()}if(markers[i])markers[i].remove();ev(it.t);if(it.t==='chest'||it.t==='boss')lootFrom(it);else if(it.t==='nature')gatherNature(it);else toast(c.go+' ✓')},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
 function updateCards(){items.forEach((it,i)=>{const m=markers[i];if(!m)return;const near=dist(targetLL,it.ll)<=RANGE,el=m.getElement();el.classList.toggle('near',near);el.classList.toggle('far',!near)});
  }
 
-function makePlayerEl(){const el=document.createElement('div');el.className='pl';el.innerHTML='<div class="col"></div><div class="disc"></div><svg viewBox="0 0 36 62"><path d="M9 21Q18 17 27 21L28 38H8Z" fill="#35527a" stroke="#14110c" stroke-width="1"/><rect x="5" y="21" width="5" height="16" rx="2.5" fill="#35527a" stroke="#14110c" stroke-width=".8"/><rect x="26" y="21" width="5" height="16" rx="2.5" fill="#35527a" stroke="#14110c" stroke-width=".8"/><circle cx="7.5" cy="38.5" r="2.6" fill="#e2b98c"/><circle cx="28.5" cy="38.5" r="2.6" fill="#e2b98c"/><rect x="8" y="36" width="20" height="3.5" fill="#c9a65a" stroke="#14110c" stroke-width=".6"/><rect x="11" y="39" width="6.2" height="15" rx="1.5" fill="#4a3a28" stroke="#14110c" stroke-width=".8"/><rect x="18.8" y="39" width="6.2" height="15" rx="1.5" fill="#4a3a28" stroke="#14110c" stroke-width=".8"/><rect x="9.5" y="52" width="8.5" height="7" rx="2" fill="#2a1d10" stroke="#14110c" stroke-width=".8"/><rect x="18" y="52" width="8.5" height="7" rx="2" fill="#2a1d10" stroke="#14110c" stroke-width=".8"/><path d="M11 22 25 36" stroke="#7a5a34" stroke-width="2"/><rect x="15.5" y="15" width="5" height="5" rx="1.5" fill="#cfa077"/><circle cx="18" cy="10" r="7" fill="#e8c196" stroke="#14110c" stroke-width=".8"/><path d="M11 9.5C10.5 3 15 1 18.5 1.2 23.5 1.5 26 5.5 25 9.5 24 6.5 21.5 5.5 18 5.5 14.5 5.5 12 6.5 11 9.5Z" fill="#4a3220" stroke="#14110c" stroke-width=".6"/><circle cx="15.3" cy="10.5" r="1" fill="#2b1d10"/><circle cx="20.7" cy="10.5" r="1" fill="#2b1d10"/><path d="M15.5 14Q18 15.6 20.5 14" stroke="#8a4a3a" fill="none" stroke-width=".9" stroke-linecap="round"/></svg>';return el}
+function makePlayerEl(){const el=document.createElement('div');el.className='pl';el.innerHTML='<div class="col"></div><div class="disc"></div><svg viewBox="0 0 36 62"><path d="M18 2C10 2 7 10 8 19L2 59h32L28 19C29 10 26 2 18 2z" fill="#1b1a24" stroke="#7ad9ff" stroke-width="1.4"/><ellipse cx="18" cy="17" rx="6" ry="7.5" fill="#07070b"/><circle cx="15.3" cy="17" r="1" fill="#8fe8ff"/><circle cx="20.7" cy="17" r="1" fill="#8fe8ff"/><path d="M9 38h18" stroke="#c9a65a" stroke-width="2"/><path d="M18 26v30" stroke="#2c2b3a" stroke-width="1.2"/></svg>';return el}
 
 /* ---------- Player glide + camera lock ---------- */
 // player = position shown on screen (glides smoothly); targetLL = latest real GPS fix.
@@ -200,7 +206,7 @@ function frame(now){track();
  if(moved){player=[player[0]+dx*.12,player[1]+dy*.12];playerMarker.setLngLat(player);
   if(dist(player,rangeAt)>.5){rangeAt=player.slice();map.getSource('range').setData(ringPoly(player,RANGE))}}
  const p=(now%2600)/2600;
- if(!gesturing&&!document.body.classList.contains('calm')&&(frameN++%3===0))map.getSource('pulse').setData(ringPoly(player,25+125*p,72,{o:+(0.9*(1-p)).toFixed(2)}));
+ if(!gesturing&&(frameN++%3===0))map.getSource('pulse').setData(ringPoly(player,25+125*p,72,{o:+(0.9*(1-p)).toFixed(2)}));
  if(moved&&following&&!intro&&gotFirst&&!gesturing&&!map.isEasing())map.jumpTo({center:player}); // map stays anchored on the player
  requestAnimationFrame(frame)}
 
@@ -214,7 +220,7 @@ map.on('load',()=>{
  playerMarker=new maplibregl.Marker({element:makePlayerEl(),anchor:'bottom'}).setLngLat(player).addTo(map);
  spawn(player);rangeAt=player.slice();
  requestAnimationFrame(frame);
- gate();
+ boot();
 });
 
 /* ---------- Modal (permission prompt + errors) ---------- */
@@ -271,12 +277,12 @@ $('compass').addEventListener('click',()=>map.easeTo({bearing:0,duration:500}));
 $('layerButton').addEventListener('click',()=>{const flat=map.getPitch()<10;map.easeTo({pitch:flat?START.pitch:0,duration:600});toast(flat?'3D view':'Top-down view')});
 const nearest=t=>items.filter(x=>x.t===t).sort((a,b)=>dist(targetLL,a.ll)-dist(targetLL,b.ll))[0];
 $('menuButton').addEventListener('click',()=>$('menu').classList.toggle('open'));
-$('menu').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{$('menu').classList.remove('open');if(b.dataset.action==='Inventory')return document.querySelector('[data-tab="Character"]').click();if(b.dataset.action==='Sign Out')return AUTH.signOut();if(b.dataset.action==='Settings')return document.querySelector('[data-tab="Settings"]').click();if(b.dataset.action==='Help & Safety')return gotoPage('Help');if(b.dataset.action!=='Close')toast(b.dataset.action+' screen is a future build step.')}));
-document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>{document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));item.classList.add('active');const t=item.dataset.tab;$('qpanel').classList.toggle('open',t==='Quests');invToggle(t==='Character');pgToggle(['Shop','Champions','Settings'].includes(t)?t:null);if(t==='Quests')render()}));
+$('menu').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{$('menu').classList.remove('open');if(b.dataset.action==='Inventory')return document.querySelector('[data-tab="Character"]').click();if(b.dataset.action!=='Close')toast(b.dataset.action+' screen is a future build step.')}));
+document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>{document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));item.classList.add('active');const t=item.dataset.tab;$('qpanel').classList.toggle('open',t==='Quests');invToggle(t==='Character');if(t==='Quests')render();else if(t!=='Map'&&t!=='Character')toast(t+' screen is not connected yet.')}));
 
 /* ================= QUESTS ================= */
 const QK='realm_quests_v1',MULT={daily:1,weekly:1.5,monthly:2},SCALE={daily:1,weekly:5,monthly:15},MAXEXP=10,MAXRND=5,panel=$('qpanel');
-const metric=()=>!!(S&&S.set&&S.set.units==='metric'),mi=m=>metric()?(Math.round(m/10)/100)+' km':(Math.round(m/1609.344*100)/100)+' mi',ft=m=>metric()?Math.round(m).toLocaleString()+' m':Math.round(m*3.28084).toLocaleString()+' ft';
+const mi=m=>(Math.round(m/1609.344*100)/100)+' mi',ft=m=>Math.round(m*3.28084).toLocaleString()+' ft';
 const POOL=[
  {id:'chest',kind:'chest',goal:1,xp:6,title:n=>`Open ${n} treasure chest${n>1?'s':''}`},
  {id:'quest',kind:'quest',goal:1,xp:8,title:n=>`Complete ${n} quest marker${n>1?'s':''}`},
@@ -296,14 +302,11 @@ let S=null;try{S=JSON.parse(localStorage.getItem(QK))}catch(e){}
 if(!S||!S.k)S={k:keys(),daily:mkTier('daily'),weekly:mkTier('weekly'),monthly:mkTier('monthly'),rnd:{n:0},claimed:{},hashes:[],xp:0,need:50,lvl:1,xpv:2};
 ['daily','weekly','monthly'].forEach(t=>{const T=S[t];T.q=T.q.map(q=>{if(q.kind!=='rift'&&q.kind!=='boss'&&q.kind!=='explore')return q;const o=POOL.find(p=>!T.q.some(x=>x.id===p.id));if(!o)return null;const g=o.goal*SCALE[t];return{id:o.id,kind:o.kind,goal:g,p:0,xp:o.xp,done:false,title:o.title(g)}}).filter(Boolean)}); // drop removed quest types from saved games
 if(S.xpv!==2){S.lvl=Math.min(100,Math.max(1,S.lvl|0));S.need=needFor(S.lvl);S.xp=Math.min(S.xp||0,S.need-1);['daily','weekly','monthly'].forEach(t=>{S[t].q.forEach(q=>{const o=POOL.find(p=>p.id===q.id);if(o)q.xp=o.xp});S[t].ms.xp=MSXP});S.xpv=2} // move old saves onto the new XP formula + reward values
-S.chaos=S.chaos||{last:0,fx:null};S.set=S.set||{units:'imperial',calm:false,vib:true};S.stats=S.stats||{walk:0,chest:0,quest:0,nature:0,rift:0,boss:0};
-S.taken=S.taken||{};S.loot=S.loot||{claimed:{}};
-if(!S.acct&&S.cls)S.acct={id:'local',name:'Adventurer',race:'human',cls:S.cls,created:Date.now(),local:true}; // older saves that already picked a class become an account with that class locked
-if(S.acct)S.cls=S.acct.cls; // the account is the source of truth for class; it can never drift from it
-S.hero=S.hero||{hp:100,eq:{},inv:[],pot:{h35:0,full:0,res:0}};
+S.chaos=S.chaos||{last:0,fx:null};
+S.taken=S.taken||{};S.loot=S.loot||{claimed:{}};S.hero=S.hero||{hp:100,eq:{},inv:[],pot:{h35:0,full:0,res:0}};
 let tab='daily',rndOffers=[],expl=[],lastWalk=null,acc=0;
-function save(){try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}pushSoon()}
-function hud(){const x=document.querySelector('.xptext'),b=document.querySelector('.xpfill'),l=document.querySelector('.level');if(x)x.textContent=S.lvl>=100?'MAX LEVEL':`${Math.floor(S.xp).toLocaleString()} / ${S.need.toLocaleString()} XP`;if(b)b.style.width=(S.lvl>=100?100:Math.min(100,100*S.xp/S.need))+'%';if(l)l.textContent=S.lvl;const pn=document.querySelector('.player-name');if(pn&&S.acct)pn.textContent=S.acct.name;const d=document.querySelector('.nav-dot');if(d)d.style.display=S.daily.ms.done?'none':''}
+function save(){try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}if(window.realmCloud)window.realmCloud.queue(S)}
+function hud(){const x=document.querySelector('.xptext'),b=document.querySelector('.xpfill'),l=document.querySelector('.level');if(x)x.textContent=S.lvl>=100?'MAX LEVEL':`${Math.floor(S.xp).toLocaleString()} / ${S.need.toLocaleString()} XP`;if(b)b.style.width=(S.lvl>=100?100:Math.min(100,100*S.xp/S.need))+'%';if(l)l.textContent=S.lvl;const d=document.querySelector('.nav-dot');if(d)d.style.display=S.daily.ms.done?'none':''}
 function needFor(L){return 50+(L-1)*10}   // XP to go from level L to L+1
 const ENC_CAP=300; // max XP per day from encounters (mimics, chest bonus, nature, bosses): they supplement quests, never overwhelm them
 function addXp(x){const cf=chaosFx();x=Math.round(x*(1+(clsMod().xpPct+(cf&&cf.k==='xp'?cf.pct:0))/100));if(S.lvl>=100)return hud();S.xp+=x;let up=0;while(S.xp>=S.need&&S.lvl<100){S.xp-=S.need;S.lvl++;S.need=needFor(S.lvl);up=1;toast('Level up! Level '+S.lvl)}if(S.lvl>=100)S.xp=0;if(up&&S.hero)S.hero.hp=stats().hp;hud()}
@@ -325,7 +328,7 @@ function rollover(){const k=keys();let ch=false;
  if(ch){S.k=k;Object.keys(S.claimed).forEach(c=>{const[t,p]=c.split('|');if(k[t]!==p)delete S.claimed[c]});save();hud();render();afterSpawn()}
  const n=rndOffers.length;rndOffers=rndOffers.filter(o=>o.exp>Date.now());if(n!==rndOffers.length)render()}
 // walking progress: ignore GPS jumps (>=80 m between frames) so teleports don't count
-function track(){if(!gotFirst)return;if(!lastWalk){lastWalk=targetLL.slice();return}const d=dist(lastWalk,targetLL);if(d<3)return;lastWalk=targetLL.slice();if(d<80){S.stats.walk=(S.stats.walk||0)+d;acc+=d*Math.max(.1,1+.15*clsMod().exp);if(acc>=10){ev('walk',acc);acc=0}}}
+function track(){if(!gotFirst)return;if(!lastWalk){lastWalk=targetLL.slice();return}const d=dist(lastWalk,targetLL);if(d<3)return;lastWalk=targetLL.slice();if(d<80){acc+=d*Math.max(.1,1+.15*clsMod().exp);if(acc>=10){ev('walk',acc);acc=0}}}
 
 /* ---- location safety: fail closed (no map data = no quest locations) ---- */
 const BAD=new Set(['police','ambulance_station','fire_station','hospital','school','kindergarten','college','university','cemetery','grave_yard','military','prison']);
@@ -373,7 +376,7 @@ function card(t,o){const pct=Math.round(100*Math.min(1,t.p/t.goal)),sub=o.sub!=n
  return `<div class="qcard${t.done?' done':''}${t.ready&&!t.done?' rdy':''}${o.ms?' ms':''}" data-act="${o.act||''}" data-i="${o.i==null?'':o.i}"><div class="qt"><b>${t.title}</b><span>+${o.xp} XP</span></div>${o.nobar?'':`<div class="qbar"><i style="width:${pct}%"></i></div>`}<div class="qs">${sub}</div></div>`}
 function render(){if(!panel.classList.contains('open'))return;const T=S[tab],tn={daily:'Daily',weekly:'Weekly',monthly:'Monthly'},M=MULT[tab],d=o=>ft(dist(targetLL,o.ll));
  let h=`<div class="qtabs">${Object.keys(tn).map(k=>`<div class="qtab${k===tab?' on':''}" data-act="tab" data-i="${k}">${tn[k]}</div>`).join('')}</div>`;
- h+=T.q.map((q,i)=>card({...q,title:ttl(q)},{xp:Math.round(q.xp*M*lvlScale()),act:'q',i})).join('');
+ h+=T.q.map((q,i)=>card(q,{xp:Math.round(q.xp*M*lvlScale()),act:'q',i})).join('');
  h+=card({title:MS[tab],p:T.ms.p,goal:5,done:T.ms.done,ready:T.ms.ready,kind:'ms'},{ms:1,xp:Math.round(T.ms.xp*M*lvlScale()),act:'ms'});
  const st=panel.scrollTop;panel.innerHTML=h;panel.scrollTop=st}
 const HINT={chest:'Open treasure chests on the map.',quest:'Complete quest markers on the map.',nature:'Gather nature discoveries on the map.',walk:'Walk on public paths and sidewalks.',rift:'Close arcane rifts on the map.',boss:'Challenge dark lairs on the map.',explore:'Finish explorable quests.',photo:'Photograph a public scene from a safe spot.'};
@@ -382,7 +385,7 @@ panel.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b|
  if(a==='tab'){tab=i;render();return}
  const tr=tab,M=MULT[tr];
  if(a==='q'){const q=S[tr].q[i];if(!q)return;const xp=Math.round(q.xp*M*lvlScale()),prog=q.kind==='walk'?`${(q.p/1609.344).toFixed(2)} / ${mi(q.goal)}`:`${Math.floor(q.p)} / ${q.goal}`,
-  base={icon:q.kind==='photo'?'📷':'📜',title:ttl(q),text:`${prog}\nReward: +${xp} XP${q.done?'':'\n'+HINT[q.kind]}`};
+  base={icon:q.kind==='photo'?'📷':'📜',title:q.title,text:`${prog}\nReward: +${xp} XP${q.done?'':'\n'+HINT[q.kind]}`};
   if(q.done)return popup({...base,btn:'Completed'});
   if(q.ready)return popup({...base,btn:'Complete Quest',on:()=>claim(tr,q)});
   if(q.kind==='photo')return popup({...base,btn:'📷 Enter Photo',on:()=>askPhoto({done:()=>ev('photo')})});
@@ -493,13 +496,13 @@ function parts(){const b=lvlBase(S.lvl),g={atk:0,def:0,hp:0},cm=clsMod();for(con
  return{b,g,cm,s}}
 function stats(){return parts().s}
 // Enemies scale off a "par" hero: level base + half of a full set of level-appropriate gear. Naked heroes lose; at-par gear wins; better gear wins easier.
-const ENEMY={mimic:{n:'Mimic',m:[.6,.7,.5]},smimic:{n:'Strong Mimic',m:[.9,.9,.8]},boss:{n:'Dark Lair Boss',m:[2.5,.9,.8]},rift:{n:'Rift Horror',m:[1.4,.9,.8]}};
+const ENEMY={mimic:{n:'Mimic',m:[.6,.7,.5]},smimic:{n:'Strong Mimic',m:[.9,.9,.8]},boss:{n:'Dark Lair Boss',m:[2.5,.9,.8]}};
 function enemy(k,L){const b=lvlBase(L),r=L<10?0:L<30?1:L<55?2:L<80?3:4,g={atk:0,def:0,hp:0};['helm','chest','feet','hands','main','off','amulet','ring','ring','cloak'].forEach(t=>{const c=CAT[t+'_'+RAR[r]];g.atk+=c.atk;g.def+=c.def;g.hp+=c.hp});
  const m=ENEMY[k].m;let hp=(b.hp+.5*g.hp)*m[0];if(k==='boss')hp*=1+.1*clsMod().chaosReq;
  return{n:ENEMY[k].n,hp:Math.max(1,Math.round(hp)),atk:Math.max(1,Math.round((b.atk+.5*g.atk)*m[1])),def:Math.round((b.def+.5*g.def)*m[2])}}
 // Damage = ceil(ATK x 10 / (10 + DEF)): DEF has diminishing returns (10 DEF halves damage). Min 1 per hit, max 50% of the target's max HP per hit. No randomness.
 const hitDmg=(a,d)=>Math.max(1,Math.ceil(a*10/(10+Math.max(0,d))));
-function fight(k,mul=1){const s=stats(),e=enemy(k,S.lvl),cm=clsMod(),boss=k==='boss',st=Math.floor(H().hp);e.hp=Math.max(1,Math.round(e.hp*mul));let ph=st,eh=e.hp,r=0,first=true;
+function fight(k){const s=stats(),e=enemy(k,S.lvl),cm=clsMod(),boss=k==='boss',st=Math.floor(H().hp);let ph=st,eh=e.hp,r=0,first=true;
  while(r<300){r++;let d=hitDmg(s.atk,e.def-cm.pierce);if(first&&cm.first)d=Math.ceil(d*(1+cm.first/100));first=false;if(boss)d+=cm.holy;eh-=Math.min(d,Math.ceil(e.hp*.5));if(eh<=0)break;
   ph-=Math.min(hitDmg(e.atk,s.def),Math.ceil(s.hp*.5));if(ph<=0)break}
  return{win:eh<=0,hp:Math.max(0,ph),dmg:st-Math.max(0,ph),rounds:r,e}}
@@ -517,10 +520,10 @@ function lootFrom(it){const boss=it.t==='boss',src=boss?'boss':'chest',ck=it.key
  if(!ck||C[ck])return toast('Already claimed.');
  const claim=()=>{Object.keys(C).forEach(k=>{if(C[k]<Date.now())delete C[k]});C[ck]=it.exp||Date.now()+864e5};   // recorded BEFORE any reward is granted
  const battle=k=>{const f=fight(k),e=f.e;L.push('⚔ '+e.n+'  HP '+e.hp+' · ATK '+e.atk+' · DEF '+e.def,f.win?'Victory in '+f.rounds+' rounds. You lost '+f.dmg+' HP ('+f.hp+'/'+stats().hp+').':'Defeat after '+f.rounds+' rounds.');h.hp=f.hp;if(!f.win)L.push(down());return f.win};
- const done=(icon,title)=>{buzz(60);save();hud();showModal('loot',{icon,title,text:L.join('\n'),primary:'Continue',onPrimary:()=>hideModal('loot')})};
+ const done=(icon,title)=>{save();hud();showModal('loot',{icon,title,text:L.join('\n'),primary:'Continue',onPrimary:()=>hideModal('loot')})};
  let item=null,bonus=false,res;
  if(boss){if(!battle('boss'))return done('💀','Defeated');   // losing a boss claims nothing: you may retry once recovered
-  claim();bump('boss');const xp=Math.round(250*(1+.1*clsMod().chaosBonus));addEnc(xp);L.push('Reward: +'+xp+' XP');}
+  claim();const xp=Math.round(250*(1+.1*clsMod().chaosBonus));addEnc(xp);L.push('Reward: +'+xp+' XP');}
  const roll=d20();res=look(src,roll);L.push('🎲 D20 roll: '+roll);
  if(MIMIC[res]){const m=MIMIC[res];claim();if(!battle(res))return done('👹',m.name+'!');addEnc(m.xp);item=grantItem(src,m.loot);L.push('Reward: +'+m.xp+' XP','★ '+fmtI(item))}
  else{if(!boss)claim();
@@ -533,91 +536,20 @@ function lootFrom(it){const boss=it.t==='boss',src=boss?'boss':'chest',ck=it.key
  done(boss?'💀':'🧰',boss?'Dark Lair Conquered':'Chest Opened')}
 function gatherNature(it){const cm=clsMod(),x=Math.max(1,Math.round(3*(1+.15*cm.exp))),m=['Nature gathered! +'+x+' XP'];addEnc(x);if(cm.herb&&ri(100)<(it.green?50:25)){H().pot.h35++;m.push('+35% Health Potion')}save();toast(m.join(' · '))}
 /* ---- class selection + character screen ---- */
-const cl=document.createElement('div');cl.style.cssText='position:absolute;inset:0;z-index:880;display:none;overflow-y:auto;padding:14px 12px 24px;background:#0b0a08f8;color:#ead8ac';panel.parentNode.appendChild(cl);
+const cl=document.createElement('div');cl.style.cssText='position:absolute;inset:0;z-index:900;display:none;overflow-y:auto;padding:14px 12px 24px;background:#0b0a08f8;color:#ead8ac';panel.parentNode.appendChild(cl);
 const lines=c=>{const i=clsInfo(c);return i.P.map(t=>'<div class="qs" style="color:#7be37a">＋ '+t+'</div>').join('')+i.N.map(t=>'<div class="qs" style="color:#ff8a7a">－ '+t+'</div>').join('')};
-/* ================= ACCOUNT ================= */
-// Paste your Supabase Project URL and anon (public) key below. Leave both empty to run in local-only mode.
-// The anon key is safe in the browser because row level security (see supabase_setup.sql) protects the data. NEVER paste the service_role key here.
-const CLOUD={url:'',key:''};
-var sb=null,cloudUser=null,pushT=null,pushing=false; // var on purpose: save() can run before this line executes
-if(CLOUD.url&&CLOUD.key){if(window.supabase)sb=window.supabase.createClient(CLOUD.url,CLOUD.key);else setTimeout(()=>toast('Could not load the sign-in library. Check your connection and reload.'),800)}
-const NAME_BAD='Name must be 3-16 letters, numbers, spaces, - or \'.',HOME=location.origin+location.pathname;
-const AUTH={
- get cloud(){return !!sb},
- session(){return S.acct||null},
- validName(n){return /^[A-Za-z0-9][A-Za-z0-9 '-]{2,15}$/.test(n)},
- async create({name,cls}){
-  if(!AUTH.validName(name))throw new Error(NAME_BAD);
-  if(!CLASSES[cls]||!S.unlocked.classes.includes(cls))throw new Error('That class is not unlocked.');
-  if(sb){if(!cloudUser)throw new Error('Please sign in first.');if(S.acct&&S.acct.id===cloudUser.id)throw new Error('Account already exists');
-   const{error}=await sb.from('profiles').insert({id:cloudUser.id,name,race:'human',cls}); // server enforces: one row per user, no later edits
-   if(error)throw new Error(error.code==='23505'?'That name is taken. Try another.':'Could not create your account. Try again.');
-   S.uid=cloudUser.id;S.acct={id:cloudUser.id,name,race:'human',cls}}
-  else{if(S.acct)throw new Error('Account already exists');S.acct={id:'local',name,race:'human',cls,created:Date.now(),local:true}}
-  S.cls=cls;S.hero.hp=stats().hp;save();hud();return S.acct}, // class is written once here and never changed afterward
- async google(){if(!sb)return;const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:HOME}});if(error)toast(error.message)},
- async apple(){toast('Apple sign-in is coming soon.')},
- async email(a){if(!sb)return;if(!/^\S+@\S+\.\S+$/.test(a))return toast('Enter a valid email address.');const{error}=await sb.auth.signInWithOtp({email:a,options:{emailRedirectTo:HOME}});toast(error?error.message:'Check your email for a sign-in link.')},
- async signIn(){toast('Sign-in arrives once the online backend is connected.')},
- signOut(){showModal('signout',{icon:'🚪',title:'Sign out?',text:sb?'Your progress is saved to your account. Sign back in to continue.':'Accounts are not online yet. This profile lives only on this device, so signing out ERASES it, including your class.',primary:'Sign Out',
-  onPrimary:async()=>{try{if(sb){await pushNow();await sb.auth.signOut()}}catch(e){}try{localStorage.removeItem(QK)}catch(e){}location.reload()},secondary:'Cancel',onSecondary:()=>hideModal('signout')})}};
-/* ---- cloud save: one jsonb row per account; newest save wins ---- */
-function pushSoon(){if(!sb||!cloudUser||!S||!S.acct||S.acct.local)return;clearTimeout(pushT);pushT=setTimeout(pushNow,8000)}
-async function pushNow(){if(!sb||!cloudUser||!S.acct||S.acct.local||pushing)return;pushing=true;clearTimeout(pushT);
- try{S.syncedAt=Date.now();S.uid=cloudUser.id;try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}
-  const{error}=await sb.from('game_state').upsert({user_id:cloudUser.id,state:cloudSnap(),updated_at:new Date().toISOString()});if(error)console.warn('cloud save failed',error.message)}catch(e){console.warn(e)}
- pushing=false}
-document.addEventListener('visibilitychange',()=>{if(document.hidden)pushNow()});
-setInterval(()=>{if(sb&&cloudUser&&S.acct&&!S.acct.local&&Date.now()-(S.syncedAt||0)>6e4)pushNow()},30000);
-/* ---- login screen ---- */
-const lg=document.createElement('div');lg.style.cssText=cl.style.cssText;panel.parentNode.appendChild(lg);
-const INP='width:100%;margin:8px 0;padding:11px;border-radius:5px;border:1px solid #a98649;background:#0b0a08;color:#fff0c6;font:16px Georgia,serif';
-function openLogin(){lg.innerHTML='<div class="qh" style="margin-top:6px"><span>The Realm</span></div>'
- +'<div class="qcard ms"><div class="qt"><b>Sign in to begin</b></div><div class="qs">Your adventurer and progress are saved to your account.</div><button class="qbtn" data-l="google">Continue with Google</button><button class="qbtn" data-l="apple" style="opacity:.55">Continue with Apple (coming soon)</button></div>'
- +'<div class="qcard"><div class="qt"><b>Email</b></div><div class="qs">We email you a one-tap sign-in link. No password.</div><input id="lgMail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" style="'+INP+'"><button class="qbtn" data-l="email">Email me a sign-in link</button></div>';
- lg.style.display='block';lg.scrollTop=0}
-lg.addEventListener('click',e=>{const k=e.target.dataset.l;if(k==='google')AUTH.google();else if(k==='apple')AUTH.apple();else if(k==='email')AUTH.email(($('lgMail').value||'').trim())});
-/* ---- gate: runs once the map is ready. Decides login -> profile -> cloud save -> GPS ---- */
-async function gate(){
- if(!sb){if(S.acct)boot();else bootPending=true;return}   // local-only mode (no keys set)
- let u=null;try{const r=await sb.auth.getSession();u=r.data&&r.data.session&&r.data.session.user}catch(e){}
- if(!u)return openLogin();
- cloudUser=u;lg.style.display='none';sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT')location.reload()});
- if(S.uid&&S.uid!==u.id){try{localStorage.removeItem(QK)}catch(e){}return location.reload()}   // a different account was on this device: start clean
- const pr=await sb.from('profiles').select('name,race,cls').eq('id',u.id).maybeSingle();
- if(pr.error)return showModal('cloud',{icon:'📡',title:'Cannot reach the server',text:'Check your connection and try again.',primary:'Retry',onPrimary:()=>location.reload()});
- if(!pr.data){if(S.acct&&S.acct.local){S.acct=null}bootPending=true;return openCreate()}   // first sign-in: choose name + class
- const P=pr.data;S.acct={id:u.id,name:P.name,race:P.race,cls:P.cls};S.cls=P.cls;S.uid=u.id;   // the server profile is the source of truth for class
- const gs=await sb.from('game_state').select('state').eq('user_id',u.id).maybeSingle(),cs=gs.data&&gs.data.state;
- if(cs&&(cs.syncedAt||0)>(S.syncedAt||0)){cs.uid=u.id;try{localStorage.setItem(QK,JSON.stringify(cs))}catch(e){}return location.reload()}   // cloud save is newer: load it
- save();hud();invRender();boot();pushNow()}
-/* ---- create-account screen: name + class (permanent). Race is Human for now; more races/classes arrive as DLC. ---- */
-let pickCls=null;
-function openCreate(){pickCls=null;
- cl.innerHTML='<div class="qh" style="margin-top:6px"><span>Create Your Adventurer</span></div>'
- +'<div class="qcard ms"><div class="qt"><b>Name</b><span>3-16 characters</span></div><input id="acctName" maxlength="16" autocomplete="off" placeholder="Adventurer name" style="width:100%;margin-top:8px;padding:11px;border-radius:5px;border:1px solid #a98649;background:#0b0a08;color:#fff0c6;font:16px Georgia,serif"></div>'
- +'<div class="qcard"><div class="qt"><b>Race</b><span>Human</span></div><div class="qs">Humans are adaptable and bold. More races will be unlockable later. 🔒</div></div>'
- +'<div class="qh"><span>Class</span><span style="color:#ff8a7a">Permanent</span></div>'
- +Object.keys(CLASSES).filter(k=>S.unlocked.classes.includes(k)).map(k=>'<div class="qcard" data-card="'+k+'"><div class="qt"><b>'+CLASSES[k].n+'</b><span></span></div><div class="qs">'+CLASSES[k].d+'</div>'+lines(CLASSES[k])+'<button class="qbtn" data-c="'+k+'">Select '+CLASSES[k].n+'</button></div>').join('')
- +'<button class="qbtn" id="acctGo" style="margin-top:16px;opacity:.45" disabled>Pick a class to continue</button><div class="qs" style="text-align:center;margin-top:10px">'+(sb?'Signed in. Your account saves to the cloud.':'Already have an account? <span id="acctIn" style="color:#f2d795;text-decoration:underline;cursor:pointer">Sign in</span>')+'</div>';
- cl.style.display='block';cl.scrollTop=0}
-cl.addEventListener('click',e=>{const t=e.target;
- if(t.id==='acctIn')return AUTH.signIn();
- if(t.dataset.c&&CLASSES[t.dataset.c]){pickCls=t.dataset.c;cl.querySelectorAll('[data-card]').forEach(c=>{const on=c.dataset.card===pickCls;c.classList.toggle('ms',on);c.querySelector('.qt span').textContent=on?'SELECTED':''});const g=$('acctGo');g.disabled=false;g.style.opacity='';g.textContent='Create '+CLASSES[pickCls].n;return}
- if(t.id==='acctGo'&&pickCls){const nm=($('acctName').value||'').trim().replace(/\s+/g,' ');
-  if(!AUTH.validName(nm))return toast('Name must be 3-16 letters, numbers, spaces, - or \'.');
-  showModal('confirmcls',{icon:'🔒',title:'Lock in '+CLASSES[pickCls].n+'?',text:'Your class is permanent for this account. Choose carefully.',primary:'Create '+nm,onPrimary:async()=>{hideModal('confirmcls');try{await AUTH.create({name:nm,cls:pickCls})}catch(er){return toast(er.message)}
-   cl.style.display='none';invRender();toast('Welcome, '+nm+'!');if(bootPending){bootPending=false;boot()}},secondary:'Go Back',onSecondary:()=>hideModal('confirmcls')})}});
+function openClass(first){cl.innerHTML='<div class="qh" style="margin-top:6px"><span>Choose Your Class</span>'+(first?'':'<span data-x="1" style="cursor:pointer">✕ Close</span>')+'</div>'+Object.keys(CLASSES).map(k=>'<div class="qcard'+(S.cls===k?' ms':'')+'"><div class="qt"><b>'+CLASSES[k].n+'</b><span>'+(S.cls===k?'CURRENT':'')+'</span></div><div class="qs">'+CLASSES[k].d+'</div>'+lines(CLASSES[k])+'<button class="qbtn" data-c="'+k+'">Choose '+CLASSES[k].n+'</button></div>').join('');cl.style.display='block';cl.scrollTop=0}
+cl.addEventListener('click',e=>{if(e.target.dataset.x)cl.style.display='none';const k=e.target.dataset.c;if(!k||!CLASSES[k])return;S.cls=k;H().hp=Math.min(H().hp,stats().hp);cl.style.display='none';save();invRender();toast('You are now a '+CLASSES[k].n)});
 /* ---- inventory / character screen ---- */
 const inv=document.createElement('div');inv.className='qpanel';inv.id='inv';panel.parentNode.appendChild(inv);
 function invToggle(on){inv.classList.toggle('open',on);if(on)invRender()}
 function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,i)=>{const c=CAT[it.cid];return`<div class="qcard"><div class="qt"><b style="color:${RC[c.rarity]}">${c.name}</b><span>${cap(c.rarity)} ${TN[c.type]}</span></div><div class="qs">${fmtS(iStat(it))}${it.extra?' · extra +'+it.extra.val+' '+it.extra.stat.toUpperCase():''}</div><button class="qbtn" data-a="${a}" data-i="${i}">${btn}</button></div>`};
- let o=`<div class="qcard ms"><div class="qt">${c?c.n:'No class'} · Level ${S.lvl}<span>${h.hp<=0?'DOWNED':Math.floor(h.hp)+' / '+s.hp+' HP'}</span></div><div class="qbar"><i style="width:${Math.max(0,100*h.hp/s.hp)}%"></i></div><div class="qs"><b>ATK ${s.atk} · DEF ${s.def} · HP ${s.hp}</b></div><div class="qs">Level base: ${p.b.atk} ATK · ${p.b.def} DEF · ${p.b.hp} HP</div><div class="qs">Equipment: ${sg(p.g.atk)} ATK · ${sg(p.g.def)} DEF · ${sg(p.g.hp)} HP</div><div class="qs">Class: ${sg(p.cm.atk)} ATK · ${sg(p.cm.def)} DEF · ${sg(p.cm.hp)} HP</div>${c?lines(c):''}${chaosFx()?'<div class="qs">🎲 Chaos: '+fxText(chaosFx())+' ('+Math.ceil((chaosFx().until-Date.now())/6e4)+' min left)</div>':''}<div class="qs">🔒 Class locked to your account</div></div><div class="qh"><span>Potions</span></div>`;
+ let o=`<div class="qcard ms"><div class="qt">${c?c.n:'No class'} · Level ${S.lvl}<span>${h.hp<=0?'DOWNED':Math.floor(h.hp)+' / '+s.hp+' HP'}</span></div><div class="qbar"><i style="width:${Math.max(0,100*h.hp/s.hp)}%"></i></div><div class="qs"><b>ATK ${s.atk} · DEF ${s.def} · HP ${s.hp}</b></div><div class="qs">Level base: ${p.b.atk} ATK · ${p.b.def} DEF · ${p.b.hp} HP</div><div class="qs">Equipment: ${sg(p.g.atk)} ATK · ${sg(p.g.def)} DEF · ${sg(p.g.hp)} HP</div><div class="qs">Class: ${sg(p.cm.atk)} ATK · ${sg(p.cm.def)} DEF · ${sg(p.cm.hp)} HP</div>${c?lines(c):''}${chaosFx()?'<div class="qs">🎲 Chaos: '+fxText(chaosFx())+' ('+Math.ceil((chaosFx().until-Date.now())/6e4)+' min left)</div>':''}<button class="qbtn" data-a="cls">Change Class</button></div><div class="qh"><span>Potions</span></div>`;
  o+=Object.keys(POTS).map(k=>`<div class="qcard"><div class="qt">${POTS[k].icon} ${POTS[k].name}<span>x${h.pot[k]}</span></div>${h.pot[k]?`<button class="qbtn" data-a="pot" data-i="${k}">Use</button>`:''}</div>`).join('');
  o+='<div class="qh"><span>Equipped</span></div>'+SLOTS.map(k=>h.eq[k]?row(h.eq[k],'Unequip','un',k).replace('<span>','<span>'+SN[k]+' · '):`<div class="qcard" style="opacity:.55"><div class="qt">${SN[k]}<span>Empty</span></div></div>`).join('');
- o+=`<div class="qh"><span>Backpack</span><span>${h.inv.length}</span></div>`+(h.inv.length?h.inv.map(it=>row(it,'Equip','eq',it.uid)).join(''):'<div class="qaw">No items yet. Open chests!</div>');
+ o+=`<div class="qh"><span>Backpack</span><span>${h.inv.length}</span></div>`+(h.inv.length?h.inv.map(it=>row(it,'Equip','eq',it.uid)).join(''):'<div class="qaw">No items yet. Open chests!</div>')+'<div class="qh"><span>Account</span></div><div class="qcard"><button class="qbtn" data-a="out">Sign out</button></div>';
  const st=inv.scrollTop;inv.innerHTML=o;inv.scrollTop=st}
-inv.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const h=H(),a=b.dataset.a,i=b.dataset.i;
+inv.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const h=H(),a=b.dataset.a,i=b.dataset.i;if(a==='cls')return openClass(false);if(a==='out')return window.realmCloud&&window.realmCloud.signOut();
  if(a==='eq'){const ix=h.inv.findIndex(x=>x.uid===i);if(ix<0)return;const it=h.inv[ix],sl=TYPE_SLOT[CAT[it.cid].type],s=sl.find(k=>!h.eq[k])||sl[0],old=h.eq[s];h.inv.splice(ix,1);h.eq[s]=it;if(old)h.inv.push(old)}
  else if(a==='un'){if(h.eq[i]){h.inv.push(h.eq[i]);h.eq[i]=null}}
  else if(a==='pot'){const mx=stats().hp;if(!h.pot[i])return;
@@ -643,107 +575,43 @@ function tempt(){const C=S.chaos,now=Date.now();if(now<C.last+CHAOS_CD)return ch
  const t=setInterval(()=>{$('mIcon').textContent='🎲 '+(1+ri(20));if(++n<14)return;clearInterval(t);showModal('chaos',{icon:'🎲 '+roll,title:CHAOS[res][0],text:txt,...okBtn('Accept Fate')});hud();if(inv.classList.contains('open'))invRender()},90)}
 $('chaosButton').addEventListener('click',chaosOpen);
 
-/* ================= ENCOUNTERS: Quest markers + Arcane Rifts ================= */
-// Each choice: [label, stat, difficulty, success text, setback text]. Checks: d20 + stat bonus vs difficulty (rises with level). Natural 20 always succeeds, natural 1 always fails.
-const ENC_Q={
- "Investigate the Strange Lights":{i:"Pale lights drift between the trees, blinking in a rhythm that almost sounds like speech.",r:[
-  {q:"The lights drift closer. What do you do?",c:[["Stride into the glow","atk",12,"The lights scatter around you, revealing a ring of humming stones.","The lights flare and singe your sleeves."],["Slip around through the shadows","def",10,"You circle unseen and spot the stones they guard.","A branch snaps. The lights wink out, then rush you."],["Hold still and let them come","luck",9,"The lights settle on your shoulders, curious and warm.","They swirl past, mocking, and tug at your pack."]]},
-  {q:"The humming stones pulse. How do you claim what they guard?",c:[["Pry the hidden cache free","atk",12,"The stones crack open, spilling glittering dust.","The cache stays stuck and the stones sting your hands."],["Brace against the pulse","hp",10,"You weather the surge and the stones go quiet.","The pulse rattles you to your boots."],["Whisper back in kind","luck",10,"The stones answer and unlock themselves.","The whisper echoes wrong. Something laughs."]]}]},
- "The Whispering Door":{i:"A weathered door stands alone in a field with no wall around it, murmuring your name.",r:[
-  {q:"The murmur grows insistent. How do you open it?",c:[["Force the latch","atk",12,"The latch gives with a groan.","The door shoves back and bruises your shoulder."],["Pick the lock quietly","def",11,"Tumblers click softly and the door yields.","The lock bites your fingers."],["Knock and wait politely","luck",9,"The whispering stops. The door swings open.","The whispers turn sour."]]},
-  {q:"Beyond the door the field folds into a dim corridor. You...",c:[["Charge through","atk",11,"You burst out the far side unscathed.","Shadows claw at you as you tumble through."],["Step lightly along the edges","def",11,"You find a hidden shelf holding a forgotten gift.","The floor shifts and you lose your footing."],["Walk straight down the middle","hp",10,"The corridor tests you and finds you steady.","The corridor squeezes the breath from you."]]}]},
- "The Lost Satchel":{i:"A battered satchel lies half-buried beside the path, a faded crest stitched on the flap.",r:[
-  {q:"The satchel is snagged on something. You...",c:[["Haul it free","atk",11,"It rips loose with a spray of dirt.","The strap snaps back and stings your wrist."],["Work the snag loose carefully","def",10,"The snag gives without a tear.","The cloth tears and a few things fall out of reach."],["Trust your luck and tug","luck",9,"It slides out as if it wanted to be found.","It catches harder. Nothing budges."]]},
-  {q:"Something small stirs inside the satchel. You...",c:[["Grab it before it escapes","atk",11,"You pin a startled, harmless sprite and it grants a gift to be let go.","It bites and bolts."],["Coax it out gently","def",10,"The sprite hops into your palm and shares its treasure.","It hides and refuses to come out."],["Offer it a snack and hope","luck",10,"The sprite adores you and leaves a gift.","It sniffs your offering and sneers."]]}]},
- "A Traveler’s Request":{i:"A weary traveler waves you over. “I must reach the old bridge before nightfall, but the road is unsafe.”",r:[
-  {q:"The road ahead is rough. How do you escort them?",c:[["Lead the way and clear it","atk",12,"You scare off whatever lurked on the road.","Something rushes you from the brush."],["Scout ahead and plan a safe route","def",10,"Your route keeps you both out of trouble.","You take a wrong turn and tire out."],["Carry their pack and keep pace","hp",10,"You hold a steady pace and the traveler is grateful.","The load drags at you."]]},
-  {q:"At the bridge a toll troll blocks the way. You...",c:[["Stare it down","atk",12,"The troll mutters and steps aside.","The troll laughs and swats you aside."],["Distract it and slip past","def",11,"You and the traveler cross unseen.","The troll catches your sleeve."],["Offer a clever riddle","luck",10,"The troll loves it and waves you through.","The troll groans and demands a fee."]]}]}};
-const ENC_R={i:"The air tears open into a swirl of violet light. Something stirs in the dark beyond.",r:[
- {q:"The rift pulls at you. You...",c:[["Plunge in headfirst","atk",13,"You land in a glittering cavern, weapon ready.","You tumble in off balance and scrape yourself."],["Edge in carefully","def",12,"You step through unseen and find a vantage point.","The edge crumbles and you slide."],["Let it carry you","hp",12,"The current passes through you harmlessly.","The pull wrenches at you."]]},
- {q:"A hall of drifting crystal lies ahead, and a shape coils in the center. You...",c:[["Smash through the crystals","atk",13,"Your path to the shape is clear.","Shards rain down on you."],["Weave between them","def",12,"You reach the shape unnoticed.","A crystal chimes and the shape turns."],["Trust fortune","luck",11,"The crystals part as if inviting you.","The crystals hum a warning."]]}]};
-const TAG={atk:"Bold · ATK",def:"Careful · DEF",hp:"Sturdy · HP",luck:"Fortune · Luck"};
-const encv=document.createElement('div');encv.style.cssText=cl.style.cssText.replace('z-index:880','z-index:870');panel.parentNode.appendChild(encv);
-function bump(k){S.stats[k]=(S.stats[k]||0)+1}
-function buzz(ms){try{if(S.set&&S.set.vib&&navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
-function ttl(q){const o=POOL.find(p=>p.id===q.id);return o?o.title(q.goal):q.title}
-function bonus(st){const s=stats();return st==='luck'?0:Math.min(10,st==='atk'?Math.ceil(s.atk/2):st==='def'?Math.ceil(s.def*.75)+1:Math.ceil(s.hp/15))}
-const dcFor=dc=>dc+Math.min(6,Math.floor(S.lvl/15));
-function encDef(){const P=S.pend;return P.t==='rift'?ENC_R:(ENC_Q[P.n]||ENC_Q["The Lost Satchel"])}
-function startEncounter(it){S.pend={t:it.t,n:it.name||'',r:0,w:0,last:null};save();showEnc()}   // progress is saved after every step, so a reload resumes here and choices can't be re-rolled
-function showEnc(){const P=S.pend;if(!P){encv.style.display='none';return}
- const D=encDef(),rift=P.t==='rift',R=D.r[P.r];
- let h='<div class="qh" style="margin-top:6px"><span>'+(rift?'✨ Arcane Rift':'📜 '+(P.n||'Quest'))+'</span><span>Step '+Math.min(P.r+1,D.r.length)+' / '+D.r.length+(rift?' + Boss':'')+'</span></div>';
- if(P.last){const L=P.last;h+='<div class="qcard ms"><div class="qt"><b>'+(L.ok?'Success':'Setback')+'</b><span>🎲 '+L.roll+(L.v?' + '+L.v:'')+' vs '+L.t+'</span></div><div class="qs" style="font-size:13px;color:#ead8ac;margin-top:8px">'+L.txt+'</div><button class="qbtn" data-e="next">Continue</button></div>'}
- else h+='<div class="qcard"><div class="qs" style="font-size:13px;color:#ead8ac">'+(P.r===0?D.i+'<br><br>':'')+R.q+'</div></div>'+R.c.map((c,i)=>{const n=dcFor(c[2])-bonus(c[1]);return'<div class="qcard" data-e="pick" data-i="'+i+'" style="cursor:pointer"><div class="qt"><b>'+c[0]+'</b><span>'+(n<=8?'Easy':n<=12?'Fair':'Risky')+'</span></div><div class="qs">'+TAG[c[1]]+'</div></div>'}).join('');
- encv.innerHTML=h;encv.style.display='block';encv.scrollTop=0}
-encv.addEventListener('click',e=>{const b=e.target.closest('[data-e]');if(!b||!S.pend)return;const P=S.pend,D=encDef();
- if(b.dataset.e==='pick'&&!P.last){const c=D.r[P.r]&&D.r[P.r].c[+b.dataset.i];if(!c)return;const roll=d20(),v=bonus(c[1]),t=dcFor(c[2]),ok=roll===20||(roll!==1&&roll+v>=t);
-  P.last={ok,roll,v,t,txt:ok?c[3]:c[4]};if(ok)P.w++;else if(H().hp>1)H().hp=Math.max(1,H().hp-Math.max(1,Math.round(stats().hp*.04)));   // a setback costs 4% max HP and can never down you
-  buzz(30);save();hud();showEnc()}
- else if(b.dataset.e==='next'&&P.last){P.last=null;P.r++;if(P.r>=D.r.length)finishEnc();else{save();showEnc()}}});
-function finishEnc(){const P=S.pend,h=H(),w=P.w,rift=P.t==='rift',L=[w+' of 2 steps succeeded.'];let icon=rift?'✨':'📜',title=rift?'Rift Conquered':'Quest Complete';S.pend=null;encv.style.display='none';
- if(!rift){const xp=[8,20,35][w];addEnc(xp);L.push('Reward: +'+xp+' XP');
-  if(w===2){const it=grantItem('chest','uncommon');L.push('★ '+fmtI(it))}else if(w===1&&ri(100)<35){const it=grantItem('chest','common');L.push('★ '+fmtI(it))}else if(w===0)title='Quest Over'}
- else{L.push('🐲 The Rift Horror rears up!'+(w?' Your '+(w>1?'successes have':'success has')+' weakened it.':''));
-  const f=fight('rift',1-.2*w),e=f.e;L.push('⚔ '+e.n+'  HP '+e.hp+' · ATK '+e.atk+' · DEF '+e.def,f.win?'Victory in '+f.rounds+' rounds. You lost '+f.dmg+' HP ('+f.hp+'/'+stats().hp+').':'Defeat after '+f.rounds+' rounds.');h.hp=f.hp;
-  if(f.win){const xp=60+10*w;addEnc(xp);L.push('Reward: +'+xp+' XP');const r=d20();L.push('🎲 D20 roll: '+r);const it=grantItem('event',r===20?'mythic':'rare');L.push('★ '+fmtI(it))}
-  else{L.push(down());title='Rift Lost';icon='💀'}}
- buzz(60);save();hud();showModal('loot',{icon,title,text:L.join('\n'),primary:'Continue',onPrimary:()=>hideModal('loot')});if(inv.classList.contains('open'))invRender()}
+H().hp=Math.min(H().hp,stats().hp);recover();setInterval(()=>{recover();if(inv.classList.contains('open'))invRender()},1e4);if(!S.cls)openClass(true);
 
-/* ================= PAGES: Shop, Champions, Settings, Help ================= */
-const pg=document.createElement('div');pg.className='qpanel';pg.id='pg';panel.parentNode.appendChild(pg);
-let pgName=null,lbCat='level';
-function pgToggle(n){pgName=n;pg.classList.toggle('open',!!n);if(n)pgRender()}
-function gotoPage(n){document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));$('qpanel').classList.remove('open');invToggle(false);pgToggle(n)}
-function pgRender(){const st=pg.scrollTop,f={Shop:pgShop,Champions:pgBoard,Settings:pgSettings,Help:pgHelp}[pgName];if(!f)return;pg.innerHTML=f();pg.scrollTop=st}
-const hd=t=>'<div class="qh" style="margin-top:6px"><span>'+t+'</span></div>';
-/* ---- Shop (real money) ---- */
-// Prices are PLACEHOLDERS. Real purchases must be granted by the SERVER after a verified payment (Stripe webhook, or App Store / Google Play receipt). The client never grants paid items.
-const PRODUCTS=[
- {id:'pot_h35_5',cat:'Potions',icon:'🧪',name:'Healing Potions ×5',desc:'Five 35% Health Potions.',price:'$0.99'},
- {id:'pot_full_3',cat:'Potions',icon:'⚗️',name:'Full Health Potions ×3',desc:'Three potions that restore all HP.',price:'$1.99'},
- {id:'pot_res_3',cat:'Potions',icon:'✨',name:'Resurrect Potions ×3',desc:'Revive on the spot when downed.',price:'$2.99'},
- {id:'pack_starter',cat:'Bundles',icon:'🎒',name:'Adventurer Starter Bundle',desc:'5 Healing, 2 Full Health and 2 Resurrect Potions.',price:'$4.99'},
- {id:'dlc_races',cat:'Expansions',icon:'🧝',name:'Race Pack I',desc:'New playable races for new adventurers.',soon:1},
- {id:'dlc_classes',cat:'Expansions',icon:'⚔️',name:'Class Pack I',desc:'Unlock new classes.',soon:1}];
-const PAY={live:false,buy(p){if(!p)return;if(!PAY.live)return showModal('shop',{icon:'🛒',title:'Store opens at launch',text:'Real-money purchases are not switched on yet, and nothing was charged. Prices shown are placeholders.',primary:'OK',onPrimary:()=>hideModal('shop')})}};
-function pgShop(){let h=hd('Shop')+'<div class="qcard ms"><div class="qs">Prices shown are placeholders. Real-money purchases are not live yet and nothing will be charged.</div></div>';
- ['Potions','Bundles','Expansions'].forEach(c=>{h+='<div class="qh"><span>'+c+'</span></div>'+PRODUCTS.filter(p=>p.cat===c).map(p=>'<div class="qcard"><div class="qt"><b>'+p.icon+' '+p.name+'</b><span>'+(p.soon?'Coming soon':p.price)+'</span></div><div class="qs">'+p.desc+'</div>'+(p.soon?'':'<button class="qbtn" data-act="buy" data-id="'+p.id+'">Buy</button>')+'</div>').join('')});
- return h+'<div class="qs" style="margin:14px 2px">Purchases use real money. Anyone under 18 needs a parent or guardian’s permission.</div>'}
-/* ---- Champions (leaderboards) ---- */
-// Stats are tracked here, but rankings need a server that computes scores itself (client-submitted scores can be edited by anyone).
-const BOARDS={level:['Level',()=>S.lvl,v=>'Lv '+v],walk:['Distance',()=>S.stats.walk||0,v=>mi(v)],chest:['Chests',()=>S.stats.chest||0,v=>v],quest:['Quests',()=>S.stats.quest||0,v=>v],rift:['Rifts',()=>S.stats.rift||0,v=>v],boss:['Dark Lairs',()=>S.stats.boss||0,v=>v]};
-function pgBoard(){const keys=Object.keys(BOARDS),b=BOARDS[lbCat],nm=S.acct?S.acct.name:'You';
- return hd('Champions')+'<div class="qtabs">'+keys.map(k=>'<div class="qtab'+(k===lbCat?' on':'')+'" data-act="lb" data-k="'+k+'" style="font-size:13px;padding:10px 2px;margin-bottom:0">'+BOARDS[k][0]+'</div>').join('')+'</div>'
- +'<div class="qh"><span>'+b[0]+'</span><span>All-time</span></div><div class="qcard ms"><div class="qt"><b>#— '+nm+' (you)</b><span>'+b[2](b[1]())+'</span></div></div>'
- +'<div class="qaw" style="font-size:13px">Global rankings go live with online accounts. Scores will be calculated by the server so they can’t be edited.</div>'}
-/* ---- Settings ---- */
-function pgSettings(){const a=S.acct,c=CLASSES[S.cls],t=S.set,row=(k,n,d,v)=>'<div class="qcard"><div class="qt"><b>'+n+'</b><span>'+v+'</span></div><div class="qs">'+d+'</div><button class="qbtn" data-act="set" data-k="'+k+'">Toggle</button></div>';
- return hd('Settings')+'<div class="qcard ms"><div class="qt"><b>'+(a?a.name:'Adventurer')+'</b><span>'+(a&&a.local?'Local profile':'Signed in')+'</span></div><div class="qs">Human · '+(c?c.n:'No class')+' · 🔒 Class is permanent</div><button class="qbtn" data-act="signout">Sign Out</button></div>'
- +row('units','Distance units','Miles and feet, or kilometers and meters.',t.units==='metric'?'Metric':'Imperial')
- +row('calm','Reduce motion','Stops marker bobbing and the pulse ring.',t.calm?'On':'Off')
- +row('vib','Vibration','Buzz on loot and encounter results.',t.vib?'On':'Off')
- +'<div class="qh"><span>Data</span></div><div class="qcard"><div class="qs">Clear the progress saved on this device.</div><button class="qbtn" data-act="wipe">Erase Local Data</button></div>'}
-/* ---- Help & Safety ---- */
-function pgHelp(){const c=(t,l)=>'<div class="qcard"><div class="qt"><b>'+t+'</b></div>'+l.map(x=>'<div class="qs" style="font-size:12px;color:#ead8ac;margin-top:6px">• '+x+'</div>').join('')+'</div>';
- return hd('Help &amp; Safety')
- +c('Play safe',['Never play while driving, cycling or crossing a road. Stop and look up.','Stay aware of traffic, steps and other people around you.','Stay on public paths and sidewalks. Never trespass or enter private property.','Skip any marker that looks unsafe, restricted or inconvenient. No reward is worth a risk.','Explore unfamiliar areas with a friend, and avoid playing alone after dark.'])
- +c('How markers work',['You must be inside the dashed circle (about '+ft(RANGE)+') to use a marker.','Chests, nature finds, quests and rifts refresh over time. Dark Lairs appear on even hours for 20 minutes.','Markers avoid highways, buildings, water, schools, hospitals, police and other sensitive places, but the map is not perfect. Use your judgement.'])
- +c('Photo quests',['Photograph public scenes from a safe, public spot.','Do not photograph people, children, private homes or restricted areas.'])
- +c('GPS trouble?',['Move to an open area and wait a few seconds for a fix.','Allow Location for this page in your browser settings.','Turn on precise location and check your internet connection.'])
- +c('Your data',['Your exact GPS position is used on your device to place markers and is not saved to your account.','Map pictures load from a public map service, which can see the area of the map you are viewing.','With an online account, your progress (level, items, quests, settings) is saved to it.','A full Privacy Policy and Terms of Service will be linked here before launch.'])}
-function applySet(){document.body.classList.toggle('calm',!!S.set.calm);render()}
-pg.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
- if(a==='lb'){lbCat=b.dataset.k;return pgRender()}
- if(a==='buy')return PAY.buy(PRODUCTS.find(p=>p.id===b.dataset.id));
- if(a==='set'){const k=b.dataset.k;if(k==='units')S.set.units=S.set.units==='metric'?'imperial':'metric';else S.set[k]=!S.set[k];applySet();save();return pgRender()}
- if(a==='signout')return AUTH.signOut();
- if(a==='wipe')return showModal('wipe',{icon:'🗑',title:'Erase local data?',text:'This clears the progress saved on this device.'+(sb?' Your cloud save will return the next time you sign in.':' With no online account yet, this cannot be undone.'),primary:'Erase',onPrimary:()=>{try{localStorage.removeItem(QK)}catch(e){}location.reload()},secondary:'Cancel',onSecondary:()=>hideModal('wipe')})});
-// cloud snapshot: drop keys that encode WHERE the player has been (grid cells, lair coordinates) so they are never uploaded
-function cloudSnap(){return{...S,taken:{},lairs:null,loot:{claimed:{}},claimed:Object.fromEntries(Object.entries(S.claimed||{}).filter(([k])=>!k.includes('exp:')))}}
-
-S.unlocked=S.unlocked||{races:['human'],classes:Object.keys(CLASSES)}; // DLC hook: later grant more races/classes here (server-side)
-H().hp=Math.min(H().hp,stats().hp);recover();setInterval(()=>{recover();if(inv.classList.contains('open'))invRender()},1e4);if(!sb&&!S.acct)openCreate();document.body.classList.toggle('calm',!!S.set.calm);if(S.pend)showEnc();
-
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(()=>{'use strict';
+// Supabase URL + publishable key are safe in front-end code: row-level security protects the data. NEVER put a secret/service_role key here.
+const SB_URL='https://qaacpipifsofisbnxxzo.supabase.co',SB_KEY='sb_publishable_dGmwmCAUzbbZkNmpd2Xp7g_b77y2ZRu',QK='realm_quests_v1',OK='realm_owner';
+const el=id=>document.getElementById(id),say=(m,bad)=>{const e=el('aMsg');e.textContent=m||'';e.className='am'+(bad?' bad':'')};
+if(!window.supabase){say('Could not load the login service. Check your connection and reload.',1);return}
+const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const back=location.origin+location.pathname;let started=false,uid=null,lastS=null,lastJson='',timer=null,busy=false;
+const busyUi=b=>['aGoogle','aIn','aUp'].forEach(i=>el(i).disabled=b);
+async function flush(){if(!lastS||!uid)return true;const s=lastS,json=JSON.stringify(s);if(json===lastJson)return true;const L=Math.max(1,s.lvl|0),xp=Math.floor(s.xp||0);
+ const{error}=await sb.from('players').upsert({id:uid,state:s,lvl:L,xp,total_xp:50*(L-1)+5*(L-1)*(L-2)+xp},{onConflict:'id'});if(error){console.warn('save failed',error.message);return false}lastJson=json;return true}
+const queue=s=>{lastS=s;clearTimeout(timer);timer=setTimeout(flush,4000)};
+async function signOut(){if(!(await flush())&&!confirm('Could not sync your latest progress. Sign out anyway?'))return;localStorage.removeItem(QK);localStorage.removeItem(OK);await sb.auth.signOut();location.reload()}
+async function begin(session){if(started)return;started=true;uid=session.user.id;busyUi(true);say('Loading your realm…');
+ try{const{data,error}=await sb.from('players').select('state').eq('id',uid).maybeSingle();if(error)throw error;
+  const cloud=data&&data.state&&Object.keys(data.state).length?data.state:null,owner=localStorage.getItem(OK);
+  if(cloud)localStorage.setItem(QK,JSON.stringify(cloud));          // saved game exists: cloud wins
+  else if(owner&&owner!==uid)localStorage.removeItem(QK);           // another account used this device: start fresh
+  localStorage.setItem(OK,uid);                                     // (an old unowned local save is adopted by the first account)
+ }catch(e){started=false;busyUi(false);say('Could not load your save. Check your connection and try again.',1);return}
+ window.realmCloud={queue,flush,signOut};el('auth').style.display='none';window.startRealm()}
+async function run(fn){if(busy)return;busy=true;busyUi(true);say('');try{await fn()}catch(e){say(e.message||'Something went wrong.',1)}busy=false;if(!started)busyUi(false)}
+const creds=()=>{const email=el('aEmail').value.trim(),password=el('aPass').value;if(!email||password.length<8)throw new Error('Enter your email and a password of 8+ characters.');return{email,password}};
+el('aGoogle').onclick=()=>run(async()=>{const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:back}});if(error)throw error});
+el('aIn').onclick=()=>run(async()=>{const{data,error}=await sb.auth.signInWithPassword(creds());if(error)throw error;if(data.session)begin(data.session)});
+el('aUp').onclick=()=>run(async()=>{const c=creds(),{data,error}=await sb.auth.signUp({...c,options:{emailRedirectTo:back}});if(error)throw error;if(data.session)begin(data.session);else say('Check your email to confirm your account, then sign in.')});
+el('aForgot').onclick=()=>run(async()=>{const email=el('aEmail').value.trim();if(!email)throw new Error('Type your email above first.');const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:back});if(error)throw error;say('Password reset email sent.')});
+sb.auth.onAuthStateChange((ev,session)=>{   // no awaits inside this callback (Supabase can deadlock); defer instead
+ if(ev==='PASSWORD_RECOVERY')setTimeout(async()=>{const p=prompt('Choose a new password (8+ characters)');if(p&&p.length>=8){const{error}=await sb.auth.updateUser({password:p});say(error?error.message:'Password updated.',!!error)}},0);
+ if(session&&(ev==='SIGNED_IN'||ev==='INITIAL_SESSION'))setTimeout(()=>begin(session),0);
+ if(ev==='SIGNED_OUT'&&started)location.reload()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)flush()});addEventListener('pagehide',flush);
 })();
-</script></body></html>
+</script>
+</body></html>
