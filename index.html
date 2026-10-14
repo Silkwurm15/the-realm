@@ -589,6 +589,7 @@ function chaosOpen(){const C=S.chaos||(S.chaos={last:0,fx:null}),wait=C.last+CHA
  showModal('chaos',{icon:'🎲',title:'Chaos',text:'Chaos is in the eye of the beholder.',primary:'Tempt Fate',onPrimary:tempt,secondary:'Not Today',onSecondary:()=>hideModal('chaos')})}
 async function tempt(){showModal('chaos',{icon:'🎲',title:'Fate is turning…',text:'',primary:'…',onPrimary:()=>{}});$('mSecondary').style.display='none';
  const r=await act('tempt',{});if(!r)return showModal('chaos',{icon:'🎲',title:'Fate is silent',text:(act.err||'Could not reach the server.')+'\nTry again in a moment.',...okBtn('OK')});   // the d20 is rolled and stored on the SERVER: reloading or editing the save can't change it
+ if(!r.result||!CHAOS[r.result.res]){console.warn('tempt: unexpected server reply',r);return showModal('chaos',{icon:'🎲',title:'Fate is tangled',text:'The server answered, but not in a form the game understands.\n'+JSON.stringify(r).slice(0,400),...okBtn('OK')})}
  const{roll,eff,res,fx,extra}=r.result,txt=['🎲 D20 roll: '+roll+(eff!==roll?' (counts as '+eff+')':''),CHAOS[res][1],fx?'Effect: '+fxText(fx)+' for 60 minutes':extra].filter(Boolean).join('\n');
  let n=0;const t=setInterval(()=>{$('mIcon').textContent='🎲 '+(1+ri(20));if(++n<14)return;clearInterval(t);showModal('chaos',{icon:'🎲 '+roll,title:CHAOS[res][0],text:txt,...okBtn('Accept Fate')});hud();if(inv.classList.contains('open'))invRender()},90)}
 $('chaosButton').addEventListener('click',chaosOpen);
