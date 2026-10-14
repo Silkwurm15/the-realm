@@ -161,7 +161,7 @@ map.on('styleimagemissing',e=>{const f=PATTERNS[e.id];if(f&&!map.hasImage(e.id))
 let errShown=false;map.on('error',e=>{console.error(e&&e.error||e);if(!errShown){errShown=true;const m=(e&&e.error&&e.error.message)||'unknown error';toast('Map problem: '+m.slice(0,140))}});
 
 /* ---------- Game layers ---------- */
-const RANGE=150; // meters: radius of the circle around the player (diameter = 2 x RANGE)
+const RANGE=3000; // meters: radius of the circle around the player (diameter = 2 x RANGE)
 let player=FALLBACK.slice(),following=false,watchId=null,playerMarker=null;
 const SVG={
  quest:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 3h3l-.6 11h-1.8zM12 16.6a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8z"/></svg>',
