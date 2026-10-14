@@ -371,7 +371,7 @@ async function verifyEvidence(e){const cl=window.realmCloud,uid=cl&&cl.uid();if(
  catch(x){console.warn(x);toast('Photo upload failed. Check your connection.');return false}}
 pf.onchange=async()=>{const f=pf.files[0],c=pctx;pctx=null;if(!f||!c)return;
  if(!/^image\//.test(f.type))return toast('Please submit a photo.');
- if(Date.now()-f.lastModified>6e5)return toast('Take the photo now. Older photos are not accepted.');
+ if((Date.nativeNow?Date.nativeNow():Date.now())-f.lastModified>6e5)return toast('Take the photo now. Older photos are not accepted.');
  if(!(c.o?dist(targetLL,c.o.ll)<=RANGE:items.some(i=>dist(targetLL,i.ll)<=RANGE)))return toast('Take the photo inside the quest area, from a public spot.');
  const th=await thumb(f);if(!th)return toast('Could not read that photo.');
  const h=hash(th);if(S.hashes.includes(h))return toast('That photo was already used.');
@@ -593,6 +593,13 @@ if(!window.supabase){say('Could not load the login service. Check your connectio
 const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const back=location.origin+location.pathname;let started=false,uid=null,lastS=null,lastJson='',timer=null,busy=false;
 const busyUi=b=>['aGoogle','aIn','aUp'].forEach(i=>el(i).disabled=b);
+// ---- server clock: every date/time in the game comes from Supabase, so changing the phone's clock changes nothing ----
+const NativeDate=Date;let clk={base:NativeDate.now(),t0:performance.now()},clockOn=false;
+async function syncClock(){const t1=performance.now(),{data,error}=await sb.rpc('server_time');if(error)throw error;const t2=performance.now();clk={base:NativeDate.parse(data)+(t2-t1)/2,t0:t2}}   // performance.now() is monotonic, so later clock edits on the phone are ignored
+const srvNow=()=>Math.round(clk.base+(performance.now()-clk.t0));
+function installClock(){if(clockOn)return;clockOn=true;
+ window.Date=new Proxy(NativeDate,{construct:(t,a,nt)=>Reflect.construct(t,a.length?a:[srvNow()],nt),apply:t=>t(srvNow()),get:(t,k)=>k==='now'?srvNow:k==='nativeNow'?()=>NativeDate.now():Reflect.get(t,k)});
+ setInterval(()=>syncClock().catch(()=>{}),3e5);document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncClock().catch(()=>{})})}
 async function api(action,args){const{data,error}=await sb.functions.invoke('realm',{body:{action,tz:Intl.DateTimeFormat().resolvedOptions().timeZone,...args}});
  if(error){let m='Connection problem. Try again.';try{const j=await error.context.json();if(j&&j.error)m=j.error}catch(e){}return{error:m}}return data&&data.error?{error:data.error}:(data||{error:'No answer from the server.'})}
 async function flush(){if(!lastS||!uid)return true;const s=lastS,json=JSON.stringify(s);if(json===lastJson)return true;const L=Math.max(1,s.lvl|0),xp=Math.floor(s.xp||0);
@@ -605,6 +612,7 @@ async function begin(session){if(started)return;started=true;uid=session.user.id
   if(cloud)localStorage.setItem(QK,JSON.stringify(cloud));          // saved game exists: cloud wins
   else if(owner&&owner!==uid)localStorage.removeItem(QK);           // another account used this device: start fresh
   localStorage.setItem(OK,uid);
+  try{await syncClock()}catch(e){throw new Error('Could not sync the game clock. Check your connection and try again.')}installClock();   // from here on, new Date() and Date.now() return server time
   const sr=await api('sync');if(sr.error)throw new Error(sr.error);   // XP, loot and quests come from the server, never from the saved file
   let cur=null;try{cur=JSON.parse(localStorage.getItem(QK))}catch(e){}localStorage.setItem(QK,JSON.stringify({...(cur||{}),...sr.core}));                                     // (an old unowned local save is adopted by the first account)
  }catch(e){started=false;busyUi(false);say(e&&e.message&&e.message.length<120?e.message:'Could not load your save. Check your connection and try again.',1);return}
