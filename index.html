@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>THE REALM — 3D Map Prototype</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" crossorigin="">
+<style>
+:root{--gold:#d9b76e;--gold-hi:#fff0b5;--gold-dim:#77552b;--parchment:#ead8ac}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#14261d;color:#f4e7c6;font-family:Georgia,'Palatino Linotype',serif}button{font:inherit}
+#map{position:absolute;inset:0;z-index:1;background:#14261d}
+.maplibregl-ctrl-attrib{font:10px Arial,sans-serif!important;background:#080a08c9!important;color:#d7c69e!important;margin-bottom:76px!important}.maplibregl-ctrl-attrib a{color:#f0d58e!important}
+.maplibregl-ctrl-bottom-right{z-index:5}
+/* Atmosphere: haze at the horizon, vignette, and arcane tint over the real map */
+.map-arcane-wash{position:absolute;inset:0;z-index:350;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,transparent 38%,rgba(7,12,8,.14) 70%,rgba(5,8,6,.55) 100%),linear-gradient(135deg,rgba(96,71,30,.08),transparent 32%,rgba(24,75,76,.08) 70%,rgba(0,0,0,.1));mix-blend-mode:multiply}
+.haze{position:absolute;left:0;right:0;top:0;height:34%;z-index:360;pointer-events:none;background:linear-gradient(180deg,#0b1812 0%,#142a22e6 22%,#2a4a4a55 60%,transparent 100%)}
+.shade{position:absolute;inset:0;z-index:400;pointer-events:none;background:linear-gradient(180deg,#070805a0 0%,#07080520 13%,transparent 28%,transparent 70%,#08080550 85%,#080805b8 100%)}
+.hud{position:absolute;z-index:500}.hud.panel{position:absolute}.panel{position:relative;background:linear-gradient(135deg,rgba(45,34,22,.97),rgba(12,12,10,.97) 70%);border:1px solid var(--gold-dim);box-shadow:0 5px 18px #000b,inset 0 1px 0 #fff2c02c,inset 0 -2px 0 #0009;border-radius:5px}.panel:before{content:"";position:absolute;inset:4px;border:1px solid #d6b56b66;pointer-events:none;border-radius:3px}.panel:after{content:"✦";position:absolute;right:6px;top:2px;font-size:9px;color:#f2d895a8;pointer-events:none}
+.topbar{top:max(8px,env(safe-area-inset-top));left:8px;right:8px;display:flex;gap:7px;align-items:stretch}.profile{display:flex;align-items:center;gap:9px;padding:9px 11px;min-width:0;flex:1}
+.portrait{position:relative;width:52px;height:52px;flex:0 0 52px;border-radius:50%;border:2px solid #e4c578;outline:1px solid #6e4d24;outline-offset:2px;background:radial-gradient(ellipse at 50% 75%,#6e5734 0,#201a13 58%,#080807 80%);display:grid;place-items:center;overflow:hidden;box-shadow:0 0 0 3px #17120d,0 0 14px #e1b95b30}.portrait svg{width:48px;height:48px;filter:drop-shadow(0 2px 3px #000)}
+.profile-info{min-width:0;flex:1}.eyebrow{color:#e6c77e;text-transform:uppercase;letter-spacing:1.7px;font:700 8px Arial,sans-serif}.player-name{font-size:18px;font-weight:bold;line-height:1.1;color:#fff0c6;text-shadow:0 2px 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:3px 0}.xptext{font:10px Arial,sans-serif;color:#d7c59f}.xpbar{height:8px;background:#080806;border:1px solid #94713a;box-shadow:inset 0 1px 3px #000;border-radius:1px;overflow:hidden;margin-top:4px}.xpfill{height:100%;width:26%;background:linear-gradient(90deg,#17677e,#4bc1d7,#c1f8f3);box-shadow:0 0 7px #4ac7df}
+.level{border:1px solid #e5c77b;background:radial-gradient(circle,#3a2b18,#0d0b08 72%);box-shadow:inset 0 0 0 2px #382817,0 0 0 1px #000;border-radius:50%;width:37px;height:37px;flex:0 0 37px;display:grid;place-items:center;font-size:17px;color:#ffebad;font-weight:bold}
+.iconbtn{width:43px;flex:0 0 43px;display:grid;place-items:center;color:var(--gold-hi);font-size:23px;cursor:pointer;border-radius:5px}.gps-pill{display:flex;align-items:center;gap:6px;padding:7px 8px;min-height:43px;font:9px Arial,sans-serif;white-space:nowrap}.gps-dot{width:7px;height:7px;border-radius:50%;background:#d9ad4e;box-shadow:0 0 9px currentColor}
+.quest-card{top:91px;left:9px;width:min(292px,75vw);padding:11px 12px 12px;background:linear-gradient(125deg,#302516f5,#110e0bf7);border-color:#b18a47;box-shadow:0 5px 16px #000a,inset 0 0 0 2px #4b371d,inset 0 0 0 3px #c6a35b3b;cursor:pointer}.quest-card:before{inset:5px;border:1px solid #d6b56b75}.quest-card:after{content:"›";top:auto;right:12px;bottom:auto;top:50%;transform:translateY(-50%);font:700 22px Arial,sans-serif;color:#e8d7a4}
+.card-row{display:flex;align-items:center;gap:10px}.card-icon{width:42px;height:46px;flex:0 0 42px;display:grid;place-items:center;background:linear-gradient(145deg,#5b4425,#1b140d);border:1px solid #d0a75a;box-shadow:inset 0 0 0 2px #1d160e,0 0 0 1px #000;color:#f6d98b;border-radius:3px}.card-icon svg{width:27px;height:30px}
+.card-title{color:#d9b56c;text-transform:uppercase;font:700 8px Arial,sans-serif;letter-spacing:1.6px;margin-bottom:4px}.card-copy{font-size:14px;line-height:1.22;color:#fff0c8;text-shadow:0 1px 2px #000;padding-right:14px}.card-sub{font:10px Arial,sans-serif;color:#b7a47c;margin-top:3px}
+.compass{top:96px;right:9px;width:55px;height:55px;border:1px solid #c7a45e;border-radius:50%;background:radial-gradient(circle,#352818,#0b0b09 70%);display:grid;place-items:center;box-shadow:0 4px 12px #000b,inset 0 0 0 3px #17120d,inset 0 0 0 4px #b08a4a66;cursor:pointer}.compass:before{content:'N';position:absolute;top:3px;left:50%;transform:translateX(-50%);font:700 9px Arial,sans-serif;color:#f5dfa0;z-index:2}
+.needle{width:26px;height:26px;transition:transform .15s linear;margin-top:6px}
+.side-controls{position:absolute;z-index:500;right:10px;top:164px;display:flex;flex-direction:column;gap:7px}.round-control{position:relative;width:43px;height:43px;border-radius:5px;background:linear-gradient(145deg,#34291b,#0b0b09);border:1px solid #a98649;box-shadow:0 3px 9px #000b,inset 0 0 0 2px #17120d,inset 0 0 0 3px #b28b482e;display:grid;place-items:center;font:22px Arial,sans-serif;color:#f1d895;cursor:pointer}.round-control:before{content:"";position:absolute;inset:3px;border:1px solid #c6a15a36;border-radius:2px;pointer-events:none}.round-control:active,.nav-item:active,.iconbtn:active{transform:scale(.96)}
+.bottom-left{left:9px;bottom:calc(79px + env(safe-area-inset-bottom));padding:9px 12px;display:flex;gap:9px;align-items:center;max-width:235px;background:linear-gradient(120deg,#332719f5,#0d0c0af5);border-color:#b08a49;cursor:pointer}.bottom-left .chest{width:35px;height:35px;display:grid;place-items:center;border:1px solid #a17c3d;background:linear-gradient(135deg,#5d421e,#1a1209);font-size:23px;box-shadow:inset 0 0 0 2px #20170d}.bottom-left strong{display:block;font-size:13px;color:#f2d795}.bottom-left small{display:block;color:#c8b894;font:9px Arial,sans-serif;margin-top:3px}
+.bottom-nav{position:absolute;z-index:510;bottom:0;left:0;right:0;min-height:72px;padding:7px 4px max(8px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(6,1fr);background:linear-gradient(180deg,#30251af7,#0a0908 78%);border-top:2px solid #b08a48;box-shadow:0 -5px 22px #000b,inset 0 1px 0 #f3d58c44}.nav-item{position:relative;color:#b8a77f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;cursor:pointer;border-right:1px solid #b38c4b20}.nav-item:last-child{border:0}.nav-icon{height:25px;display:grid;place-items:center;font-size:21px;line-height:1;color:inherit;position:relative}.nav-label{font:9px Arial,sans-serif;letter-spacing:.25px;white-space:nowrap}.nav-item.active{color:#ffe4a0;text-shadow:0 0 8px #d6ad5d66;background:linear-gradient(180deg,#b68a3b1c,transparent)}.nav-item.active:before{content:"";position:absolute;top:-7px;width:28px;height:2px;background:#e7c675;box-shadow:0 0 8px #f5d78d}.nav-dot{position:absolute;top:-2px;right:-7px;width:9px;height:9px;border-radius:50%;background:#e5483d;border:1px solid #2a0d0b}
+.toolfar{position:absolute;z-index:850;left:50%;top:42%;transform:translate(-50%,-50%);padding:14px 26px;border:1px solid var(--gold);border-radius:4px;background:linear-gradient(135deg,#342718,#0e0c09);box-shadow:0 10px 35px #000d,inset 0 0 0 3px #1b140b;color:#fff0c6;font:700 16px Georgia,serif;letter-spacing:.5px;text-align:center;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .5s ease,visibility 0s .5s}.toolfar.show{opacity:1;visibility:visible;transition:opacity .15s ease}.toolfar small{display:block;margin-top:3px;font:11px Arial,sans-serif;font-weight:400;color:#c8b894;letter-spacing:0}
+.toast{position:absolute;z-index:800;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#342718,#0e0c09);border:1px solid var(--gold);border-radius:4px;padding:16px 20px;max-width:82vw;text-align:center;box-shadow:0 10px 35px #000d,inset 0 0 0 3px #1b140b;display:none;font-size:14px;line-height:1.4}.toast.show{display:block;animation:fade .2s ease-out}@keyframes fade{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}
+.menu{position:absolute;z-index:700;right:9px;top:60px;width:200px;padding:9px;display:none}.menu.open{display:block}.menu button{display:block;width:100%;padding:12px 10px;text-align:left;background:transparent;color:var(--parchment);border:0;border-bottom:1px solid #a8874a35;font:14px Georgia,serif}.menu button:last-child{border:0}
+
+/* ===== World markers (HTML, billboarded above the tilted ground) ===== */
+.mk{--c:#f4d17e;--bg:#3a2506;width:56px;height:92px;position:absolute;top:0;left:0;cursor:pointer}
+.mk .beam{position:absolute;left:50%;bottom:8px;width:4px;height:74px;transform:translateX(-50%);background:linear-gradient(to top,var(--c),transparent);opacity:.5;filter:blur(1.5px)}
+.mk .float{position:absolute;inset:0;animation:bob 2.6s ease-in-out infinite}
+.mk .badge{position:absolute;left:9px;top:4px;width:38px;height:38px;transform:rotate(45deg);border:2px solid var(--c);border-radius:9px;background:radial-gradient(circle at 35% 30%,var(--bg),#0b0a08 95%);box-shadow:0 0 14px var(--c),0 0 0 3px #0a0907aa,inset 0 0 0 2px #00000066;display:grid;place-items:center}
+.mk .badge i{transform:rotate(-45deg);display:grid;place-items:center;color:var(--c);filter:drop-shadow(0 1px 2px #000)}.mk .badge svg{width:21px;height:21px}
+.mk .tip{position:absolute;left:50%;top:40px;width:0;height:0;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-top:12px solid var(--c);filter:drop-shadow(0 0 5px var(--c))}
+.mk .ground{position:absolute;left:1px;bottom:-9px;width:54px;height:22px;border-radius:50%;border:2px solid var(--c);box-shadow:0 0 14px var(--c),inset 0 0 10px var(--c);opacity:.8;animation:ring 2.4s ease-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes ring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.15);opacity:.15}}
+.mk.quest{--c:#62c8ff;--bg:#0f2f4d}.mk.chest{--c:#ffc24a;--bg:#3a2506}.mk.nature{--c:#7be37a;--bg:#12301a}.mk.boss{--c:#ff5a4d;--bg:#3a0f0d}.mk.rift{--c:#b184ff;--bg:#24123f}
+.mk.boss .badge{width:42px;height:42px;left:7px;box-shadow:0 0 22px var(--c),0 0 0 3px #0a0907aa}
+.mk{transition:opacity .3s,filter .3s}.mk.far{opacity:.5;filter:grayscale(.65)}
+/* Player */
+.pl{width:80px;height:92px;position:absolute;top:0;left:0;pointer-events:none}.pl .disc{position:absolute;left:5px;bottom:-6px;width:70px;height:30px;border-radius:50%;border:2px solid #66e1f2;background:radial-gradient(ellipse,#55c9ff66,#55c9ff10 70%);box-shadow:0 0 18px #48bfffaa,inset 0 0 12px #48bfff88}.pl .col{position:absolute;left:50%;bottom:8px;width:5px;height:84px;transform:translateX(-50%);background:linear-gradient(to top,#6fdcff,transparent);opacity:.55;filter:blur(1.5px)}.pl svg{position:absolute;left:22px;bottom:6px;width:36px;height:62px;filter:drop-shadow(0 3px 4px #000)}
+
+/* ===== Compact HUD (v3) ===== */
+.topbar{align-items:flex-start;gap:6px;top:max(6px,env(safe-area-inset-top))}
+.profile{padding:6px 9px;gap:8px;flex:1}
+.portrait{width:42px;height:42px;flex:0 0 42px}.portrait svg{width:39px;height:39px}
+.eyebrow{display:none}.player-name{font-size:15px;margin:0 0 2px}.xptext{font-size:9px}.xpbar{height:6px;margin-top:3px}
+.level{width:30px;height:30px;flex:0 0 30px;font-size:14px}
+.gps-pill{min-height:0;height:34px;padding:0 9px;font-size:9px}
+.iconbtn{width:36px;height:34px;flex:0 0 36px;font-size:19px}
+.quest-card{top:calc(max(6px,env(safe-area-inset-top)) + 60px);left:8px;width:min(246px,66vw);padding:7px 9px}.quest-card:before{inset:3px}.quest-card:after{font-size:18px;right:8px}
+.card-row{gap:8px}.card-icon{width:32px;height:36px;flex:0 0 32px}.card-icon svg{width:21px;height:24px}
+.card-title{font-size:7px;margin-bottom:2px}.card-copy{font-size:12.5px;line-height:1.18;padding-right:12px}.card-sub{font-size:9px;margin-top:2px}
+.compass{top:calc(max(6px,env(safe-area-inset-top)) + 60px);right:8px;width:44px;height:44px}.needle{width:20px;height:20px;margin-top:5px}.compass:before{font-size:8px}
+.side-controls{top:calc(max(6px,env(safe-area-inset-top)) + 112px);right:8px;gap:6px}.round-control{width:38px;height:38px;font-size:19px}
+.bottom-left{left:8px;padding:6px 9px;max-width:200px}.bottom-left .chest{width:28px;height:28px;font-size:18px}.bottom-left strong{font-size:12px}.bottom-left small{font-size:8px;margin-top:2px}
+/* Follow-mode button: glows gold when the camera is NOT locked to you */
+/* Modal (GPS permission / errors) */
+.modal{position:absolute;inset:0;z-index:900;background:rgba(5,8,6,.74);display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}
+.modal-card{max-width:340px;width:100%;padding:22px 20px;text-align:center}.modal-card h2{font:700 20px Georgia,serif;color:#fff0c6;margin:6px 0 8px}.modal-card p{font:14px/1.45 Arial,sans-serif;color:#d7c59f;margin:0 0 14px}.m-icon{font-size:34px}
+.m-btn{display:block;width:100%;padding:13px;margin-top:8px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 15px Georgia,serif;cursor:pointer}.m-btn.ghost{background:transparent;border-color:#77552b;color:#b9a67d;font-weight:400;font-size:13px}
+@media(min-width:700px){.topbar{left:18px;right:18px;top:18px}.profile{max-width:380px}.quest-card{left:18px;top:84px}.compass{right:18px;top:84px}.side-controls{right:18px;top:140px}.bottom-left{left:18px;bottom:92px}.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(700px,90vw);border:2px solid #8b6937;border-bottom:0;border-radius:7px 7px 0 0}}
+@media(max-width:390px){.gps-pill{padding:0 6px;font-size:8px}.topbar{gap:5px}.player-name{font-size:14px}.nav-icon{font-size:19px}.nav-label{font-size:8px}.bottom-left{max-width:190px}}
+
+.qpanel{position:absolute;z-index:505;left:0;right:0;top:calc(max(6px,env(safe-area-inset-top)) + 58px);bottom:calc(72px + env(safe-area-inset-bottom));display:none;overflow-y:auto;padding:10px 10px 18px;background:linear-gradient(180deg,#120f0bf2,#0b0a08f7);-webkit-overflow-scrolling:touch;overscroll-behavior:contain}.qpanel.open{display:block}
+.qtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.qtab{padding:14px 4px;text-align:center;font:700 15px Georgia,serif;color:#cdb98a;background:linear-gradient(145deg,#34291b,#0b0b09);border:1px solid #77552b;border-radius:5px;cursor:pointer}.qtab.on{color:#fff0c6;border-color:#e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);box-shadow:0 0 12px #d6ad5d44}
+.qcard{margin-top:8px;padding:10px 12px;border:1px solid #77552b;border-radius:5px;background:linear-gradient(135deg,#2d2216f2,#0e0c09f2);color:#ead8ac}.qcard.ms{border-color:#e5c77b;box-shadow:inset 0 0 0 2px #4b371d}.qcard.done{opacity:.55}
+.qt{display:flex;justify-content:space-between;gap:8px;font-size:14px}.qt span{color:#f2d795;font:700 11px Arial,sans-serif;white-space:nowrap;padding-top:2px}.qbar{height:5px;margin:8px 0 5px;background:#000a;border-radius:3px;overflow:hidden}.qbar i{display:block;height:100%;background:linear-gradient(90deg,#b9893a,#f2d795)}.qs{font:10px Arial,sans-serif;color:#c8b894;margin-top:5px}.qbar+.qs{margin-top:0}
+.qbtn{margin-top:8px;width:100%;padding:10px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 13px Georgia,serif;cursor:pointer}
+.qh{margin:26px 2px 0;display:flex;justify-content:space-between;color:#f2d795;font:700 13px Georgia,serif;letter-spacing:.8px;text-transform:uppercase}.qsp{height:14px}.qaw{margin-top:10px;text-align:center;color:#f2d795;font:700 15px Georgia,serif;padding:14px;border:1px dashed #77552b;border-radius:5px}
+.qcard:not([data-act=""]){cursor:pointer}.qcard.rdy{border-color:#7be37a;box-shadow:0 0 12px #7be37a55}.qcard:active{transform:scale(.99)}#mText{white-space:pre-line}
+@media(min-width:700px){.qpanel{top:84px;left:50%;right:auto;width:min(700px,90vw);transform:translateX(-50%)}}
+</style></head><body>
+<div id="auth"><div class="ab"><div class="at">THE REALM</div><div class="as">Sign in to begin your adventure</div>
+<button id="aGoogle" class="ag">Continue with Google</button><div class="ad"><span>or</span></div>
+<input id="aEmail" type="email" placeholder="Email" autocomplete="email"><input id="aPass" type="password" placeholder="Password (8+ characters)" autocomplete="current-password">
+<div class="ar"><button id="aIn">Sign in</button><button id="aUp" class="alt">Create account</button></div>
+<div id="aForgot" class="al">Forgot password?</div><div id="aMsg" class="am"></div></div></div>
+<style>#auth{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 50% 30%,#2a2214,#080a08 70%);color:#ead8ac;font-family:Georgia,serif}#auth .ab{width:100%;max-width:360px;padding:26px 22px;border:1px solid #b99a52;border-radius:6px;background:linear-gradient(135deg,#251d12,#0e0c09);box-shadow:0 14px 50px #000c,inset 0 0 0 3px #1b140b}#auth .at{text-align:center;font-size:28px;font-weight:700;letter-spacing:5px;color:#f0d58e}#auth .as{text-align:center;margin:6px 0 20px;font-size:13px;color:#c8b894}#auth button,#auth input{width:100%;box-sizing:border-box;padding:13px;margin:0 0 10px;border-radius:4px;font:16px Georgia,serif}#auth input{border:1px solid #6b5a33;background:#0b0a08;color:#ffeccb}#auth button{border:1px solid #d6b866;background:linear-gradient(#5a4725,#33280f);color:#fff0c6;font-weight:700;cursor:pointer}#auth button.alt{background:#15110a}#auth button:disabled{opacity:.5}#auth .ag{background:#f4f1ea;color:#222;border-color:#fff}#auth .ad{text-align:center;margin:2px 0 12px;font-size:12px;color:#8d7d57}#auth .ar{display:flex;gap:8px}#auth .ar button{margin:0}#auth .al{text-align:center;margin-top:14px;font-size:13px;color:#d6b866;text-decoration:underline;cursor:pointer}#auth .am{min-height:18px;margin-top:12px;text-align:center;font-size:13px;color:#c8b894}#auth .am.bad{color:#ff8a7a}</style>
+
+<div id="map" aria-label="Real-world exploration map"></div><div class="map-arcane-wash" aria-hidden="true"></div><div class="haze" aria-hidden="true"></div><div class="shade" aria-hidden="true"></div>
+
+<div class="hud topbar"><div class="panel profile"><div class="portrait" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="cloak" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#77704f"/><stop offset=".45" stop-color="#302b22"/><stop offset="1" stop-color="#090908"/></linearGradient><linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d2b78b"/><stop offset="1" stop-color="#6d5035"/></linearGradient></defs><path d="M8 64 12 37 18 16 31 5 45 13 54 38 60 64Z" fill="url(#cloak)" stroke="#c8a65c" stroke-width="1.3"/><path d="M17 29 20 15 32 8 45 17 48 31 41 25 33 20 24 26Z" fill="#171511"/><path d="M24 23 32 17 41 23 42 37 35 46 27 39Z" fill="url(#face)"/><path d="M23 27 31 25 40 28 39 32 32 30 25 32Z" fill="#17130e"/><path d="M24 23 32 16 42 23 48 33 40 29 32 24 24 29 17 34Z" fill="#201d17" stroke="#a88a4c" stroke-width="1"/><path d="M27 40 33 45 40 39 45 53 20 53Z" fill="#17140f"/><path d="M15 57 25 47 33 53 42 47 52 58" fill="none" stroke="#d0ad61" stroke-width="1.2"/></svg></div><div class="profile-info"><div class="eyebrow">The Realm · Adventurer</div><div class="player-name">Adventurer</div><div class="xptext">1,250 / 4,800 XP</div><div class="xpbar"><div class="xpfill"></div></div></div><div class="level">12</div></div><button class="panel iconbtn" id="menuButton" aria-label="Open menu">⚙</button></div>
+
+
+<div class="hud compass" id="compass" aria-label="Compass — tap to face north"><svg class="needle" id="needle" viewBox="0 0 26 26"><path d="M13 2 18 13H8Z" fill="#e5483d"/><path d="M13 24 8 13h10Z" fill="#e8d7a4"/></svg></div>
+<div class="side-controls"><button class="round-control" id="layerButton" aria-label="Toggle 2D/3D" title="Toggle 2D / 3D">▱</button><button class="round-control" id="rotateButton" aria-label="Rotate camera" title="Rotate camera">⟳</button><button class="round-control" id="chaosButton" aria-label="Chaos" title="Tempt Fate">🎲</button><button class="round-control" id="zoomIn" aria-label="Zoom in">＋</button><button class="round-control" id="zoomOut" aria-label="Zoom out">−</button></div>
+
+<div class="qpanel" id="qpanel"></div>
+<div class="bottom-nav"><div class="nav-item active" data-tab="Map"><div class="nav-icon">⌖</div><div class="nav-label">Map</div></div><div class="nav-item" data-tab="Quests"><div class="nav-icon">▤<span class="nav-dot"></span></div><div class="nav-label">Quests</div></div><div class="nav-item" data-tab="Champions"><div class="nav-icon">⚔</div><div class="nav-label">Champions</div></div><div class="nav-item" data-tab="Shop"><div class="nav-icon">♢</div><div class="nav-label">Shop</div></div><div class="nav-item" data-tab="Character"><div class="nav-icon">♟</div><div class="nav-label">Character</div></div><div class="nav-item" data-tab="Settings"><div class="nav-icon">⚙</div><div class="nav-label">Settings</div></div></div>
+<div class="panel menu" id="menu"><button data-action="Inventory">🎒 &nbsp; Inventory</button><button data-action="Settings">⚙ &nbsp; Settings</button><button data-action="Help & Safety">🛡 &nbsp; Help &amp; Safety</button><button data-action="Close">✕ &nbsp; Close Menu</button></div><div class="toast" id="toast" role="status"></div><div class="toolfar" id="toolFar" role="status"></div>
+<div class="modal" id="modal" role="alertdialog" aria-modal="true"><div class="panel modal-card"><div class="m-icon" id="mIcon"></div><h2 id="mTitle"></h2><p id="mText"></p><button class="m-btn" id="mPrimary"></button><button class="m-btn ghost" id="mSecondary"></button></div></div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" crossorigin=""></script>
+<script>
+window.startRealm=()=>{'use strict';
+const $=id=>document.getElementById(id);
+const FALLBACK=[-89.0940,42.2711]; // [lng,lat]
+const START={zoom:16.6,pitch:62,bearing:-18};
+
+function tooFar(d){const e=$('toolFar');e.innerHTML='Too Far Away'+(d!=null?'<small>'+ft(d)+' away</small>':'');e.classList.add('show');clearTimeout(tooFar.t);tooFar.t=setTimeout(()=>e.classList.remove('show'),2000)}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('show'),2800)}
+
+/* ---------- Geo helpers ---------- */
+const R=6371000,rad=d=>d*Math.PI/180,deg=r=>r*180/Math.PI;
+function dest([lng,lat],bearingDeg,meters){const b=rad(bearingDeg),d=meters/R,la=rad(lat),lo=rad(lng);const la2=Math.asin(Math.sin(la)*Math.cos(d)+Math.cos(la)*Math.sin(d)*Math.cos(b));const lo2=lo+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(la),Math.cos(d)-Math.sin(la)*Math.sin(la2));return[deg(lo2),deg(la2)]}
+function dist([lng1,lat1],[lng2,lat2]){const dLa=rad(lat2-lat1),dLo=rad(lng2-lng1);const a=Math.sin(dLa/2)**2+Math.cos(rad(lat1))*Math.cos(rad(lat2))*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(a))}
+function ringPoly(c,m,n=72,props={}){const pts=[];for(let i=0;i<=n;i++)pts.push(dest(c,i*360/n,m));return{type:'Feature',properties:props,geometry:{type:'Polygon',coordinates:[pts]}}}
+
+/* ---------- Generated terrain textures (no image files needed) ---------- */
+function rng(seed){let s=seed;return()=>(s=(s*16807)%2147483647)/2147483647}
+function canvasImg(S,fn){const c=document.createElement('canvas');c.width=c.height=S;const g=c.getContext('2d');fn(g,S);return g.getImageData(0,0,S,S)}
+function canopyBlob(g,cx,cy,rd){const gr=g.createRadialGradient(cx-rd*.3,cy-rd*.35,rd*.1,cx,cy,rd);gr.addColorStop(0,'rgba(125,180,84,.95)');gr.addColorStop(.55,'rgba(44,104,52,.95)');gr.addColorStop(1,'rgba(12,42,26,.92)');g.fillStyle=gr;g.beginPath();g.arc(cx,cy,rd,0,6.2832);g.fill()}
+const PATTERNS={
+ canopy:()=>canvasImg(128,(g,S)=>{const r=rng(7);for(let i=0;i<26;i++){const x=r()*S,y=r()*S,rd=9+r()*9;for(const dx of[-S,0,S])for(const dy of[-S,0,S]){const cx=x+dx,cy=y+dy;if(cx<-rd||cx>S+rd||cy<-rd||cy>S+rd)continue;canopyBlob(g,cx,cy,rd)}}}),
+ groves:()=>canvasImg(128,(g,S)=>{const r=rng(21);for(let i=0;i<5;i++)canopyBlob(g,16+r()*(S-32),16+r()*(S-32),7+r()*5)}),
+ tufts:()=>canvasImg(64,(g,S)=>{const r=rng(5);g.lineCap='round';g.lineWidth=1.3;for(let i=0;i<16;i++){const x=6+r()*(S-12),y=9+r()*(S-15),light=r()>.5;g.strokeStyle=light?'rgba(176,220,112,.5)':'rgba(24,70,30,.5)';for(let k=-1;k<=1;k++){g.beginPath();g.moveTo(x+k*2,y);g.lineTo(x+k*3.4,y-4-r()*2);g.stroke()}}}),
+ rows:()=>canvasImg(32,(g,S)=>{for(let x=0;x<S;x+=8){g.fillStyle='rgba(235,222,120,.12)';g.fillRect(x,0,4,S);g.fillStyle='rgba(20,52,12,.14)';g.fillRect(x+4,0,4,S)}}),
+ waves:()=>canvasImg(48,(g,S)=>{const r=rng(11);g.strokeStyle='rgba(205,242,255,.4)';g.lineWidth=1.2;for(let i=0;i<5;i++){const x=10+r()*(S-20),y=8+r()*(S-16);g.beginPath();g.arc(x,y,4+r()*3,Math.PI*1.1,Math.PI*1.9);g.stroke()}})
+};
+
+/* ---------- Fantasy map style built on free OpenFreeMap vector tiles ---------- */
+const roadWidth=m=>['interpolate',['exponential',1.5],['zoom'],10,['match',['get','class'],['motorway','trunk','primary'],1*m,['secondary','tertiary'],.7*m,.4*m],18,['match',['get','class'],['motorway','trunk','primary'],14*m,['secondary','tertiary'],10*m,['path','track'],2.5*m,6*m]];
+const roadW=roadWidth(1);
+const style={version:8,name:'Realm',
+sources:{om:{type:'vector',url:'https://tiles.openfreemap.org/planet',attribution:'<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'}},
+layers:[
+{id:'bg',type:'background',paint:{'background-color':'#3d6a35'}},
+{id:'lc-grass',type:'fill',source:'om','source-layer':'landcover',filter:['in',['get','class'],['literal',['grass','farmland']]],paint:{'fill-color':['match',['get','class'],'farmland','#6f8f3c','#4f8a3a']}},
+{id:'farm-rows',type:'fill',source:'om','source-layer':'landcover',filter:['==',['get','class'],'farmland'],paint:{'fill-pattern':'rows'}},
+{id:'tufts',type:'fill',source:'om','source-layer':'landcover',filter:['in',['get','class'],['literal',['grass','farmland']]],paint:{'fill-pattern':'tufts'}},
+{id:'lc-sand',type:'fill',source:'om','source-layer':'landcover',filter:['in',['get','class'],['literal',['sand','rock']]],paint:{'fill-color':'#a8946a'}},
+{id:'lc-wet',type:'fill',source:'om','source-layer':'landcover',filter:['==',['get','class'],'wetland'],paint:{'fill-color':'#35744f'}},
+{id:'park',type:'fill',source:'om','source-layer':'park',paint:{'fill-color':'#3f8a45','fill-opacity':.9}},
+{id:'park-tufts',type:'fill',source:'om','source-layer':'park',paint:{'fill-pattern':'tufts'}},
+{id:'park-groves',type:'fill',source:'om','source-layer':'park',paint:{'fill-pattern':'groves'}},
+{id:'lu-res',type:'fill',source:'om','source-layer':'landuse',filter:['in',['get','class'],['literal',['residential','suburb','neighbourhood','commercial','retail','industrial']]],paint:{'fill-color':'#5f6f3a','fill-opacity':.55}},
+{id:'wood',type:'fill',source:'om','source-layer':'landcover',filter:['==',['get','class'],'wood'],paint:{'fill-color':'#1f4d2a'}},
+{id:'wood-trees',type:'fill',source:'om','source-layer':'landcover',filter:['==',['get','class'],'wood'],paint:{'fill-pattern':'canopy'}},
+{id:'water',type:'fill',source:'om','source-layer':'water',paint:{'fill-color':'#1f6a96'}},
+{id:'water-shine',type:'fill',source:'om','source-layer':'water',paint:{'fill-pattern':'waves'}},
+{id:'water-edge',type:'line',source:'om','source-layer':'water',paint:{'line-color':'#8fe0ea','line-opacity':.55,'line-width':['interpolate',['linear'],['zoom'],12,.8,18,3],'line-blur':1}},
+{id:'waterway',type:'line',source:'om','source-layer':'waterway',paint:{'line-color':'#2b7fae','line-width':['interpolate',['exponential',1.4],['zoom'],10,.8,18,8]}},
+{id:'road-case',type:'line',source:'om','source-layer':'transportation',filter:['!',['in',['get','class'],['literal',['rail','transit','ferry']]]],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#2a1d0f','line-opacity':.55,'line-width':roadWidth(1.5)}},
+{id:'road',type:'line',source:'om','source-layer':'transportation',filter:['!',['in',['get','class'],['literal',['rail','transit','ferry']]]],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['match',['get','class'],['motorway','trunk','primary'],'#d9bd7c',['secondary','tertiary'],'#c9a96a','#b89560'],'line-width':roadW}},
+{id:'road-hi',type:'line',source:'om','source-layer':'transportation',filter:['!',['in',['get','class'],['literal',['rail','transit','ferry']]]],layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#f3deaa','line-opacity':.55,'line-width':roadWidth(.3)}},
+{id:'building',type:'fill-extrusion',source:'om','source-layer':'building',minzoom:14,paint:{'fill-extrusion-color':['interpolate',['linear'],['coalesce',['get','render_height'],6],0,'#9c7a52',12,'#8b7355',40,'#8a8794'],'fill-extrusion-height':['coalesce',['get','render_height'],6],'fill-extrusion-base':['coalesce',['get','render_min_height'],0],'fill-extrusion-opacity':.92,'fill-extrusion-vertical-gradient':true}}
+]};
+
+const map=new maplibregl.Map({container:'map',style,center:FALLBACK,zoom:START.zoom,pitch:START.pitch,bearing:START.bearing,maxPitch:75,minZoom:12,maxZoom:19.5,attributionControl:{compact:true},dragRotate:true,touchPitch:false});
+map.dragPan.disable();map.doubleClickZoom.disable();map.scrollZoom.enable({around:'center'});map.touchZoomRotate.enable({around:'center'});
+let gesturing=false;
+['touchstart','pointerdown'].forEach(ev=>map.getCanvasContainer().addEventListener(ev,()=>{gesturing=true},{passive:true}));
+['touchend','touchcancel','pointerup','pointercancel'].forEach(ev=>window.addEventListener(ev,e=>{if(!e.touches||e.touches.length===0)setTimeout(()=>{gesturing=false},120)},{passive:true}));
+map.getCanvasContainer().style.touchAction='none';
+map.on('styleimagemissing',e=>{const f=PATTERNS[e.id];if(f&&!map.hasImage(e.id))map.addImage(e.id,f(),{pixelRatio:2})});
+let errShown=false;map.on('error',e=>{console.error(e&&e.error||e);if(!errShown){errShown=true;const m=(e&&e.error&&e.error.message)||'unknown error';toast('Map problem: '+m.slice(0,140))}});
+
+/* ---------- Game layers ---------- */
+const RANGE=150; // meters: radius of the circle around the player (diameter = 2 x RANGE)
+let player=FALLBACK.slice(),following=false,watchId=null,playerMarker=null;
+const SVG={
+ quest:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 3h3l-.6 11h-1.8zM12 16.6a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8z"/></svg>',
+ chest:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 11V8a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v3"/><rect x="3" y="11" width="18" height="9" rx="1.5"/><path d="M3 14h18M12 12v4"/></svg>',
+ nature:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21v-8M12 13C7 13 4 9.5 4 4c5.5 0 8 3 8 9zM12 13c0-4 2-7 8-7 0 5-3 7-8 7z"/><path d="M12 21v-8" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>',
+ boss:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5c-4.7 0-8 3.2-8 7.3 0 2.5 1.2 4.3 2.8 5.4V19h2.6v-1.8h1.2V19h2.8v-1.8h1.2V19h2.6v-3.8c1.6-1.1 2.8-2.9 2.8-5.4 0-4.1-3.3-7.3-8-7.3zM8.7 12.8a1.9 1.9 0 1 1 0-3.8 1.9 1.9 0 0 1 0 3.8zm6.6 0a1.9 1.9 0 1 1 0-3.8 1.9 1.9 0 0 1 0 3.8z"/></svg>',
+ rift:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/></svg>'};
+const LABEL={quest:'Quest',chest:'Treasure Chest',nature:'Nature Discovery',boss:'Dark Lair (Boss)',rift:'Arcane Rift'};
+// Sample layout around the player (meters / compass bearing). Replace with real server data later.
+const SAMPLE=[
+ {t:'quest',name:'Investigate the Strange Lights',d:125,b:20},{t:'quest',name:'The Whispering Door',d:230,b:250},
+ {t:'chest',d:90,b:150},{t:'chest',d:270,b:80},{t:'chest',d:310,b:305},
+ {t:'nature',d:170,b:335},{t:'nature',d:285,b:200},
+ {t:'rift',d:240,b:115}];
+let items=[],markers=[];
+function mkEl(t){const el=document.createElement('div');el.className='mk '+t;el.innerHTML='<div class="beam"></div><div class="float"><div class="badge"><i>'+SVG[t]+'</i></div><div class="tip"></div></div><div class="ground"></div>';return el}
+const POI={
+ quest:{icon:'📜',title:it=>it.name,text:'Something strange stirs nearby. Investigate to begin the quest.',go:'Begin Quest'},
+ chest:{icon:'🧰',title:()=>'Treasure Chest',text:'A chest lies within reach. Open it to claim your loot.',go:'Open Chest'},
+ nature:{icon:'🌿',title:()=>'Nature Discovery',text:'Something rare grows here. Gather it before it fades.',go:'Gather'},
+ rift:{icon:'✨',title:()=>'Arcane Rift',text:'The air shimmers and tears open. Step through if you dare.',go:'Enter Rift'},
+ boss:{icon:'💀',title:()=>'Dark Lair',text:'A powerful foe lurks within. Prepare yourself before you strike.',go:'Challenge'}};
+function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
+ if(d>RANGE){tooFar(d);return}
+ if((it.t==='chest'||it.t==='boss')&&S.hero.downed){toast('You are downed. Recover to 25% HP first ('+Math.floor(100*S.hero.hp/stats().hp)+'% now).');return}
+ const c=POI[it.t];
+ showModal('poi',{icon:c.icon,title:c.title(it),text:ft(d)+' away. '+c.text+(it.exp?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+' (Sample marker, not a live event yet.)',primary:c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));const i=items.indexOf(it);if(it.used)return;it.used=true;if(it.key){S.taken[it.key]=it.exp;save()}if(markers[i])markers[i].remove();ev(it.t);if(it.t==='chest'||it.t==='boss')lootFrom(it);else if(it.t==='nature')gatherNature(it);else toast(c.go+' ✓')},secondary:'Close',onSecondary:()=>hideModal('poi')})}
+function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
+function updateCards(){items.forEach((it,i)=>{const m=markers[i];if(!m)return;const near=dist(targetLL,it.ll)<=RANGE,el=m.getElement();el.classList.toggle('near',near);el.classList.toggle('far',!near)});
+ }
+
+function makePlayerEl(){const el=document.createElement('div');el.className='pl';el.innerHTML='<div class="col"></div><div class="disc"></div><svg viewBox="0 0 36 62"><path d="M18 2C10 2 7 10 8 19L2 59h32L28 19C29 10 26 2 18 2z" fill="#1b1a24" stroke="#7ad9ff" stroke-width="1.4"/><ellipse cx="18" cy="17" rx="6" ry="7.5" fill="#07070b"/><circle cx="15.3" cy="17" r="1" fill="#8fe8ff"/><circle cx="20.7" cy="17" r="1" fill="#8fe8ff"/><path d="M9 38h18" stroke="#c9a65a" stroke-width="2"/><path d="M18 26v30" stroke="#2c2b3a" stroke-width="1.2"/></svg>';return el}
+
+/* ---------- Player glide + camera lock ---------- */
+// player = position shown on screen (glides smoothly); targetLL = latest real GPS fix.
+let targetLL=player.slice(),gotFirst=false,gpsLost=false,lastFix=0,intro=false,probing=false,rangeAt=[0,0],spawnAt=null;
+map.setPadding({top:Math.round(window.innerHeight*0.22),bottom:0,left:0,right:0}); // player sits lower on screen, like Pokémon GO
+function setFollow(on){following=on}
+let frameN=0;
+function frame(now){track();
+ const dx=targetLL[0]-player[0],dy=targetLL[1]-player[1],moved=Math.abs(dx)>1e-9||Math.abs(dy)>1e-9;
+ if(moved){player=[player[0]+dx*.12,player[1]+dy*.12];playerMarker.setLngLat(player);
+  if(dist(player,rangeAt)>.5){rangeAt=player.slice();map.getSource('range').setData(ringPoly(player,RANGE))}}
+ const p=(now%2600)/2600;
+ if(!gesturing&&(frameN++%3===0))map.getSource('pulse').setData(ringPoly(player,25+125*p,72,{o:+(0.9*(1-p)).toFixed(2)}));
+ if(moved&&following&&!intro&&gotFirst&&!gesturing&&!map.isEasing())map.jumpTo({center:player}); // map stays anchored on the player
+ requestAnimationFrame(frame)}
+
+map.on('load',()=>{
+ const collapseAttr=()=>{const c=document.querySelector('.maplibregl-ctrl-attrib');if(c){c.classList.remove('maplibregl-compact-show');c.removeAttribute('open')}};collapseAttr();map.once('idle',collapseAttr);setTimeout(collapseAttr,1500); // attribution stays available behind the (i) button, just starts closed
+ map.addSource('range',{type:'geojson',data:ringPoly(player,RANGE)});
+ map.addSource('pulse',{type:'geojson',data:ringPoly(player,60,72,{o:1})});
+ map.addLayer({id:'range-fill',type:'fill',source:'range',paint:{'fill-color':'#66e1f2','fill-opacity':.07}});
+ map.addLayer({id:'range-line',type:'line',source:'range',paint:{'line-color':'#9eeeff','line-width':2,'line-opacity':.85,'line-dasharray':[3,2]}});
+ map.addLayer({id:'pulse-line',type:'line',source:'pulse',paint:{'line-color':'#66e1f2','line-width':2.5,'line-opacity':['get','o']}});
+ playerMarker=new maplibregl.Marker({element:makePlayerEl(),anchor:'bottom'}).setLngLat(player).addTo(map);
+ spawn(player);rangeAt=player.slice();
+ requestAnimationFrame(frame);
+ boot();
+});
+
+/* ---------- Modal (permission prompt + errors) ---------- */
+const modal=$('modal');let modalKind=null;
+function showModal(kind,o){modalKind=kind;$('mIcon').textContent=o.icon;$('mTitle').textContent=o.title;$('mText').textContent=o.text;
+ const b1=$('mPrimary'),b2=$('mSecondary');b1.disabled=false;b1.style.opacity='';b1.textContent=o.primary;b1.onclick=o.onPrimary;
+ if(o.secondary){b2.style.display='block';b2.textContent=o.secondary;b2.onclick=o.onSecondary}else b2.style.display='none';
+ modal.classList.add('open')}
+function hideModal(kind){if(!kind||modalKind===kind){modal.classList.remove('open');modalKind=null}}
+
+/* ---------- GPS ---------- */
+function gpsState(){} // status pill removed; errors are shown as pop-ups
+const GOPTS={enableHighAccuracy:true,maximumAge:2000,timeout:15000};
+function showStart(){showModal('start',{icon:'🧭',title:'Enable Location',text:'The Realm is built on the real world. Allow location access so your adventurer can walk the map as you move.',primary:'Allow Location & Begin',onPrimary:startGPS})}
+function showDenied(){gpsState('GPS blocked','#ed6d63');showModal('denied',{icon:'🚫',title:'Location is blocked',text:'Location access is turned off for this page. In Chrome, tap the icon at the left of the address bar, then Permissions, then Location, and choose Allow. Then tap Try Again.',primary:'Try Again',onPrimary:startGPS})}
+function triggerLost(reason){if(gpsLost)return;gpsLost=true;gpsState('GPS signal lost','#ed6d63');
+ if(modalKind!=='offline')showModal('lost',{icon:'📡',title:'GPS signal lost',text:reason+' Move to an open area. The game reconnects automatically.',primary:'Retry GPS',onPrimary:startGPS})}
+function startGPS(){hideModal();gpsLost=false;
+ if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null}
+ gpsState('Locating…','#e5b94c');watchId=navigator.geolocation.watchPosition(onFix,onGpsErr,GOPTS)}
+function onFix(pos){lastFix=Date.now();const ll=[pos.coords.longitude,pos.coords.latitude];
+ if(!gotFirst){gotFirst=true;hideModal();spawnAt=ll;targetLL=ll.slice();spawn(ll);
+  player=ll.slice();targetLL=ll.slice();rangeAt=ll.slice();playerMarker.setLngLat(ll);map.getSource('range').setData(ringPoly(ll,RANGE));
+  setFollow(true);intro=true;map.flyTo({center:ll,zoom:17,pitch:START.pitch,duration:1400});setTimeout(()=>{intro=false},1500);
+  updateCards();toast('Location locked. Adventure awaits!')}
+ else{if(gpsLost){gpsLost=false;hideModal('lost');toast('GPS signal restored')}
+  if(spawnAt&&dist(spawnAt,ll)>800){spawnAt=ll;spawn(ll)}
+  targetLL=ll;updateCards()}
+ gpsState('GPS Connected','#8fd18b')}
+function onGpsErr(err){
+ if(err.code===1){showDenied();return}
+ triggerLost(err.code===3?'GPS is taking too long to respond.':'Your device could not determine its position.')}
+function probe(){if(probing)return;probing=true;
+ navigator.geolocation.getCurrentPosition(p=>{probing=false;onFix(p)},()=>{probing=false;triggerLost('No GPS updates were received.')},{enableHighAccuracy:true,maximumAge:0,timeout:8000})}
+// Watchdog: if the browser stops sending updates, check the GPS directly before raising the alarm.
+setInterval(()=>{if(gotFirst&&!gpsLost&&!document.hidden&&Date.now()-lastFix>30000)probe()},5000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&gotFirst)probe()});
+window.addEventListener('offline',()=>showModal('offline',{icon:'📶',title:'Connection lost',text:'No internet connection. The map and quests need a signal. The game reconnects automatically.',primary:'OK',onPrimary:()=>hideModal('offline')}));
+window.addEventListener('online',()=>{hideModal('offline');toast('Back online')});
+
+async function boot(){
+ if(!window.isSecureContext){showModal('secure',{icon:'🔒',title:'Secure page needed',text:'GPS only works on an https page. Open the game from its https link, not a downloaded file.',primary:'Reload',onPrimary:()=>location.reload()});return}
+ if(!navigator.geolocation){showModal('nogps',{icon:'⚠️',title:'GPS not supported',text:'This browser cannot provide your location, so the game cannot track your adventurer.',primary:'Reload',onPrimary:()=>location.reload()});return}
+ let state='prompt';
+ try{const perm=await navigator.permissions.query({name:'geolocation'});state=perm.state;
+  perm.onchange=()=>{if(perm.state==='granted'&&!gotFirst)startGPS();else if(perm.state==='denied')showDenied()}}catch(e){}
+ if(state==='granted')startGPS();else if(state==='denied')showDenied();else showStart()}
+
+/* ---------- Controls ---------- */
+map.on('rotate',()=>{$('needle').style.transform='rotate('+(-map.getBearing())+'deg)'});
+$('zoomIn').addEventListener('click',()=>map.zoomIn({duration:250}));$('zoomOut').addEventListener('click',()=>map.zoomOut({duration:250}));
+$('rotateButton').addEventListener('click',()=>map.easeTo({bearing:map.getBearing()+45,duration:500}));
+$('compass').addEventListener('click',()=>map.easeTo({bearing:0,duration:500}));
+$('layerButton').addEventListener('click',()=>{const flat=map.getPitch()<10;map.easeTo({pitch:flat?START.pitch:0,duration:600});toast(flat?'3D view':'Top-down view')});
+const nearest=t=>items.filter(x=>x.t===t).sort((a,b)=>dist(targetLL,a.ll)-dist(targetLL,b.ll))[0];
+$('menuButton').addEventListener('click',()=>$('menu').classList.toggle('open'));
+$('menu').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{$('menu').classList.remove('open');if(b.dataset.action==='Inventory')return document.querySelector('[data-tab="Character"]').click();if(b.dataset.action!=='Close')toast(b.dataset.action+' screen is a future build step.')}));
+document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>{document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));item.classList.add('active');const t=item.dataset.tab;$('qpanel').classList.toggle('open',t==='Quests');invToggle(t==='Character');if(t==='Quests')render();else if(t!=='Map'&&t!=='Character')toast(t+' screen is not connected yet.')}));
+
+/* ================= QUESTS ================= */
+const QK='realm_quests_v1',MULT={daily:1,weekly:1.5,monthly:2},SCALE={daily:1,weekly:5,monthly:15},MAXEXP=10,MAXRND=5,panel=$('qpanel');
+const mi=m=>(Math.round(m/1609.344*100)/100)+' mi',ft=m=>Math.round(m*3.28084).toLocaleString()+' ft';
+const POOL=[
+ {id:'chest',kind:'chest',goal:1,xp:6,title:n=>`Open ${n} treasure chest${n>1?'s':''}`},
+ {id:'quest',kind:'quest',goal:1,xp:8,title:n=>`Complete ${n} quest marker${n>1?'s':''}`},
+ {id:'nature',kind:'nature',goal:2,xp:6,title:n=>`Gather ${n} nature discoveries`},
+ {id:'walk1',kind:'walk',goal:402.336,xp:5,title:n=>`Walk ${mi(n)}`},
+ {id:'walk2',kind:'walk',goal:1609.344,xp:8,title:n=>`Journey ${mi(n)} on foot`},
+ {id:'photo1',kind:'photo',goal:1,xp:10,title:n=>`Photograph ${n} nature scene${n>1?'s':''}`},
+ {id:'photo2',kind:'photo',goal:1,xp:10,title:n=>`Photograph ${n} public landmark${n>1?'s':''}`}];
+const MS={daily:'Complete Dailies!',weekly:'Daily Dailies',monthly:'Weekly Weeklies'},MSXP=15;
+const pad=n=>String(n).padStart(2,'0');
+function keys(){ // resets follow the phone's local time: midnight daily, midnight Monday weekly, midnight on the 1st monthly
+ const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}).formatToParts(new Date()).map(x=>[x.type,x.value]));
+ const Y=+p.year,M=+p.month,D=+p.day,wd=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].indexOf(p.weekday),m=new Date(Date.UTC(Y,M-1,D-wd));
+ return{daily:`${Y}-${pad(M)}-${pad(D)}`,weekly:`${m.getUTCFullYear()}-${pad(m.getUTCMonth()+1)}-${pad(m.getUTCDate())}`,monthly:`${Y}-${pad(M)}`}}
+function mkTier(t){const T={q:[...POOL].sort(()=>Math.random()-.5).slice(0,7).map(q=>({id:q.id,kind:q.kind,goal:q.goal*SCALE[t],p:0,xp:q.xp,done:false,title:q.title(q.goal*SCALE[t])})),ms:{p:0,done:false,xp:MSXP}};return T}
+let S=null;try{S=JSON.parse(localStorage.getItem(QK))}catch(e){}
+if(!S||!S.k)S={k:keys(),daily:mkTier('daily'),weekly:mkTier('weekly'),monthly:mkTier('monthly'),rnd:{n:0},claimed:{},hashes:[],xp:0,need:50,lvl:1,xpv:2};
+['daily','weekly','monthly'].forEach(t=>{const T=S[t];T.q=T.q.map(q=>{if(q.kind!=='rift'&&q.kind!=='boss'&&q.kind!=='explore')return q;const o=POOL.find(p=>!T.q.some(x=>x.id===p.id));if(!o)return null;const g=o.goal*SCALE[t];return{id:o.id,kind:o.kind,goal:g,p:0,xp:o.xp,done:false,title:o.title(g)}}).filter(Boolean)}); // drop removed quest types from saved games
+if(S.xpv!==2){S.lvl=Math.min(100,Math.max(1,S.lvl|0));S.need=needFor(S.lvl);S.xp=Math.min(S.xp||0,S.need-1);['daily','weekly','monthly'].forEach(t=>{S[t].q.forEach(q=>{const o=POOL.find(p=>p.id===q.id);if(o)q.xp=o.xp});S[t].ms.xp=MSXP});S.xpv=2} // move old saves onto the new XP formula + reward values
+S.chaos=S.chaos||{last:0,fx:null};
+S.taken=S.taken||{};S.loot=S.loot||{claimed:{}};S.hero=S.hero||{hp:100,eq:{},inv:[],pot:{h35:0,full:0,res:0}};S.hero.buy=S.hero.buy||{h35:0,full:0,res:0};   // pot = earned stack (cap 20 each), buy = purchased stack (separate, never capped)
+let tab='daily',rndOffers=[],expl=[],lastWalk=null,acc=0;
+function save(){try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}if(window.realmCloud)window.realmCloud.queue(S)}
+function hud(){const x=document.querySelector('.xptext'),b=document.querySelector('.xpfill'),l=document.querySelector('.level');if(x)x.textContent=S.lvl>=100?'MAX LEVEL':`${Math.floor(S.xp).toLocaleString()} / ${S.need.toLocaleString()} XP`;if(b)b.style.width=(S.lvl>=100?100:Math.min(100,100*S.xp/S.need))+'%';if(l)l.textContent=S.lvl;const d=document.querySelector('.nav-dot');if(d)d.style.display=S.daily.ms.done?'none':''}
+function needFor(L){return 50+(L-1)*10}   // XP to go from level L to L+1
+const ENC_CAP=300; // max XP per day from encounters (mimics, chest bonus, nature, bosses): they supplement quests, never overwhelm them
+function addXp(x){const cf=chaosFx();x=Math.round(x*(1+(clsMod().xpPct+(cf&&cf.k==='xp'?cf.pct:0))/100));if(S.lvl>=100)return hud();S.xp+=x;let up=0;while(S.xp>=S.need&&S.lvl<100){S.xp-=S.need;S.lvl++;S.need=needFor(S.lvl);up=1;toast('Level up! Level '+S.lvl)}if(S.lvl>=100)S.xp=0;if(up&&S.hero){S.hero.hp=stats().hp;S.hero.downed=false}hud()}
+function addEnc(x){const e=S.enc&&S.enc.k===S.k.daily?S.enc:(S.enc={k:S.k.daily,n:0}),g=Math.max(0,Math.min(x,ENC_CAP-e.n));e.n+=g;if(g<x)toast('Daily encounter XP cap reached.');if(g>0)addXp(g)}
+// One reward per quest per period, ever. XP = base x tier multiplier.
+function lvlScale(){return 1+(S.lvl-1)*.02}   // quest + milestone XP grows ~3x by level 100 (tune the .02)
+function award(tier,id,base){const c=`${tier}|${S.k[tier]}|${id}`;if(S.claimed[c])return false;S.claimed[c]=1;srv('award',{p_tier:tier,p_period:S.k[tier],p_id:id}).then(r=>{if(r&&!r.err&&r.xp!=null)toast('+'+r.xp+' XP')});return true}   // amount decided by the server
+function tick(tier){const m=S[tier].ms;if(m.done)return;m.p=Math.min(5,m.p+1);if(m.p>=5)m.ready=true}
+const MSPOT={daily:{h35:1,full:1,res:0},weekly:{h35:2,full:2,res:2},monthly:{h35:3,full:3,res:3}},PN={h35:'Small HP',full:'Full Health',res:'Resurrect'};   // potions granted per milestone (earned stack caps at 20); Resurrect only from weekly + monthly
+async function claimMs(tier){const m=S[tier].ms;if(!m.ready||m.done||m.busy)return;m.busy=true;const r=await srv('award',{p_tier:tier,p_period:S.k[tier],p_id:'ms'});m.busy=false;
+ if(!r||(r.err&&r.err!=='claimed')){toast(r&&r.err==='not_ready'?'Milestone not ready yet.':'Could not claim. Try again.');return}
+ S.claimed[`${tier}|${S.k[tier]}|ms`]=1;m.done=true;m.ready=false;if(!r.err){const got=Object.keys(MSPOT[tier]).filter(k=>MSPOT[tier][k]).map(k=>'+'+((r.pots||{})[k]||0)+' '+PN[k]);toast('+'+r.xp+' XP · '+got.join(' · '))}if(tier==='daily')tick('weekly');else if(tier==='weekly')tick('monthly');save();render()}
+function claim(tier,q){if(!q.ready||q.done)return;finish(tier,q);save();render()}
+function finish(tier,q){if(q.done)return;q.done=true;q.ready=false;q.p=q.goal;award(tier,q.id,q.xp);
+ if(tier==='daily'){const n=S.daily.q.filter(x=>x.done).length,m=S.daily.ms;m.p=Math.min(5,n);if(n>=5&&!m.done)m.ready=true}
+}
+function ev(kind,a=1){let ch=false;['daily','weekly','monthly'].forEach(t=>S[t].q.forEach(q=>{if(q.done||q.kind!==kind)return;ch=true;q.p=Math.min(q.goal,q.p+a);if(q.p>=q.goal){if(q.kind==='photo')finish(t,q);else if(!q.ready){q.ready=true;toast('Quest ready: '+q.title)}}}));if(ch){save();render()}}
+function rollover(){const k=keys();let ch=false;
+ if(k.daily>S.k.daily){S.daily=mkTier('daily');S.rnd={n:0,done:[]};S.expDone=[];rndOffers=[];ch=true}
+ if(k.weekly>S.k.weekly){S.weekly=mkTier('weekly');ch=true}
+ if(k.monthly>S.k.monthly){S.monthly=mkTier('monthly');ch=true}
+ if(ch){S.k=k;Object.keys(S.claimed).forEach(c=>{const[t,p]=c.split('|');if(k[t]!==p)delete S.claimed[c]});save();hud();render();afterSpawn()}
+ const n=rndOffers.length;rndOffers=rndOffers.filter(o=>o.exp>Date.now());if(n!==rndOffers.length)render()}
+// walking progress: ignore GPS jumps (>=80 m between frames) so teleports don't count
+function track(){if(!gotFirst)return;if(!lastWalk){lastWalk=targetLL.slice();return}const d=dist(lastWalk,targetLL);if(d<3)return;lastWalk=targetLL.slice();if(d<80){acc+=d*Math.max(.1,1+.15*clsMod().exp);if(acc>=10){ev('walk',acc);acc=0}}}
+
+/* ---- location safety: fail closed (no map data = no quest locations) ---- */
+const BAD=new Set(['police','ambulance_station','fire_station','hospital','school','kindergarten','college','university','cemetery','grave_yard','military','prison']);
+function feats(l,f){try{return map.querySourceFeatures('om',f?{sourceLayer:l,filter:f}:{sourceLayer:l})}catch(e){return[]}}
+function safeCtx(){const pf=feats('poi').filter(f=>f.geometry.type==='Point'&&(BAD.has(f.properties.class)||BAD.has(f.properties.subclass)));
+ return{ready:feats('transportation').length>0,bad:pf,land:feats('landuse').filter(f=>BAD.has(f.properties.class)),area:[...feats('building'),...feats('water')],roads:feats('transportation',['in',['get','class'],['literal',['motorway','trunk','primary']]])}}
+const polys=g=>g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];
+function inRing(p,r){let c=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const[a,b]=r[i],[x,y]=r[j];if((b>p[1])!==(y>p[1])&&p[0]<(x-a)*(p[1]-b)/(y-b)+a)c=!c}return c}
+const inPoly=(p,g)=>polys(g).some(pl=>inRing(p,pl[0])&&!pl.slice(1).some(h=>inRing(p,h)));
+function segD(p,a,b){const k=Math.cos(rad(p[1]))*111320,x=(a[0]-p[0])*k,y=(a[1]-p[1])*110540,u=(b[0]-p[0])*k-x,v=(b[1]-p[1])*110540-y,l=u*u+v*v,t=l?Math.max(0,Math.min(1,-(x*u+y*v)/l)):0;return Math.hypot(x+t*u,y+t*v)}
+function safeAt(p,c){if(!c.ready)return false;
+ if(c.bad.some(f=>dist(p,f.geometry.coordinates)<100))return false;           // police, EMS, schools, cemeteries, military, etc.
+ const ring=[p,...[0,90,180,270].map(b=>dest(p,b,40))];
+ if(c.land.some(f=>ring.some(q=>inPoly(q,f.geometry))))return false;          // restricted land (40 m buffer)
+ if(c.area.some(f=>inPoly(p,f.geometry)))return false;                         // inside buildings (private) or water
+ for(const f of c.roads){const g=f.geometry,ls=g.type==='LineString'?[g.coordinates]:g.type==='MultiLineString'?g.coordinates:[];for(const l of ls)for(let i=1;i<l.length;i++)if(segD(p,l[i-1],l[i])<35)return false}  // keep off highways
+ return true}
+function pickSafe(){const c=safeCtx();if(!c.ready)return null;for(let i=0;i<14;i++){const p=dest(targetLL,Math.random()*360,40+Math.random()*(RANGE-60));if(safeAt(p,c))return p}return null}
+
+/* ---- random + explorable ---- */
+const RT=[['Open a Nearby Chest',80],['Find a Nature Discovery',90],['Complete a Nearby Quest',100],['Visit a Public Landmark',80]];
+function offerRandom(){return;if(!gotFirst||S.rnd.n+rndOffers.length>=MAXRND||rndOffers.length>=3)return;const p=pickSafe();if(!p)return;const r=RT[Math.random()*RT.length|0],ph=Math.random()<.25;rndOffers.push({id:Date.now().toString(36),title:ph?'Photograph a Public Scene':r[0],xp:r[1],ll:p,photo:ph,exp:Date.now()+18e5});render()}
+function addExpl(o){if(expl.length>=MAXEXP)return false;expl.push(o);return true}   // beyond 10: rejected
+function afterSpawn(){expl=expl.filter(e=>items.some(it=>it.key===e.key&&!it.used));items.forEach(it=>{const key=it.key;if(!key||it.used||it.t==='rift'||it.t==='boss'||expl.some(e=>e.key===key)||S.claimed[`daily|${S.k.daily}|exp:${key}`])return;addExpl({key,t:it.t,ll:it.ll})});offerRandom();render()}
+function completeLoc(a,o){if(a==='rgo'){if(S.rnd.n>=MAXRND)return toast('Daily random quest limit reached.');if(!award('daily','rnd:'+o.id,o.xp))return;S.rnd.n++;(S.rnd.done=S.rnd.done||[]).push({title:o.title,xp:o.xp});rndOffers=rndOffers.filter(x=>x!==o)}
+ else{if(!award('daily','exp:'+o.key,100))return;expl=expl.filter(x=>x!==o);(S.expDone=S.expDone||[]).push({title:LABEL[o.t]||'Discovery',xp:100});ev('explore')}save();render()}
+
+/* ---- photo evidence: camera capture -> client checks -> verifyEvidence() hook ---- */
+const pf=document.createElement('input');pf.type='file';pf.accept='image/*';pf.setAttribute('capture','environment');pf.style.display='none';document.body.appendChild(pf);let pctx=null;
+function askPhoto(c){if(!gotFirst)return toast('Waiting for a GPS fix.');pctx=c;pf.value='';pf.click()}
+function thumb(f){return new Promise(r=>{const u=URL.createObjectURL(f),i=new Image();i.onload=()=>{const k=240/Math.max(i.width,i.height,240),cv=document.createElement('canvas');cv.width=Math.round(i.width*k);cv.height=Math.round(i.height*k);cv.getContext('2d').drawImage(i,0,0,cv.width,cv.height);URL.revokeObjectURL(u);r(cv.toDataURL('image/jpeg',.5))};i.onerror=()=>r(null);i.src=u})}
+const hash=t=>{let h=5381;for(let i=0;i<t.length;i+=7)h=(h*33^t.charCodeAt(i))>>>0;return h};
+async function verifyEvidence(e){return true} // TODO: send {thumb,ll,time} to your server for EXIF/GPS, content and moderation review
+pf.onchange=async()=>{const f=pf.files[0],c=pctx;pctx=null;if(!f||!c)return;
+ if(!/^image\//.test(f.type))return toast('Please submit a photo.');
+ if(Date.now()-f.lastModified>6e5)return toast('Take the photo now. Older photos are not accepted.');
+ if(!(c.o?dist(targetLL,c.o.ll)<=RANGE:items.some(i=>dist(targetLL,i.ll)<=RANGE)))return toast('Take the photo inside the quest area, from a public spot.');
+ const th=await thumb(f);if(!th)return toast('Could not read that photo.');
+ const h=hash(th);if(S.hashes.includes(h))return toast('That photo was already used.');
+ if(!(await verifyEvidence({th,h,ll:targetLL,t:Date.now()})))return toast('Photo could not be verified.');
+ S.hashes=[...S.hashes,h].slice(-200);c.done();save()};
+
+/* ---- UI ---- */
+function card(t,o){const pct=Math.round(100*Math.min(1,t.p/t.goal)),sub=o.sub!=null?o.sub:t.done?'Completed':t.ready?'Ready to complete':t.kind==='walk'?`${(t.p/1609.344).toFixed(2)} / ${mi(t.goal)}`:`${Math.floor(t.p)} / ${t.goal}`;
+ return `<div class="qcard${t.done?' done':''}${t.ready&&!t.done?' rdy':''}${o.ms?' ms':''}" data-act="${o.act||''}" data-i="${o.i==null?'':o.i}"><div class="qt"><b>${t.title}</b><span>+${o.xp} XP</span></div>${o.nobar?'':`<div class="qbar"><i style="width:${pct}%"></i></div>`}<div class="qs">${sub}</div></div>`}
+function render(){if(!panel.classList.contains('open'))return;const T=S[tab],tn={daily:'Daily',weekly:'Weekly',monthly:'Monthly'},M=MULT[tab],d=o=>ft(dist(targetLL,o.ll));
+ let h=`<div class="qtabs">${Object.keys(tn).map(k=>`<div class="qtab${k===tab?' on':''}" data-act="tab" data-i="${k}">${tn[k]}</div>`).join('')}</div>`;
+ h+=T.q.map((q,i)=>card(q,{xp:Math.round(q.xp*M*lvlScale()),act:'q',i})).join('');
+ h+=card({title:MS[tab],p:T.ms.p,goal:5,done:T.ms.done,ready:T.ms.ready,kind:'ms'},{ms:1,xp:Math.round(T.ms.xp*M*lvlScale()),act:'ms'});
+ const st=panel.scrollTop;panel.innerHTML=h;panel.scrollTop=st}
+const HINT={chest:'Open treasure chests on the map.',quest:'Complete quest markers on the map.',nature:'Gather nature discoveries on the map.',walk:'Walk on public paths and sidewalks.',rift:'Close arcane rifts on the map.',boss:'Challenge dark lairs on the map.',explore:'Finish explorable quests.',photo:'Photograph a public scene from a safe spot.'};
+function popup(o){showModal('quest',{icon:o.icon,title:o.title,text:o.text,primary:o.btn,onPrimary:()=>{if(!o.on)return;hideModal('quest');o.on()},secondary:'Close',onSecondary:()=>hideModal('quest')});const b=$('mPrimary');b.disabled=!o.on;b.style.opacity=o.on?'':'.45'}
+panel.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||!b.dataset.act)return;const a=b.dataset.act,i=b.dataset.i;
+ if(a==='tab'){tab=i;render();return}
+ const tr=tab,M=MULT[tr];
+ if(a==='q'){const q=S[tr].q[i];if(!q)return;const xp=Math.round(q.xp*M*lvlScale()),prog=q.kind==='walk'?`${(q.p/1609.344).toFixed(2)} / ${mi(q.goal)}`:`${Math.floor(q.p)} / ${q.goal}`,
+  base={icon:q.kind==='photo'?'📷':'📜',title:q.title,text:`${prog}\nReward: +${xp} XP${q.done?'':'\n'+HINT[q.kind]}`};
+  if(q.done)return popup({...base,btn:'Completed'});
+  if(q.ready)return popup({...base,btn:'Complete Quest',on:()=>claim(tr,q)});
+  if(q.kind==='photo')return popup({...base,btn:'📷 Enter Photo',on:()=>askPhoto({done:()=>ev('photo')})});
+  return popup({...base,btn:'In Progress'})}
+ if(a==='ms'){const m=S[tr].ms,base={icon:'🏆',title:MS[tr],text:`${m.p} / 5\nReward: +${Math.round(m.xp*M*lvlScale())} XP\n${Object.keys(MSPOT[tr]).filter(k=>MSPOT[tr][k]).map(k=>'+'+MSPOT[tr][k]+' '+PN[k]).join(', ')} Potion${tr==='daily'?'s':'s'}`};
+  if(m.done)return popup({...base,btn:'Completed'});
+  if(m.ready)return popup({...base,btn:'Claim Reward',on:()=>claimMs(tr)});
+  return popup({...base,btn:'In Progress'})}
+ const o=(a==='rgo'?rndOffers:expl)[i];if(!o)return;
+ const dd=dist(targetLL,o.ll),base={icon:o.photo?'📷':'🧭',title:a==='rgo'?o.title:(LABEL[o.t]||'Discovery'),text:`${ft(dd)} away\nReward: +${a==='rgo'?o.xp:100} XP`};
+ if(dd>RANGE)return tooFar(dd);
+ popup({...base,btn:o.photo?'📷 Enter Photo':'Enter',on:()=>{if(dist(targetLL,o.ll)>RANGE)return tooFar(dist(targetLL,o.ll));o.photo?askPhoto({o,done:()=>completeLoc(a,o)}):completeLoc(a,o)}})});
+rollover();save();hud();setInterval(()=>{rollover();offerRandom()},20000);setInterval(lairTick,15000);setInterval(()=>{if(!lastSync||dist(lastSync,targetLL)>80||Date.now()-lastSyncT>6e4)syncWorld()},10000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)rollover()});
+
+/* ---- Dark lairs: appear on even hours (12, 2, 4 ... local time), vanish 20 min later, >=500 ft apart ---- */
+const LAIR={max:3,minGap:152.4,life:20*6e4,rMin:150,rMax:600}; // max per window; min spacing (m); lifetime (ms); spawn ring around player (m)
+function lairWindow(){const d=new Date();if(d.getHours()%2)return null;const st=new Date(d);st.setMinutes(0,0,0);return{id:`${st.getFullYear()}-${st.getMonth()}-${st.getDate()}-${st.getHours()}`,end:st.getTime()+LAIR.life}}
+function activeLairs(){const L=S&&S.lairs;return L&&L.end>Date.now()?L.list.map(ll=>({t:'boss',ll,exp:L.end,key:'lair'+ll[0]})).filter(l=>!S.loot.claimed[l.key+'|'+l.exp]):[]}
+function lairTick(){const now=Date.now(),w=lairWindow();
+ dropExpired();
+ if(!w||now>=w.end||(S.lairs&&S.lairs.id===w.id)||!gotFirst)return;
+ const c=safeCtx();if(!c.ready)return;const list=[];
+ for(let i=0;i<80&&list.length<LAIR.max;i++){const p=dest(targetLL,Math.random()*360,LAIR.rMin+Math.random()*(LAIR.rMax-LAIR.rMin));if(list.every(q=>dist(p,q)>=LAIR.minGap)&&safeAt(p,c))list.push(p)}
+ S.lairs={id:w.id,end:w.end,list};save();
+ list.forEach(ll=>addItem({t:'boss',ll,exp:w.end,key:'lair'+ll[0]}));
+ updateCards();if(list.length)toast('Dark lairs have appeared nearby!')}
+
+
+/* ---- World spawning: deterministic grid. Same place + same time = same markers for everyone, nothing stored ---- */
+const GRID={cell:.0025,radius:600,max:30, // cell size in degrees (~900 ft); spawn radius around player (m); max markers on screen
+ types:{chest:{n:2,p:.40,life:60},nature:{n:2,p:.45,life:60},quest:{n:1,p:.30,life:120},rift:{n:1,p:.15,life:30}}}; // n = sites per cell, p = chance a site is active, life = minutes
+const QN=['Investigate the Strange Lights','The Whispering Door','The Lost Satchel',"A Traveler's Request"];
+function h32(t){let h=2166136261;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+const rnd=t=>h32(t)/4294967296,safeMemo={};let lastSync=null,lastSyncT=0;
+function addItem(it){items.push(it);const el=mkEl(it.t);el.addEventListener('click',e=>{e.stopPropagation();openPoi(it)});markers.push(new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(it.ll).addTo(map))}
+function dropItem(i){if(markers[i])markers[i].remove();items.splice(i,1);markers.splice(i,1)}
+function dropExpired(){const now=Date.now();let ch=false;for(let i=items.length-1;i>=0;i--)if(items[i].exp&&items[i].exp<=now){dropItem(i);ch=true}return ch}
+function syncWorld(){const c=safeCtx();if(!c.ready)return false;const now=Date.now(),G=GRID,[lng,lat]=targetLL;
+ c.pois=feats('poi');c.green=[...feats('park'),...feats('landuse',['in',['get','class'],['literal',['park','garden','playground','recreation_ground']]]),...feats('landcover',['in',['get','class'],['literal',['wood','grass','wetland']]])]; // 'park' is its own tile layer in OpenMapTiles (the map draws it from there)
+ const cnt={};c.pois.forEach(f=>{if(f.geometry.type!=='Point')return;const[x,y]=f.geometry.coordinates,k=Math.floor(x/G.cell)+','+Math.floor(y/G.cell);cnt[k]=(cnt[k]||0)+1});
+ const dLat=G.radius/110540,dLng=G.radius/(111320*Math.cos(rad(lat))),want=new Map();
+ for(let cx=Math.floor((lng-dLng)/G.cell);cx<=Math.floor((lng+dLng)/G.cell);cx++)for(let cy=Math.floor((lat-dLat)/G.cell);cy<=Math.floor((lat+dLat)/G.cell);cy++){
+  const dens=Math.min(2,Math.max(.7,.7+(cnt[cx+','+cy]||0)*.12)); // busier areas spawn more; rural keeps a 0.7x floor
+  for(const t in G.types){const T=G.types[t];for(let j=0;j<T.n;j++){
+   const sk=`${cx},${cy},${t},${j}`,ll=[(cx+.1+.8*rnd(sk+'x'))*G.cell,(cy+.1+.8*rnd(sk+'y'))*G.cell];
+   if(dist(ll,targetLL)>G.radius)continue;
+   const life=T.life*6e4,ph=rnd(sk+'p')*life,n=Math.floor((now+ph)/life);let p=T.p*dens;
+   let gr=false;if(t==='nature'&&c.green.some(f=>inPoly(ll,f.geometry))){gr=true;p*=2} // parks and woods: more nature
+   if(rnd(sk+'|'+n)>=p)continue;const key=sk+'|'+n;if(S.taken[key])continue;
+   if(!(sk in safeMemo))safeMemo[sk]=safeAt(ll,c);if(!safeMemo[sk])continue;
+   want.set(key,{t,ll,key,grid:1,green:gr,exp:(n+1)*life-ph,name:t==='quest'?QN[Math.floor(rnd(sk+'n'+n)*QN.length)]:undefined})}}}
+ const near=[...want.values()].sort((a,b)=>dist(a.ll,targetLL)-dist(b.ll,targetLL)).slice(0,G.max);want.clear();near.forEach(o=>want.set(o.key,o));
+ let ch=dropExpired();
+ for(let i=items.length-1;i>=0;i--){const it=items[i];if(!it.grid)continue;if(want.has(it.key))want.delete(it.key);else{dropItem(i);ch=true}}
+ activeLairs().forEach(l=>{if(!items.some(i=>i.key===l.key))want.set(l.key,l)});
+ want.forEach(o=>{addItem(o);ch=true});
+ Object.keys(S.taken).forEach(k=>{if(S.taken[k]<now)delete S.taken[k]});
+ lastSync=targetLL.slice();lastSyncT=now;if(ch){updateCards();afterSpawn()}return true}
+
+/* ================= LOOT (single authoritative catalog + tables) ================= */
+const RAR=['common','uncommon','rare','mythic','legendary'],RC={common:'#cfc9b8',uncommon:'#6fdc7a',rare:'#5ab4ff',mythic:'#c98aff',legendary:'#ffb23e'},cap=s=>s[0].toUpperCase()+s.slice(1);
+const SLOTS=['helm','chest','feet','hands','main','off','amulet','ring1','ring2','cloak'],SN={helm:'Helm',chest:'Chest',feet:'Feet',hands:'Gloves',main:'Main Hand',off:'Off Hand',amulet:'Amulet',ring1:'Ring 1',ring2:'Ring 2',cloak:'Cloak'};
+const TYPE_SLOT={helm:['helm'],chest:['chest'],feet:['feet'],hands:['hands'],main:['main'],off:['off'],amulet:['amulet'],ring:['ring1','ring2'],cloak:['cloak']},TN={...SN,ring:'Ring'};
+const BUDGET={common:2,uncommon:4,rare:6,mythic:9,legendary:14};   // stat points per item; HP counts x3 (1 point = 1 ATK, 1 DEF or 3 HP)
+const WT={helm:[0,.6,.4],chest:[0,.4,.6],feet:[.2,.4,.4],hands:[.5,.5,0],main:[1,0,0],off:[.4,.6,0],amulet:[.4,0,.6],ring:[.5,.25,.25],cloak:[.2,.4,.4]};   // share of budget as [ATK, DEF, HP]
+const NAMES={helm:['Worn Cap',"Ranger's Hood","Knight's Helm",'Dragonscale Helm','Crown of Dawn'],chest:['Padded Tunic','Studded Jerkin','Steel Cuirass','Wyrmhide Plate','Aegis of the Sunforge'],feet:['Travel Boots','Trail Boots','Greaves of Stride','Stormwalkers','Boots of the Endless Road'],hands:['Cloth Wraps','Leather Gloves','Steel Gauntlets','Voidgrip Gauntlets','Fists of the Titan'],main:['Rusty Sword','Iron Blade','Silverwood Blade','Nightfang','Realmbreaker'],off:['Wooden Buckler','Iron Shield',"Warden's Shield",'Mythril Bulwark','Bulwark of Ages'],amulet:['Bone Charm','Copper Pendant','Moonstone Amulet','Heart of Embers','Eye of the Realm'],ring:['Tin Band','Silver Band','Sapphire Ring','Ring of Eclipse','Ring of the First King'],cloak:['Frayed Cloak','Wool Cloak',"Ranger's Mantle",'Shadow Veil','Mantle of Stars']};
+const CAT={};RAR.forEach((r,i)=>Object.keys(NAMES).forEach(t=>{const w=WT[t],B=BUDGET[r];CAT[t+'_'+r]=Object.freeze({id:t+'_'+r,name:NAMES[t][i],type:t,rarity:r,atk:Math.round(B*w[0]),def:Math.round(B*w[1]),hp:Math.round(B*w[2]*3)})}));Object.freeze(CAT);
+const POTS={h35:{name:'Small HP Potion',icon:'🧪',heal:.35},full:{name:'Full Health Potion',icon:'⚗️',heal:1},res:{name:'Resurrect Potion',icon:'✨',heal:.5}};   // Resurrect: revives at 50% max HP
+const BONUS_XP={chest:25,boss:100},EXTRA_PCT=.25;   // bonus-20 extra stat = 25% of the item's rarity budget
+const MIMIC={mimic:{name:'Mimic',xp:10,loot:'common'},smimic:{name:'Strong Mimic',xp:20,loot:'uncommon'}};   // real fights now; win = XP + item, lose = chest forfeited
+// ONE table set, used by chests AND bosses. Ranges are [lo,hi,result]; validated below.
+const TABLES={
+ chest:[[1,2,'smimic'],[3,4,'mimic'],[5,6,'h35'],[7,10,'common'],[11,13,'uncommon'],[14,16,'rare'],[17,19,'mythic'],[20,20,'mythic+']],
+ boss:[[1,4,'common'],[5,8,'uncommon'],[9,11,'rare'],[12,15,'mythic'],[16,19,'legendary'],[20,20,'legendary+']],
+ bonus:[[1,10,'xp'],[11,15,'full'],[16,19,'res'],[20,20,'extra']],
+ chaos:[[1,2,'cfail'],[3,5,'omen'],[6,9,'shrug'],[10,12,'blessing'],[13,15,'explore'],[16,17,'potion'],[18,18,'surge'],[19,20,'cwin']]};
+for(const k in TABLES){let n=1;TABLES[k].forEach(([a,b])=>{if(a!==n||b<a)throw new Error('Loot table "'+k+'" overlaps or has a gap at '+a);n=b+1});if(n!==21)throw new Error('Loot table "'+k+'" must cover 1-20')}
+const ri=n=>{const a=new Uint32Array(1),lim=4294967296-4294967296%n;let x;do{crypto.getRandomValues(a);x=a[0]}while(x>=lim);return x%n},d20=()=>ri(20)+1,look=(t,r)=>TABLES[t].find(e=>r>=e[0]&&r<=e[1])[2];
+const H=()=>S.hero,iStat=it=>{const c=CAT[it.cid],o={atk:c.atk,def:c.def,hp:c.hp};if(it.extra&&o[it.extra.stat]!==undefined)o[it.extra.stat]+=it.extra.val;return o};   // always recomputed from the catalog
+const fmtS=o=>[o.atk&&'+'+o.atk+' ATK',o.def&&'+'+o.def+' DEF',o.hp&&'+'+o.hp+' HP'].filter(Boolean).join('  '),fmtI=it=>{const c=CAT[it.cid];return`${cap(c.rarity)} ${c.name} (${TN[c.type]})  ${fmtS(iStat(it))}${it.extra?'  [extra +'+it.extra.val+' '+it.extra.stat.toUpperCase()+']':''}`};
+function grantItem(src,rarity){if(rarity==='legendary'&&src!=='boss'&&src!=='event')rarity='mythic';   // hard guard: chests can never give Legendary
+ const types=Object.keys(NAMES),it={uid:Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>b.toString(16).padStart(2,'0')).join(''),cid:types[ri(types.length)]+'_'+rarity};
+ if(H().inv.some(i=>i.uid===it.uid))return grantItem(src,rarity);H().inv.push(it);return it}
+/* ================= CLASSES + COMBAT ================= */
+// Class modifiers are FLAT and applied AFTER level + equipment are summed (additive only, so nothing multiplies or stacks).
+const sg=v=>(v>0?'+':'')+v;
+const CLASSES={
+ warrior:{n:'Warrior',d:'Front-line fighter.',atk:1,exp:-1},
+ paladin:{n:'Paladin',d:'Holy champion.',atk:2,chaosBonus:-1},
+ antipaladin:{n:'Anti-Paladin',d:'Dark knight who thrives on chaos.',chaosReq:-1,holy:1},
+ druid:{n:'Druid',d:'Nature specialist. Parks and wild places favor you.',exp:1,herb:1,def:-1},
+ archer:{n:'Archer',d:'Opens every fight with a deadly shot.',first:50,hp:-5},
+ assassin:{n:'Assassin',d:'Hits hard but fragile.',atk:2,hp:-5},
+ barbarian:{n:'Barbarian',d:'Huge health pool, lightly armored.',hp:10,def:-1},
+ monk:{n:'Monk',d:'Disciplined and hard to hurt.',def:2,atk:-1},
+ scout:{n:'Scout',d:'Born explorer.',exp:2,atk:-1},
+ bard:{n:'Bard',d:'Songs that speed progression.',xpPct:10,def:-1},
+ healer:{n:'Healer',d:'Recovers faster than anyone.',heal:15,regen:2,atk:-1},
+ wizard:{n:'Wizard',d:'Arcane bolts slip past armor.',pierce:2,hp:-5}};
+const DESC={atk:v=>sg(v)+' Attack',def:v=>sg(v)+' Defense',hp:v=>sg(v)+' HP',exp:v=>sg(v)+' Exploration ('+sg(15*v)+'% nature-gather XP and walking credit)',chaosBonus:v=>sg(v)+' Chaos Completion Bonus ('+sg(10*v)+'% XP from Dark Lairs, '+sg(v)+'% boon strength on Tempt Fate)',chaosReq:v=>sg(v)+' Chaos Completion Requirements (Dark Lair bosses have '+Math.abs(10*v)+'% '+(v<0?'less':'more')+' HP; Tempt Fate rolls count '+sg(-v)+')',holy:v=>sg(v)+' Holy Damage (extra damage to Dark Lairs, ignores Defense)',first:v=>'Opening Shot: your first hit deals +'+v+'% damage',pierce:v=>'Arcane Bolt: ignores '+v+' enemy Defense',xpPct:v=>'Inspiring Song: '+sg(v)+'% XP from all sources',heal:v=>'Healing Hands: Health Potions restore +'+v+'% extra',regen:v=>'Rest: natural regeneration x'+v,herb:()=>'Herbalist: Nature Discoveries may give a Small HP Potion (better odds in parks)'};
+function chaosFx(){const f=S.chaos&&S.chaos.fx;return f&&f.until>Date.now()?f:null}
+const clsMod=()=>{const c={atk:0,def:0,hp:0,exp:0,chaosBonus:0,chaosReq:0,holy:0,pierce:0,first:0,xpPct:0,heal:0,regen:1,herb:0,...(CLASSES[S.cls]||{})},f=chaosFx();if(f&&f.k==='exp')c.exp+=f.v;return c};
+const clsInfo=c=>{const P=[],N=[];Object.keys(DESC).forEach(k=>{const v=c[k];if(!v)return;(k==='chaosReq'?v<0:v>0?1:0)?P.push(DESC[k](v)):N.push(DESC[k](v))});return{P,N}};
+const lvlBase=L=>({atk:2+Math.floor(L/10),def:Math.floor(L/10),hp:10+5*(L-1)});   // Start 10 HP, +5 per level, level cap 100
+function parts(){const b=lvlBase(S.lvl),g={atk:0,def:0,hp:0},cm=clsMod();for(const k in H().eq){const it=H().eq[k];if(!it||!CAT[it.cid])continue;const o=iStat(it);g.atk+=o.atk;g.def+=o.def;g.hp+=o.hp}
+ const s={atk:Math.max(1,b.atk+g.atk+cm.atk),def:Math.max(0,b.def+g.def+cm.def),hp:Math.max(5,b.hp+g.hp+cm.hp)},f=chaosFx();
+ if(f&&f.k==='stat'){const v=s[f.stat];s[f.stat]=Math.max(f.stat==='atk'?1:0,v+Math.sign(f.pct)*Math.max(1,Math.round(v*Math.abs(f.pct)/100)))}   // chaos buff/debuff applied last, min 1 point
+ return{b,g,cm,s}}
+function stats(){return parts().s}
+// Enemies scale off a "par" hero: level base + half of a full set of level-appropriate gear. Naked heroes lose; at-par gear wins; better gear wins easier.
+const ENEMY={mimic:{n:'Mimic',m:[.6,.7,.5]},smimic:{n:'Strong Mimic',m:[.9,.9,.8]},boss:{n:'Dark Lair Boss',m:[2.5,.9,.8]}};
+function enemy(k,L){const b=lvlBase(L),r=L<10?0:L<30?1:L<55?2:L<80?3:4,g={atk:0,def:0,hp:0};['helm','chest','feet','hands','main','off','amulet','ring','ring','cloak'].forEach(t=>{const c=CAT[t+'_'+RAR[r]];g.atk+=c.atk;g.def+=c.def;g.hp+=c.hp});
+ const m=ENEMY[k].m;let hp=(b.hp+.5*g.hp)*m[0];if(k==='boss')hp*=1+.1*clsMod().chaosReq;
+ return{n:ENEMY[k].n,hp:Math.max(1,Math.round(hp)),atk:Math.max(1,Math.round((b.atk+.5*g.atk)*m[1])),def:Math.round((b.def+.5*g.def)*m[2])}}
+// Damage = ceil(ATK x 10 / (10 + DEF)): DEF has diminishing returns (10 DEF halves damage). Min 1 per hit, max 50% of the target's max HP per hit. No randomness.
+const hitDmg=(a,d)=>Math.max(1,Math.ceil(a*10/(10+Math.max(0,d))));
+function fight(k){const s=stats(),e=enemy(k,S.lvl),cm=clsMod(),boss=k==='boss',st=Math.floor(H().hp);let ph=st,eh=e.hp,r=0,first=true;
+ while(r<300){r++;let d=hitDmg(s.atk,e.def-cm.pierce);if(first&&cm.first)d=Math.ceil(d*(1+cm.first/100));first=false;if(boss)d+=cm.holy;eh-=Math.min(d,Math.ceil(e.hp*.5));if(eh<=0)break;
+  ph-=Math.min(hitDmg(e.atk,s.def),Math.ceil(s.hp*.5));if(ph<=0)break}
+ return{win:eh<=0,hp:Math.max(0,ph),dmg:st-Math.max(0,ph),rounds:r,e}}
+/* ---- defeat + recovery ---- */
+// 0 HP = downed: no XP/item penalty, but no chests or lairs until you recover to 25% max HP. A Resurrect Potion auto-triggers (revives at 50% max HP).
+// Downed players regenerate 2% max HP/min (+5% per Nature Discovery) and can't open chests or lairs until they reach 25% max HP. Level-up fully heals.
+function heal(f){const h=H(),mx=stats().hp;h.hp=Math.min(mx,h.hp+Math.round(mx*Math.min(1,f)))}
+function revive(){const h=H();h.hp=Math.max(1,Math.round(stats().hp*POTS.res.heal));h.downed=false}
+const POT_CAP=20,potN=k=>(H().pot[k]||0)+(H().buy[k]||0);
+function givePot(k,n){const h=H(),a=Math.max(0,Math.min(n,POT_CAP-(h.pot[k]||0)));h.pot[k]=(h.pot[k]||0)+a;return a}   // earned potions stop at the cap: no potion, no XP substitute
+async function srv(fn,args){const R=window.realmCloud;if(!R){toast('Not connected to the server.');return null}try{const r=await R.rpc(fn,args);if(r&&r.core)applyCore(r.core);return r}catch(e){toast(/rate_limited/.test(e.message||'')?'Slow down, adventurer. Try again later.':'Server error. Check your connection.');return null}}
+function applyCore(c){if(!c)return;const h=S.hero,up=c.lvl>S.lvl;S.xp=c.xp;S.lvl=c.lvl;S.need=needFor(c.lvl);if(c.cls)S.cls=c.cls;h.pot=c.pot;h.buy=c.buy;   // server-owned: XP, level, potions, items, class, chaos
+ const own=new Map(c.inv.map(i=>[i.uid,i]));for(const k in h.eq){const it=h.eq[k];if(it&&own.has(it.uid)){h.eq[k]=own.get(it.uid);own.delete(it.uid)}else h.eq[k]=null}h.inv=[...own.values()];
+ S.chaos={last:(c.chaos&&c.chaos.last)||0,fx:(c.chaos&&c.chaos.fx)||null};if(up){h.hp=stats().hp;h.downed=false;toast('Level up! Level '+S.lvl)}hud();if(typeof inv!=='undefined'&&inv.classList.contains('open'))invRender();save()}
+async function takePot(k){const r=await srv('use_potion',{p_k:k});return !!(r&&r.ok)}   // the server does the subtracting
+async function useRes(){if(!H().downed||!(await takePot('res')))return false;revive();save();hud();return true}
+function down(){const h=H();h.hp=0;h.downed=true;return'You are downed. No chests or lairs until you recover to 25% HP. Rest, gather Nature Discoveries (+5% HP each), or use a Resurrect Potion.'}   // Resurrect is always the player's choice
+function upDown(){const h=H(),mx=stats().hp;if(h.downed&&h.hp>=mx*.25){h.downed=false;toast('You have recovered enough to fight again.')}}
+function recover(){const h=H(),now=Date.now(),mx=stats().hp,dt=Math.max(0,(now-(h.t||now))/6e4);h.t=now;if(C)return;if(h.hp<=0)h.downed=true;   // rest regenerates 2% max HP/min, even while downed
+ h.hp=Math.min(mx,h.hp+mx*.02*clsMod().regen*dt);upDown();save()}
+/* ---- rewards: chest + boss ---- */
+async function lootFrom(it){const boss=it.t==='boss',h=H(),L=[],ex=it.exp||0,lk=it.key+'|'+ex,CL=S.loot.claimed;
+ if(!it.key||CL[lk])return toast('Already claimed.');
+ const battle=k=>{const f=fight(k),e=f.e;L.push('⚔ '+e.n+'  HP '+e.hp+' · ATK '+e.atk+' · DEF '+e.def,f.win?'Victory in '+f.rounds+' rounds. You lost '+f.dmg+' HP ('+f.hp+'/'+stats().hp+').':'Defeat after '+f.rounds+' rounds.');h.hp=f.hp;if(!f.win)L.push(down());return f.win};
+ const done=(icon,title)=>{save();hud();const rp=h.downed&&potN('res')>0;showModal('loot',{icon,title,text:L.join('\n')+(rp?'\n\nUse a Resurrect Potion? You have '+potN('res')+'.':''),primary:rp?'Use Resurrect Potion':'Continue',onPrimary:async()=>{hideModal('loot');if(rp&&await useRes()){toast('You rise again at '+Math.floor(H().hp)+' HP.');if(inv.classList.contains('open'))invRender()}},...(rp?{secondary:'Stay Downed',onSecondary:()=>hideModal('loot')}:{})})};
+ const bonusLine=(b,item)=>b.k==='xp'?(b.xp?'Bonus: +'+b.xp+' XP':'Bonus: daily encounter XP cap reached'):b.k==='extra'?'Bonus: extra stat on your '+cap(CAT[item.cid].rarity)+' item (+'+item.extra.val+' '+item.extra.stat.toUpperCase()+')':(b.got?'Bonus: '+POTS[b.k].name:'Bonus: your potion bag is already full');
+ CL[lk]=ex||Date.now()+864e5;   // blocks double-taps; the server's claim record is the real lock
+ if(boss){if(!battle('boss')){delete CL[lk];return done('💀','Defeated')}   // losing a boss claims nothing: retry once recovered
+  const r=await srv('resolve_boss',{p_key:it.key,p_exp:ex,p_win:true});if(!r||r.err){if(!r)delete CL[lk];else toast('Already claimed.');return}
+  L.push('Reward: +'+r.xp+' XP','🎲 D20 roll: '+r.roll,'Reward: '+cap(CAT[r.item.cid].rarity)+' loot','★ '+fmtI(r.item));if(r.bonus)L.push('','🎲 Bonus D20 roll: '+r.bonus.br,bonusLine(r.bonus,r.item));
+  return done('💀','Dark Lair Conquered')}
+ const r=await srv('open_chest',{p_key:it.key,p_exp:ex});if(!r||r.err){if(!r)delete CL[lk];else toast('Already claimed.');return}   // the roll happens on the server and is never shown
+ if(r.res==='mimic'||r.res==='smimic')return mimicFight(r.res,it);
+ if(r.res==='pot')L.push(r.got?'Reward: Small HP Potion (restores 35% max HP)':'Your potion bag is already full.');
+ else{L.push('Reward: '+cap(CAT[r.item.cid].rarity)+' loot','★ '+fmtI(r.item));if(r.bonus)L.push(bonusLine(r.bonus,r.item))}
+ done('🧰','Chest Opened')}
+async function gatherNature(it){const r=await srv('gather_nature',{p_key:it.key||'n'+it.ll[0],p_exp:it.exp||0,p_green:!!it.green});if(!r||r.err)return;const m=['Nature gathered! +'+r.xp+' XP'];if(H().downed){const mx=stats().hp,g=Math.max(1,Math.round(mx*.05));H().hp=Math.min(mx,H().hp+g);m.push('+'+g+' HP (resting in nature)');upDown()}if(r.potion)m.push('+Small HP Potion');save();toast(m.join(' · '))}
+/* ---- interactive mimic combat (chest ambush) ---- */
+const mimicArt=strong=>{const B=strong?'#3d2a52':'#7a4a1f',D=strong?'#24162f':'#4a2b10',G=strong?'#b8a0d8':'#d6b050',E=strong?'#ff3b30':'#ffd83a',T='#f6f1e3',sp=strong?'<path d="M45 22l8-24 8 24zM85 14l10-30 10 30zM125 22l8-24 8 24z" fill="'+G+'"/>':'',tt=(a,y,d,n)=>Array.from({length:n},(_,i)=>'<path d="M'+(a+i*22)+' '+y+'l7 '+d+' 7 '+(-d)+'z" fill="'+T+'"/>').join('');
+ return'<svg viewBox="0 0 200 150" width="100%" style="max-width:230px"><ellipse cx="100" cy="142" rx="78" ry="6" fill="#0007"/><rect x="30" y="82" width="140" height="54" rx="7" fill="'+B+'" stroke="'+D+'" stroke-width="3"/><rect x="30" y="104" width="140" height="9" fill="'+G+'"/><rect x="92" y="98" width="16" height="20" rx="3" fill="'+G+'" stroke="'+D+'" stroke-width="2"/><ellipse cx="100" cy="83" rx="70" ry="13" fill="#2b0a12"/><path d="M78 84q22 36 44 0z" fill="#d6304a"/>'+tt(40,84,-17,7)+sp+'<path d="M28 62Q28 12 100 12T172 62z" fill="'+B+'" stroke="'+D+'" stroke-width="3"/><path d="M28 40Q100 28 172 40" stroke="'+G+'" stroke-width="7" fill="none"/>'+tt(37,62,17,7)+'<circle cx="72" cy="40" r="11" fill="'+E+'" stroke="#000" stroke-width="2"/><circle cx="128" cy="40" r="11" fill="'+E+'" stroke="#000" stroke-width="2"/><rect x="70" y="32" width="4" height="16" rx="2" fill="#000"/><rect x="126" y="32" width="4" height="16" rx="2" fill="#000"/><path d="M58 26l26 8M142 26l-26 8" stroke="#000" stroke-width="4"/></svg>'};
+const cbs=document.createElement('style');cbs.textContent='#cbt{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;padding:14px;background:#000d;font-family:Georgia,serif;color:#ead8ac}#cbt .cbb{width:100%;max-width:380px;max-height:100%;overflow-y:auto;padding:18px 16px;border:1px solid #b99a52;border-radius:6px;background:linear-gradient(135deg,#251d12,#0e0c09);box-shadow:0 14px 50px #000c,inset 0 0 0 3px #1b140b;text-align:center}#cbt .cbt{font-size:19px;font-weight:700;color:#fff0c6;margin-bottom:6px}#cbt .cbh{font-size:12px;margin:8px 0 2px;display:flex;justify-content:space-between}#cbt .cbbar{height:9px;border-radius:5px;background:#000;border:1px solid #5a4725;overflow:hidden}#cbt .cbbar i{display:block;height:100%}#cbt .cbl{min-height:62px;margin:12px 0;font-size:14px;line-height:1.45;color:#e6d6ae;white-space:pre-line}#cbt .cbr{display:flex;gap:8px}#cbt button{flex:1;padding:13px 6px;border:1px solid #d6b866;border-radius:4px;background:linear-gradient(#5a4725,#33280f);color:#fff0c6;font:700 16px Georgia,serif;cursor:pointer}#cbt button.alt{background:#15110a}';document.head.appendChild(cbs);
+const cb=document.createElement('div');cb.id='cbt';cb.innerHTML='<div class="cbb"><div class="cbt" id="cbT"></div><div id="cbA"></div><div id="cbB"></div><div class="cbl" id="cbL"></div><div class="cbr" id="cbR"></div></div>';document.body.appendChild(cb);
+let C=null;
+function cbDraw(title,btns,bars){$('cbT').textContent=title;$('cbA').innerHTML=mimicArt(C.k==='smimic');
+ $('cbB').innerHTML=bars?'<div class="cbh"><span>'+C.e.n+'</span><span>'+Math.max(0,C.eh)+' / '+C.e.hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*C.eh/C.e.hp)+'%;background:#d6304a"></i></div><div class="cbh"><span>You</span><span>'+Math.floor(H().hp)+' / '+stats().hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*H().hp/stats().hp)+'%;background:#4caf50"></i></div>':'';
+ $('cbL').textContent=C.log.slice(-4).join('\n');$('cbR').innerHTML='';btns.forEach(b=>{const x=document.createElement('button');x.textContent=b[0];if(b[2])x.className='alt';x.onclick=b[1];$('cbR').appendChild(x)});cb.style.display='flex'}
+function mimicFight(k,it){const e=enemy(k,S.lvl);C={k,it,m:MIMIC[k],e,eh:e.hp,first:true,log:[]};
+ cbDraw('Oh no! The chest was a '+C.m.name+'!',[['Defend Yourself!',cbStart]],false)}
+function cbFoe(){const s=stats(),d=Math.min(hitDmg(C.e.atk,s.def),Math.ceil(s.hp*.5));H().hp=Math.max(0,Math.floor(H().hp)-d);save();C.log.push('The '+C.m.name+' bites you for '+d+'.');return H().hp<=0}
+function cbMe(){const s=stats(),cm=clsMod();let d=hitDmg(s.atk,C.e.def-cm.pierce);if(C.first&&cm.first)d=Math.ceil(d*(1+cm.first/100));C.first=false;d=Math.min(d,Math.ceil(C.e.hp*.5));C.eh-=d;C.log.push('You strike the '+C.m.name+' for '+d+'.');return C.eh<=0}
+function cbChoice(){cbDraw('Your move!',[['Attack',cbAttack],['Flee',cbFlee,1]],true)}
+function cbStart(){C.log.push('The '+C.m.name+' lunges first!');if(cbFoe())return cbLose();cbChoice()}   // mimic always strikes first
+function cbAttack(){if(cbMe())return cbWin();if(cbFoe())return cbLose();cbChoice()}
+function cbEnd(title,lines){C.log=lines;cbDraw(title,[['Continue',()=>{cb.style.display='none';C=null;hud();if(inv.classList.contains('open'))invRender()}]],true);save()}
+function cbFlee(){srv('finish_mimic',{p_key:C.it.key,p_exp:C.it.exp||0,p_win:false});cbEnd('You Fled!',['You escape, but your wounds remain ('+Math.floor(H().hp)+' / '+stats().hp+' HP).','The chest is lost.'])}
+async function cbWin(){const m=C.m,r=await srv('finish_mimic',{p_key:C.it.key,p_exp:C.it.exp||0,p_win:true});if(!r||!r.win)return cbEnd('Victory!',['The '+m.name+' falls!','The server could not confirm a reward. Check your connection.']);cbEnd('Victory!',['The '+m.name+' falls!','Reward: '+(r.xp?'+'+r.xp+' XP':'daily encounter XP cap reached'),'★ '+fmtI(r.item)])}
+function cbLose(){if(potN('res')>0){C.log.push('You have fallen!');return cbDraw('You have fallen!',[['Use Resurrect Potion ('+potN('res')+')',cbRes],['Give Up',cbDefeat,1]],true)}cbDefeat()}
+async function cbRes(){if(!(await takePot('res')))return;revive();save();C.log.push('✨ A Resurrect Potion lifts you to '+Math.floor(H().hp)+' HP. The fight goes on!');cbChoice()}
+function cbDefeat(){srv('finish_mimic',{p_key:C.it.key,p_exp:C.it.exp||0,p_win:false});cbEnd('Defeated!',['The '+C.m.name+' overwhelms you.','The chest is lost.',down()])}
+/* ---- class selection + character screen ---- */
+const cl=document.createElement('div');cl.style.cssText='position:absolute;inset:0;z-index:900;display:none;overflow-y:auto;padding:14px 12px 24px;background:#0b0a08f8;color:#ead8ac';panel.parentNode.appendChild(cl);
+const lines=c=>{const i=clsInfo(c);return i.P.map(t=>'<div class="qs" style="color:#7be37a">＋ '+t+'</div>').join('')+i.N.map(t=>'<div class="qs" style="color:#ff8a7a">－ '+t+'</div>').join('')};
+function openClass(first){cl.innerHTML='<div class="qh" style="margin-top:6px"><span>Choose Your Class</span>'+(first?'':'<span data-x="1" style="cursor:pointer">✕ Close</span>')+'</div>'+Object.keys(CLASSES).map(k=>'<div class="qcard'+(S.cls===k?' ms':'')+'"><div class="qt"><b>'+CLASSES[k].n+'</b><span>'+(S.cls===k?'CURRENT':'')+'</span></div><div class="qs">'+CLASSES[k].d+'</div>'+lines(CLASSES[k])+'<button class="qbtn" data-c="'+k+'">Choose '+CLASSES[k].n+'</button></div>').join('');cl.style.display='block';cl.scrollTop=0}
+cl.addEventListener('click',e=>{if(e.target.dataset.x)cl.style.display='none';const k=e.target.dataset.c;if(!k||!CLASSES[k])return;S.cls=k;srv('set_class',{p_cls:k});H().hp=Math.min(H().hp,stats().hp);cl.style.display='none';save();invRender();toast('You are now a '+CLASSES[k].n)});
+/* ---- inventory / character screen ---- */
+const inv=document.createElement('div');inv.className='qpanel';inv.id='inv';panel.parentNode.appendChild(inv);
+function invToggle(on){inv.classList.toggle('open',on);if(on)invRender()}
+function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,i)=>{const c=CAT[it.cid];return`<div class="qcard"><div class="qt"><b style="color:${RC[c.rarity]}">${c.name}</b><span>${cap(c.rarity)} ${TN[c.type]}</span></div><div class="qs">${fmtS(iStat(it))}${it.extra?' · extra +'+it.extra.val+' '+it.extra.stat.toUpperCase():''}</div><button class="qbtn" data-a="${a}" data-i="${i}">${btn}</button></div>`};
+ let o=`<div class="qcard ms"><div class="qt">${c?c.n:'No class'} · Level ${S.lvl}<span>${h.downed?'DOWNED (need 25%)':Math.floor(h.hp)+' / '+s.hp+' HP'}</span></div><div class="qbar"><i style="width:${Math.max(0,100*h.hp/s.hp)}%"></i></div><div class="qs"><b>ATK ${s.atk} · DEF ${s.def} · HP ${s.hp}</b></div><div class="qs">Level base: ${p.b.atk} ATK · ${p.b.def} DEF · ${p.b.hp} HP</div><div class="qs">Equipment: ${sg(p.g.atk)} ATK · ${sg(p.g.def)} DEF · ${sg(p.g.hp)} HP</div><div class="qs">Class: ${sg(p.cm.atk)} ATK · ${sg(p.cm.def)} DEF · ${sg(p.cm.hp)} HP</div>${c?lines(c):''}${chaosFx()?'<div class="qs">🎲 Chaos: '+fxText(chaosFx())+' ('+Math.ceil((chaosFx().until-Date.now())/6e4)+' min left)</div>':''}<button class="qbtn" data-a="cls">Change Class</button></div><div class="qh"><span>Potions</span></div>`;
+ o+=Object.keys(POTS).map(k=>`<div class="qcard"><div class="qt">${POTS[k].icon} ${POTS[k].name}<span>x${potN(k)}</span></div><div class="qs">Earned ${h.pot[k]||0} / ${POT_CAP} · Bought ${h.buy[k]||0}</div>${potN(k)?`<button class="qbtn" data-a="pot" data-i="${k}">Use</button>`:''}</div>`).join('');
+ o+='<div class="qh"><span>Equipped</span></div>'+SLOTS.map(k=>h.eq[k]?row(h.eq[k],'Unequip','un',k).replace('<span>','<span>'+SN[k]+' · '):`<div class="qcard" style="opacity:.55"><div class="qt">${SN[k]}<span>Empty</span></div></div>`).join('');
+ o+=`<div class="qh"><span>Backpack</span><span>${h.inv.length}</span></div>`+(h.inv.length?h.inv.map(it=>row(it,'Equip','eq',it.uid)).join(''):'<div class="qaw">No items yet. Open chests!</div>')+'<div class="qh"><span>Account</span></div><div class="qcard"><button class="qbtn" data-a="out">Sign out</button></div>';
+ const st=inv.scrollTop;inv.innerHTML=o;inv.scrollTop=st}
+inv.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;const h=H(),a=b.dataset.a,i=b.dataset.i;if(a==='cls')return openClass(false);if(a==='out')return window.realmCloud&&window.realmCloud.signOut();
+ if(a==='eq'){const ix=h.inv.findIndex(x=>x.uid===i);if(ix<0)return;const it=h.inv[ix],sl=TYPE_SLOT[CAT[it.cid].type],s=sl.find(k=>!h.eq[k])||sl[0],old=h.eq[s];h.inv.splice(ix,1);h.eq[s]=it;if(old)h.inv.push(old)}
+ else if(a==='un'){if(h.eq[i]){h.inv.push(h.eq[i]);h.eq[i]=null}}
+ else if(a==='pot'){const mx=stats().hp;if(!potN(i))return;
+  if(i==='res'){if(!h.downed)return toast('Resurrect Potions only work when you are downed.');if(!(await takePot('res')))return;revive();hud()}
+  else{if(h.downed)return toast('You are downed. Rest, gather nature, or use a Resurrect Potion.');if(h.hp>=mx)return toast('Already at full health.');if(!(await takePot(i)))return;heal(POTS[i].heal+clsMod().heal/100)}}
+ h.hp=Math.min(h.hp,stats().hp);save();invRender()});
+
+/* ---- Chaos: Tempt Fate (virtual d20) ---- */
+const CHAOS_CD=36e5,CHAOS_DUR=36e5;   // one roll per hour; effects last 1 hour (so only one effect is ever active)
+const CHAOS={cfail:['Critical Failure','Fate turns on you.'],omen:['Dim Omen','A cold wind follows you.'],shrug:['Fate Shrugs','Nothing stirs. Chaos is content, for now.'],blessing:['Small Blessing','A warm thread of luck.'],explore:["Wanderer's Luck",'The road opens before you.'],potion:['Windfall','You find a Small HP Potion.'],surge:['Second Wind','Fate restores you to full health.'],cwin:['Critical Success','Fate smiles on you.']};
+const fxText=f=>f.k==='stat'?sg(f.pct)+'% '+f.stat.toUpperCase():f.k==='xp'?sg(f.pct)+'% XP':'+'+f.v+' Exploration';
+const okBtn=t=>({primary:t||'OK',onPrimary:()=>hideModal('chaos')});
+function chaosOpen(){const C=S.chaos,wait=C.last+CHAOS_CD-Date.now(),f=chaosFx();
+ if(wait>0)return showModal('chaos',{icon:'🎲',title:'Chaos',text:'Fate is quiet. Return in '+Math.ceil(wait/6e4)+' min.'+(f?'\nActive: '+fxText(f)+' ('+Math.ceil((f.until-Date.now())/6e4)+' min left)':''),...okBtn()});
+ showModal('chaos',{icon:'🎲',title:'Chaos',text:'Chaos is in the eye of the beholder.',primary:'Tempt Fate',onPrimary:tempt,secondary:'Not Today',onSecondary:()=>hideModal('chaos')})}
+async function tempt(){const C=S.chaos;if(Date.now()<C.last+CHAOS_CD)return chaosOpen();
+ showModal('chaos',{icon:'🎲',title:'Fate is turning…',text:'',primary:'…',onPrimary:()=>{}});$('mSecondary').style.display='none';
+ const t0=Date.now(),spin=setInterval(()=>{$('mIcon').textContent='🎲 '+(1+ri(20))},90),r=await srv('tempt_fate',{p_downed:!!H().downed});   // roll, cooldown and effect are decided by the server
+ await new Promise(ok=>setTimeout(ok,Math.max(0,1300-(Date.now()-t0))));clearInterval(spin);
+ if(!r){hideModal('chaos');return}if(r.err==='cooldown'){S.chaos.last=Date.now()-CHAOS_CD+r.wait;return chaosOpen()}
+ if(r.heal)H().hp=stats().hp;const extra=r.heal?'HP restored: '+H().hp:(r.res==='potion'||r.res==='surge')?(r.got?'+1 Small HP Potion':'Your potion bag is already full.'):'';
+ const txt=['🎲 D20 roll: '+r.roll+(r.eff!==r.roll?' (counts as '+r.eff+')':''),CHAOS[r.res][1],r.fx?'Effect: '+fxText(r.fx)+' for 60 minutes':extra].filter(Boolean).join('\n');
+ showModal('chaos',{icon:'🎲 '+r.roll,title:CHAOS[r.res][0],text:txt,...okBtn('Accept Fate')});save();hud();if(inv.classList.contains('open'))invRender()}
+$('chaosButton').addEventListener('click',chaosOpen);
+
+if(window.realmCore)applyCore(window.realmCore);
+H().hp=Math.min(H().hp,stats().hp);if(H().hp<=0)H().downed=true;recover();setInterval(()=>{recover();if(inv.classList.contains('open'))invRender()},1e4);if(!S.cls)openClass(true);
+
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.js"></script>
+<script>
+(()=>{'use strict';
+// Supabase URL + publishable key are safe in front-end code: row-level security protects the data. NEVER put a secret/service_role key here.
+const SB_URL='https://qaacpipifsofisbnxxzo.supabase.co',SB_KEY='sb_publishable_dGmwmCAUzbbZkNmpd2Xp7g_b77y2ZRu',QK='realm_quests_v1',OK='realm_owner';
+const el=id=>document.getElementById(id),say=(m,bad)=>{const e=el('aMsg');e.textContent=m||'';e.className='am'+(bad?' bad':'')};
+if(!window.supabase){say('Could not load the login service. Check your connection and reload.',1);return}
+const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const back=location.origin+location.pathname;let started=false,uid=null,lastS=null,lastJson='',timer=null,busy=false;
+const busyUi=b=>['aGoogle','aIn','aUp'].forEach(i=>el(i).disabled=b);
+async function flush(){if(!lastS||!uid)return true;const s=lastS,json=JSON.stringify(s);if(json===lastJson)return true;const{error}=await sb.from('players').update({state:s}).eq('id',uid);/* xp, level, items, potions are server-owned now */if(error){console.warn('save failed',error.message);return false}lastJson=json;return true}
+async function rpc(fn,args){const{data,error}=await sb.rpc(fn,args||{});if(error)throw error;return data}
+const queue=s=>{lastS=s;clearTimeout(timer);timer=setTimeout(flush,4000)};
+async function signOut(){if(!(await flush())&&!confirm('Could not sync your latest progress. Sign out anyway?'))return;localStorage.removeItem(QK);localStorage.removeItem(OK);await sb.auth.signOut();location.reload()}
+async function begin(session){if(started)return;started=true;uid=session.user.id;busyUi(true);say('Loading your realm…');
+ try{const{data,error}=await sb.from('players').select('state').eq('id',uid).maybeSingle();if(error)throw error;
+  const cloud=data&&data.state&&Object.keys(data.state).length?data.state:null,owner=localStorage.getItem(OK);
+  if(cloud)localStorage.setItem(QK,JSON.stringify(cloud));          // saved game exists: cloud wins
+  else if(owner&&owner!==uid)localStorage.removeItem(QK);           // another account used this device: start fresh
+  localStorage.setItem(OK,uid);                                     // (an old unowned local save is adopted by the first account)
+  let st=null;try{st=JSON.parse(localStorage.getItem(QK))}catch(e){}
+  window.realmCore=await rpc('sync_player',{p_cls:(st&&st.cls)||null});   // server-owned progress (XP, level, items, potions)
+ }catch(e){started=false;busyUi(false);say(/sync_player|function/i.test(e.message||'')?'The game server is not set up yet (run realm_server.sql in Supabase).':'Could not load your save. Check your connection and try again.',1);return}
+ window.realmCloud={queue,flush,signOut,rpc};el('auth').style.display='none';window.startRealm()}
+async function run(fn){if(busy)return;busy=true;busyUi(true);say('');try{await fn()}catch(e){say(e.message||'Something went wrong.',1)}busy=false;if(!started)busyUi(false)}
+const creds=()=>{const email=el('aEmail').value.trim(),password=el('aPass').value;if(!email||password.length<8)throw new Error('Enter your email and a password of 8+ characters.');return{email,password}};
+el('aGoogle').onclick=()=>run(async()=>{const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:back}});if(error)throw error});
+el('aIn').onclick=()=>run(async()=>{const{data,error}=await sb.auth.signInWithPassword(creds());if(error)throw error;if(data.session)begin(data.session)});
+el('aUp').onclick=()=>run(async()=>{const c=creds(),{data,error}=await sb.auth.signUp({...c,options:{emailRedirectTo:back}});if(error)throw error;if(data.session)begin(data.session);else say('Check your email to confirm your account, then sign in.')});
+el('aForgot').onclick=()=>run(async()=>{const email=el('aEmail').value.trim();if(!email)throw new Error('Type your email above first.');const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:back});if(error)throw error;say('Password reset email sent.')});
+sb.auth.onAuthStateChange((ev,session)=>{   // no awaits inside this callback (Supabase can deadlock); defer instead
+ if(ev==='PASSWORD_RECOVERY')setTimeout(async()=>{const p=prompt('Choose a new password (8+ characters)');if(p&&p.length>=8){const{error}=await sb.auth.updateUser({password:p});say(error?error.message:'Password updated.',!!error)}},0);
+ if(session&&(ev==='SIGNED_IN'||ev==='INITIAL_SESSION'))setTimeout(()=>begin(session),0);
+ if(ev==='SIGNED_OUT'&&started)location.reload()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)flush()});addEventListener('pagehide',flush);
+})();
+</script>
+</body></html>
