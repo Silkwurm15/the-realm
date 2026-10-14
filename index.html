@@ -186,7 +186,7 @@ const POI={
  boss:{icon:'💀',title:()=>'Dark Lair',text:'A powerful foe lurks within. Prepare yourself before you strike.',go:'Challenge'}};
 function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(d>RANGE){tooFar(d);return}
- if((it.t==='chest'||it.t==='boss')&&S.hero.hp<=0){toast('You are downed. Rest, or use a Resurrect Potion.');return}
+ if((it.t==='chest'||it.t==='boss')&&S.hero.downed){toast('You are downed. Recover to 25% HP first ('+Math.floor(100*S.hero.hp/stats().hp)+'% now).');return}
  const c=POI[it.t];
  showModal('poi',{icon:c.icon,title:c.title(it),text:ft(d)+' away. '+c.text+(it.exp?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+' (Sample marker, not a live event yet.)',primary:c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));const i=items.indexOf(it);if(it.used)return;it.used=true;if(it.key){S.taken[it.key]=it.exp;save()}if(markers[i])markers[i].remove();ev(it.t);if(it.t==='chest'||it.t==='boss')lootFrom(it);else if(it.t==='nature')gatherNature(it);else toast(c.go+' ✓')},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
@@ -303,19 +303,22 @@ if(!S||!S.k)S={k:keys(),daily:mkTier('daily'),weekly:mkTier('weekly'),monthly:mk
 ['daily','weekly','monthly'].forEach(t=>{const T=S[t];T.q=T.q.map(q=>{if(q.kind!=='rift'&&q.kind!=='boss'&&q.kind!=='explore')return q;const o=POOL.find(p=>!T.q.some(x=>x.id===p.id));if(!o)return null;const g=o.goal*SCALE[t];return{id:o.id,kind:o.kind,goal:g,p:0,xp:o.xp,done:false,title:o.title(g)}}).filter(Boolean)}); // drop removed quest types from saved games
 if(S.xpv!==2){S.lvl=Math.min(100,Math.max(1,S.lvl|0));S.need=needFor(S.lvl);S.xp=Math.min(S.xp||0,S.need-1);['daily','weekly','monthly'].forEach(t=>{S[t].q.forEach(q=>{const o=POOL.find(p=>p.id===q.id);if(o)q.xp=o.xp});S[t].ms.xp=MSXP});S.xpv=2} // move old saves onto the new XP formula + reward values
 S.chaos=S.chaos||{last:0,fx:null};
-S.taken=S.taken||{};S.loot=S.loot||{claimed:{}};S.hero=S.hero||{hp:100,eq:{},inv:[],pot:{h35:0,full:0,res:0}};
+S.taken=S.taken||{};S.loot=S.loot||{claimed:{}};S.hero=S.hero||{hp:100,eq:{},inv:[],pot:{h35:0,full:0,res:0}};S.hero.buy=S.hero.buy||{h35:0,full:0,res:0};   // pot = earned stack (cap 20 each), buy = purchased stack (separate, never capped)
 let tab='daily',rndOffers=[],expl=[],lastWalk=null,acc=0;
 function save(){try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}if(window.realmCloud)window.realmCloud.queue(S)}
 function hud(){const x=document.querySelector('.xptext'),b=document.querySelector('.xpfill'),l=document.querySelector('.level');if(x)x.textContent=S.lvl>=100?'MAX LEVEL':`${Math.floor(S.xp).toLocaleString()} / ${S.need.toLocaleString()} XP`;if(b)b.style.width=(S.lvl>=100?100:Math.min(100,100*S.xp/S.need))+'%';if(l)l.textContent=S.lvl;const d=document.querySelector('.nav-dot');if(d)d.style.display=S.daily.ms.done?'none':''}
 function needFor(L){return 50+(L-1)*10}   // XP to go from level L to L+1
 const ENC_CAP=300; // max XP per day from encounters (mimics, chest bonus, nature, bosses): they supplement quests, never overwhelm them
-function addXp(x){const cf=chaosFx();x=Math.round(x*(1+(clsMod().xpPct+(cf&&cf.k==='xp'?cf.pct:0))/100));if(S.lvl>=100)return hud();S.xp+=x;let up=0;while(S.xp>=S.need&&S.lvl<100){S.xp-=S.need;S.lvl++;S.need=needFor(S.lvl);up=1;toast('Level up! Level '+S.lvl)}if(S.lvl>=100)S.xp=0;if(up&&S.hero)S.hero.hp=stats().hp;hud()}
+function addXp(x){const cf=chaosFx();x=Math.round(x*(1+(clsMod().xpPct+(cf&&cf.k==='xp'?cf.pct:0))/100));if(S.lvl>=100)return hud();S.xp+=x;let up=0;while(S.xp>=S.need&&S.lvl<100){S.xp-=S.need;S.lvl++;S.need=needFor(S.lvl);up=1;toast('Level up! Level '+S.lvl)}if(S.lvl>=100)S.xp=0;if(up&&S.hero){S.hero.hp=stats().hp;S.hero.downed=false}hud()}
 function addEnc(x){const e=S.enc&&S.enc.k===S.k.daily?S.enc:(S.enc={k:S.k.daily,n:0}),g=Math.max(0,Math.min(x,ENC_CAP-e.n));e.n+=g;if(g<x)toast('Daily encounter XP cap reached.');if(g>0)addXp(g)}
 // One reward per quest per period, ever. XP = base x tier multiplier.
 function lvlScale(){return 1+(S.lvl-1)*.02}   // quest + milestone XP grows ~3x by level 100 (tune the .02)
-function award(tier,id,base){const c=`${tier}|${S.k[tier]}|${id}`;if(S.claimed[c])return false;S.claimed[c]=1;const x=Math.round(base*MULT[tier]*lvlScale());addXp(x);toast(`+${x} XP`);return true}
+function award(tier,id,base){const c=`${tier}|${S.k[tier]}|${id}`;if(S.claimed[c])return false;S.claimed[c]=1;srv('award',{p_tier:tier,p_period:S.k[tier],p_id:id}).then(r=>{if(r&&!r.err&&r.xp!=null)toast('+'+r.xp+' XP')});return true}   // amount decided by the server
 function tick(tier){const m=S[tier].ms;if(m.done)return;m.p=Math.min(5,m.p+1);if(m.p>=5)m.ready=true}
-function claimMs(tier){const m=S[tier].ms;if(!m.ready||m.done)return;m.done=true;m.ready=false;award(tier,'ms',m.xp);if(tier==='daily')tick('weekly');else if(tier==='weekly')tick('monthly');save();render()}
+const MSPOT={daily:{h35:1,full:1,res:0},weekly:{h35:2,full:2,res:2},monthly:{h35:3,full:3,res:3}},PN={h35:'Small HP',full:'Full Health',res:'Resurrect'};   // potions granted per milestone (earned stack caps at 20); Resurrect only from weekly + monthly
+async function claimMs(tier){const m=S[tier].ms;if(!m.ready||m.done||m.busy)return;m.busy=true;const r=await srv('award',{p_tier:tier,p_period:S.k[tier],p_id:'ms'});m.busy=false;
+ if(!r||(r.err&&r.err!=='claimed')){toast(r&&r.err==='not_ready'?'Milestone not ready yet.':'Could not claim. Try again.');return}
+ S.claimed[`${tier}|${S.k[tier]}|ms`]=1;m.done=true;m.ready=false;if(!r.err){const got=Object.keys(MSPOT[tier]).filter(k=>MSPOT[tier][k]).map(k=>'+'+((r.pots||{})[k]||0)+' '+PN[k]);toast('+'+r.xp+' XP · '+got.join(' · '))}if(tier==='daily')tick('weekly');else if(tier==='weekly')tick('monthly');save();render()}
 function claim(tier,q){if(!q.ready||q.done)return;finish(tier,q);save();render()}
 function finish(tier,q){if(q.done)return;q.done=true;q.ready=false;q.p=q.goal;award(tier,q.id,q.xp);
  if(tier==='daily'){const n=S.daily.q.filter(x=>x.done).length,m=S.daily.ms;m.p=Math.min(5,n);if(n>=5&&!m.done)m.ready=true}
@@ -390,7 +393,7 @@ panel.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b|
   if(q.ready)return popup({...base,btn:'Complete Quest',on:()=>claim(tr,q)});
   if(q.kind==='photo')return popup({...base,btn:'📷 Enter Photo',on:()=>askPhoto({done:()=>ev('photo')})});
   return popup({...base,btn:'In Progress'})}
- if(a==='ms'){const m=S[tr].ms,base={icon:'🏆',title:MS[tr],text:`${m.p} / 5\nReward: +${Math.round(m.xp*M*lvlScale())} XP`};
+ if(a==='ms'){const m=S[tr].ms,base={icon:'🏆',title:MS[tr],text:`${m.p} / 5\nReward: +${Math.round(m.xp*M*lvlScale())} XP\n${Object.keys(MSPOT[tr]).filter(k=>MSPOT[tr][k]).map(k=>'+'+MSPOT[tr][k]+' '+PN[k]).join(', ')} Potion${tr==='daily'?'s':'s'}`};
   if(m.done)return popup({...base,btn:'Completed'});
   if(m.ready)return popup({...base,btn:'Claim Reward',on:()=>claimMs(tr)});
   return popup({...base,btn:'In Progress'})}
@@ -453,7 +456,7 @@ const BUDGET={common:2,uncommon:4,rare:6,mythic:9,legendary:14};   // stat point
 const WT={helm:[0,.6,.4],chest:[0,.4,.6],feet:[.2,.4,.4],hands:[.5,.5,0],main:[1,0,0],off:[.4,.6,0],amulet:[.4,0,.6],ring:[.5,.25,.25],cloak:[.2,.4,.4]};   // share of budget as [ATK, DEF, HP]
 const NAMES={helm:['Worn Cap',"Ranger's Hood","Knight's Helm",'Dragonscale Helm','Crown of Dawn'],chest:['Padded Tunic','Studded Jerkin','Steel Cuirass','Wyrmhide Plate','Aegis of the Sunforge'],feet:['Travel Boots','Trail Boots','Greaves of Stride','Stormwalkers','Boots of the Endless Road'],hands:['Cloth Wraps','Leather Gloves','Steel Gauntlets','Voidgrip Gauntlets','Fists of the Titan'],main:['Rusty Sword','Iron Blade','Silverwood Blade','Nightfang','Realmbreaker'],off:['Wooden Buckler','Iron Shield',"Warden's Shield",'Mythril Bulwark','Bulwark of Ages'],amulet:['Bone Charm','Copper Pendant','Moonstone Amulet','Heart of Embers','Eye of the Realm'],ring:['Tin Band','Silver Band','Sapphire Ring','Ring of Eclipse','Ring of the First King'],cloak:['Frayed Cloak','Wool Cloak',"Ranger's Mantle",'Shadow Veil','Mantle of Stars']};
 const CAT={};RAR.forEach((r,i)=>Object.keys(NAMES).forEach(t=>{const w=WT[t],B=BUDGET[r];CAT[t+'_'+r]=Object.freeze({id:t+'_'+r,name:NAMES[t][i],type:t,rarity:r,atk:Math.round(B*w[0]),def:Math.round(B*w[1]),hp:Math.round(B*w[2]*3)})}));Object.freeze(CAT);
-const POTS={h35:{name:'35% Health Potion',icon:'🧪',heal:.35},full:{name:'Full Health Potion',icon:'⚗️',heal:1},res:{name:'Resurrect Potion',icon:'✨',heal:.5}};   // Resurrect: revives at 50% max HP
+const POTS={h35:{name:'Small HP Potion',icon:'🧪',heal:.35},full:{name:'Full Health Potion',icon:'⚗️',heal:1},res:{name:'Resurrect Potion',icon:'✨',heal:.5}};   // Resurrect: revives at 50% max HP
 const BONUS_XP={chest:25,boss:100},EXTRA_PCT=.25;   // bonus-20 extra stat = 25% of the item's rarity budget
 const MIMIC={mimic:{name:'Mimic',xp:10,loot:'common'},smimic:{name:'Strong Mimic',xp:20,loot:'uncommon'}};   // real fights now; win = XP + item, lose = chest forfeited
 // ONE table set, used by chests AND bosses. Ranges are [lo,hi,result]; validated below.
@@ -485,7 +488,7 @@ const CLASSES={
  bard:{n:'Bard',d:'Songs that speed progression.',xpPct:10,def:-1},
  healer:{n:'Healer',d:'Recovers faster than anyone.',heal:15,regen:2,atk:-1},
  wizard:{n:'Wizard',d:'Arcane bolts slip past armor.',pierce:2,hp:-5}};
-const DESC={atk:v=>sg(v)+' Attack',def:v=>sg(v)+' Defense',hp:v=>sg(v)+' HP',exp:v=>sg(v)+' Exploration ('+sg(15*v)+'% nature-gather XP and walking credit)',chaosBonus:v=>sg(v)+' Chaos Completion Bonus ('+sg(10*v)+'% XP from Dark Lairs, '+sg(v)+'% boon strength on Tempt Fate)',chaosReq:v=>sg(v)+' Chaos Completion Requirements (Dark Lair bosses have '+Math.abs(10*v)+'% '+(v<0?'less':'more')+' HP; Tempt Fate rolls count '+sg(-v)+')',holy:v=>sg(v)+' Holy Damage (extra damage to Dark Lairs, ignores Defense)',first:v=>'Opening Shot: your first hit deals +'+v+'% damage',pierce:v=>'Arcane Bolt: ignores '+v+' enemy Defense',xpPct:v=>'Inspiring Song: '+sg(v)+'% XP from all sources',heal:v=>'Healing Hands: Health Potions restore +'+v+'% extra',regen:v=>'Rest: natural regeneration x'+v,herb:()=>'Herbalist: Nature Discoveries may give a 35% Health Potion (better odds in parks)'};
+const DESC={atk:v=>sg(v)+' Attack',def:v=>sg(v)+' Defense',hp:v=>sg(v)+' HP',exp:v=>sg(v)+' Exploration ('+sg(15*v)+'% nature-gather XP and walking credit)',chaosBonus:v=>sg(v)+' Chaos Completion Bonus ('+sg(10*v)+'% XP from Dark Lairs, '+sg(v)+'% boon strength on Tempt Fate)',chaosReq:v=>sg(v)+' Chaos Completion Requirements (Dark Lair bosses have '+Math.abs(10*v)+'% '+(v<0?'less':'more')+' HP; Tempt Fate rolls count '+sg(-v)+')',holy:v=>sg(v)+' Holy Damage (extra damage to Dark Lairs, ignores Defense)',first:v=>'Opening Shot: your first hit deals +'+v+'% damage',pierce:v=>'Arcane Bolt: ignores '+v+' enemy Defense',xpPct:v=>'Inspiring Song: '+sg(v)+'% XP from all sources',heal:v=>'Healing Hands: Health Potions restore +'+v+'% extra',regen:v=>'Rest: natural regeneration x'+v,herb:()=>'Herbalist: Nature Discoveries may give a Small HP Potion (better odds in parks)'};
 function chaosFx(){const f=S.chaos&&S.chaos.fx;return f&&f.until>Date.now()?f:null}
 const clsMod=()=>{const c={atk:0,def:0,hp:0,exp:0,chaosBonus:0,chaosReq:0,holy:0,pierce:0,first:0,xpPct:0,heal:0,regen:1,herb:0,...(CLASSES[S.cls]||{})},f=chaosFx();if(f&&f.k==='exp')c.exp+=f.v;return c};
 const clsInfo=c=>{const P=[],N=[];Object.keys(DESC).forEach(k=>{const v=c[k];if(!v)return;(k==='chaosReq'?v<0:v>0?1:0)?P.push(DESC[k](v)):N.push(DESC[k](v))});return{P,N}};
@@ -507,75 +510,103 @@ function fight(k){const s=stats(),e=enemy(k,S.lvl),cm=clsMod(),boss=k==='boss',s
   ph-=Math.min(hitDmg(e.atk,s.def),Math.ceil(s.hp*.5));if(ph<=0)break}
  return{win:eh<=0,hp:Math.max(0,ph),dmg:st-Math.max(0,ph),rounds:r,e}}
 /* ---- defeat + recovery ---- */
-// 0 HP = downed: no XP/item penalty, but you can't open chests or fight. A Resurrect Potion auto-triggers (revives at 50% max HP).
-// Otherwise you recover to 25% max HP after 5 minutes. Resting regenerates 2% max HP/min. Level-up fully heals.
+// 0 HP = downed: no XP/item penalty, but no chests or lairs until you recover to 25% max HP. A Resurrect Potion auto-triggers (revives at 50% max HP).
+// Downed players regenerate 2% max HP/min (+5% per Nature Discovery) and can't open chests or lairs until they reach 25% max HP. Level-up fully heals.
 function heal(f){const h=H(),mx=stats().hp;h.hp=Math.min(mx,h.hp+Math.round(mx*Math.min(1,f)))}
-function revive(){const h=H();h.hp=Math.max(1,Math.round(stats().hp*POTS.res.heal));h.downAt=0}
-function down(){const h=H();h.hp=0;if(h.pot.res>0){h.pot.res--;revive();return'✨ Resurrect Potion used. Back at '+h.hp+' HP.'}h.downAt=Date.now();return'You are downed. You recover to 25% HP in 5 minutes, or use a Resurrect Potion.'}
-function recover(){const h=H(),now=Date.now(),mx=stats().hp,dt=Math.max(0,(now-(h.t||now))/6e4);h.t=now;
- if(h.hp<=0){if(!h.downAt)h.downAt=now;if(now-h.downAt>=3e5){h.hp=Math.max(1,Math.round(mx*.25));h.downAt=0;toast('You recover to '+h.hp+' HP.')}}
- else h.hp=Math.min(mx,h.hp+mx*.02*clsMod().regen*dt);save()}
+function revive(){const h=H();h.hp=Math.max(1,Math.round(stats().hp*POTS.res.heal));h.downed=false}
+const POT_CAP=20,potN=k=>(H().pot[k]||0)+(H().buy[k]||0);
+function givePot(k,n){const h=H(),a=Math.max(0,Math.min(n,POT_CAP-(h.pot[k]||0)));h.pot[k]=(h.pot[k]||0)+a;return a}   // earned potions stop at the cap: no potion, no XP substitute
+async function srv(fn,args){const R=window.realmCloud;if(!R){toast('Not connected to the server.');return null}try{const r=await R.rpc(fn,args);if(r&&r.core)applyCore(r.core);return r}catch(e){toast(/rate_limited/.test(e.message||'')?'Slow down, adventurer. Try again later.':'Server error. Check your connection.');return null}}
+function applyCore(c){if(!c)return;const h=S.hero,up=c.lvl>S.lvl;S.xp=c.xp;S.lvl=c.lvl;S.need=needFor(c.lvl);if(c.cls)S.cls=c.cls;h.pot=c.pot;h.buy=c.buy;   // server-owned: XP, level, potions, items, class, chaos
+ const own=new Map(c.inv.map(i=>[i.uid,i]));for(const k in h.eq){const it=h.eq[k];if(it&&own.has(it.uid)){h.eq[k]=own.get(it.uid);own.delete(it.uid)}else h.eq[k]=null}h.inv=[...own.values()];
+ S.chaos={last:(c.chaos&&c.chaos.last)||0,fx:(c.chaos&&c.chaos.fx)||null};if(up){h.hp=stats().hp;h.downed=false;toast('Level up! Level '+S.lvl)}hud();if(typeof inv!=='undefined'&&inv.classList.contains('open'))invRender();save()}
+async function takePot(k){const r=await srv('use_potion',{p_k:k});return !!(r&&r.ok)}   // the server does the subtracting
+async function useRes(){if(!H().downed||!(await takePot('res')))return false;revive();save();hud();return true}
+function down(){const h=H();h.hp=0;h.downed=true;return'You are downed. No chests or lairs until you recover to 25% HP. Rest, gather Nature Discoveries (+5% HP each), or use a Resurrect Potion.'}   // Resurrect is always the player's choice
+function upDown(){const h=H(),mx=stats().hp;if(h.downed&&h.hp>=mx*.25){h.downed=false;toast('You have recovered enough to fight again.')}}
+function recover(){const h=H(),now=Date.now(),mx=stats().hp,dt=Math.max(0,(now-(h.t||now))/6e4);h.t=now;if(C)return;if(h.hp<=0)h.downed=true;   // rest regenerates 2% max HP/min, even while downed
+ h.hp=Math.min(mx,h.hp+mx*.02*clsMod().regen*dt);upDown();save()}
 /* ---- rewards: chest + boss ---- */
-function lootFrom(it){const boss=it.t==='boss',src=boss?'boss':'chest',ck=it.key&&it.key+'|'+it.exp,C=S.loot.claimed,h=H(),L=[];
- if(!ck||C[ck])return toast('Already claimed.');
- const claim=()=>{Object.keys(C).forEach(k=>{if(C[k]<Date.now())delete C[k]});C[ck]=it.exp||Date.now()+864e5};   // recorded BEFORE any reward is granted
+async function lootFrom(it){const boss=it.t==='boss',h=H(),L=[],ex=it.exp||0,lk=it.key+'|'+ex,CL=S.loot.claimed;
+ if(!it.key||CL[lk])return toast('Already claimed.');
  const battle=k=>{const f=fight(k),e=f.e;L.push('⚔ '+e.n+'  HP '+e.hp+' · ATK '+e.atk+' · DEF '+e.def,f.win?'Victory in '+f.rounds+' rounds. You lost '+f.dmg+' HP ('+f.hp+'/'+stats().hp+').':'Defeat after '+f.rounds+' rounds.');h.hp=f.hp;if(!f.win)L.push(down());return f.win};
- const done=(icon,title)=>{save();hud();showModal('loot',{icon,title,text:L.join('\n'),primary:'Continue',onPrimary:()=>hideModal('loot')})};
- let item=null,bonus=false,res;
- if(boss){if(!battle('boss'))return done('💀','Defeated');   // losing a boss claims nothing: you may retry once recovered
-  claim();const xp=Math.round(250*(1+.1*clsMod().chaosBonus));addEnc(xp);L.push('Reward: +'+xp+' XP');}
- const roll=d20();res=look(src,roll);L.push('🎲 D20 roll: '+roll);
- if(MIMIC[res]){const m=MIMIC[res];claim();if(!battle(res))return done('👹',m.name+'!');addEnc(m.xp);item=grantItem(src,m.loot);L.push('Reward: +'+m.xp+' XP','★ '+fmtI(item))}
- else{if(!boss)claim();
-  if(POTS[res]){h.pot[res]++;L.push('Reward: '+POTS[res].name+' (restores '+POTS[res].heal*100+'% max HP)')}
-  else{bonus=res.endsWith('+');item=grantItem(src,res.replace('+',''));L.push('Reward: '+cap(CAT[item.cid].rarity)+' loot','★ '+fmtI(item))}}
- if(bonus){const b=d20(),br=look('bonus',b);L.push('','🎲 Bonus D20 roll: '+b);
-  if(br==='xp'){addEnc(BONUS_XP[src]);L.push('Bonus: +'+BONUS_XP[src]+' XP')}
-  else if(br==='full'||br==='res'){h.pot[br]++;L.push('Bonus: '+POTS[br].name)}
-  else{const st=['atk','def','hp'][ri(3)],r=CAT[item.cid].rarity,v=Math.round(BUDGET[r]*EXTRA_PCT)*(st==='hp'?3:1);item.extra={stat:st,val:v};L.push('Bonus: extra stat on your '+cap(r)+' item (+'+v+' '+st.toUpperCase()+')')}}
- done(boss?'💀':'🧰',boss?'Dark Lair Conquered':'Chest Opened')}
-function gatherNature(it){const cm=clsMod(),x=Math.max(1,Math.round(3*(1+.15*cm.exp))),m=['Nature gathered! +'+x+' XP'];addEnc(x);if(cm.herb&&ri(100)<(it.green?50:25)){H().pot.h35++;m.push('+35% Health Potion')}save();toast(m.join(' · '))}
+ const done=(icon,title)=>{save();hud();const rp=h.downed&&potN('res')>0;showModal('loot',{icon,title,text:L.join('\n')+(rp?'\n\nUse a Resurrect Potion? You have '+potN('res')+'.':''),primary:rp?'Use Resurrect Potion':'Continue',onPrimary:async()=>{hideModal('loot');if(rp&&await useRes()){toast('You rise again at '+Math.floor(H().hp)+' HP.');if(inv.classList.contains('open'))invRender()}},...(rp?{secondary:'Stay Downed',onSecondary:()=>hideModal('loot')}:{})})};
+ const bonusLine=(b,item)=>b.k==='xp'?(b.xp?'Bonus: +'+b.xp+' XP':'Bonus: daily encounter XP cap reached'):b.k==='extra'?'Bonus: extra stat on your '+cap(CAT[item.cid].rarity)+' item (+'+item.extra.val+' '+item.extra.stat.toUpperCase()+')':(b.got?'Bonus: '+POTS[b.k].name:'Bonus: your potion bag is already full');
+ CL[lk]=ex||Date.now()+864e5;   // blocks double-taps; the server's claim record is the real lock
+ if(boss){if(!battle('boss')){delete CL[lk];return done('💀','Defeated')}   // losing a boss claims nothing: retry once recovered
+  const r=await srv('resolve_boss',{p_key:it.key,p_exp:ex,p_win:true});if(!r||r.err){if(!r)delete CL[lk];else toast('Already claimed.');return}
+  L.push('Reward: +'+r.xp+' XP','🎲 D20 roll: '+r.roll,'Reward: '+cap(CAT[r.item.cid].rarity)+' loot','★ '+fmtI(r.item));if(r.bonus)L.push('','🎲 Bonus D20 roll: '+r.bonusRoll,bonusLine(r.bonus,r.item));
+  return done('💀','Dark Lair Conquered')}
+ const r=await srv('open_chest',{p_key:it.key,p_exp:ex});if(!r||r.err){if(!r)delete CL[lk];else toast('Already claimed.');return}   // the roll happens on the server and is never shown
+ if(r.res==='mimic'||r.res==='smimic')return mimicFight(r.res,it);
+ if(r.res==='pot')L.push(r.got?'Reward: Small HP Potion (restores 35% max HP)':'Your potion bag is already full.');
+ else{L.push('Reward: '+cap(CAT[r.item.cid].rarity)+' loot','★ '+fmtI(r.item));if(r.bonus)L.push(bonusLine(r.bonus,r.item))}
+ done('🧰','Chest Opened')}
+async function gatherNature(it){const r=await srv('gather_nature',{p_key:it.key||'n'+it.ll[0],p_exp:it.exp||0,p_green:!!it.green});if(!r||r.err)return;const m=['Nature gathered! +'+r.xp+' XP'];if(H().downed){const mx=stats().hp,g=Math.max(1,Math.round(mx*.05));H().hp=Math.min(mx,H().hp+g);m.push('+'+g+' HP (resting in nature)');upDown()}if(r.potion)m.push('+Small HP Potion');save();toast(m.join(' · '))}
+/* ---- interactive mimic combat (chest ambush) ---- */
+const mimicArt=strong=>{const B=strong?'#3d2a52':'#7a4a1f',D=strong?'#24162f':'#4a2b10',G=strong?'#b8a0d8':'#d6b050',E=strong?'#ff3b30':'#ffd83a',T='#f6f1e3',sp=strong?'<path d="M45 22l8-24 8 24zM85 14l10-30 10 30zM125 22l8-24 8 24z" fill="'+G+'"/>':'',tt=(a,y,d,n)=>Array.from({length:n},(_,i)=>'<path d="M'+(a+i*22)+' '+y+'l7 '+d+' 7 '+(-d)+'z" fill="'+T+'"/>').join('');
+ return'<svg viewBox="0 0 200 150" width="100%" style="max-width:230px"><ellipse cx="100" cy="142" rx="78" ry="6" fill="#0007"/><rect x="30" y="82" width="140" height="54" rx="7" fill="'+B+'" stroke="'+D+'" stroke-width="3"/><rect x="30" y="104" width="140" height="9" fill="'+G+'"/><rect x="92" y="98" width="16" height="20" rx="3" fill="'+G+'" stroke="'+D+'" stroke-width="2"/><ellipse cx="100" cy="83" rx="70" ry="13" fill="#2b0a12"/><path d="M78 84q22 36 44 0z" fill="#d6304a"/>'+tt(40,84,-17,7)+sp+'<path d="M28 62Q28 12 100 12T172 62z" fill="'+B+'" stroke="'+D+'" stroke-width="3"/><path d="M28 40Q100 28 172 40" stroke="'+G+'" stroke-width="7" fill="none"/>'+tt(37,62,17,7)+'<circle cx="72" cy="40" r="11" fill="'+E+'" stroke="#000" stroke-width="2"/><circle cx="128" cy="40" r="11" fill="'+E+'" stroke="#000" stroke-width="2"/><rect x="70" y="32" width="4" height="16" rx="2" fill="#000"/><rect x="126" y="32" width="4" height="16" rx="2" fill="#000"/><path d="M58 26l26 8M142 26l-26 8" stroke="#000" stroke-width="4"/></svg>'};
+const cbs=document.createElement('style');cbs.textContent='#cbt{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;padding:14px;background:#000d;font-family:Georgia,serif;color:#ead8ac}#cbt .cbb{width:100%;max-width:380px;max-height:100%;overflow-y:auto;padding:18px 16px;border:1px solid #b99a52;border-radius:6px;background:linear-gradient(135deg,#251d12,#0e0c09);box-shadow:0 14px 50px #000c,inset 0 0 0 3px #1b140b;text-align:center}#cbt .cbt{font-size:19px;font-weight:700;color:#fff0c6;margin-bottom:6px}#cbt .cbh{font-size:12px;margin:8px 0 2px;display:flex;justify-content:space-between}#cbt .cbbar{height:9px;border-radius:5px;background:#000;border:1px solid #5a4725;overflow:hidden}#cbt .cbbar i{display:block;height:100%}#cbt .cbl{min-height:62px;margin:12px 0;font-size:14px;line-height:1.45;color:#e6d6ae;white-space:pre-line}#cbt .cbr{display:flex;gap:8px}#cbt button{flex:1;padding:13px 6px;border:1px solid #d6b866;border-radius:4px;background:linear-gradient(#5a4725,#33280f);color:#fff0c6;font:700 16px Georgia,serif;cursor:pointer}#cbt button.alt{background:#15110a}';document.head.appendChild(cbs);
+const cb=document.createElement('div');cb.id='cbt';cb.innerHTML='<div class="cbb"><div class="cbt" id="cbT"></div><div id="cbA"></div><div id="cbB"></div><div class="cbl" id="cbL"></div><div class="cbr" id="cbR"></div></div>';document.body.appendChild(cb);
+let C=null;
+function cbDraw(title,btns,bars){$('cbT').textContent=title;$('cbA').innerHTML=mimicArt(C.k==='smimic');
+ $('cbB').innerHTML=bars?'<div class="cbh"><span>'+C.e.n+'</span><span>'+Math.max(0,C.eh)+' / '+C.e.hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*C.eh/C.e.hp)+'%;background:#d6304a"></i></div><div class="cbh"><span>You</span><span>'+Math.floor(H().hp)+' / '+stats().hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*H().hp/stats().hp)+'%;background:#4caf50"></i></div>':'';
+ $('cbL').textContent=C.log.slice(-4).join('\n');$('cbR').innerHTML='';btns.forEach(b=>{const x=document.createElement('button');x.textContent=b[0];if(b[2])x.className='alt';x.onclick=b[1];$('cbR').appendChild(x)});cb.style.display='flex'}
+function mimicFight(k,it){const e=enemy(k,S.lvl);C={k,it,m:MIMIC[k],e,eh:e.hp,first:true,log:[]};
+ cbDraw('Oh no! The chest was a '+C.m.name+'!',[['Defend Yourself!',cbStart]],false)}
+function cbFoe(){const s=stats(),d=Math.min(hitDmg(C.e.atk,s.def),Math.ceil(s.hp*.5));H().hp=Math.max(0,Math.floor(H().hp)-d);save();C.log.push('The '+C.m.name+' bites you for '+d+'.');return H().hp<=0}
+function cbMe(){const s=stats(),cm=clsMod();let d=hitDmg(s.atk,C.e.def-cm.pierce);if(C.first&&cm.first)d=Math.ceil(d*(1+cm.first/100));C.first=false;d=Math.min(d,Math.ceil(C.e.hp*.5));C.eh-=d;C.log.push('You strike the '+C.m.name+' for '+d+'.');return C.eh<=0}
+function cbChoice(){cbDraw('Your move!',[['Attack',cbAttack],['Flee',cbFlee,1]],true)}
+function cbStart(){C.log.push('The '+C.m.name+' lunges first!');if(cbFoe())return cbLose();cbChoice()}   // mimic always strikes first
+function cbAttack(){if(cbMe())return cbWin();if(cbFoe())return cbLose();cbChoice()}
+function cbEnd(title,lines){C.log=lines;cbDraw(title,[['Continue',()=>{cb.style.display='none';C=null;hud();if(inv.classList.contains('open'))invRender()}]],true);save()}
+function cbFlee(){srv('finish_mimic',{p_key:C.it.key,p_exp:C.it.exp||0,p_win:false});cbEnd('You Fled!',['You escape, but your wounds remain ('+Math.floor(H().hp)+' / '+stats().hp+' HP).','The chest is lost.'])}
+async function cbWin(){const m=C.m,r=await srv('finish_mimic',{p_key:C.it.key,p_exp:C.it.exp||0,p_win:true});if(!r||!r.win)return cbEnd('Victory!',['The '+m.name+' falls!','The server could not confirm a reward. Check your connection.']);cbEnd('Victory!',['The '+m.name+' falls!','Reward: '+(r.xp?'+'+r.xp+' XP':'daily encounter XP cap reached'),'★ '+fmtI(r.item)])}
+function cbLose(){if(potN('res')>0){C.log.push('You have fallen!');return cbDraw('You have fallen!',[['Use Resurrect Potion ('+potN('res')+')',cbRes],['Give Up',cbDefeat,1]],true)}cbDefeat()}
+async function cbRes(){if(!(await takePot('res')))return;revive();save();C.log.push('✨ A Resurrect Potion lifts you to '+Math.floor(H().hp)+' HP. The fight goes on!');cbChoice()}
+function cbDefeat(){srv('finish_mimic',{p_key:C.it.key,p_exp:C.it.exp||0,p_win:false});cbEnd('Defeated!',['The '+C.m.name+' overwhelms you.','The chest is lost.',down()])}
 /* ---- class selection + character screen ---- */
 const cl=document.createElement('div');cl.style.cssText='position:absolute;inset:0;z-index:900;display:none;overflow-y:auto;padding:14px 12px 24px;background:#0b0a08f8;color:#ead8ac';panel.parentNode.appendChild(cl);
 const lines=c=>{const i=clsInfo(c);return i.P.map(t=>'<div class="qs" style="color:#7be37a">＋ '+t+'</div>').join('')+i.N.map(t=>'<div class="qs" style="color:#ff8a7a">－ '+t+'</div>').join('')};
 function openClass(first){cl.innerHTML='<div class="qh" style="margin-top:6px"><span>Choose Your Class</span>'+(first?'':'<span data-x="1" style="cursor:pointer">✕ Close</span>')+'</div>'+Object.keys(CLASSES).map(k=>'<div class="qcard'+(S.cls===k?' ms':'')+'"><div class="qt"><b>'+CLASSES[k].n+'</b><span>'+(S.cls===k?'CURRENT':'')+'</span></div><div class="qs">'+CLASSES[k].d+'</div>'+lines(CLASSES[k])+'<button class="qbtn" data-c="'+k+'">Choose '+CLASSES[k].n+'</button></div>').join('');cl.style.display='block';cl.scrollTop=0}
-cl.addEventListener('click',e=>{if(e.target.dataset.x)cl.style.display='none';const k=e.target.dataset.c;if(!k||!CLASSES[k])return;S.cls=k;H().hp=Math.min(H().hp,stats().hp);cl.style.display='none';save();invRender();toast('You are now a '+CLASSES[k].n)});
+cl.addEventListener('click',e=>{if(e.target.dataset.x)cl.style.display='none';const k=e.target.dataset.c;if(!k||!CLASSES[k])return;S.cls=k;srv('set_class',{p_cls:k});H().hp=Math.min(H().hp,stats().hp);cl.style.display='none';save();invRender();toast('You are now a '+CLASSES[k].n)});
 /* ---- inventory / character screen ---- */
 const inv=document.createElement('div');inv.className='qpanel';inv.id='inv';panel.parentNode.appendChild(inv);
 function invToggle(on){inv.classList.toggle('open',on);if(on)invRender()}
 function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,i)=>{const c=CAT[it.cid];return`<div class="qcard"><div class="qt"><b style="color:${RC[c.rarity]}">${c.name}</b><span>${cap(c.rarity)} ${TN[c.type]}</span></div><div class="qs">${fmtS(iStat(it))}${it.extra?' · extra +'+it.extra.val+' '+it.extra.stat.toUpperCase():''}</div><button class="qbtn" data-a="${a}" data-i="${i}">${btn}</button></div>`};
- let o=`<div class="qcard ms"><div class="qt">${c?c.n:'No class'} · Level ${S.lvl}<span>${h.hp<=0?'DOWNED':Math.floor(h.hp)+' / '+s.hp+' HP'}</span></div><div class="qbar"><i style="width:${Math.max(0,100*h.hp/s.hp)}%"></i></div><div class="qs"><b>ATK ${s.atk} · DEF ${s.def} · HP ${s.hp}</b></div><div class="qs">Level base: ${p.b.atk} ATK · ${p.b.def} DEF · ${p.b.hp} HP</div><div class="qs">Equipment: ${sg(p.g.atk)} ATK · ${sg(p.g.def)} DEF · ${sg(p.g.hp)} HP</div><div class="qs">Class: ${sg(p.cm.atk)} ATK · ${sg(p.cm.def)} DEF · ${sg(p.cm.hp)} HP</div>${c?lines(c):''}${chaosFx()?'<div class="qs">🎲 Chaos: '+fxText(chaosFx())+' ('+Math.ceil((chaosFx().until-Date.now())/6e4)+' min left)</div>':''}<button class="qbtn" data-a="cls">Change Class</button></div><div class="qh"><span>Potions</span></div>`;
- o+=Object.keys(POTS).map(k=>`<div class="qcard"><div class="qt">${POTS[k].icon} ${POTS[k].name}<span>x${h.pot[k]}</span></div>${h.pot[k]?`<button class="qbtn" data-a="pot" data-i="${k}">Use</button>`:''}</div>`).join('');
+ let o=`<div class="qcard ms"><div class="qt">${c?c.n:'No class'} · Level ${S.lvl}<span>${h.downed?'DOWNED (need 25%)':Math.floor(h.hp)+' / '+s.hp+' HP'}</span></div><div class="qbar"><i style="width:${Math.max(0,100*h.hp/s.hp)}%"></i></div><div class="qs"><b>ATK ${s.atk} · DEF ${s.def} · HP ${s.hp}</b></div><div class="qs">Level base: ${p.b.atk} ATK · ${p.b.def} DEF · ${p.b.hp} HP</div><div class="qs">Equipment: ${sg(p.g.atk)} ATK · ${sg(p.g.def)} DEF · ${sg(p.g.hp)} HP</div><div class="qs">Class: ${sg(p.cm.atk)} ATK · ${sg(p.cm.def)} DEF · ${sg(p.cm.hp)} HP</div>${c?lines(c):''}${chaosFx()?'<div class="qs">🎲 Chaos: '+fxText(chaosFx())+' ('+Math.ceil((chaosFx().until-Date.now())/6e4)+' min left)</div>':''}<button class="qbtn" data-a="cls">Change Class</button></div><div class="qh"><span>Potions</span></div>`;
+ o+=Object.keys(POTS).map(k=>`<div class="qcard"><div class="qt">${POTS[k].icon} ${POTS[k].name}<span>x${potN(k)}</span></div><div class="qs">Earned ${h.pot[k]||0} / ${POT_CAP} · Bought ${h.buy[k]||0}</div>${potN(k)?`<button class="qbtn" data-a="pot" data-i="${k}">Use</button>`:''}</div>`).join('');
  o+='<div class="qh"><span>Equipped</span></div>'+SLOTS.map(k=>h.eq[k]?row(h.eq[k],'Unequip','un',k).replace('<span>','<span>'+SN[k]+' · '):`<div class="qcard" style="opacity:.55"><div class="qt">${SN[k]}<span>Empty</span></div></div>`).join('');
  o+=`<div class="qh"><span>Backpack</span><span>${h.inv.length}</span></div>`+(h.inv.length?h.inv.map(it=>row(it,'Equip','eq',it.uid)).join(''):'<div class="qaw">No items yet. Open chests!</div>')+'<div class="qh"><span>Account</span></div><div class="qcard"><button class="qbtn" data-a="out">Sign out</button></div>';
  const st=inv.scrollTop;inv.innerHTML=o;inv.scrollTop=st}
-inv.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const h=H(),a=b.dataset.a,i=b.dataset.i;if(a==='cls')return openClass(false);if(a==='out')return window.realmCloud&&window.realmCloud.signOut();
+inv.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;const h=H(),a=b.dataset.a,i=b.dataset.i;if(a==='cls')return openClass(false);if(a==='out')return window.realmCloud&&window.realmCloud.signOut();
  if(a==='eq'){const ix=h.inv.findIndex(x=>x.uid===i);if(ix<0)return;const it=h.inv[ix],sl=TYPE_SLOT[CAT[it.cid].type],s=sl.find(k=>!h.eq[k])||sl[0],old=h.eq[s];h.inv.splice(ix,1);h.eq[s]=it;if(old)h.inv.push(old)}
  else if(a==='un'){if(h.eq[i]){h.inv.push(h.eq[i]);h.eq[i]=null}}
- else if(a==='pot'){const mx=stats().hp;if(!h.pot[i])return;
-  if(i==='res'){if(h.hp>0)return toast('Resurrect Potions only work when you are downed.');h.pot.res--;revive()}
-  else{if(h.hp<=0)return toast('You are downed. Use a Resurrect Potion.');if(h.hp>=mx)return toast('Already at full health.');h.pot[i]--;heal(POTS[i].heal+clsMod().heal/100)}}
+ else if(a==='pot'){const mx=stats().hp;if(!potN(i))return;
+  if(i==='res'){if(!h.downed)return toast('Resurrect Potions only work when you are downed.');if(!(await takePot('res')))return;revive();hud()}
+  else{if(h.downed)return toast('You are downed. Rest, gather nature, or use a Resurrect Potion.');if(h.hp>=mx)return toast('Already at full health.');if(!(await takePot(i)))return;heal(POTS[i].heal+clsMod().heal/100)}}
  h.hp=Math.min(h.hp,stats().hp);save();invRender()});
 
 /* ---- Chaos: Tempt Fate (virtual d20) ---- */
 const CHAOS_CD=36e5,CHAOS_DUR=36e5;   // one roll per hour; effects last 1 hour (so only one effect is ever active)
-const CHAOS={cfail:['Critical Failure','Fate turns on you.'],omen:['Dim Omen','A cold wind follows you.'],shrug:['Fate Shrugs','Nothing stirs. Chaos is content, for now.'],blessing:['Small Blessing','A warm thread of luck.'],explore:["Wanderer's Luck",'The road opens before you.'],potion:['Windfall','You find a 35% Health Potion.'],surge:['Second Wind','Fate restores you to full health.'],cwin:['Critical Success','Fate smiles on you.']};
+const CHAOS={cfail:['Critical Failure','Fate turns on you.'],omen:['Dim Omen','A cold wind follows you.'],shrug:['Fate Shrugs','Nothing stirs. Chaos is content, for now.'],blessing:['Small Blessing','A warm thread of luck.'],explore:["Wanderer's Luck",'The road opens before you.'],potion:['Windfall','You find a Small HP Potion.'],surge:['Second Wind','Fate restores you to full health.'],cwin:['Critical Success','Fate smiles on you.']};
 const fxText=f=>f.k==='stat'?sg(f.pct)+'% '+f.stat.toUpperCase():f.k==='xp'?sg(f.pct)+'% XP':'+'+f.v+' Exploration';
 const okBtn=t=>({primary:t||'OK',onPrimary:()=>hideModal('chaos')});
 function chaosOpen(){const C=S.chaos,wait=C.last+CHAOS_CD-Date.now(),f=chaosFx();
  if(wait>0)return showModal('chaos',{icon:'🎲',title:'Chaos',text:'Fate is quiet. Return in '+Math.ceil(wait/6e4)+' min.'+(f?'\nActive: '+fxText(f)+' ('+Math.ceil((f.until-Date.now())/6e4)+' min left)':''),...okBtn()});
  showModal('chaos',{icon:'🎲',title:'Chaos',text:'Chaos is in the eye of the beholder.',primary:'Tempt Fate',onPrimary:tempt,secondary:'Not Today',onSecondary:()=>hideModal('chaos')})}
-function tempt(){const C=S.chaos,now=Date.now();if(now<C.last+CHAOS_CD)return chaosOpen();
- const cm=clsMod(),h=H(),roll=d20(),eff=Math.min(20,Math.max(1,roll-cm.chaosReq)),res=look('chaos',eff),pb=cm.chaosBonus,st=()=>ri(2)?'atk':'def';let fx=null,extra='';   // class "requirements" shift the roll; class "bonus" shifts boon strength
- if(res==='cfail')fx={k:'stat',stat:st(),pct:-10};else if(res==='omen')fx={k:'xp',pct:-10};else if(res==='blessing')fx={k:'xp',pct:10+pb};else if(res==='explore')fx={k:'exp',v:1};else if(res==='cwin')fx={k:'stat',stat:st(),pct:10+pb};
- else if(res==='potion'||(res==='surge'&&h.hp<=0)){h.pot.h35++;extra='+1 35% Health Potion'}else if(res==='surge'){h.hp=stats().hp;extra='HP restored: '+h.hp}
- if(fx)fx.until=now+CHAOS_DUR;C.last=now;C.fx=fx;save();   // result is stored BEFORE the animation, so reloading can't re-roll
- const txt=['🎲 D20 roll: '+roll+(eff!==roll?' (counts as '+eff+')':''),CHAOS[res][1],fx?'Effect: '+fxText(fx)+' for 60 minutes':extra].filter(Boolean).join('\n');
- let n=0;showModal('chaos',{icon:'🎲',title:'Fate is turning…',text:'',primary:'…',onPrimary:()=>{}});$('mSecondary').style.display='none';
- const t=setInterval(()=>{$('mIcon').textContent='🎲 '+(1+ri(20));if(++n<14)return;clearInterval(t);showModal('chaos',{icon:'🎲 '+roll,title:CHAOS[res][0],text:txt,...okBtn('Accept Fate')});hud();if(inv.classList.contains('open'))invRender()},90)}
+async function tempt(){const C=S.chaos;if(Date.now()<C.last+CHAOS_CD)return chaosOpen();
+ showModal('chaos',{icon:'🎲',title:'Fate is turning…',text:'',primary:'…',onPrimary:()=>{}});$('mSecondary').style.display='none';
+ const t0=Date.now(),spin=setInterval(()=>{$('mIcon').textContent='🎲 '+(1+ri(20))},90),r=await srv('tempt_fate',{p_downed:!!H().downed});   // roll, cooldown and effect are decided by the server
+ await new Promise(ok=>setTimeout(ok,Math.max(0,1300-(Date.now()-t0))));clearInterval(spin);
+ if(!r){hideModal('chaos');return}if(r.err==='cooldown'){S.chaos.last=Date.now()-CHAOS_CD+r.wait;return chaosOpen()}
+ if(r.heal)H().hp=stats().hp;const extra=r.heal?'HP restored: '+H().hp:(r.res==='potion'||r.res==='surge')?(r.got?'+1 Small HP Potion':'Your potion bag is already full.'):'';
+ const txt=['🎲 D20 roll: '+r.roll+(r.eff!==r.roll?' (counts as '+r.eff+')':''),CHAOS[r.res][1],r.fx?'Effect: '+fxText(r.fx)+' for 60 minutes':extra].filter(Boolean).join('\n');
+ showModal('chaos',{icon:'🎲 '+r.roll,title:CHAOS[r.res][0],text:txt,...okBtn('Accept Fate')});save();hud();if(inv.classList.contains('open'))invRender()}
 $('chaosButton').addEventListener('click',chaosOpen);
 
-H().hp=Math.min(H().hp,stats().hp);recover();setInterval(()=>{recover();if(inv.classList.contains('open'))invRender()},1e4);if(!S.cls)openClass(true);
+if(window.realmCore)applyCore(window.realmCore);
+H().hp=Math.min(H().hp,stats().hp);if(H().hp<=0)H().downed=true;recover();setInterval(()=>{recover();if(inv.classList.contains('open'))invRender()},1e4);if(!S.cls)openClass(true);
 
 };
 </script>
@@ -589,8 +620,8 @@ if(!window.supabase){say('Could not load the login service. Check your connectio
 const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const back=location.origin+location.pathname;let started=false,uid=null,lastS=null,lastJson='',timer=null,busy=false;
 const busyUi=b=>['aGoogle','aIn','aUp'].forEach(i=>el(i).disabled=b);
-async function flush(){if(!lastS||!uid)return true;const s=lastS,json=JSON.stringify(s);if(json===lastJson)return true;const L=Math.max(1,s.lvl|0),xp=Math.floor(s.xp||0);
- const{error}=await sb.from('players').upsert({id:uid,state:s,lvl:L,xp,total_xp:50*(L-1)+5*(L-1)*(L-2)+xp},{onConflict:'id'});if(error){console.warn('save failed',error.message);return false}lastJson=json;return true}
+async function flush(){if(!lastS||!uid)return true;const s=lastS,json=JSON.stringify(s);if(json===lastJson)return true;const{error}=await sb.from('players').update({state:s}).eq('id',uid);/* xp, level, items, potions are server-owned now */if(error){console.warn('save failed',error.message);return false}lastJson=json;return true}
+async function rpc(fn,args){const{data,error}=await sb.rpc(fn,args||{});if(error)throw error;return data}
 const queue=s=>{lastS=s;clearTimeout(timer);timer=setTimeout(flush,4000)};
 async function signOut(){if(!(await flush())&&!confirm('Could not sync your latest progress. Sign out anyway?'))return;localStorage.removeItem(QK);localStorage.removeItem(OK);await sb.auth.signOut();location.reload()}
 async function begin(session){if(started)return;started=true;uid=session.user.id;busyUi(true);say('Loading your realm…');
@@ -599,8 +630,10 @@ async function begin(session){if(started)return;started=true;uid=session.user.id
   if(cloud)localStorage.setItem(QK,JSON.stringify(cloud));          // saved game exists: cloud wins
   else if(owner&&owner!==uid)localStorage.removeItem(QK);           // another account used this device: start fresh
   localStorage.setItem(OK,uid);                                     // (an old unowned local save is adopted by the first account)
- }catch(e){started=false;busyUi(false);say('Could not load your save. Check your connection and try again.',1);return}
- window.realmCloud={queue,flush,signOut};el('auth').style.display='none';window.startRealm()}
+  let st=null;try{st=JSON.parse(localStorage.getItem(QK))}catch(e){}
+  window.realmCore=await rpc('sync_player',{p_cls:(st&&st.cls)||null});   // server-owned progress (XP, level, items, potions)
+ }catch(e){started=false;busyUi(false);say(/sync_player|function/i.test(e.message||'')?'The game server is not set up yet (run realm_server.sql in Supabase).':'Could not load your save. Check your connection and try again.',1);return}
+ window.realmCloud={queue,flush,signOut,rpc};el('auth').style.display='none';window.startRealm()}
 async function run(fn){if(busy)return;busy=true;busyUi(true);say('');try{await fn()}catch(e){say(e.message||'Something went wrong.',1)}busy=false;if(!started)busyUi(false)}
 const creds=()=>{const email=el('aEmail').value.trim(),password=el('aPass').value;if(!email||password.length<8)throw new Error('Enter your email and a password of 8+ characters.');return{email,password}};
 el('aGoogle').onclick=()=>run(async()=>{const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:back}});if(error)throw error});
