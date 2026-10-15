@@ -38,7 +38,7 @@
 .mk .tip{position:absolute;left:50%;top:40px;width:0;height:0;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-top:12px solid var(--c);filter:drop-shadow(0 0 5px var(--c))}
 .mk .ground{position:absolute;left:1px;bottom:-9px;width:54px;height:22px;border-radius:50%;border:2px solid var(--c);box-shadow:0 0 14px var(--c),inset 0 0 10px var(--c);opacity:.8;animation:ring 2.4s ease-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes ring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.15);opacity:.15}}
-.mk.quest{--c:#62c8ff;--bg:#0f2f4d}.mk.chest{--c:#ffc24a;--bg:#3a2506}.mk.nature{--c:#7be37a;--bg:#12301a}.mk.boss{--c:#ff5a4d;--bg:#3a0f0d}.mk.rift{--c:#b184ff;--bg:#24123f}.mk.qpoint{--c:#ffe08a;--bg:#3a2e08}
+.mk.quest{--c:#62c8ff;--bg:#0f2f4d}.mk.chest{--c:#ffc24a;--bg:#3a2506}.mk.nature{--c:#7be37a;--bg:#12301a}.mk.boss{--c:#ff5a4d;--bg:#3a0f0d}.mk.rift{--c:#b184ff;--bg:#24123f}.mk.qpoint{--c:#ff4fd8;--bg:#3d0f35}
 .mk.boss .badge{width:42px;height:42px;left:7px;box-shadow:0 0 22px var(--c),0 0 0 3px #0a0907aa}
 .mk{transition:opacity .3s,filter .3s}.mk.far{opacity:.5;filter:grayscale(.65)}
 /* Player */
@@ -190,7 +190,7 @@ function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(d>RANGE){tooFar(d);return}
  if((it.t==='chest'||it.t==='boss'||it.t==='rift')&&S.hero.downed){toast('You are downed. Recover to 25% HP first ('+Math.floor(100*S.hero.hp/stats().hp)+'% now).');return}
  const c=POI[it.t];
- showModal('poi',{icon:c.icon,title:c.title(it),text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));if(it.used||it.busy)return;it.busy=true;(it.t==='chest'||it.t==='boss'?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
+ showModal('poi',{icon:c.icon,title:c.title(it),color:it.t==='qpoint'?'#ff4fd8':'',text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));if(it.used||it.busy)return;it.busy=true;(it.t==='chest'||it.t==='boss'?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
 function updateCards(){items.forEach((it,i)=>{const m=markers[i];if(!m)return;const near=dist(targetLL,it.ll)<=RANGE,el=m.getElement();el.classList.toggle('near',near);el.classList.toggle('far',!near)});
  }
@@ -228,6 +228,7 @@ map.on('load',()=>{
 /* ---------- Modal (permission prompt + errors) ---------- */
 const modal=$('modal');let modalKind=null;
 function showModal(kind,o){modalKind=kind;$('mIcon').textContent=o.icon;$('mTitle').textContent=o.title;$('mText').textContent=o.text;
+ const mc=modal.firstElementChild;mc.style.borderColor=o.color||'';mc.style.boxShadow=o.color?'0 0 22px '+o.color+'66':'';$('mTitle').style.color=o.color||'';
  const b1=$('mPrimary'),b2=$('mSecondary');b1.disabled=false;b1.style.opacity='';b1.textContent=o.primary;b1.onclick=o.onPrimary;
  if(o.secondary){b2.style.display='block';b2.textContent=o.secondary;b2.onclick=o.onSecondary}else b2.style.display='none';
  modal.classList.add('open')}
