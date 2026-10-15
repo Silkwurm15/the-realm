@@ -38,7 +38,7 @@
 .mk .tip{position:absolute;left:50%;top:40px;width:0;height:0;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-top:12px solid var(--c);filter:drop-shadow(0 0 5px var(--c))}
 .mk .ground{position:absolute;left:1px;bottom:-9px;width:54px;height:22px;border-radius:50%;border:2px solid var(--c);box-shadow:0 0 14px var(--c),inset 0 0 10px var(--c);opacity:.8;animation:ring 2.4s ease-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes ring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.15);opacity:.15}}
-.mk.quest{--c:#62c8ff;--bg:#0f2f4d}.mk.chest{--c:#ffc24a;--bg:#3a2506}.mk.nature{--c:#7be37a;--bg:#12301a}.mk.boss{--c:#ff5a4d;--bg:#3a0f0d}.mk.rift{--c:#b184ff;--bg:#24123f}
+.mk.quest{--c:#62c8ff;--bg:#0f2f4d}.mk.chest{--c:#ffc24a;--bg:#3a2506}.mk.nature{--c:#7be37a;--bg:#12301a}.mk.boss{--c:#ff5a4d;--bg:#3a0f0d}.mk.rift{--c:#b184ff;--bg:#24123f}.mk.qpoint{--c:#ffe08a;--bg:#3a2e08}
 .mk.boss .badge{width:42px;height:42px;left:7px;box-shadow:0 0 22px var(--c),0 0 0 3px #0a0907aa}
 .mk{transition:opacity .3s,filter .3s}.mk.far{opacity:.5;filter:grayscale(.65)}
 /* Player */
@@ -168,8 +168,9 @@ const SVG={
  chest:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 11V8a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v3"/><rect x="3" y="11" width="18" height="9" rx="1.5"/><path d="M3 14h18M12 12v4"/></svg>',
  nature:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21v-8M12 13C7 13 4 9.5 4 4c5.5 0 8 3 8 9zM12 13c0-4 2-7 8-7 0 5-3 7-8 7z"/><path d="M12 21v-8" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>',
  boss:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5c-4.7 0-8 3.2-8 7.3 0 2.5 1.2 4.3 2.8 5.4V19h2.6v-1.8h1.2V19h2.8v-1.8h1.2V19h2.6v-3.8c1.6-1.1 2.8-2.9 2.8-5.4 0-4.1-3.3-7.3-8-7.3zM8.7 12.8a1.9 1.9 0 1 1 0-3.8 1.9 1.9 0 0 1 0 3.8zm6.6 0a1.9 1.9 0 1 1 0-3.8 1.9 1.9 0 0 1 0 3.8z"/></svg>',
- rift:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/></svg>'};
-const LABEL={quest:'Quest',chest:'Treasure Chest',nature:'Nature Discovery',boss:'Dark Lair (Boss)',rift:'Arcane Rift'};
+ rift:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z"/></svg>',
+ qpoint:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>'};
+const LABEL={quest:'Quest',chest:'Treasure Chest',nature:'Nature Discovery',boss:'Dark Lair (Boss)',rift:'Arcane Rift',qpoint:'Quest Point'};
 // Sample layout around the player (meters / compass bearing). Replace with real server data later.
 const SAMPLE=[
  {t:'quest',name:'Investigate the Strange Lights',d:125,b:20},{t:'quest',name:'The Whispering Door',d:230,b:250},
@@ -183,12 +184,13 @@ const POI={
  chest:{icon:'🧰',title:()=>'Treasure Chest',text:'A chest lies within reach. Open it to claim your loot.',go:'Open Chest'},
  nature:{icon:'🌿',title:()=>'Nature Discovery',text:'Something rare grows here. Gather it before it fades.',go:'Gather'},
  rift:{icon:'✨',title:()=>'Arcane Rift',text:'The air shimmers and tears open. One room, one choice. Win and fate rewards you. Fail and the rift bites back.',go:'Enter Rift'},
+ qpoint:{icon:'📍',title:it=>it.name,text:it=>it.q==='satchel'?'The owner of the satchel is waiting here.':'A strange glow gathers here. Step closer and investigate.',go:it=>it.q==='satchel'?'Return the Satchel':'Investigate'},
  boss:{icon:'💀',title:()=>'Dark Lair',text:'A powerful foe lurks within. Prepare yourself before you strike.',go:'Challenge'}};
 function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(d>RANGE){tooFar(d);return}
  if((it.t==='chest'||it.t==='boss'||it.t==='rift')&&S.hero.downed){toast('You are downed. Recover to 25% HP first ('+Math.floor(100*S.hero.hp/stats().hp)+'% now).');return}
  const c=POI[it.t];
- showModal('poi',{icon:c.icon,title:c.title(it),text:ft(d)+' away. '+c.text+(it.exp?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+' (Sample marker, not a live event yet.)',primary:c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));if(it.used||it.busy)return;it.busy=true;(it.t==='chest'||it.t==='boss'?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):markerUse(it)).finally(()=>{it.busy=false})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
+ showModal('poi',{icon:c.icon,title:c.title(it),text:ft(d)+' away. '+(typeof c.text==='function'?c.text(it):c.text)+(it.exp?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+(it.live?'':' (Sample marker, not a live event yet.)'),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));if(it.used||it.busy)return;it.busy=true;(it.t==='chest'||it.t==='boss'?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
 function updateCards(){items.forEach((it,i)=>{const m=markers[i];if(!m)return;const near=dist(targetLL,it.ll)<=RANGE,el=m.getElement();el.classList.toggle('near',near);el.classList.toggle('far',!near)});
  }
@@ -283,14 +285,19 @@ document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('clic
 /* ================= QUESTS ================= */
 const QK='realm_quests_v1',MULT={daily:1,weekly:1.5,monthly:2},SCALE={daily:1,weekly:5,monthly:15},MAXEXP=10,MAXRND=5,panel=$('qpanel');
 const mi=m=>(Math.round(m/1609.344*100)/100)+' mi',ft=m=>Math.round(m*3.28084).toLocaleString()+' ft';
-const POOL=[
+const POOL_BASE=[
  {id:'chest',kind:'chest',goal:1,xp:6,title:n=>`Open ${n} treasure chest${n>1?'s':''}`},
  {id:'quest',kind:'quest',goal:1,xp:8,title:n=>`Complete ${n} quest marker${n>1?'s':''}`},
  {id:'nature',kind:'nature',goal:2,xp:6,title:n=>`Gather ${n} nature discoveries`},
  {id:'walk1',kind:'walk',goal:402.336,xp:5,title:n=>`Walk ${mi(n)}`},
  {id:'walk2',kind:'walk',goal:1609.344,xp:8,title:n=>`Journey ${mi(n)} on foot`},
+ {id:'walk3',kind:'walk',goal:3218.688,xp:10,title:n=>`Trek ${mi(n)} across the realm`},
+ {id:'chaos',kind:'chaos',goal:1,xp:6,title:n=>`Tempt Fate ${n} time${n>1?'s':''}`}];
+const PHOTO_POOL=[
  {id:'photo1',kind:'photo',goal:1,xp:10,title:n=>`Photograph ${n} nature scene${n>1?'s':''}`},
  {id:'photo2',kind:'photo',goal:1,xp:10,title:n=>`Photograph ${n} public landmark${n>1?'s':''}`}];
+const PHOTO_ON=false;   // photo quests are PAUSED until real verification exists. All photo code is still here: set true (here AND on the server) to bring them back.
+const POOL=[...POOL_BASE,...(PHOTO_ON?PHOTO_POOL:[])];
 const MS={daily:'Complete Dailies!',weekly:'Daily Dailies',monthly:'Weekly Weeklies'},MSXP=15;
 const pad=n=>String(n).padStart(2,'0');
 function keys(){ // resets follow the phone's local time: midnight daily, midnight Monday weekly, midnight on the 1st monthly
@@ -300,22 +307,22 @@ function keys(){ // resets follow the phone's local time: midnight daily, midnig
 function mkTier(t){const T={q:[...POOL].sort(()=>Math.random()-.5).slice(0,7).map(q=>({id:q.id,kind:q.kind,goal:q.goal*SCALE[t],p:0,xp:q.xp,done:false,title:q.title(q.goal*SCALE[t])})),ms:{p:0,done:false,xp:MSXP}};return T}
 let S=null;try{S=JSON.parse(localStorage.getItem(QK))}catch(e){}
 if(!S||!S.k)S={k:keys(),daily:mkTier('daily'),weekly:mkTier('weekly'),monthly:mkTier('monthly'),rnd:{n:0},claimed:{},hashes:[],xp:0,need:50,lvl:1,xpv:2};
-['daily','weekly','monthly'].forEach(t=>{const T=S[t];T.q=T.q.map(q=>{if(q.kind!=='rift'&&q.kind!=='boss'&&q.kind!=='explore')return q;const o=POOL.find(p=>!T.q.some(x=>x.id===p.id));if(!o)return null;const g=o.goal*SCALE[t];return{id:o.id,kind:o.kind,goal:g,p:0,xp:o.xp,done:false,title:o.title(g)}}).filter(Boolean)}); // drop removed quest types from saved games
+['daily','weekly','monthly'].forEach(t=>{const T=S[t];T.q=T.q.map(q=>{if(q.kind!=='rift'&&q.kind!=='boss'&&q.kind!=='explore'&&!(q.kind==='photo'&&!PHOTO_ON&&!q.done))return q;const o=POOL.find(p=>!T.q.some(x=>x.id===p.id));if(!o)return null;const g=o.goal*SCALE[t];return{id:o.id,kind:o.kind,goal:g,p:0,xp:o.xp,done:false,title:o.title(g)}}).filter(Boolean)}); // drop removed quest types from saved games
 if(S.xpv!==2){S.lvl=Math.min(100,Math.max(1,S.lvl|0));S.need=needFor(S.lvl);S.xp=Math.min(S.xp||0,S.need-1);['daily','weekly','monthly'].forEach(t=>{S[t].q.forEach(q=>{const o=POOL.find(p=>p.id===q.id);if(o)q.xp=o.xp});S[t].ms.xp=MSXP});S.xpv=2} // move old saves onto the new XP formula + reward values
-S.chaos=S.chaos||{last:0,fx:null};S.rift=S.rift||{fx:null,run:null};S.shards=S.shards||0;
+S.chaos=S.chaos||{last:0,fx:null};S.rift=S.rift||{fx:null,run:null};S.shards=S.shards||0;S.sq=S.sq||{active:null,n:0};
 S.taken=S.taken||{};S.hashes=S.hashes||[];S.rnd=S.rnd||{n:0,done:[]};S.loot=S.loot||{claimed:{}};S.hero=S.hero||{hp:100,eq:{},inv:[],pot:{h35:0,full:0,res:0}};S.hero.buy=S.hero.buy||{h35:0,full:0,res:0};   // pot = earned stack (cap 20 each), buy = purchased stack (separate, never capped)
 /* ---- server-authoritative state: XP, level, loot, claims, potions, quests and Tempt Fate live on the server ---- */
-const CORE_KEYS=['xpv','xp','need','lvl','cls','hero','loot','chaos','enc','k','daily','weekly','monthly','claimed','rnd','lairs','rift','shards'];
+const CORE_KEYS=['xpv','xp','need','lvl','cls','hero','loot','chaos','enc','k','daily','weekly','monthly','claimed','rnd','lairs','rift','shards','sq'];
 let fighting=false,actChain=Promise.resolve();
 function applyCore(c){if(!c)return;CORE_KEYS.forEach(k=>{if(c[k]!==undefined)S[k]=c[k]});try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}hud();render();try{if(inv.classList.contains('open'))invRender()}catch(e){}}
-function act(action,args){return actChain=actChain.then(async()=>{const r=await window.realmCloud.api(action,args||{});if(r.error){act.err=r.error;if(!(args&&args.quiet))toast(r.error);return null}act.err=null;applyCore(r.core);(r.msgs||[]).forEach(m=>toast(m));return r}).catch(e=>{console.error('act failed',action,e);act.err='Something went wrong. Try again.';return null})}
+function act(action,args){return actChain=actChain.then(async()=>{const r=await window.realmCloud.api(action,args||{});if(r.error){act.err=r.error;if(!(args&&args.quiet))toast(r.error);return null}act.err=null;applyCore(r.core);try{syncQPoints()}catch(e){}(r.msgs||[]).forEach(m=>toast(m));return r}).catch(e=>{console.error('act failed',action,e);act.err='Something went wrong. Try again.';return null})}
 let tab='daily',rndOffers=[],expl=[],lastWalk=null,acc=0;
 function save(){try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}if(window.realmCloud)window.realmCloud.queue(S)}
 function hud(){const x=document.querySelector('.xptext'),b=document.querySelector('.xpfill'),l=document.querySelector('.level');if(x)x.textContent=S.lvl>=100?'MAX LEVEL':`${Math.floor(S.xp).toLocaleString()} / ${S.need.toLocaleString()} XP`;if(b)b.style.width=(S.lvl>=100?100:Math.min(100,100*S.xp/S.need))+'%';if(l)l.textContent=S.lvl;const d=document.querySelector('.nav-dot');if(d)d.style.display=S.daily.ms.done?'none':'';try{hudPlus()}catch(e){}}
 function needFor(L){return 50+(L-1)*10}   // XP to go from level L to L+1
-const ENC_CAP=300; // max XP per day from encounters (mimics, chest bonus, nature, bosses): they supplement quests, never overwhelm them
+// Encounter XP has NO daily cap and grows with level (the server decides; this copy only mirrors the rule).
 function addXp(x){x=Math.round(x*(1+(clsMod().xpPct+fxList().reduce((a,f)=>a+(f.k==='xp'?f.pct:0),0))/100));if(S.lvl>=100)return hud();S.xp+=x;let up=0;while(S.xp>=S.need&&S.lvl<100){S.xp-=S.need;S.lvl++;S.need=needFor(S.lvl);up=1;toast('Level up! Level '+S.lvl)}if(S.lvl>=100)S.xp=0;if(up&&S.hero){S.hero.hp=stats().hp;S.hero.downed=false}hud()}
-function addEnc(x){const e=S.enc&&S.enc.k===S.k.daily?S.enc:(S.enc={k:S.k.daily,n:0}),g=Math.max(0,Math.min(x,ENC_CAP-e.n));e.n+=g;if(g<x)toast('Daily encounter XP cap reached.');if(g>0)addXp(g)}
+function addEnc(x){const g=Math.max(1,Math.round(x*lvlScale()));addXp(g);return g}
 // One reward per quest per period, ever. XP = base x tier multiplier.
 function lvlScale(){return 1+(S.lvl-1)*.02}   // quest + milestone XP grows ~3x by level 100 (tune the .02)
 function award(tier,id,base){const c=`${tier}|${S.k[tier]}|${id}`;if(S.claimed[c])return false;S.claimed[c]=1;const x=Math.round(base*MULT[tier]*lvlScale());addXp(x);toast(`+${x} XP`);return true}
@@ -382,14 +389,15 @@ pf.onchange=async()=>{const f=pf.files[0],c=pctx;pctx=null;if(!f||!c)return;
 function card(t,o){const pct=Math.round(100*Math.min(1,t.p/t.goal)),sub=o.sub!=null?o.sub:t.done?'Completed':t.ready?'Ready to complete':t.kind==='walk'?`${(t.p/1609.344).toFixed(2)} / ${mi(t.goal)}`:`${Math.floor(t.p)} / ${t.goal}`;
  return `<div class="qcard${t.done?' done':''}${t.ready&&!t.done?' rdy':''}${o.ms?' ms':''}" data-act="${o.act||''}" data-i="${o.i==null?'':o.i}"><div class="qt"><b>${t.title}</b><span>+${o.xp} XP</span></div>${o.nobar?'':`<div class="qbar"><i style="width:${pct}%"></i></div>`}<div class="qs">${sub}</div></div>`}
 function render(){if(!panel.classList.contains('open'))return;const T=S[tab],tn={daily:'Daily',weekly:'Weekly',monthly:'Monthly'},M=MULT[tab],d=o=>ft(dist(targetLL,o.ll));
- let h=`<div class="qtabs">${Object.keys(tn).map(k=>`<div class="qtab${k===tab?' on':''}" data-act="tab" data-i="${k}">${tn[k]}</div>`).join('')}</div>`;
+ let h=`<div class="qtabs">${Object.keys(tn).map(k=>`<div class="qtab${k===tab?' on':''}" data-act="tab" data-i="${k}">${tn[k]}</div>`).join('')}</div>`+sqCard();
  h+=T.q.map((q,i)=>card(q,{xp:Math.round(q.xp*M*lvlScale()),act:'q',i})).join('');
  h+=card({title:MS[tab],p:T.ms.p,goal:5,done:T.ms.done,ready:T.ms.ready,kind:'ms'},{ms:1,xp:Math.round(T.ms.xp*M*lvlScale()),act:'ms'});
  const st=panel.scrollTop;panel.innerHTML=h;panel.scrollTop=st}
-const HINT={chest:'Open treasure chests on the map.',quest:'Complete quest markers on the map.',nature:'Gather nature discoveries on the map.',walk:'Walk on public paths and sidewalks.',rift:'Close arcane rifts on the map.',boss:'Challenge dark lairs on the map.',explore:'Finish explorable quests.',photo:'Photograph a public scene from a safe spot.'};
+const HINT={chest:'Open treasure chests on the map.',quest:'Complete quest markers on the map.',nature:'Gather nature discoveries on the map.',walk:'Walk on public paths and sidewalks.',rift:'Close arcane rifts on the map.',boss:'Challenge dark lairs on the map.',explore:'Finish explorable quests.',photo:'Photograph a public scene from a safe spot.',chaos:'Tempt Fate with the dice button.'};
 function popup(o){showModal('quest',{icon:o.icon,title:o.title,text:o.text,primary:o.btn,onPrimary:()=>{if(!o.on)return;hideModal('quest');o.on()},secondary:'Close',onSecondary:()=>hideModal('quest')});const b=$('mPrimary');b.disabled=!o.on;b.style.opacity=o.on?'':'.45'}
 panel.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||!b.dataset.act)return;const a=b.dataset.act,i=b.dataset.i;
  if(a==='tab'){tab=i;render();return}
+ if(a==='sq')return sqPanel();
  const tr=tab,M=MULT[tr];
  if(a==='q'){const q=S[tr].q[i];if(!q)return;const xp=Math.round(q.xp*M*lvlScale()),prog=q.kind==='walk'?`${(q.p/1609.344).toFixed(2)} / ${mi(q.goal)}`:`${Math.floor(q.p)} / ${q.goal}`,
   base={icon:q.kind==='photo'?'📷':'📜',title:q.title,text:`${prog}\nReward: +${xp} XP${q.done?'':'\n'+HINT[q.kind]}`};
@@ -449,7 +457,7 @@ function syncWorld(){const c=safeCtx();if(!c.ready)return false;const now=Date.n
  activeLairs().forEach(l=>{if(!items.some(i=>i.key===l.key))want.set(l.key,l)});
  want.forEach(o=>{addItem(o);ch=true});
  Object.keys(S.taken).forEach(k=>{if(S.taken[k]<now)delete S.taken[k]});
- lastSync=targetLL.slice();lastSyncT=now;if(ch){updateCards();afterSpawn()}return true}
+ try{syncQPoints()}catch(e){}lastSync=targetLL.slice();lastSyncT=now;if(ch){updateCards();afterSpawn()}return true}
 
 /* ================= LOOT (single authoritative catalog + tables) ================= */
 const RAR=['common','uncommon','rare','mythic','legendary'],RC={common:'#cfc9b8',uncommon:'#6fdc7a',rare:'#5ab4ff',mythic:'#c98aff',legendary:'#ffb23e'},cap=s=>s[0].toUpperCase()+s.slice(1);
@@ -609,6 +617,31 @@ async function riftPick(id){const r=await act('rift',{op:'pick',pick:id});
  if(!r||!r.result||!r.result.rift)return rfDraw({icon:'✨',title:'The rift flickers',text:(act.err||'Could not reach the server.')+'\nIf the rift is still open you can try again.',btns:[{html:'Try again',fn:()=>act('rift',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.rift?rfRoom(x.result.rift.room):rfClose())},{html:'Close',alt:1,fn:rfClose}]});
  const x=r.result.rift;rfDraw({icon:x.ok?'✨':'💥',title:x.ok?'The Rift Yields':'The Rift Snaps Shut',text:x.room,lines:x.lines,btns:[{html:'Continue',fn:rfClose}]})}
 async function riftEnter(it){const r=await useMarker(it,()=>act('rift',{op:'enter',key:it.key,exp:it.exp,ll:targetLL}));if(r&&r.result&&r.result.rift)rfRoom(r.result.rift.room)}
+/* ---- Story quests: the four quest markers are mini-series. The server picks the quest, places the points, checks every step and pays out. ---- */
+const SQ_ICON={lights:'✨',door:'🚪',satchel:'🎒',traveler:'🧙'};
+function sqInfo(q){const name={lights:'Investigate the Strange Lights',door:'The Whispering Door',satchel:'The Lost Satchel',traveler:"A Traveler's Request"}[q.id],
+ sub=q.id==='lights'?q.pts.filter(p=>p.v).length+' / '+q.pts.length+' lights found':q.id==='satchel'?'Return the satchel to '+q.who:q.id==='door'?'Answer the riddle':q.task.text+' ('+q.have+' / '+q.task.n+')';
+ return{name,sub,left:Math.max(1,Math.ceil((q.until-Date.now())/6e4))}}
+function sqCard(){const q=S.sq&&S.sq.active;if(!q)return'';const i=sqInfo(q);return '<div class="qcard ms" data-act="sq"><div class="qt"><b>📜 '+i.name+'</b><span>'+i.left+' min</span></div><div class="qs">'+i.sub+'</div></div>'}
+function sqPanel(){const q=S.sq&&S.sq.active;if(!q)return;const i=sqInfo(q);
+ if(q.id==='door')return popup({icon:'🚪',title:i.name,text:'The riddle is still waiting.\n'+i.left+' min left',btn:'Open Riddle',on:()=>act('quest',{op:'resume'}).then(r=>{if(r&&r.result&&r.result.sq)sqShow(r.result.sq)})});
+ popup({icon:SQ_ICON[q.id],title:i.name,text:i.sub+'\n'+i.left+' min left\n\nAbandoning forfeits the reward.',btn:'Abandon Quest',on:()=>{if(confirm('Abandon this quest? You will not get the reward.'))act('quest',{op:'abandon'}).then(()=>render())}})}
+function sqClose(){rf.style.display='none';hud();try{render()}catch(e){}try{syncQPoints()}catch(e){}try{if(inv.classList.contains('open'))invRender()}catch(e){}}
+function sqShow(sq){
+ if(sq.phase==='riddle')return rfDraw({icon:'🚪',title:sq.name,text:'A carved face in the door whispers:\n\n'+sq.riddle.q,btns:sq.riddle.opts.map((o,i)=>({html:esc(o),fn:()=>sqAnswer(i)}))});
+ rfDraw({icon:sq.phase==='done'?(sq.ok?'🏆':'🚪'):sq.phase==='progress'?'✨':(SQ_ICON[sq.id]||'📜'),title:sq.phase==='done'?(sq.ok?'Quest Complete':'A Meager Prize'):sq.name,text:sq.phase==='done'?sq.name:'',lines:sq.lines,btns:[{html:'Continue',fn:sqClose}]})}
+async function sqAnswer(i){const r=await act('quest',{op:'answer',pick:i});
+ if(!r||!r.result||!r.result.sq)return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});
+ sqShow(r.result.sq)}
+function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,180+Math.random()*320);if(safeAt(p,c))out.push(p)}return out}   // safe spots 180-500 m away; the server picks from them and checks the distances
+async function questStart(it){const r=await useMarker(it,()=>act('quest',{op:'start',key:it.key,exp:it.exp,ll:targetLL,cands:gatherCands()}));if(r&&r.result&&r.result.sq){sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
+async function questVisit(it){const r=await act('quest',{op:'visit',i:it.i,ll:targetLL});if(r&&r.result&&r.result.sq)sqShow(r.result.sq)}
+function syncQPoints(){const q=S.sq&&S.sq.active,want=new Map();
+ if(q&&q.pts)q.pts.forEach((p,i)=>{if(!p.v)want.set('sq'+i,{t:'qpoint',ll:p.ll,key:'sq'+i,i,q:q.id,live:1,exp:q.until,name:q.id==='satchel'?'The Owner: '+q.who:'Strange Light '+(i+1)})});
+ let ch=false;for(let i=items.length-1;i>=0;i--){const it=items[i];if(it.t!=='qpoint')continue;const w=want.get(it.key);if(w&&w.exp===it.exp&&w.ll[0]===it.ll[0]&&w.ll[1]===it.ll[1])want.delete(it.key);else{dropItem(i);ch=true}}
+ want.forEach(o=>{addItem(o);ch=true});if(ch)updateCards()}
+try{syncQPoints()}catch(e){}
+if(S.cls&&S.sq&&S.sq.active&&S.sq.active.id==='door'&&!(S.rift&&S.rift.run))act('quest',{op:'resume',quiet:true}).then(r=>{if(r&&r.result&&r.result.sq)sqShow(r.result.sq)});   // a riddle you left half-answered
 if(S.cls&&S.rift&&S.rift.run&&S.rift.run.until>Date.now())act('rift',{op:'resume',quiet:true}).then(r=>{if(r&&r.result&&r.result.rift)rfRoom(r.result.rift.room)});   // picks up a rift you were inside when the page closed
 
 if(!S.name){try{const n=cleanName(localStorage.getItem('realm_name'));if(n)S.name=n}catch(e){}}
