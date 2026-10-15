@@ -342,10 +342,12 @@ function track(){if(!gotFirst)return;if(!lastWalk){lastWalk=targetLL.slice();ret
 function flushWalk(){if(acc<20||!window.realmCloud)return;const m=acc;acc=0;act('walk',{m,ll:targetLL,quiet:true})}   // raw meters; the server caps the speed and applies class bonuses
 
 /* ---- location safety: fail closed (no map data = no quest locations) ---- */
-const BAD=new Set(['police','ambulance_station','fire_station','hospital','school','kindergarten','college','university','cemetery','grave_yard','military','prison']);
+const BAD=new Set(['police','ambulance_station','fire_station','hospital','school','kindergarten','college','university','cemetery','grave_yard','military','prison','railway']);
 function feats(l,f){try{return map.querySourceFeatures('om',f?{sourceLayer:l,filter:f}:{sourceLayer:l})}catch(e){return[]}}
 function safeCtx(){const pf=feats('poi').filter(f=>f.geometry.type==='Point'&&(BAD.has(f.properties.class)||BAD.has(f.properties.subclass)));
- return{ready:feats('transportation').length>0,bad:pf,land:feats('landuse').filter(f=>BAD.has(f.properties.class)),area:[...feats('building'),...feats('water')],roads:feats('transportation',['in',['get','class'],['literal',['motorway','trunk','primary']]])}}
+ return{ready:feats('transportation').length>0,bad:pf,land:feats('landuse').filter(f=>BAD.has(f.properties.class)),area:[...feats('building'),...feats('water')],roads:feats('transportation',['in',['get','class'],['literal',['motorway','trunk','primary']]]),
+  nogo:[...feats('landcover',['==',['get','class'],'farmland']),...feats('landcover',['==',['get','subclass'],'golf_course']),...feats('landuse',['==',['get','class'],'golf_course'])],   // farmland (private fields) + golf courses
+  rails:feats('transportation',['all',['!=',['get','brunnel'],'tunnel'],['any',['==',['get','class'],'rail'],['all',['==',['get','class'],'transit'],['in',['get','subclass'],['literal',['light_rail','monorail']]]]]])}}
 const polys=g=>g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];
 function inRing(p,r){let c=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const[a,b]=r[i],[x,y]=r[j];if((b>p[1])!==(y>p[1])&&p[0]<(x-a)*(p[1]-b)/(y-b)+a)c=!c}return c}
 const inPoly=(p,g)=>polys(g).some(pl=>inRing(p,pl[0])&&!pl.slice(1).some(h=>inRing(p,h)));
@@ -355,7 +357,10 @@ function safeAt(p,c){if(!c.ready)return false;
  const ring=[p,...[0,90,180,270].map(b=>dest(p,b,40))];
  if(c.land.some(f=>ring.some(q=>inPoly(q,f.geometry))))return false;          // restricted land (40 m buffer)
  if(c.area.some(f=>inPoly(p,f.geometry)))return false;                         // inside buildings (private) or water
- for(const f of c.roads){const g=f.geometry,ls=g.type==='LineString'?[g.coordinates]:g.type==='MultiLineString'?g.coordinates:[];for(const l of ls)for(let i=1;i<l.length;i++)if(segD(p,l[i-1],l[i])<35)return false}  // keep off highways
+ const near=(L,m)=>{for(const f of L){const g=f.geometry,ls=g.type==='LineString'?[g.coordinates]:g.type==='MultiLineString'?g.coordinates:[];for(const l of ls)for(let i=1;i<l.length;i++)if(segD(p,l[i-1],l[i])<m)return true}return false};
+ if(near(c.roads,35))return false;    // keep off highways
+ if(near(c.rails,35))return false;    // keep 35 m off railways (and railway stations/yards via the lists above)
+ const r20=[p,...[0,90,180,270].map(b=>dest(p,b,20))];if(c.nogo.some(f=>r20.some(q=>inPoly(q,f.geometry))))return false;   // farmland + golf courses (20 m buffer)
  return true}
 function pickSafe(){const c=safeCtx();if(!c.ready)return null;for(let i=0;i<14;i++){const p=dest(targetLL,Math.random()*360,40+Math.random()*(RANGE-60));if(safeAt(p,c))return p}return null}
 
