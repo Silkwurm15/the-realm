@@ -136,7 +136,16 @@ window.LOOK_IMG={"red": "data:image/webp;base64,UklGRp4cAABXRUJQVlA4WAoAAAAQAAAA
 .olg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
 .ol{padding:4px 2px 6px;border-radius:8px;border:1px solid #4b3a1f;background:#0e0c09aa;color:#cdb98a;cursor:pointer;font:.78rem Georgia,serif}
 .ol img{width:100%;display:block}.ol.sel{border-color:#e5c77b;box-shadow:0 0 12px #d6ad5d77;color:#fff0c6}
-@media(prefers-reduced-motion:reduce){.ob,.ob-s{transition-duration:.01s}.ob::before{animation:none}}`;
+.pz{display:block;margin:0 auto .4em;width:min(56vw,236px);height:auto;filter:drop-shadow(0 8px 16px #000a);cursor:pointer}
+.pz .b{transform-box:fill-box;transform-origin:50% 100%;animation:pzb 3.8s ease-in-out infinite}
+.pz .zz{opacity:0;transform-box:fill-box;animation:pzz 3.6s ease-in infinite}.pz .z2{animation-delay:1.2s}.pz .z3{animation-delay:2.4s}
+.pz .eo{display:none}.pz.wake .ec,.pz.wake .zz{display:none}.pz.wake .eo{display:inline}.pz.wake .b{animation:pzhop .5s ease-out}
+.ob .tap{animation:obtap 1.9s ease-in-out infinite;letter-spacing:.06em}
+@keyframes pzb{50%{transform:scale(1.03,.97)}}
+@keyframes pzz{0%{opacity:0;transform:translate(0,6px)}25%{opacity:.95}100%{opacity:0;transform:translate(12px,-24px)}}
+@keyframes pzhop{40%{transform:translateY(-16px) scale(.98,1.05)}100%{transform:none}}
+@keyframes obtap{50%{opacity:.3}}
+@media(prefers-reduced-motion:reduce){.ob,.ob-s{transition-duration:.01s}.ob::before,.pz .b,.ob .tap{animation:none}.pz .zz{animation:none;opacity:.8}}`;
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   function run(o) {
@@ -156,10 +165,11 @@ window.LOOK_IMG={"red": "data:image/webp;base64,UklGRp4cAABXRUJQVlA4WAoAAAAQAAAA
         const f = cur.querySelector('input[type=text]'); if (f) setTimeout(() => f.focus({ preventScroll: true }), 700);
       }
       const q = (el, s) => el.querySelector(s);
+      const PANDA = '<svg class="pz" viewBox="0 0 220 204" aria-hidden="true"><ellipse cx="110" cy="194" rx="66" ry="8" fill="#000" opacity=".45"/><g class="b"><path d="M54 108Q110 90 166 108L186 178Q110 198 34 178Z" fill="#1f4f8a" stroke="#d6ad5d" stroke-width="3" stroke-linejoin="round"/><path d="M76 116Q110 108 144 116L156 176Q110 188 64 176Z" fill="#2a64ad"/><ellipse cx="78" cy="176" rx="22" ry="15" fill="#1c1a1f"/><ellipse cx="142" cy="176" rx="22" ry="15" fill="#1c1a1f"/><ellipse cx="110" cy="144" rx="45" ry="40" fill="#f7f3e8" stroke="#d8d2bf" stroke-width="2"/><ellipse cx="110" cy="152" rx="28" ry="24" fill="#fffdf6" opacity=".7"/><path d="M70 116Q110 134 150 116" fill="none" stroke="#d6ad5d" stroke-width="6" stroke-linecap="round"/><circle cx="110" cy="127" r="6.5" fill="#f2d795" stroke="#a9792a" stroke-width="2"/><circle cx="110" cy="127" r="2.4" fill="#1f4f8a"/><ellipse cx="64" cy="146" rx="14" ry="26" fill="#1c1a1f" transform="rotate(18 64 146)"/><ellipse cx="156" cy="146" rx="14" ry="26" fill="#1c1a1f" transform="rotate(-18 156 146)"/><circle cx="68" cy="42" r="17" fill="#1c1a1f"/><circle cx="152" cy="42" r="17" fill="#1c1a1f"/><circle cx="68" cy="42" r="7" fill="#4a3a44"/><circle cx="152" cy="42" r="7" fill="#4a3a44"/><ellipse cx="110" cy="80" rx="54" ry="46" fill="#fbf8ee" stroke="#d8d2bf" stroke-width="2"/><ellipse cx="85" cy="82" rx="13" ry="17" fill="#1c1a1f" transform="rotate(22 85 82)"/><ellipse cx="135" cy="82" rx="13" ry="17" fill="#1c1a1f" transform="rotate(-22 135 82)"/><g class="ec" fill="none" stroke="#f7f3e8" stroke-width="3" stroke-linecap="round"><path d="M77 84Q85 91 93 84"/><path d="M127 84Q135 91 143 84"/></g><g class="eo"><circle cx="86" cy="82" r="6.5" fill="#fff"/><circle cx="134" cy="82" r="6.5" fill="#fff"/><circle cx="87.5" cy="83" r="3.4" fill="#1c1a1f"/><circle cx="132.5" cy="83" r="3.4" fill="#1c1a1f"/><circle cx="89" cy="81" r="1.4" fill="#fff"/><circle cx="134" cy="81" r="1.4" fill="#fff"/></g><ellipse cx="110" cy="97" rx="8" ry="5.5" fill="#1c1a1f"/><path d="M110 102.5V106M110 106Q104 112 98 107M110 106Q116 112 122 107" fill="none" stroke="#1c1a1f" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="68" cy="102" rx="9" ry="5" fill="#ff9aa2" opacity=".45"/><ellipse cx="152" cy="102" rx="9" ry="5" fill="#ff9aa2" opacity=".45"/></g><g font-family="Georgia,serif" font-style="italic" fill="#f2d795"><text class="zz z1" x="160" y="34" font-size="20">z</text><text class="zz z2" x="174" y="20" font-size="15">z</text><text class="zz z3" x="150" y="14" font-size="12">z</text></g></svg>';
       const screens = {
         async welcome() {
-          await show('<h1>Welcome to<em>The Realm!</em></h1><p class="sub">Tap to begin</p>', el => { el.onclick = () => { clearTimeout(timer); go('name') }; });
-          timer = setTimeout(() => go('name'), 3200);
+          // waits for a tap (no auto-advance): the panda wakes up, hops, then the next screen opens
+          await show(PANDA + '<h1>Welcome to<em>The Realm!</em></h1><p class="sub tap">Tap to begin</p>', el => { el.onclick = () => { if (el.dataset.go) return; el.dataset.go = '1'; const p = q(el, '.pz'); if (p) p.classList.add('wake'); setTimeout(() => go('name'), reduce ? 20 : 520); }; });
         },
         async name() {
           const links = (o.terms || o.privacy) ? ` the ${o.terms ? `<a href="${esc(o.terms)}" target="_blank" rel="noopener">Terms</a>` : ''}${o.terms && o.privacy ? ' and ' : ''}${o.privacy ? `<a href="${esc(o.privacy)}" target="_blank" rel="noopener">Privacy Policy</a>` : ''}` : ' the Terms and Privacy Policy';
