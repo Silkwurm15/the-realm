@@ -68,8 +68,8 @@
 .bottom-left{left:8px;padding:6px 9px;max-width:200px}.bottom-left .chest{width:28px;height:28px;font-size:18px}.bottom-left strong{font-size:12px}.bottom-left small{font-size:8px;margin-top:2px}
 /* Follow-mode button: glows gold when the camera is NOT locked to you */
 /* Modal (GPS permission / errors) */
-.modal{position:absolute;inset:0;z-index:900;background:rgba(5,8,6,.74);display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}
-.modal-card{max-width:340px;width:100%;padding:22px 20px;text-align:center}.modal-card h2{font:700 20px Georgia,serif;color:#fff0c6;margin:6px 0 8px}.modal-card p{font:14px/1.45 Arial,sans-serif;color:#d7c59f;margin:0 0 14px}.m-icon{font-size:34px}
+.modal{position:absolute;inset:0;z-index:1200;background:rgba(5,8,6,.74);display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}
+#mText:empty{display:none}.modal-card{max-width:340px;width:100%;padding:22px 20px;text-align:center}.modal-card h2{font:700 20px Georgia,serif;color:#fff0c6;margin:6px 0 8px}.modal-card p{font:14px/1.45 Arial,sans-serif;color:#d7c59f;margin:0 0 14px}.m-icon{font-size:34px}
 .m-btn{display:block;width:100%;padding:13px;margin-top:8px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 15px Georgia,serif;cursor:pointer}.m-btn.ghost{background:transparent;border-color:#77552b;color:#b9a67d;font-weight:400;font-size:13px}
 @media(min-width:700px){.topbar{left:18px;right:18px;top:18px}.profile{max-width:380px}.quest-card{left:18px;top:84px}.compass{right:18px;top:84px}.side-controls{right:18px;top:140px}.bottom-left{left:18px;bottom:92px}.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(700px,90vw);border:2px solid #8b6937;border-bottom:0;border-radius:7px 7px 0 0}}
 @media(max-width:390px){.gps-pill{padding:0 6px;font-size:8px}.topbar{gap:5px}.player-name{font-size:14px}.nav-icon{font-size:19px}.nav-label{font-size:8px}.nav-icon{height:42px!important;width:42px}.nav-icon .ni{width:42px;height:42px;display:block;object-fit:contain;opacity:.72;filter:saturate(.85) brightness(.9) drop-shadow(0 2px 3px #000a);transition:opacity .2s,filter .25s,transform .2s;-webkit-user-drag:none;pointer-events:none}.nav-item.active .ni{opacity:1;filter:saturate(1.08) brightness(1.08) drop-shadow(0 0 7px #f0c46a99) drop-shadow(0 2px 3px #000a);transform:translateY(-1px) scale(1.06)}.nav-item .nav-label{font:600 9.5px Georgia,serif;letter-spacing:.5px;margin-top:-1px}.bottom-nav .nav-dot{top:2px;right:-4px}.bottom-left{max-width:190px}}
@@ -931,7 +931,7 @@ function switchRender(){const o=shopOwned();sw.innerHTML='<div class="qh" style=
 function openSwitch(){if(shopOwned().size<2)return;switchRender();sw.style.display='block'}
 sw.addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;if(b.dataset.w==='x'){sw.style.display='none';return}
  const k=b.dataset.k;if(!CLASSES[k]||k===S.cls)return;
- showModal('switch',{icon:'🎭',title:'Switch to '+CLASSES[k].n+'?',text:CLASSES[k].d+'\n\nEach class keeps its own level and XP.',color:'#e5c77b',primary:'Switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k}).then(r=>{if(r){sw.style.display='none';invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'Cancel',onSecondary:()=>hideModal('switch')})});
+ showModal('switch',{icon:'🎭',title:'Switch to '+CLASSES[k].n,text:'',color:'#e5c77b',primary:'Switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){sw.style.display='none';invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'Cancel',onSecondary:()=>hideModal('switch')})});
 
 /* ---- Chaos: Tempt Fate (virtual d20) ---- */
 const CHAOS_CD=36e5,CHAOS_DUR=36e5;   // one roll per hour; effects last 1 hour (so only one effect is ever active)
