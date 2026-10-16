@@ -387,14 +387,16 @@ function triggerLost(reason){if(gpsLost)return;gpsLost=true;gpsState('GPS signal
 function startGPS(){hideModal();gpsLost=false;
  if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null}
  gpsState('Locating…','#e5b94c');watchId=navigator.geolocation.watchPosition(onFix,onGpsErr,GOPTS)}
-function onFix(pos){lastFix=Date.now();const ll=[pos.coords.longitude,pos.coords.latitude];
+let anchorLL=null,fixBuf=[],fixT=0;   // Standing still: GPS wobbles by 10-30 m. We average the last 8 fixes and only move the player once the average has shifted by more than the wobble (1.2 x the reported accuracy, 12-40 m). Walking still tracks normally.
+function onFix(pos){const nowT=Date.now();lastFix=nowT;const ll=[pos.coords.longitude,pos.coords.latitude];if(nowT-fixT>10000)fixBuf=[];fixT=nowT;fixBuf.push(ll);if(fixBuf.length>8)fixBuf.shift();
  if(!gotFirst){gotFirst=true;hideModal();spawnAt=ll;targetLL=ll.slice();spawn(ll);
-  player=ll.slice();targetLL=ll.slice();rangeAt=ll.slice();playerMarker.setLngLat(ll);map.getSource('range').setData(ringPoly(ll,RANGE));
+  anchorLL=ll.slice();fixBuf=[ll.slice()];player=ll.slice();targetLL=ll.slice();rangeAt=ll.slice();playerMarker.setLngLat(ll);map.getSource('range').setData(ringPoly(ll,RANGE));
   setFollow(true);intro=true;map.flyTo({center:ll,zoom:17,pitch:START.pitch,duration:1400});setTimeout(()=>{intro=false},1500);
   updateCards();toast('Location locked. Adventure awaits!')}
  else{if(gpsLost){gpsLost=false;hideModal('lost');toast('GPS signal restored')}
   if(spawnAt&&dist(spawnAt,ll)>800){spawnAt=ll;spawn(ll)}
-  targetLL=ll;updateCards()}
+  const ga=pos.coords.accuracy||0,mv=pos.coords.speed>1.2,thr=mv?Math.max(8,Math.min(25,ga*.7)):Math.max(12,Math.min(40,ga*1.2)),cand=[fixBuf.reduce((a,q)=>a+q[0],0)/fixBuf.length,fixBuf.reduce((a,q)=>a+q[1],0)/fixBuf.length];
+  if(!anchorLL||dist(anchorLL,cand)>=thr){anchorLL=cand.slice();targetLL=cand;updateCards()}}
  gpsState('GPS Connected','#8fd18b')}
 function onGpsErr(err){
  if(err.code===1){showDenied();return}
@@ -724,7 +726,7 @@ cl.addEventListener('click',e=>{if(e.target.dataset.x)cl.style.display='none';co
 const inv=document.createElement('div');inv.className='qpanel';inv.id='inv';panel.parentNode.appendChild(inv);
 function invToggle(on){inv.classList.toggle('open',on);if(on)invRender()}
 function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,i)=>{const c=CAT[it.cid];return`<div class="qcard"><div class="qt"><b style="color:${RC[c.rarity]}">${c.name}</b><span>${cap(c.rarity)} ${TN[c.type]}</span></div><div class="qs">${fmtS(iStat(it))}${it.extra?' · extra +'+it.extra.val+' '+it.extra.stat.toUpperCase():''}</div><button class="qbtn" data-a="${a}" data-i="${i}">${btn}</button></div>`};
- let o=`<div class="qcard ms"><div class="qt">${c?c.n:'No class'} · Level ${S.lvl}<span>${h.downed?'DOWNED (need 25%)':Math.floor(h.hp)+' / '+s.hp+' HP'}</span></div><div class="qbar"><i style="width:${Math.max(0,100*h.hp/s.hp)}%"></i></div><div class="qs"><b>ATK ${s.atk} · DEF ${s.def} · HP ${s.hp}</b></div><div class="qs">Level base: ${p.b.atk} ATK · ${p.b.def} DEF · ${p.b.hp} HP</div><div class="qs">Equipment: ${sg(p.g.atk)} ATK · ${sg(p.g.def)} DEF · ${sg(p.g.hp)} HP</div><div class="qs">Class: ${sg(p.cm.atk)} ATK · ${sg(p.cm.def)} DEF · ${sg(p.cm.hp)} HP</div>${c?lines(c):''}${chaosFx()?'<div class="qs">🎲 Chaos: '+fxText(chaosFx())+' ('+Math.ceil((chaosFx().until-Date.now())/6e4)+' min left)</div>':''}${riftFx()?'<div class="qs" style="color:'+((riftFx().pct||riftFx().v)<0?'#ff8a7a':'#c9a8ff')+'">✨ Rift: '+fxText(riftFx())+' ('+Math.ceil((riftFx().until-Date.now())/6e4)+' min left)</div>':''}<div class="qs">💠 Rift Shards: <b>${(S.shards||0).toLocaleString()}</b></div><button class="qbtn" data-a="cls">🔒 Class Locked</button><button class="qbtn" data-a="name">Rename</button></div><div class="qh"><span>Potions</span></div>`;
+ let o=`<div class="qcard ms"><div class="qt">${c?c.n:'No class'} · Level ${S.lvl}<span>${h.downed?'DOWNED (need 25%)':Math.floor(h.hp)+' / '+s.hp+' HP'}</span></div><div class="qbar"><i style="width:${Math.max(0,100*h.hp/s.hp)}%"></i></div><div class="qs"><b>ATK ${s.atk} · DEF ${s.def} · HP ${s.hp}</b></div><div class="qs">Level base: ${p.b.atk} ATK · ${p.b.def} DEF · ${p.b.hp} HP</div><div class="qs">Equipment: ${sg(p.g.atk)} ATK · ${sg(p.g.def)} DEF · ${sg(p.g.hp)} HP</div><div class="qs">Class: ${sg(p.cm.atk)} ATK · ${sg(p.cm.def)} DEF · ${sg(p.cm.hp)} HP</div>${c?lines(c):''}${chaosFx()?'<div class="qs">🎲 Chaos: '+fxText(chaosFx())+' ('+Math.ceil((chaosFx().until-Date.now())/6e4)+' min left)</div>':''}${riftFx()?'<div class="qs" style="color:'+((riftFx().pct||riftFx().v)<0?'#ff8a7a':'#c9a8ff')+'">✨ Rift: '+fxText(riftFx())+' ('+Math.ceil((riftFx().until-Date.now())/6e4)+' min left)</div>':''}<div class="qs">💠 Rift Shards: <b>${(S.shards||0).toLocaleString()}</b></div><button class="qbtn" data-a="cls" style="${S.classChange?'':'display:none'}">🔒 Class Locked</button><button class="qbtn" data-a="name">Rename</button></div><div class="qh"><span>Potions</span></div>`;
  o+=Object.keys(POTS).map(k=>`<div class="qcard"><div class="qt">${POTS[k].icon} ${POTS[k].name}<span>x${potN(k)}</span></div><div class="qs">Earned ${h.pot[k]||0} / ${POT_CAP} · Bought ${h.buy[k]||0}</div>${potN(k)?`<button class="qbtn" data-a="pot" data-i="${k}">Use</button>`:''}</div>`).join('');
  o+='<div class="qh"><span>Equipped</span></div>'+SLOTS.map(k=>h.eq[k]?row(h.eq[k],'Unequip','un',k).replace('<span>','<span>'+SN[k]+' · '):`<div class="qcard" style="opacity:.55"><div class="qt">${SN[k]}<span>Empty</span></div></div>`).join('');
  o+=`<div class="qh"><span>Backpack</span><span>${h.inv.length}</span></div>`+(h.inv.length?h.inv.map(it=>row(it,'Equip','eq',it.uid)).join(''):'<div class="qaw">No items yet. Open chests!</div>')+'<div class="qh"><span>Account</span></div><div class="qcard"><button class="qbtn" data-a="out">Sign out</button></div>';
@@ -766,13 +768,15 @@ const SQ_ICON={lights:'✨',door:'🚪',satchel:'🎒',traveler:'🧙'};
 function sqInfo(q){const name={lights:'Investigate the Strange Lights',door:'The Whispering Door',satchel:'The Lost Satchel',traveler:"A Traveler's Request"}[q.id],
  sub=q.id==='lights'?q.pts.filter(p=>p.v).length+' / '+q.pts.length+' lights found':q.id==='satchel'?'Return the satchel to '+q.who:q.id==='door'?'Answer the riddle':q.task.text+' ('+q.have+' / '+q.task.n+')';
  return{name,sub,left:Math.max(1,Math.ceil((q.until-Date.now())/6e4))}}
-function sqCard(){const q=S.sq&&S.sq.active;if(!q)return'';const i=sqInfo(q);return '<div class="qcard ms" data-act="sq"><div class="qt"><b>📜 '+i.name+'</b><span>'+i.left+' min</span></div><div class="qs">'+i.sub+'</div></div>'}
-function sqPanel(){const q=S.sq&&S.sq.active;if(!q)return;const i=sqInfo(q);
- if(q.id==='door')return popup({icon:'🚪',title:i.name,text:'The riddle is still waiting.\n'+i.left+' min left',btn:'Open Riddle',on:()=>act('quest',{op:'resume'}).then(r=>{if(r&&r.result&&r.result.sq)sqShow(r.result.sq)})});
- popup({icon:SQ_ICON[q.id],title:i.name,text:i.sub+'\n'+i.left+' min left\n\nAbandoning forfeits the reward.',btn:'Abandon Quest',on:()=>{if(confirm('Abandon this quest? You will not get the reward.'))act('quest',{op:'abandon'}).then(()=>render())}})}
+function sqActive(){const q=S.sq&&S.sq.active;if(q&&q.until<=Date.now()){S.sq.active=null;return null}return q||null}   // a quest whose time ran out disappears right away, no server round-trip needed
+function sqCard(){const q=sqActive();if(!q)return'';const i=sqInfo(q);return '<div class="qcard ms" data-act="sq"><div class="qt"><b>📜 '+i.name+'</b><span>'+i.left+' min</span></div><div class="qs">'+i.sub+'</div></div>'}
+function sqAbandon(){if(confirm('Abandon this quest? You will not get the reward.'))act('quest',{op:'abandon'}).then(()=>{rf.style.display='none';render();try{syncQPoints()}catch(e){}})}
+function sqPanel(){const q=sqActive();if(!q){render();return}const i=sqInfo(q);
+ if(q.id==='door'){showModal('quest',{icon:'🚪',title:i.name,text:'The riddle is still waiting.\n'+i.left+' min left',primary:'Open Riddle',onPrimary:()=>{hideModal('quest');act('quest',{op:'resume'}).then(r=>{if(r&&r.result&&r.result.sq)sqShow(r.result.sq)})},secondary:'Abandon Quest',onSecondary:()=>{hideModal('quest');sqAbandon()}});return}
+ popup({icon:SQ_ICON[q.id],title:i.name,text:i.sub+'\n'+i.left+' min left\n\nAbandoning forfeits the reward.',btn:'Abandon Quest',on:sqAbandon})}
 function sqClose(){rf.style.display='none';hud();try{render()}catch(e){}try{syncQPoints()}catch(e){}try{if(inv.classList.contains('open'))invRender()}catch(e){}}
 function sqShow(sq){
- if(sq.phase==='riddle')return rfDraw({icon:'🚪',title:sq.name,text:'A carved face in the door whispers:\n\n'+sq.riddle.q,btns:sq.riddle.opts.map((o,i)=>({html:esc(o),fn:()=>sqAnswer(i)}))});
+ if(sq.phase==='riddle')return rfDraw({icon:'🚪',title:sq.name,text:'A carved face in the door whispers:\n\n'+sq.riddle.q,btns:[...sq.riddle.opts.map((o,i)=>({html:esc(o),fn:()=>sqAnswer(i)})),{html:'Not now',alt:1,fn:sqClose},{html:'Abandon quest',alt:1,fn:sqAbandon}]});
  rfDraw({icon:sq.phase==='done'?(sq.ok?'🏆':'🚪'):sq.phase==='progress'?'✨':(SQ_ICON[sq.id]||'📜'),title:sq.phase==='done'?(sq.ok?'Quest Complete':'A Meager Prize'):sq.name,text:sq.phase==='done'?sq.name:'',lines:sq.lines,btns:[{html:'Continue',fn:sqClose}]})}
 async function sqAnswer(i){const r=await act('quest',{op:'answer',pick:i});
  if(!r||!r.result||!r.result.sq)return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});
@@ -780,12 +784,12 @@ async function sqAnswer(i){const r=await act('quest',{op:'answer',pick:i});
 function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,180+Math.random()*320);if(safeAt(p,c))out.push(p)}return out}   // safe spots 180-500 m away; the server picks from them and checks the distances
 async function questStart(it){const r=await useMarker(it,()=>act('quest',{op:'start',key:it.key,exp:it.exp,ll:targetLL,cands:gatherCands()}));if(r&&r.result&&r.result.sq){sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
 async function questVisit(it){const r=await act('quest',{op:'visit',i:it.i,ll:targetLL});if(r&&r.result&&r.result.sq)sqShow(r.result.sq)}
-function syncQPoints(){const q=S.sq&&S.sq.active,want=new Map();
+function syncQPoints(){const q=sqActive(),want=new Map();
  if(q&&q.pts)q.pts.forEach((p,i)=>{if(!p.v)want.set('sq'+i,{t:'qpoint',ll:p.ll,key:'sq'+i,i,q:q.id,live:1,exp:q.until,name:q.id==='satchel'?'The Owner: '+q.who:'Strange Light '+(i+1)})});
  let ch=false;for(let i=items.length-1;i>=0;i--){const it=items[i];if(it.t!=='qpoint')continue;const w=want.get(it.key);if(w&&w.exp===it.exp&&w.ll[0]===it.ll[0]&&w.ll[1]===it.ll[1])want.delete(it.key);else{dropItem(i);ch=true}}
  want.forEach(o=>{addItem(o);ch=true});if(ch)updateCards()}
 try{syncQPoints()}catch(e){}
-if(S.cls&&S.sq&&S.sq.active&&S.sq.active.id==='door'&&!(S.rift&&S.rift.run))act('quest',{op:'resume',quiet:true}).then(r=>{if(r&&r.result&&r.result.sq)sqShow(r.result.sq)});   // a riddle you left half-answered
+// (a half-answered riddle no longer pops up by itself: it waits in the quest log until you open it or it expires)
 if(S.cls&&S.rift&&S.rift.run&&S.rift.run.until>Date.now())act('rift',{op:'resume',quiet:true}).then(r=>{if(r&&r.result&&r.result.rift)rfRoom(r.result.rift.room)});   // picks up a rift you were inside when the page closed
 
 if(!S.name){try{const n=cleanName(localStorage.getItem('realm_name'));if(n)S.name=n}catch(e){}}
