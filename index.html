@@ -174,7 +174,7 @@ requestAnimationFrame(f)})();</script>
 <div class="hud compass" id="compass" aria-label="Compass — tap to face north"><svg class="needle" id="needle" viewBox="0 0 26 26"><path d="M13 2 18 13H8Z" fill="#e5483d"/><path d="M13 24 8 13h10Z" fill="#e8d7a4"/></svg></div>
 <div class="side-controls"><button class="round-control" id="layerButton" aria-label="Toggle 2D/3D" title="Toggle 2D / 3D">▱</button><button class="round-control" id="rotateButton" aria-label="Rotate camera" title="Rotate camera">⟳</button><button class="round-control" id="chaosButton" aria-label="Chaos" title="Tempt Fate">🎲</button><button class="round-control" id="zoomIn" aria-label="Zoom in">＋</button><button class="round-control" id="zoomOut" aria-label="Zoom out">−</button></div>
 
-<div class="qpanel" id="qpanel"></div><div class="qpanel" id="mpanel"></div>
+<div class="qpanel" id="qpanel"></div><div class="qpanel" id="mpanel"></div><div class="qpanel" id="spanel"></div>
 <div class="bottom-nav"><div class="nav-item active" data-tab="Map"><div class="nav-icon">⌖</div><div class="nav-label">Map</div></div><div class="nav-item" data-tab="Quests"><div class="nav-icon">▤<span class="nav-dot"></span></div><div class="nav-label">Quests</div></div><div class="nav-item" data-tab="Champions"><div class="nav-icon">⚔</div><div class="nav-label">Champions</div></div><div class="nav-item" data-tab="Shop"><div class="nav-icon">♢</div><div class="nav-label">Shop</div></div><div class="nav-item" data-tab="Character"><div class="nav-icon">♟</div><div class="nav-label">Character</div></div><div class="nav-item" data-tab="Menu"><div class="nav-icon">☰</div><div class="nav-label">Menu</div></div></div>
 <div class="toast" id="toast" role="status"></div><div class="toolfar" id="toolFar" role="status"></div>
 <div class="modal" id="modal" role="alertdialog" aria-modal="true"><div class="panel modal-card"><div class="m-icon" id="mIcon"></div><h2 id="mTitle"></h2><p id="mText"></p><button class="m-btn" id="mPrimary"></button><button class="m-btn ghost" id="mSecondary"></button></div></div>
@@ -516,7 +516,7 @@ $('rotateButton').addEventListener('click',()=>map.easeTo({bearing:map.getBearin
 $('compass').addEventListener('click',()=>map.easeTo({bearing:0,duration:500}));
 $('layerButton').addEventListener('click',()=>{const flat=map.getPitch()<10;map.easeTo({pitch:flat?START.pitch:0,duration:600});toast(flat?'3D view':'Top-down view')});
 const nearest=t=>items.filter(x=>x.t===t).sort((a,b)=>dist(targetLL,a.ll)-dist(targetLL,b.ll))[0];
-document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>{document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));item.classList.add('active');const t=item.dataset.tab;$('qpanel').classList.toggle('open',t==='Quests');$('mpanel').classList.toggle('open',t==='Menu');invToggle(t==='Character');if(t==='Quests')render();else if(t==='Menu')menuHome();else if(t!=='Map'&&t!=='Character')toast(t+' screen is not connected yet.')}));
+document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>{document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));item.classList.add('active');const t=item.dataset.tab;$('qpanel').classList.toggle('open',t==='Quests');$('mpanel').classList.toggle('open',t==='Menu');$('spanel').classList.toggle('open',t==='Shop');invToggle(t==='Character');if(t==='Quests')render();else if(t==='Menu')menuHome();else if(t==='Shop')shopHome();else if(t!=='Map'&&t!=='Character')toast(t+' screen is not connected yet.')}));
 
 /* ================= QUESTS ================= */
 const QK='realm_quests_v1',MULT={daily:1,weekly:1.5,monthly:2},SCALE={daily:1,weekly:5,monthly:15},MAXEXP=10,MAXRND=5,panel=$('qpanel');
@@ -833,7 +833,7 @@ function menuHome(){mp.innerHTML='<div class="qh"><span>Menu</span></div><div cl
 function menuSub(title,body){mp.innerHTML='<div class="qh"><span>'+title+'</span></div>'+body+'<div class="qcard"><button class="qbtn" data-m="home">← Back</button></div>'}
 const CLASS_ORDER=['antipaladin','archer','assassin','barbarian','bard','druid','healer','monk','paladin','scout','warrior','wizard'];   // 2 x 6 grid on the Profile screen
 function menuProfile(){const c=CLASSES[S.cls],pct=S.lvl>=100?100:Math.min(100,100*S.xp/S.need);
- menuSub('Profile','<div class="qcard ms"><div class="qt">'+esc(S.name||'Adventurer')+'<span>Level '+S.lvl+'</span></div><div class="qbar"><i style="width:'+pct+'%"></i></div><div class="qs">'+(S.lvl>=100?'MAX LEVEL':Math.floor(S.xp).toLocaleString()+' / '+S.need.toLocaleString()+' XP')+'</div><div class="qs">Class: <b>'+(c?c.n:'None')+'</b></div><div class="qs">💠 Rift Shards: <b>'+(S.shards||0).toLocaleString()+'</b></div>'+(S.cu>0?'<div class="qs">🔓 Class Unlocks: <b>'+S.cu+'</b></div>':'')+'<button class="qbtn" data-m="rename">Rename</button></div><div class="qh"><span>Classes</span><span>'+CLASS_ORDER.filter(k=>k===S.cls||(S.cx||{})[k]).length+' / 12</span></div><div class="cgrid">'+CLASS_ORDER.map(k=>{const on=k===S.cls,t=on?{lvl:S.lvl,xp:S.xp}:(S.cx||{})[k],L=t?t.lvl:0,X=t?t.xp:0;return'<div class="cc '+(on?'on':'off')+'">'+clsIcon(k)+'<div style="min-width:0;flex:1"><b>'+CLASSES[k].n+'</b><small>'+(t?'Level '+L+(on?' · Active':''):'Not started')+'</small>'+(t?'<div class="mb"><i style="width:'+(L>=100?100:Math.min(100,100*X/needFor(L)))+'%"></i></div>':'')+'</div></div>'}).join('')+'</div>')}
+ menuSub('Profile','<div class="qcard ms"><div class="qt">'+esc(S.name||'Adventurer')+'<span>Level '+S.lvl+'</span></div><div class="qbar"><i style="width:'+pct+'%"></i></div><div class="qs">'+(S.lvl>=100?'MAX LEVEL':Math.floor(S.xp).toLocaleString()+' / '+S.need.toLocaleString()+' XP')+'</div><div class="qs">Class: <b>'+(c?c.n:'None')+'</b></div><div class="qs">💠 Rift Shards: <b>'+(S.shards||0).toLocaleString()+'</b></div>'+(S.cu>0?'<div class="qs">🔓 Class Unlocks: <b>'+S.cu+'</b></div>':'')+'<button class="qbtn" data-m="rename">Rename</button></div><div class="qh"><span>Classes</span><span>'+shopOwned().size+' / 12</span></div><div class="cgrid">'+CLASS_ORDER.map(k=>{const on=k===S.cls,t=on?{lvl:S.lvl,xp:S.xp}:(S.cx||{})[k],L=t?t.lvl:0,X=t?t.xp:0;return'<div class="cc '+(on?'on':(t||shopOwned().has(k))?'':'off')+'">'+clsIcon(k)+'<div style="min-width:0;flex:1"><b>'+CLASSES[k].n+'</b><small>'+(t?'Level '+L+(on?' · Active':''):shopOwned().has(k)?'Unlocked':'Locked')+'</small>'+(t?'<div class="mb"><i style="width:'+(L>=100?100:Math.min(100,100*X/needFor(L)))+'%"></i></div>':'')+'</div></div>'}).join('')+'</div>')}
 async function menuAccount(){menuSub('Account Management','<div class="qcard"><div class="qs">Signed in as</div><div class="qs"><b id="mEmail">…</b></div></div><div class="qcard"><button class="qbtn" data-m="pass">Change password</button><button class="qbtn" data-m="out">Sign out</button></div><div class="qh"><span>Danger zone</span></div><div class="qcard"><div class="qs">Deleting your account permanently erases your character and progress. This cannot be undone.</div><button class="qbtn" data-m="del" style="border-color:#ff5a4d;background:linear-gradient(180deg,#6a1f1a,#2c0f0c)">Delete account</button></div>');
  try{const{data}=await window.realmCloud.sb.auth.getUser();const e=document.getElementById('mEmail');if(e)e.textContent=(data&&data.user&&data.user.email)||'Unknown'}catch(x){}}
 async function deleteAccount(){
@@ -853,6 +853,49 @@ mp.addEventListener('click',async e=>{const b=e.target.closest('[data-m]');if(!b
  if(m==='pass'){const p=prompt('Choose a new password (8+ characters)');if(p==null)return;if(p.length<8)return toast('Password must be 8+ characters.');const{error}=await window.realmCloud.sb.auth.updateUser({password:p});return toast(error?error.message:'Password updated.')}
  if(m==='del')return deleteAccount();
  if(m==='out')return window.realmCloud&&window.realmCloud.signOut()});
+
+
+/* ---- Shop screen (Shop tab) ---- */
+const sp=$('spanel');
+const SHOP_PRICE={single:0,fighter:0,explorer:0,random:0,mass:0};   // 0 = FREE for now. Put real prices here later (Rift Shards).
+const PACKS={fighter:{n:'Fighter Pack',icon:'⚔️',list:['antipaladin','assassin','barbarian','monk','paladin','warrior']},explorer:{n:'Explorer Pack',icon:'🧭',list:['archer','bard','druid','healer','scout','wizard']}};
+const priceTxt=p=>p>0?'💠 '+p.toLocaleString():'FREE';
+function shopOwned(){return new Set([...(S.unlocked||[]),S.cls,...Object.keys(S.cx||{})].filter(k=>k&&CLASSES[k]))}   // bought, active, or already played = owned
+function shopLocked(keys){const o=shopOwned();return(keys||CLASS_ORDER).filter(k=>!o.has(k))}
+function shopSpend(p){if(!(p>0))return true;toast('Paid purchases are not available yet.');return false}   // hook for real prices later
+function shopGrant(keys){const o=shopOwned();keys.forEach(k=>{if(CLASSES[k])o.add(k)});S.unlocked=[...o];save()}
+const shopBack=to=>'<div class="qcard"><button class="qbtn" data-s="'+to+'">← Back</button></div>';
+function shopHome(){sp.innerHTML='<div class="qh"><span>Shop</span><span>💠 '+(S.shards||0).toLocaleString()+'</span></div>'
+ +'<div class="qcard"><div class="qt"><b>🎭 Class Change</b><span>'+shopOwned().size+' / 12 owned</span></div><div class="qs">Unlock new classes, one at a time or in packs.</div><button class="qbtn" data-s="cc">Browse</button></div>'}
+function shopCC(){const n=shopLocked().length;sp.innerHTML='<div class="qh"><span>Class Change</span><span>'+shopOwned().size+' / 12 owned</span></div>'
+ +'<div class="qcard"><div class="qt"><b>Single Unlock</b><span>'+priceTxt(SHOP_PRICE.single)+'</span></div><div class="qs">Pick one class and unlock it.</div><button class="qbtn" data-s="single"'+(n?'':' disabled style="opacity:.5"')+'>'+(n?'Choose a class':'All classes unlocked')+'</button></div>'
+ +'<div class="qcard"><div class="qt"><b>Pack Unlock</b><span>Bundles</span></div><div class="qs">Unlock several classes at once. Classes you already own are skipped.</div><button class="qbtn" data-s="packs"'+(n?'':' disabled style="opacity:.5"')+'>'+(n?'See packs':'All classes unlocked')+'</button></div>'+shopBack('home')}
+function shopSingle(){const o=shopOwned();sp.innerHTML='<div class="qh"><span>Single Unlock</span><span>'+shopLocked().length+' available</span></div><div class="qcard"><div class="qs">Tap a class to unlock it for <b>'+priceTxt(SHOP_PRICE.single)+'</b>.</div></div><div class="cgrid">'
+ +CLASS_ORDER.map(k=>{const own=o.has(k),on=k===S.cls;return own?'<div class="cc '+(on?'on':'off')+'">'+clsIcon(k)+'<div style="min-width:0"><b>'+CLASSES[k].n+'</b><small>'+(on?'Active':'Unlocked')+'</small></div></div>'
+  :'<div class="cc" data-s="buy1" data-k="'+k+'" style="cursor:pointer">'+clsIcon(k)+'<div style="min-width:0"><b>'+CLASSES[k].n+'</b><small>'+priceTxt(SHOP_PRICE.single)+'</small></div></div>'}).join('')+'</div>'+shopBack('cc')}
+function shopPacks(){const f=shopLocked(PACKS.fighter.list).length,e=shopLocked(PACKS.explorer.list).length,a=shopLocked().length;
+ const card=(t,d,price,n,tot,key)=>'<div class="qcard"><div class="qt"><b>'+t+'</b><span>'+priceTxt(price)+'</span></div><div class="qs">'+d+'</div><button class="qbtn" data-s="pack" data-p="'+key+'"'+(n?'':' disabled style="opacity:.5"')+'>'+(n?'Unlock '+n+(tot?' of '+tot:'')+' new':'Already unlocked')+'</button></div>';
+ sp.innerHTML='<div class="qh"><span>Pack Unlock</span><span>'+a+' locked</span></div>'
+ +card('⚔️ Fighter Pack','Unlocks every fighter class: '+PACKS.fighter.list.map(k=>CLASSES[k].n).join(', ')+'.',SHOP_PRICE.fighter,f,6,'fighter')
+ +card('🧭 Explorer Pack','Unlocks every explorer class: '+PACKS.explorer.list.map(k=>CLASSES[k].n).join(', ')+'.',SHOP_PRICE.explorer,e,6,'explorer')
+ +card('🎲 Random Unlock','Unlocks one random class you do not own yet.',SHOP_PRICE.random,a?1:0,0,'random')
+ +card('🌟 Mass Unlock','Unlocks every class you do not own yet.',SHOP_PRICE.mass,a,0,'mass')+shopBack('cc')}
+function shopConfirm(o){showModal('shop',{icon:o.icon,title:o.title,text:o.text+'\n\nPrice: '+priceTxt(o.price),color:'#e5c77b',primary:o.price>0?'Buy ('+priceTxt(o.price)+')':'Unlock (Free)',onPrimary:()=>{hideModal('shop');if(shopSpend(o.price))o.ok()},secondary:'Cancel',onSecondary:()=>hideModal('shop')})}
+function shopDone(title,keys){showModal('shopdone',{icon:'🎉',title,text:keys.map(k=>'• '+CLASSES[k].n).join('\n'),color:'#e5c77b',primary:'Nice!',onPrimary:()=>hideModal('shopdone')})}
+function buySingle(k){if(!CLASSES[k])return;if(shopOwned().has(k))return toast('You already own that class.');const c=CLASSES[k],i=clsInfo(c);
+ shopConfirm({icon:'🎭',title:'Unlock '+c.n+'?',text:c.d+'\n'+i.P.map(t=>'＋ '+t).concat(i.N.map(t=>'－ '+t)).join('\n'),price:SHOP_PRICE.single,ok:()=>{if(shopOwned().has(k))return;shopGrant([k]);toast(c.n+' unlocked!');shopSingle()}})}
+function buyPack(key){const o=shopOwned();let list;
+ if(key==='fighter'||key==='explorer'){const P=PACKS[key];list=shopLocked(P.list);
+  if(!list.length)return toast('You already own every class in this pack.');
+  const skip=P.list.filter(k=>o.has(k));
+  return shopConfirm({icon:P.icon,title:'Buy the '+P.n+'?',text:'You will unlock:\n'+list.map(k=>'• '+CLASSES[k].n).join('\n')+(skip.length?'\n\nAlready owned (skipped): '+skip.map(k=>CLASSES[k].n).join(', '):''),price:SHOP_PRICE[key],ok:()=>{const g=shopLocked(P.list);if(!g.length)return;shopGrant(g);shopDone(P.n+' unlocked!',g);shopPacks()}})}
+ if(key==='random'){list=shopLocked();if(!list.length)return toast('You already own every class.');
+  return shopConfirm({icon:'🎲',title:'Random Unlock?',text:'You will unlock one random class you do not own yet ('+list.length+' possible).',price:SHOP_PRICE.random,ok:()=>{const g=shopLocked();if(!g.length)return;const k=g[Math.floor(Math.random()*g.length)];shopGrant([k]);shopDone('You unlocked...',[k]);shopPacks()}})}
+ if(key==='mass'){list=shopLocked();if(!list.length)return toast('You already own every class.');
+  return shopConfirm({icon:'🌟',title:'Mass Unlock?',text:'You will unlock all '+list.length+' classes you do not own yet:\n'+list.map(k=>'• '+CLASSES[k].n).join('\n'),price:SHOP_PRICE.mass,ok:()=>{const g=shopLocked();if(!g.length)return;shopGrant(g);shopDone('Every class unlocked!',g);shopPacks()}})}}
+sp.addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b||b.disabled)return;const a=b.dataset.s;
+ if(a==='home')return shopHome();if(a==='cc')return shopCC();if(a==='single')return shopSingle();if(a==='packs')return shopPacks();
+ if(a==='buy1')return buySingle(b.dataset.k);if(a==='pack')return buyPack(b.dataset.p)});
 
 /* ---- Chaos: Tempt Fate (virtual d20) ---- */
 const CHAOS_CD=36e5,CHAOS_DUR=36e5;   // one roll per hour; effects last 1 hour (so only one effect is ever active)
