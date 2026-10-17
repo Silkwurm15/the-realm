@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.68';window.__BUILD=B;
+(function(){var B='1.69';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -77,7 +77,7 @@ try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
 /* Follow-mode button: glows gold when the camera is NOT locked to you */
 /* Modal (GPS permission / errors) */
 .modal{position:absolute;inset:0;z-index:900;background:rgba(5,8,6,.74);display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}
-.modal-card{max-width:340px;width:100%;padding:22px 20px;text-align:center}.modal-card h2{font:700 20px Georgia,serif;color:#fff0c6;margin:6px 0 8px}.modal-card p{font:14px/1.45 Arial,sans-serif;color:#d7c59f;margin:0 0 14px}.m-icon{font-size:34px}
+.modal-card{max-width:340px;width:100%;padding:22px 20px;text-align:center}.modal-card h2{font:700 20px Georgia,serif;color:#fff0c6;margin:6px 0 8px}.modal-card p{font:14px/1.45 Arial,sans-serif;color:#d7c59f;margin:0 0 14px}.m-icon{font-size:34px}.m-icon img.emb{width:84px;height:84px;display:block;margin:0 auto;object-fit:contain;filter:drop-shadow(0 2px 6px #000)}
 .m-btn{display:block;width:100%;padding:13px;margin-top:8px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 15px Georgia,serif;cursor:pointer}.m-btn.ghost{background:transparent;border-color:#77552b;color:#b9a67d;font-weight:400;font-size:13px}
 @media(min-width:700px){.topbar{left:18px;right:18px;top:18px}.profile{max-width:380px}.quest-card{left:18px;top:84px}.compass{right:18px;top:84px}.side-controls{right:18px;top:140px}.bottom-left{left:18px;bottom:92px}.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(700px,90vw);border:2px solid #8b6937;border-bottom:0;border-radius:7px 7px 0 0}}
 @media(max-width:390px){.gps-pill{padding:0 6px;font-size:8px}.topbar{gap:5px}.player-name{font-size:14px}.nav-icon{font-size:19px}.nav-label{font-size:8px}.nav-icon{height:42px!important;width:42px}.nav-icon .ni{width:42px;height:42px;display:block;object-fit:contain;opacity:.72;filter:saturate(.85) brightness(.9) drop-shadow(0 2px 3px #000a);transition:opacity .2s,filter .25s,transform .2s;-webkit-user-drag:none;pointer-events:none}.nav-item.active .ni{opacity:1;filter:saturate(1.08) brightness(1.08) drop-shadow(0 0 7px #f0c46a99) drop-shadow(0 2px 3px #000a);transform:translateY(-1px) scale(1.06)}.nav-item .nav-label{font:600 9.5px Georgia,serif;letter-spacing:.5px;margin-top:-1px}.bottom-nav .nav-dot{top:2px;right:-4px}.bottom-left{max-width:190px}}
@@ -97,7 +97,7 @@ html,body{position:fixed!important;left:0;top:0;right:0;bottom:0;width:100%!impo
 #map{touch-action:none}
 .build-tag{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));text-align:center;font:10px Arial,sans-serif;color:#d9b76e66;z-index:2100;pointer-events:none}
 #cbt #cbA img{display:block;margin:0 auto;width:auto;max-width:100%;height:auto;max-height:240px;object-fit:contain;filter:drop-shadow(0 6px 10px #000c)}
-.cc img.emb{width:38px;height:38px;flex:0 0 38px;object-fit:contain;filter:drop-shadow(0 2px 3px #000a)}.portrait img.emb,.portrait.cls img.emb{width:12.6cqw;height:12.6cqw;margin:auto;display:block;object-fit:contain;filter:drop-shadow(0 1px 3px #000)}
+.cc img.emb{width:38px;height:38px;flex:0 0 38px;object-fit:contain;filter:drop-shadow(0 2px 3px #000a)}.portrait img.emb,.portrait.cls img.emb{width:12.6cqw;height:12.6cqw;margin:auto;display:block;object-fit:contain;transform:translate(.24cqw,-.24cqw);filter:drop-shadow(0 1px 3px #000)}
 *{-webkit-tap-highlight-color:transparent!important;-webkit-touch-callout:none}html,body,button,.qbtn,.qcard,.cc,.portrait,img,svg,[data-m],[data-a],[data-w],[data-s]{-webkit-user-select:none;user-select:none}button:focus,button:focus-visible,.qbtn:focus,.qbtn:focus-visible,[data-m]:focus,[tabindex]:focus,.portrait:focus{outline:none!important}input,textarea,select{-webkit-user-select:text;user-select:text}img{-webkit-user-drag:none}::selection{background:transparent}input::selection,textarea::selection{background:#b99a5266}
 </style><style id="hud-v4">
 /* ===== HUD v4 — ornate fantasy frame (matches the reference screenshot) ===== */
@@ -503,7 +503,7 @@ map.on('load',()=>{
 
 /* ---------- Modal (permission prompt + errors) ---------- */
 const modal=$('modal');let modalKind=null;
-function showModal(kind,o){modalKind=kind;$('mIcon').textContent=o.icon;$('mTitle').textContent=o.title;$('mText').textContent=o.text;
+function showModal(kind,o){modalKind=kind;if(o.iconHtml)$('mIcon').innerHTML=o.iconHtml;else $('mIcon').textContent=o.icon;$('mTitle').textContent=o.title;$('mText').textContent=o.text;
  const mc=modal.firstElementChild;mc.style.borderColor=o.color||'';mc.style.boxShadow=o.color?'0 0 22px '+o.color+'66':'';$('mTitle').style.color=o.color||'';
  const b1=$('mPrimary'),b2=$('mSecondary');b1.disabled=false;b1.style.opacity='';b1.textContent=o.primary;b1.onclick=o.onPrimary;
  if(o.secondary){b2.style.display='block';b2.textContent=o.secondary;b2.onclick=o.onSecondary}else b2.style.display='none';
@@ -996,7 +996,7 @@ function switchRender(){const o=shopOwned();sw.innerHTML='<div class="qh" style=
 function openSwitch(){if(shopOwned().size<2)return;switchRender();sw.style.display='block'}
 sw.addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;if(b.dataset.w==='x'){sw.style.display='none';return}
  const k=b.dataset.k;if(!CLASSES[k]||k===S.cls)return;
- showModal('switch',{icon:'🎭',title:'Switch to '+CLASSES[k].n+'?',text:'',color:'#e5c77b',primary:'Switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){sw.style.display='none';invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'Cancel',onSecondary:()=>hideModal('switch')})});
+ showModal('switch',{icon:'🎭',iconHtml:clsIcon(k),title:'Switch to '+CLASSES[k].n+'?',text:'',color:'#e5c77b',primary:'Switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){sw.style.display='none';invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'Cancel',onSecondary:()=>hideModal('switch')})});
 
 /* ---- Chaos: Tempt Fate (virtual d20) ---- */
 const CHAOS_CD=36e5,CHAOS_DUR=36e5;   // one roll per hour; effects last 1 hour (so only one effect is ever active)
