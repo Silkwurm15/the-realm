@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.701';window.__BUILD=B;
+(function(){var B='1.703';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -413,7 +413,7 @@ layers:[
 {id:'building',type:'fill-extrusion',source:'om','source-layer':'building',minzoom:14,paint:{'fill-extrusion-color':['interpolate',['linear'],['coalesce',['get','render_height'],6],0,'#9c7a52',12,'#8b7355',40,'#8a8794'],'fill-extrusion-height':['coalesce',['get','render_height'],6],'fill-extrusion-base':['coalesce',['get','render_min_height'],0],'fill-extrusion-opacity':.92,'fill-extrusion-vertical-gradient':true}}
 ]};
 
-const map=new maplibregl.Map({container:'map',style,center:FALLBACK,zoom:START.zoom,pitch:START.pitch,bearing:START.bearing,maxPitch:75,minZoom:14,maxZoom:16,attributionControl:{compact:true},dragRotate:true,touchPitch:false});
+const map=new maplibregl.Map({container:'map',style,center:FALLBACK,zoom:START.zoom,pitch:START.pitch,bearing:START.bearing,maxPitch:75,minZoom:14,maxZoom:19,attributionControl:{compact:true},dragRotate:true,touchPitch:false});
 map.dragPan.disable();map.doubleClickZoom.disable();map.scrollZoom.enable({around:'center'});map.touchZoomRotate.enable({around:'center'});
 let gesturing=false;
 ['touchstart','pointerdown'].forEach(ev=>map.getCanvasContainer().addEventListener(ev,()=>{gesturing=true},{passive:true}));
@@ -423,7 +423,7 @@ map.on('styleimagemissing',e=>{const f=PATTERNS[e.id];if(f&&!map.hasImage(e.id))
 let errShown=false;map.on('error',e=>{console.error(e&&e.error||e);if(!errShown){errShown=true;const m=(e&&e.error&&e.error.message)||'unknown error';toast('Map problem: '+m.slice(0,140))}});
 
 /* ---------- Game layers ---------- */
-const RANGE=25; // meters: radius of the circle around the player (diameter = 2 x RANGE = 50 m)
+const RANGE=30; // meters: radius of the circle around the player (diameter = 2 x RANGE = 60 m)
 let player=FALLBACK.slice(),following=false,watchId=null,playerMarker=null;
 const SVG={
  quest:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 3h3l-.6 11h-1.8zM12 16.6a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8z"/></svg>',
@@ -586,7 +586,7 @@ let S=null;try{S=JSON.parse(localStorage.getItem(QK))}catch(e){}
 if(!S||!S.k)S={k:keys(),daily:mkTier('daily'),weekly:mkTier('weekly'),monthly:mkTier('monthly'),rnd:{n:0},claimed:{},hashes:[],xp:0,need:50,lvl:1,xpv:2};
 ['daily','weekly','monthly'].forEach(t=>{const T=S[t];T.q=T.q.map(q=>{if(q.kind!=='rift'&&q.kind!=='boss'&&q.kind!=='explore'&&!(q.kind==='photo'&&!PHOTO_ON&&!q.done))return q;const o=POOL.find(p=>!T.q.some(x=>x.id===p.id));if(!o)return null;const g=o.goal*SCALE[t];return{id:o.id,kind:o.kind,goal:g,p:0,xp:o.xp,done:false,title:o.title(g)}}).filter(Boolean)}); // drop removed quest types from saved games
 if(S.xpv!==2){S.lvl=Math.min(100,Math.max(1,S.lvl|0));S.need=needFor(S.lvl);S.xp=Math.min(S.xp||0,S.need-1);['daily','weekly','monthly'].forEach(t=>{S[t].q.forEach(q=>{const o=POOL.find(p=>p.id===q.id);if(o)q.xp=o.xp});S[t].ms.xp=MSXP});S.xpv=2} // move old saves onto the new XP formula + reward values
-S.chaos=S.chaos||{last:0,fx:null};S.rift=S.rift||{fx:null,run:null};S.shards=S.shards||0;S.sq=S.sq||{active:null,n:0};
+S.chaos=S.chaos||{last:0,fx:null};S.rift=S.rift||{fx:null,run:null};S.shards=S.shards||0;S.sq=S.sq||{list:[],n:0};
 S.taken=S.taken||{};S.hashes=S.hashes||[];S.rnd=S.rnd||{n:0,done:[]};S.loot=S.loot||{claimed:{}};S.hero=S.hero||{hp:100,eq:{},inv:[],pot:{h35:0,full:0,res:0}};S.hero.buy=S.hero.buy||{h35:0,full:0,res:0};   // pot = earned stack (cap 20 each), buy = purchased stack (separate, never capped)
 /* ---- server-authoritative state: XP, level, loot, claims, potions, quests and Tempt Fate live on the server ---- */
 const CORE_KEYS=['xpv','xp','need','lvl','cls','hero','loot','chaos','enc','k','daily','weekly','monthly','claimed','rnd','lairs','rift','shards','sq','name','look','onboarded','cx','cu'];
@@ -674,7 +674,7 @@ const HINT={chest:'Open treasure chests on the map.',quest:'Complete quest marke
 function popup(o){showModal('quest',{icon:o.icon,title:o.title,text:o.text,primary:o.btn,onPrimary:()=>{if(!o.on)return;hideModal('quest');o.on()},secondary:'Close',onSecondary:()=>hideModal('quest')});const b=$('mPrimary');b.disabled=!o.on;b.style.opacity=o.on?'':'.45'}
 panel.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||!b.dataset.act)return;const a=b.dataset.act,i=b.dataset.i;
  if(a==='tab'){tab=i;render();return}
- if(a==='sq')return sqPanel();
+ if(a==='sq')return sqPanel(i);
  const tr=tab,M=MULT[tr];
  if(a==='q'){const q=S[tr].q[i];if(!q)return;const xp=Math.round(q.xp*M*lvlScale()),prog=q.kind==='walk'?`${(q.p/1609.344).toFixed(2)} / ${mi(q.goal)}`:`${Math.floor(q.p)} / ${q.goal}`,
   base={icon:q.kind==='photo'?'📷':'📜',title:q.title,text:`${prog}\nReward: +${xp} XP${q.done?'':'\n'+HINT[q.kind]}`};
@@ -706,7 +706,7 @@ function lairTick(){const now=Date.now(),w=lairWindow();
 
 
 /* ---- World spawning: deterministic grid. Same place + same time = same markers for everyone, nothing stored ---- */
-const GRID={cell:.0025,radius:600,max:60, // cell size in degrees (~900 ft); spawn radius around player (m); max markers on screen
+const GRID={cell:.0025,radius:300,max:60, // cell size in degrees (~900 ft); spawn radius around player (m); max markers on screen
  types:{chest:{n:4,p:.55,life:60},nature:{n:4,p:.60,life:60},quest:{n:3,p:.50,life:120},rift:{n:2,p:.25,life:30}}}; // n = sites per cell, p = chance a site is active, life = minutes
 const QN=['Investigate the Strange Lights','The Whispering Door','The Lost Satchel',"A Traveler's Request"];
 function h32(t){let h=2166136261;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
@@ -1031,25 +1031,26 @@ const SQ_ICON={lights:'✨',door:'🚪',satchel:'🎒',traveler:'🧙'};
 function sqInfo(q){const name={lights:'Investigate the Strange Lights',door:'The Whispering Door',satchel:'The Lost Satchel',traveler:"A Traveler's Request"}[q.id],
  sub=q.id==='lights'?q.pts.filter(p=>p.v).length+' / '+q.pts.length+' lights found':q.id==='satchel'?'Return the satchel to '+q.who:q.id==='door'?'Answer the riddle':q.task.text+' ('+q.have+' / '+q.task.n+')';
  return{name,sub,left:Math.max(1,Math.ceil((q.until-Date.now())/6e4))}}
-function sqActive(){const q=S.sq&&S.sq.active;if(q&&q.until<=Date.now()){S.sq.active=null;return null}return q||null}   // a quest whose time ran out disappears right away, no server round-trip needed
-function sqCard(){const q=sqActive();if(!q)return'';const i=sqInfo(q);return '<div class="qcard ms" data-act="sq"><div class="qt"><b>📜 '+i.name+'</b><span>'+i.left+' min</span></div><div class="qs">'+i.sub+'</div></div>'}
-function sqAbandon(){if(confirm('Abandon this quest? You will not get the reward.'))act('quest',{op:'abandon'}).then(()=>{rf.style.display='none';render();try{syncQPoints()}catch(e){}})}
-function sqPanel(){const q=sqActive();if(!q){render();return}const i=sqInfo(q);
- if(q.id==='door'){showModal('quest',{icon:'🚪',title:i.name,text:'The riddle is still waiting.\n'+i.left+' min left',primary:'Open Riddle',onPrimary:()=>{hideModal('quest');act('quest',{op:'resume'}).then(r=>{if(r&&r.result&&r.result.sq)sqShow(r.result.sq)})},secondary:'Abandon Quest',onSecondary:()=>{hideModal('quest');sqAbandon()}});return}
- popup({icon:SQ_ICON[q.id],title:i.name,text:i.sub+'\n'+i.left+' min left\n\nAbandoning forfeits the reward.',btn:'Abandon Quest',on:sqAbandon})}
+function sqList(){if(!S.sq)S.sq={list:[],n:0};if(S.sq.active){(S.sq.list=S.sq.list||[]).push(S.sq.active);delete S.sq.active}const L=S.sq.list||(S.sq.list=[]),keep=L.filter(q=>q.until>Date.now());if(keep.length!==L.length)S.sq.list=keep;return S.sq.list}   // quests whose time ran out disappear right away, no server round-trip needed
+const sqGet=id=>sqList().find(q=>q.qid===id);   // a quest whose time ran out disappears right away, no server round-trip needed
+function sqCard(){return sqList().map(q=>{const i=sqInfo(q);return '<div class="qcard ms" data-act="sq" data-i="'+q.qid+'"><div class="qt"><b>📜 '+i.name+'</b><span>'+i.left+' min</span></div><div class="qs">'+i.sub+'</div></div>'}).join('')}
+function sqAbandon(id){if(confirm('Abandon this quest? You will not get the reward.'))act('quest',{op:'abandon',qid:id}).then(()=>{rf.style.display='none';render();try{syncQPoints()}catch(e){}})}
+function sqPanel(id){const q=sqGet(id);if(!q){render();return}const i=sqInfo(q);
+ if(q.id==='door'){showModal('quest',{icon:'🚪',title:i.name,text:'The riddle is still waiting.\n'+i.left+' min left',primary:'Open Riddle',onPrimary:()=>{hideModal('quest');act('quest',{op:'resume',qid:q.qid}).then(r=>{if(r&&r.result&&r.result.sq)sqShow(r.result.sq)})},secondary:'Abandon Quest',onSecondary:()=>{hideModal('quest');sqAbandon(q.qid)}});return}
+ popup({icon:SQ_ICON[q.id],title:i.name,text:i.sub+'\n'+i.left+' min left\n\nAbandoning forfeits the reward.',btn:'Abandon Quest',on:()=>sqAbandon(q.qid)})}
 function sqClose(){rf.style.display='none';hud();try{render()}catch(e){}try{syncQPoints()}catch(e){}try{if(inv.classList.contains('open'))invRender()}catch(e){}}
 function sqShow(sq){
- if(sq.phase==='riddle')return rfDraw({icon:'🚪',title:sq.name,text:'A carved face in the door whispers:\n\n'+sq.riddle.q,btns:[...sq.riddle.opts.map((o,i)=>({html:esc(o),fn:()=>sqAnswer(i)})),{html:'Not now',alt:1,fn:sqClose},{html:'Abandon quest',alt:1,fn:sqAbandon}]});
+ if(sq.phase==='riddle')return rfDraw({icon:'🚪',title:sq.name,text:'A carved face in the door whispers:\n\n'+sq.riddle.q,btns:[...sq.riddle.opts.map((o,i)=>({html:esc(o),fn:()=>sqAnswer(sq.qid,i)})),{html:'Not now',alt:1,fn:sqClose},{html:'Abandon quest',alt:1,fn:()=>sqAbandon(sq.qid)}]});
  rfDraw({icon:sq.phase==='done'?(sq.ok?'🏆':'🚪'):sq.phase==='progress'?'✨':(SQ_ICON[sq.id]||'📜'),title:sq.phase==='done'?(sq.ok?'Quest Complete':'A Meager Prize'):sq.name,text:sq.phase==='done'?sq.name:'',lines:sq.lines,btns:[{html:'Continue',fn:sqClose}]})}
-async function sqAnswer(i){const r=await act('quest',{op:'answer',pick:i});
- if(!r||!r.result||!r.result.sq)return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});
+async function sqAnswer(qid,i){const r=await act('quest',{op:'answer',qid,pick:i});
+ if(!r||!r.result||!r.result.sq)return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',qid,quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});
  sqShow(r.result.sq)}
 function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,25+Math.random()*15);if(safeAt(p,c))out.push(p)}return out}   // safe spots 25-40 m away; the server picks from them and checks the distances
 function gatherFar(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,180+Math.random()*320);if(safeAt(p,c))out.push(p)}return out}   // old 180-500 m spots, used only if the server refuses the close ones
-async function questStart(it){const r=await useMarker(it,async()=>{const a={op:'start',key:it.key,exp:it.exp,ll:targetLL},m=['Already claimed.','That marker has vanished.','Marker mismatch.','No marker there.'];let x=await act('quest',{...a,cands:gatherCands(),quiet:true});if(!x&&!m.includes(act.err)&&!/already|active|one quest/i.test(act.err||'')){const f=gatherFar();if(f.length)x=await act('quest',{...a,cands:f})}else if(!x&&act.err)toast(act.err);return x});if(r&&r.result&&r.result.sq){sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
-async function questVisit(it){const r=await act('quest',{op:'visit',i:it.i,ll:targetLL});if(r&&r.result&&r.result.sq)sqShow(r.result.sq)}
-function syncQPoints(){const q=sqActive(),want=new Map();
- if(q&&q.pts)q.pts.forEach((p,i)=>{if(!p.v)want.set('sq'+i,{t:'qpoint',ll:p.ll,key:'sq'+i,i,q:q.id,live:1,exp:q.until,name:q.id==='satchel'?'The Owner: '+q.who:'Strange Light '+(i+1)})});
+async function questStart(it){const r=await useMarker(it,async()=>{const a={op:'start',key:it.key,exp:it.exp,ll:targetLL},m=['Already claimed.','That marker has vanished.','Marker mismatch.','No marker there.'];let x=await act('quest',{...a,cands:gatherCands(),quiet:true});if(!x&&!m.includes(act.err)&&/safe/i.test(act.err||'')){const f=gatherFar();if(f.length)x=await act('quest',{...a,cands:f})}else if(!x&&act.err)toast(act.err);return x});if(r&&r.result&&r.result.sq){sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
+async function questVisit(it){const r=await act('quest',{op:'visit',qid:it.qid,i:it.i,ll:targetLL});if(r&&r.result&&r.result.sq)sqShow(r.result.sq)}
+function syncQPoints(){const want=new Map();
+ sqList().forEach(q=>{if(q.pts)q.pts.forEach((p,i)=>{if(!p.v){const k='sq'+q.qid+'_'+i;want.set(k,{t:'qpoint',ll:p.ll,key:k,i,qid:q.qid,q:q.id,live:1,exp:q.until,name:q.id==='satchel'?'The Owner: '+q.who:'Strange Light '+(i+1)})}})});
  let ch=false;for(let i=items.length-1;i>=0;i--){const it=items[i];if(it.t!=='qpoint')continue;const w=want.get(it.key);if(w&&w.exp===it.exp&&w.ll[0]===it.ll[0]&&w.ll[1]===it.ll[1])want.delete(it.key);else{dropItem(i);ch=true}}
  want.forEach(o=>{addItem(o);ch=true});if(ch)updateCards()}
 try{syncQPoints()}catch(e){}
