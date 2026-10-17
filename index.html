@@ -84,10 +84,9 @@
 @media(min-width:700px){.qpanel{top:84px;left:50%;right:auto;width:min(700px,90vw);transform:translateX(-50%)}}
 .hpbar,.xpbar{position:relative;height:14px!important;margin:3px 0 0!important;border:1px solid #94713a;border-radius:7px;background:#080806;overflow:hidden}.hpfill,.xpfill{height:100%}.hpfill{width:100%;transition:width .4s}.hptext,.xptext{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;margin:0!important;font:700 9px Arial,sans-serif!important;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}.portrait.cls svg{width:30px;height:30px;filter:drop-shadow(0 1px 2px #000)}.player-name{margin:2px 0 1px!important}
 /* ===== Atmosphere (rays + drifting mist) ===== */
-.fx-wrap{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;contain:paint;z-index:355;pointer-events:none}
-.fx-rays{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:.55;background:repeating-linear-gradient(104deg,transparent 0 34px,rgba(255,236,170,.10) 60px,transparent 96px 150px);-webkit-mask-image:linear-gradient(180deg,#000 0,#0008 45%,transparent 75%);mask-image:linear-gradient(180deg,#000 0,#0008 45%,transparent 75%);animation:rays 22s ease-in-out infinite alternate}
+.fx-rays{position:absolute;inset:0;z-index:355;pointer-events:none;mix-blend-mode:screen;opacity:.55;background:repeating-linear-gradient(104deg,transparent 0 34px,rgba(255,236,170,.10) 60px,transparent 96px 150px);-webkit-mask-image:linear-gradient(180deg,#000 0,#0008 45%,transparent 75%);mask-image:linear-gradient(180deg,#000 0,#0008 45%,transparent 75%);animation:rays 22s ease-in-out infinite alternate}
 @keyframes rays{from{transform:translateX(-18px) skewX(-2deg);opacity:.35}to{transform:translateX(22px) skewX(2deg);opacity:.6}}
-.fx-mist{position:absolute;left:-30%;width:160%;height:34%;pointer-events:none;opacity:.5;background:radial-gradient(ellipse 22% 40% at 20% 50%,rgba(205,235,228,.28),transparent 70%),radial-gradient(ellipse 26% 45% at 55% 40%,rgba(205,235,228,.22),transparent 70%),radial-gradient(ellipse 20% 38% at 85% 55%,rgba(205,235,228,.26),transparent 70%);filter:blur(6px)}
+.fx-mist{position:absolute;left:-30%;right:-30%;height:34%;z-index:356;pointer-events:none;opacity:.5;background:radial-gradient(ellipse 22% 40% at 20% 50%,rgba(205,235,228,.28),transparent 70%),radial-gradient(ellipse 26% 45% at 55% 40%,rgba(205,235,228,.22),transparent 70%),radial-gradient(ellipse 20% 38% at 85% 55%,rgba(205,235,228,.26),transparent 70%);filter:blur(6px)}
 .fx-mist.m1{top:6%;animation:mist 60s linear infinite alternate}.fx-mist.m2{top:30%;opacity:.35;animation:mist 85s linear infinite alternate-reverse}
 @keyframes mist{from{transform:translateX(-8%)}to{transform:translateX(8%)}}
 @media(prefers-reduced-motion:reduce){.fx-rays,.fx-mist{animation:none}}
@@ -199,7 +198,7 @@ size();addEventListener('resize',size);
 function f(ms){if(!a.isConnected||a.style.display==='none')return;var t=ms/1000;x.clearRect(0,0,W,H);for(var i=0;i<P.length;i++){var p=P[i];p.y-=p.vy;p.x+=Math.sin(t*p.sw+p.ph)*.25;if(p.y<-10){P[i]=p=mk(false)}var al=.2+.8*Math.abs(Math.sin(t*p.sp+p.ph)),col=p.t?'120,220,215':'240,213,142';x.beginPath();x.fillStyle='rgba('+col+','+(.1*al)+')';x.arc(p.x,p.y,p.r*4,0,6.283);x.fill();x.beginPath();x.fillStyle='rgba('+col+','+(.85*al)+')';x.arc(p.x,p.y,p.r,0,6.283);x.fill()}requestAnimationFrame(f)}
 requestAnimationFrame(f)})();</script>
 
-<div id="map" aria-label="Real-world exploration map"></div><div class="map-arcane-wash" aria-hidden="true"></div><div class="haze" aria-hidden="true"></div><div class="fx-wrap" aria-hidden="true"><div class="fx-rays"></div><div class="fx-mist m1"></div><div class="fx-mist m2"></div></div><div class="shade" aria-hidden="true"></div>
+<div id="map" aria-label="Real-world exploration map"></div><div class="map-arcane-wash" aria-hidden="true"></div><div class="haze" aria-hidden="true"></div><div class="fx-rays" aria-hidden="true"></div><div class="fx-mist m1" aria-hidden="true"></div><div class="fx-mist m2" aria-hidden="true"></div><div class="shade" aria-hidden="true"></div>
 
 <div class="hud topbar"><div class="panel profile"><div class="portrait" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="cloak" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#77704f"/><stop offset=".45" stop-color="#302b22"/><stop offset="1" stop-color="#090908"/></linearGradient><linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d2b78b"/><stop offset="1" stop-color="#6d5035"/></linearGradient></defs><path d="M8 64 12 37 18 16 31 5 45 13 54 38 60 64Z" fill="url(#cloak)" stroke="#c8a65c" stroke-width="1.3"/><path d="M17 29 20 15 32 8 45 17 48 31 41 25 33 20 24 26Z" fill="#171511"/><path d="M24 23 32 17 41 23 42 37 35 46 27 39Z" fill="url(#face)"/><path d="M23 27 31 25 40 28 39 32 32 30 25 32Z" fill="#17130e"/><path d="M24 23 32 16 42 23 48 33 40 29 32 24 24 29 17 34Z" fill="#201d17" stroke="#a88a4c" stroke-width="1"/><path d="M27 40 33 45 40 39 45 53 20 53Z" fill="#17140f"/><path d="M15 57 25 47 33 53 42 47 52 58" fill="none" stroke="#d0ad61" stroke-width="1.2"/></svg></div><div class="profile-info"><div class="eyebrow">Titan's Path · Adventurer</div><div class="player-name">Adventurer</div><div class="hpbar"><div class="hpfill"></div><div class="hptext">HP</div></div><div class="xpbar"><div class="xpfill"></div><div class="xptext">XP</div></div></div><div class="level">12</div></div></div>
 
@@ -517,20 +516,16 @@ const SCN=(()=>{
   if(t==='f'){if(r<.62)k=pick(FOREST)}else if(t==='p'){if(r<.16)k=pick(PARK)}else if(t==='g'){if(r<.035)k=pick(GRASS);if(k&&k.startsWith('cliff'))k=null;else if(r<.003)k=hs(i,j,6)<.5?'cliff1':'cliff2'}else if(t==='w'){if(r<.3)k='reeds'}
   return{i,j,t,ll,k,s,f:hs(i,j,7)<.5,d:hs(i,j,8)}}
  let queue=[],busy=false;
- let retry=false,lastSig='';
- function sig(){const c=map.getCenter();return[c.lng.toFixed(5),c.lat.toFixed(5),map.getZoom().toFixed(2),map.getBearing().toFixed(0),map.getPitch().toFixed(0)].join()}
- function plan(){try{plan0()}catch(e){console.warn('scenery plan',e)}}
- function plan0(){ // list on-screen unclassified cells near the view centre, nearest first
+ function plan(){ // list on-screen unclassified cells near the view centre, nearest first
   if(q==='off')return;const c=map.getCenter(),ci=Math.floor(c.lng/DLNG),cj=Math.floor(c.lat/DLAT),R=28,out=[];
   for(let a=-R;a<=R;a++)for(let b=-R;b<=R;b++){const i=ci+a,j=cj+b,key=i+','+j;if(cells.has(key))continue;const p=map.project([(i+.5)*DLNG,(j+.5)*DLAT]);if(p.x<-40||p.x>CW+40||p.y<CH*.08||p.y>CH+60)continue;out.push([a*a+b*b,i,j])}
   out.sort((x,y)=>x[0]-y[0]);queue=out;if(!busy){busy=true;requestAnimationFrame(work)}}
  function work(){const t0=performance.now();
-  if(!map.areTilesLoaded()){busy=false;retry=true;return}
-  try{while(queue.length&&performance.now()-t0<5){const[,i,j]=queue.shift(),key=i+','+j;if(cells.has(key))continue;const c=classify(i,j);if(c)cells.set(key,c)}}catch(e){console.warn('scenery',e);queue=[]}
+  if(!map.areTilesLoaded()){busy=false;return}
+  while(queue.length&&performance.now()-t0<5){const[,i,j]=queue.shift(),key=i+','+j;if(cells.has(key))continue;const c=classify(i,j);if(c)cells.set(key,c)}
   if(queue.length)requestAnimationFrame(work);else busy=false;map.triggerRepaint()}
  let spr=[];
- function draw(){try{draw0()}catch(e){console.warn('scenery draw',e)}}
- function draw0(){cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,CW,CH);if(q==='off'||ready<names.length)return;
+ function draw(){cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,CW,CH);if(q==='off'||ready<names.length)return;
   const dens=Q[q],list=[];
   const c=map.getCenter(),ci=Math.floor(c.lng/DLNG),cj=Math.floor(c.lat/DLAT),R=28;
   for(let a=-R;a<=R;a++)for(let b=-R;b<=R;b++){const cell=cells.get((ci+a)+','+(cj+b));if(!cell||!cell.k)continue;
@@ -546,8 +541,7 @@ const SCN=(()=>{
  names.forEach(n=>{const im=new Image();im.onload=()=>{IMG[n]=im;ARTIMG[n]=im;ready++;
    if(n.startsWith('tex_')&&map.hasImage&&map.hasImage(n)){try{map.updateImage(n,PATTERNS[n]())}catch(e){}}
    if(ready===names.length){plan();map.triggerRepaint()}};im.src=window.ART[n]});
- map.on('render',draw);map.on('idle',plan);map.on('moveend',()=>{if(map.loaded())plan()});map.on('sourcedata',e=>{if(e.isSourceLoaded&&e.sourceId==='om')retry=true});
- setInterval(()=>{if(q==='off'||ready<names.length||busy||!map.areTilesLoaded())return;const g=sig();if(retry||g!==lastSig){retry=false;lastSig=g;plan()}},800);
+ map.on('render',draw);map.on('idle',plan);map.on('moveend',()=>{if(map.loaded())plan()});
  return{cycle(){const o=['high','med','low','off'];q=o[(o.indexOf(q)+1)%4];try{localStorage.setItem('gfxq',q)}catch(e){}cells.clear();plan();draw();return q},get q(){return q}}
 })();
 (function(){const c=$('compass');let t=null,long=false;
