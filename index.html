@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='2026-10-17-fullscreen-4';window.__BUILD=B;
+(function(){var B='1.56';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -830,7 +830,11 @@ async function useMarker(it,call){const r=await call();if(!r){if(['Already claim
 async function markerUse(it){const r=await useMarker(it,()=>act('marker',{t:it.t,key:it.key,exp:it.exp,ll:targetLL}));if(r)toast((POI[it.t]?POI[it.t].go:'Done')+' ✓')}
 async function lootFrom(it){const r=await useMarker(it,()=>act('loot',{t:it.t,key:it.key,exp:it.exp,ll:targetLL}));if(!r)return;const o=r.result;if(o.fight)return cbShow(o.fight);
  showModal('loot',{icon:o.icon,title:o.title,text:o.lines.join('\n')+(o.res?'\n\nUse a Resurrect Potion? You have '+potN('res')+'.':''),primary:o.res?'Use Resurrect Potion':'Continue',onPrimary:()=>{hideModal('loot');if(o.res)act('usepot',{k:'res'}).then(x=>{if(x)toast('You rise again at '+Math.floor(S.hero.hp)+' HP.')})},...(o.res?{secondary:'Stay Downed',onSecondary:()=>hideModal('loot')}:{})})}
-async function gatherNature(it){const r=await useMarker(it,()=>act('nature',{key:it.key,exp:it.exp,ll:targetLL,green:!!it.green}));if(r)toast(r.result.lines.join(' · '))}
+async function gatherNature(it){const pre=H().hp,r=await useMarker(it,()=>act('nature',{key:it.key,exp:it.exp,ll:targetLL,green:!!it.green}));
+ if(!r)return;let lines=(r.result&&r.result.lines||[]).slice();
+ /* Nature Discovery heals 5% of max HP when you are hurt (never above 100%). Skipped if the server already healed you. */
+ try{const h=H(),mx=stats().hp;if(h&&h.hp<mx&&h.hp<=pre+.5){const add=Math.max(1,Math.round(mx*.05)),before=h.hp;h.hp=Math.min(mx,h.hp+add);upDown();save();hud();lines.push('+'+Math.round(h.hp-before)+' HP')}}catch(e){console.warn('nature heal',e)}
+ toast(lines.join(' · '))}
 /* ---- interactive mimic combat (chest ambush) ---- */
 const mimicArt=strong=>{const B=strong?'#3d2a52':'#7a4a1f',D=strong?'#24162f':'#4a2b10',G=strong?'#b8a0d8':'#d6b050',E=strong?'#ff3b30':'#ffd83a',T='#f6f1e3',sp=strong?'<path d="M45 22l8-24 8 24zM85 14l10-30 10 30zM125 22l8-24 8 24z" fill="'+G+'"/>':'',tt=(a,y,d,n)=>Array.from({length:n},(_,i)=>'<path d="M'+(a+i*22)+' '+y+'l7 '+d+' 7 '+(-d)+'z" fill="'+T+'"/>').join('');
  return'<svg viewBox="0 0 200 150" width="100%" style="max-width:230px"><ellipse cx="100" cy="142" rx="78" ry="6" fill="#0007"/><rect x="30" y="82" width="140" height="54" rx="7" fill="'+B+'" stroke="'+D+'" stroke-width="3"/><rect x="30" y="104" width="140" height="9" fill="'+G+'"/><rect x="92" y="98" width="16" height="20" rx="3" fill="'+G+'" stroke="'+D+'" stroke-width="2"/><ellipse cx="100" cy="83" rx="70" ry="13" fill="#2b0a12"/><path d="M78 84q22 36 44 0z" fill="#d6304a"/>'+tt(40,84,-17,7)+sp+'<path d="M28 62Q28 12 100 12T172 62z" fill="'+B+'" stroke="'+D+'" stroke-width="3"/><path d="M28 40Q100 28 172 40" stroke="'+G+'" stroke-width="7" fill="none"/>'+tt(37,62,17,7)+'<circle cx="72" cy="40" r="11" fill="'+E+'" stroke="#000" stroke-width="2"/><circle cx="128" cy="40" r="11" fill="'+E+'" stroke="#000" stroke-width="2"/><rect x="70" y="32" width="4" height="16" rx="2" fill="#000"/><rect x="126" y="32" width="4" height="16" rx="2" fill="#000"/><path d="M58 26l26 8M142 26l-26 8" stroke="#000" stroke-width="4"/></svg>'};
@@ -1057,4 +1061,4 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)flush()});a
 })();
 </script>
 <script>if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
-<script>try{document.getElementById("buildTag").textContent="build "+window.__BUILD}catch(e){}</script></body></html>
+<script>try{document.getElementById("buildTag").textContent="Build "+window.__BUILD}catch(e){}</script></body></html>
