@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.69';window.__BUILD=B;
+(function(){var B='1.701';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -423,7 +423,7 @@ map.on('styleimagemissing',e=>{const f=PATTERNS[e.id];if(f&&!map.hasImage(e.id))
 let errShown=false;map.on('error',e=>{console.error(e&&e.error||e);if(!errShown){errShown=true;const m=(e&&e.error&&e.error.message)||'unknown error';toast('Map problem: '+m.slice(0,140))}});
 
 /* ---------- Game layers ---------- */
-const RANGE=150; // meters: radius of the circle around the player (diameter = 2 x RANGE)
+const RANGE=25; // meters: radius of the circle around the player (diameter = 2 x RANGE = 50 m)
 let player=FALLBACK.slice(),following=false,watchId=null,playerMarker=null;
 const SVG={
  quest:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 3h3l-.6 11h-1.8zM12 16.6a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8z"/></svg>',
@@ -484,14 +484,14 @@ function frame(now){track();
  if(moved){player=[player[0]+dx*.12,player[1]+dy*.12];playerMarker.setLngLat(player);
   if(dist(player,rangeAt)>.5){rangeAt=player.slice();map.getSource('range').setData(ringPoly(player,RANGE))}}
  const p=(now%2600)/2600;
- if(!gesturing&&(frameN++%3===0))map.getSource('pulse').setData(ringPoly(player,25+125*p,72,{o:+(0.9*(1-p)).toFixed(2)}));
+ if(!gesturing&&(frameN++%3===0))map.getSource('pulse').setData(ringPoly(player,RANGE*(.17+.83*p),72,{o:+(0.9*(1-p)).toFixed(2)}));
  if(moved&&following&&!intro&&gotFirst&&!gesturing&&!map.isEasing())map.jumpTo({center:player}); // map stays anchored on the player
  requestAnimationFrame(frame)}
 
 map.on('load',()=>{
  const collapseAttr=()=>{const c=document.querySelector('.maplibregl-ctrl-attrib');if(c){c.classList.remove('maplibregl-compact-show');c.removeAttribute('open')}};collapseAttr();map.once('idle',collapseAttr);setTimeout(collapseAttr,1500); // attribution stays available behind the (i) button, just starts closed
  map.addSource('range',{type:'geojson',data:ringPoly(player,RANGE)});
- map.addSource('pulse',{type:'geojson',data:ringPoly(player,60,72,{o:1})});
+ map.addSource('pulse',{type:'geojson',data:ringPoly(player,RANGE*.4,72,{o:1})});
  map.addLayer({id:'range-fill',type:'fill',source:'range',paint:{'fill-color':'#66e1f2','fill-opacity':.07}});
  map.addLayer({id:'range-line',type:'line',source:'range',paint:{'line-color':'#9eeeff','line-width':2,'line-opacity':.85,'line-dasharray':[3,2]}});
  map.addLayer({id:'pulse-line',type:'line',source:'pulse',paint:{'line-color':'#66e1f2','line-width':2.5,'line-opacity':['get','o']}});
@@ -633,7 +633,7 @@ function safeAt(p,c){if(!c.ready)return false;
  if(c.area.some(f=>inPoly(p,f.geometry)))return false;                         // inside buildings (private) or water
  for(const f of c.roads){const g=f.geometry,ls=g.type==='LineString'?[g.coordinates]:g.type==='MultiLineString'?g.coordinates:[];for(const l of ls)for(let i=1;i<l.length;i++)if(segD(p,l[i-1],l[i])<35)return false}  // keep off highways
  return true}
-function pickSafe(){const c=safeCtx();if(!c.ready)return null;for(let i=0;i<14;i++){const p=dest(targetLL,Math.random()*360,40+Math.random()*(RANGE-60));if(safeAt(p,c))return p}return null}
+function pickSafe(){const c=safeCtx();if(!c.ready)return null;for(let i=0;i<14;i++){const p=dest(targetLL,Math.random()*360,5+Math.random()*(RANGE-10));if(safeAt(p,c))return p}return null}
 
 /* ---- random + explorable ---- */
 const RT=[['Open a Nearby Chest',80],['Find a Nature Discovery',90],['Complete a Nearby Quest',100],['Visit a Public Landmark',80]];
@@ -706,8 +706,8 @@ function lairTick(){const now=Date.now(),w=lairWindow();
 
 
 /* ---- World spawning: deterministic grid. Same place + same time = same markers for everyone, nothing stored ---- */
-const GRID={cell:.0025,radius:600,max:30, // cell size in degrees (~900 ft); spawn radius around player (m); max markers on screen
- types:{chest:{n:2,p:.40,life:60},nature:{n:2,p:.45,life:60},quest:{n:1,p:.30,life:120},rift:{n:1,p:.15,life:30}}}; // n = sites per cell, p = chance a site is active, life = minutes
+const GRID={cell:.0025,radius:600,max:60, // cell size in degrees (~900 ft); spawn radius around player (m); max markers on screen
+ types:{chest:{n:4,p:.55,life:60},nature:{n:4,p:.60,life:60},quest:{n:3,p:.50,life:120},rift:{n:2,p:.25,life:30}}}; // n = sites per cell, p = chance a site is active, life = minutes
 const QN=['Investigate the Strange Lights','The Whispering Door','The Lost Satchel',"A Traveler's Request"];
 function h32(t){let h=2166136261;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 const rnd=t=>h32(t)/4294967296,safeMemo={};let lastSync=null,lastSyncT=0;
@@ -1044,8 +1044,9 @@ function sqShow(sq){
 async function sqAnswer(i){const r=await act('quest',{op:'answer',pick:i});
  if(!r||!r.result||!r.result.sq)return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});
  sqShow(r.result.sq)}
-function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,180+Math.random()*320);if(safeAt(p,c))out.push(p)}return out}   // safe spots 180-500 m away; the server picks from them and checks the distances
-async function questStart(it){const r=await useMarker(it,()=>act('quest',{op:'start',key:it.key,exp:it.exp,ll:targetLL,cands:gatherCands()}));if(r&&r.result&&r.result.sq){sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
+function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,25+Math.random()*15);if(safeAt(p,c))out.push(p)}return out}   // safe spots 25-40 m away; the server picks from them and checks the distances
+function gatherFar(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,180+Math.random()*320);if(safeAt(p,c))out.push(p)}return out}   // old 180-500 m spots, used only if the server refuses the close ones
+async function questStart(it){const r=await useMarker(it,async()=>{const a={op:'start',key:it.key,exp:it.exp,ll:targetLL},m=['Already claimed.','That marker has vanished.','Marker mismatch.','No marker there.'];let x=await act('quest',{...a,cands:gatherCands(),quiet:true});if(!x&&!m.includes(act.err)&&!/already|active|one quest/i.test(act.err||'')){const f=gatherFar();if(f.length)x=await act('quest',{...a,cands:f})}else if(!x&&act.err)toast(act.err);return x});if(r&&r.result&&r.result.sq){sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
 async function questVisit(it){const r=await act('quest',{op:'visit',i:it.i,ll:targetLL});if(r&&r.result&&r.result.sq)sqShow(r.result.sq)}
 function syncQPoints(){const q=sqActive(),want=new Map();
  if(q&&q.pts)q.pts.forEach((p,i)=>{if(!p.v)want.set('sq'+i,{t:'qpoint',ll:p.ll,key:'sq'+i,i,q:q.id,live:1,exp:q.until,name:q.id==='satchel'?'The Owner: '+q.who:'Strange Light '+(i+1)})});
