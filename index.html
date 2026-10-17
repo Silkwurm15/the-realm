@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.66';window.__BUILD=B;
+(function(){var B='1.67';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -932,7 +932,7 @@ mp.addEventListener('click',async e=>{const b=e.target.closest('[data-m]');if(!b
  if(m==='help')return menuSub('Help &amp; Safety','<div class="qcard"><div class="qs">Play aware of your surroundings. Never enter roads, private property or unsafe places to reach a marker. Help topics are coming soon.</div></div>');
  if(m==='account')return menuAccount();
  if(m==='profile')return menuProfile();
- if(m==='rename')return toast('Your name is set. Name changes are coming soon.');
+ if(m==='rename')return askRename();
  if(m==='pass'){const p=prompt('Choose a new password (8+ characters)');if(p==null)return;if(p.length<8)return toast('Password must be 8+ characters.');const{error}=await window.realmCloud.sb.auth.updateUser({password:p});return toast(error?error.message:'Password updated.')}
  if(m==='del')return deleteAccount();
  if(m==='out')return window.realmCloud&&window.realmCloud.signOut()});
@@ -940,7 +940,7 @@ mp.addEventListener('click',async e=>{const b=e.target.closest('[data-m]');if(!b
 
 /* ---- Shop screen (Shop tab) ---- */
 const sp=$('spanel');
-const SHOP_PRICE={single:0,fighter:0,explorer:0,random:0,mass:0};   // 0 = FREE for now. Put real prices here later (Rift Shards).
+const SHOP_PRICE={single:0,fighter:0,explorer:0,random:0,mass:0,rename:0};   // 0 = FREE for now. Put real prices here later (Rift Shards).
 const PACKS={fighter:{n:'Fighter Pack',icon:'⚔️',list:['antipaladin','assassin','barbarian','monk','paladin','warrior']},explorer:{n:'Explorer Pack',icon:'🧭',list:['archer','bard','druid','healer','scout','wizard']}};
 const priceTxt=p=>p>0?'💠 '+p.toLocaleString():'FREE';
 function shopOwned(){return new Set([...(S.unlocked||[]),S.cls,...Object.keys(S.cx||{})].filter(k=>k&&CLASSES[k]))}   // bought, active, or already played = owned
@@ -949,7 +949,8 @@ function shopSpend(p){if(!(p>0))return true;toast('Paid purchases are not availa
 function shopGrant(keys){const o=shopOwned();keys.forEach(k=>{if(CLASSES[k])o.add(k)});S.unlocked=[...o];save()}
 const shopBack=to=>'<div class="qcard"><button class="qbtn" data-s="'+to+'">← Back</button></div>';
 function shopHome(){sp.innerHTML='<div class="qh"><span>Shop</span><span>💠 '+(S.shards||0).toLocaleString()+'</span></div>'
- +'<div class="qcard"><div class="qt"><b>🎭 Class Change</b><span>'+shopOwned().size+' / 12 owned</span></div><div class="qs">Unlock new classes, one at a time or in packs.</div><button class="qbtn" data-s="cc">Browse</button></div>'}
+ +'<div class="qcard"><div class="qt"><b>🎭 Class Change</b><span>'+shopOwned().size+' / 12 owned</span></div><div class="qs">Unlock new classes, one at a time or in packs.</div><button class="qbtn" data-s="cc">Browse</button></div>'
+ +'<div class="qcard"><div class="qt"><b>✏️ Character Rename</b><span>'+priceTxt(SHOP_PRICE.rename)+'</span></div><div class="qs">Change your character name.</div><button class="qbtn" data-s="rename">Rename</button></div>'}
 function shopCC(){const n=shopLocked().length;sp.innerHTML='<div class="qh"><span>Class Change</span><span>'+shopOwned().size+' / 12 owned</span></div>'
  +'<div class="qcard"><div class="qt"><b>Single Unlock</b><span>'+priceTxt(SHOP_PRICE.single)+'</span></div><div class="qs">Pick one class and unlock it.</div><button class="qbtn" data-s="single"'+(n?'':' disabled style="opacity:.5"')+'>'+(n?'Choose a class':'All classes unlocked')+'</button></div>'
  +'<div class="qcard"><div class="qt"><b>Pack Unlock</b><span>Bundles</span></div><div class="qs">Unlock several classes at once. Classes you already own are skipped.</div><button class="qbtn" data-s="packs"'+(n?'':' disabled style="opacity:.5"')+'>'+(n?'See packs':'All classes unlocked')+'</button></div>'+shopBack('home')}
@@ -979,9 +980,15 @@ function buyPack(key){const o=shopOwned();let list;
   return shopConfirm({icon:'🌟',title:'Mass Unlock?',text:'You will unlock all '+list.length+' classes you do not own yet:\n'+list.map(k=>'• '+CLASSES[k].n).join('\n'),price:SHOP_PRICE.mass,ok:()=>{const g=shopLocked();if(!g.length)return;shopGrant(g);shopDone('Every class unlocked!',g);shopPacks()}})}}
 sp.addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b||b.disabled)return;const a=b.dataset.s;
  if(a==='home')return shopHome();if(a==='cc')return shopCC();if(a==='single')return shopSingle();if(a==='packs')return shopPacks();
- if(a==='buy1')return buySingle(b.dataset.k);if(a==='pack')return buyPack(b.dataset.p)});
+ if(a==='rename')return askRename();if(a==='buy1')return buySingle(b.dataset.k);if(a==='pack')return buyPack(b.dataset.p)});
 
 
+/* ---- Character Rename: confirm popup -> rename window. Cancel/No just closes and leaves you where you were. ---- */
+const rn=document.createElement('div');rn.style.cssText='position:absolute;inset:0;z-index:890;display:none;overflow-y:auto;padding:14px 12px 24px;background:#0b0a08;color:#ead8ac';panel.parentNode.appendChild(rn);
+function askRename(){showModal('rename',{icon:'✏️',title:'Rename Character?',text:'Do you want to change your character name?\n\nPrice: '+priceTxt(SHOP_PRICE.rename),color:'#e5c77b',primary:SHOP_PRICE.rename>0?'Rename ('+priceTxt(SHOP_PRICE.rename)+')':'Rename (Free)',onPrimary:()=>{hideModal('rename');if(shopSpend(SHOP_PRICE.rename))openRename()},secondary:'Cancel',onSecondary:()=>hideModal('rename')})}
+function openRename(){rn.innerHTML='<div class="qh" style="margin-top:6px"><span>Rename Character</span><span data-r="x" style="cursor:pointer">✕ Close</span></div><div class="qcard"><div class="qs">New name (3-16 letters, numbers, spaces, - or \')</div><input id="rnName" maxlength="16" placeholder="Your name" value="'+esc(S.name||'')+'" style="width:100%;box-sizing:border-box;margin-top:6px;padding:11px;border:1px solid #6b5a33;border-radius:4px;background:#0b0a08;color:#ffeccb;font:16px Georgia,serif"></div><button class="m-btn" data-r="save">Save Name</button><button class="m-btn ghost" data-r="x">Cancel</button>';rn.style.display='block';setTimeout(()=>{const i=document.getElementById('rnName');if(i){i.focus();i.select()}},50)}
+rn.addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;if(b.dataset.r==='x'){rn.style.display='none';return}
+ const i=document.getElementById('rnName');if(i&&setName(i.value)){rn.style.display='none';toast('Your name is now '+S.name);try{if($('mpanel').classList.contains('open'))menuProfile()}catch(_){}}});
 /* ---- Switch Class window (Character screen) ---- */
 const sw=document.createElement('div');sw.style.cssText='position:absolute;inset:0;z-index:880;display:none;overflow-y:auto;padding:14px 12px 24px;background:#0b0a08;color:#ead8ac';panel.parentNode.appendChild(sw);
 function switchRender(){const o=shopOwned();sw.innerHTML='<div class="qh" style="margin-top:6px"><span>Switch Class</span><span data-w="x" style="cursor:pointer">✕ Close</span></div><div class="cgrid">'
