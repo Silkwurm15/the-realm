@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.705';window.__BUILD=B;
+(function(){var B='1.706';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1045,9 +1045,8 @@ function sqShow(sq){
 async function sqAnswer(qid,i){const r=await act('quest',{op:'answer',qid,pick:i});
  if(!r||!r.result||!r.result.sq)return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',qid,quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});
  sqShow(r.result.sq)}
-function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,25+Math.random()*15);if(safeAt(p,c))out.push(p)}return out}   // safe spots 25-40 m away; the server picks from them and checks the distances
-function gatherFar(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,180+Math.random()*320);if(safeAt(p,c))out.push(p)}return out}   // old 180-500 m spots, used only if the server refuses the close ones
-async function questStart(it){const r=await useMarker(it,async()=>{const a={op:'start',key:it.key,exp:it.exp,ll:targetLL},m=['Already claimed.','That marker has vanished.','Marker mismatch.','No marker there.'];let x=await act('quest',{...a,cands:gatherCands(),quiet:true});if(!x&&!m.includes(act.err)&&/safe/i.test(act.err||'')){const f=gatherFar();if(f.length)x=await act('quest',{...a,cands:f})}else if(!x&&act.err)toast(act.err);return x});if(r&&r.result&&r.result.sq){sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
+function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,90+Math.random()*110);if(safeAt(p,c))out.push(p)}return out}   // safe spots 90-200 m away; the server picks from them and checks the distances
+async function questStart(it){const r=await useMarker(it,()=>act('quest',{op:'start',key:it.key,exp:it.exp,ll:targetLL,cands:gatherCands()}));if(r&&r.result&&r.result.sq){sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
 async function questVisit(it){const r=await act('quest',{op:'visit',qid:it.qid,i:it.i,ll:targetLL});if(r&&r.result&&r.result.sq)sqShow(r.result.sq)}
 function syncQPoints(){const want=new Map();
  sqList().forEach(q=>{if(q.pts)q.pts.forEach((p,i)=>{if(!p.v){const k='sq'+q.qid+'_'+i;want.set(k,{t:'qpoint',ll:p.ll,key:k,i,qid:q.qid,q:q.id,live:1,exp:q.until,name:q.id==='satchel'?'The Owner: '+q.who:'Strange Light '+(i+1)})}})});
