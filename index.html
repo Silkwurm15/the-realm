@@ -939,13 +939,13 @@ sp.addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b||b.di
 
 
 /* ---- Switch Class window (Character screen) ---- */
-const sw=document.createElement('div');sw.style.cssText='position:absolute;inset:0;z-index:900;display:none;overflow-y:auto;padding:14px 12px 24px;background:#0b0a08;color:#ead8ac';panel.parentNode.appendChild(sw);
-function switchRender(){const o=shopOwned();sw.innerHTML='<div class="qh" style="margin-top:6px"><span>Switch Class</span><span data-w="x" style="cursor:pointer">✕ Close</span></div><div class="qcard"><div class="qs">Choose from your unlocked classes. Each class keeps its own level and XP.</div></div><div class="cgrid">'
+const sw=document.createElement('div');sw.style.cssText='position:absolute;inset:0;z-index:880;display:none;overflow-y:auto;padding:14px 12px 24px;background:#0b0a08;color:#ead8ac';panel.parentNode.appendChild(sw);
+function switchRender(){const o=shopOwned();sw.innerHTML='<div class="qh" style="margin-top:6px"><span>Switch Class</span><span data-w="x" style="cursor:pointer">✕ Close</span></div><div class="cgrid">'
  +CLASS_ORDER.filter(k=>o.has(k)).map(k=>{const on=k===S.cls,t=(S.cx||{})[k];return'<div class="cc '+(on?'on':'')+'"'+(on?'':' data-w="pick" data-k="'+k+'" style="cursor:pointer"')+'>'+clsIcon(k)+'<div style="min-width:0"><b>'+CLASSES[k].n+'</b><small>'+(on?'Active · Level '+S.lvl:t?'Level '+t.lvl:'New · Level 1')+'</small></div></div>'}).join('')+'</div>'}
 function openSwitch(){if(shopOwned().size<2)return;switchRender();sw.style.display='block'}
 sw.addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;if(b.dataset.w==='x'){sw.style.display='none';return}
  const k=b.dataset.k;if(!CLASSES[k]||k===S.cls)return;
- showModal('switch',{icon:'🎭',title:'Switch to '+CLASSES[k].n+'?',text:CLASSES[k].d+'\n\nEach class keeps its own level and XP.',color:'#e5c77b',primary:'Switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k}).then(r=>{if(r){sw.style.display='none';invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'Cancel',onSecondary:()=>hideModal('switch')})});
+ showModal('switch',{icon:'🎭',title:'Switch to '+CLASSES[k].n+'?',text:'',color:'#e5c77b',primary:'Switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){sw.style.display='none';invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'Cancel',onSecondary:()=>hideModal('switch')})});
 
 /* ---- Chaos: Tempt Fate (virtual d20) ---- */
 const CHAOS_CD=36e5,CHAOS_DUR=36e5;   // one roll per hour; effects last 1 hour (so only one effect is ever active)
