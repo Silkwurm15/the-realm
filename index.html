@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.56';window.__BUILD=B;
+(function(){var B='1.57';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -859,14 +859,40 @@ cl.addEventListener('click',e=>{if(e.target.dataset.x)cl.style.display='none';co
 /* ---- inventory / character screen ---- */
 const inv=document.createElement('div');inv.className='qpanel';inv.id='inv';panel.parentNode.appendChild(inv);
 function invToggle(on){inv.classList.toggle('open',on);if(on)invRender()}
+/* ---- Inventory: sort by rarity, lock items, sell for Rift Shards ---- */
+const SHARD_VAL={common:2,uncommon:5,rare:12,mythic:30,legendary:75};   // must match the server (A.discard)
+let invSort='new';try{invSort=localStorage.getItem('invSort')||'new'}catch(e){}
+const SORT_NAME={new:'Newest first',rar:'Rarity: high to low',low:'Rarity: low to high'};
+const itemPow=it=>{const o=iStat(it);return o.atk+o.def+o.hp/3};
+function sortedInv(list){const a=list.slice(),R=it=>RAR.indexOf(CAT[it.cid].rarity);
+ if(invSort==='rar')a.sort((x,y)=>R(y)-R(x)||itemPow(y)-itemPow(x));else if(invSort==='low')a.sort((x,y)=>R(x)-R(y)||itemPow(x)-itemPow(y));return a}
+const shardOf=it=>SHARD_VAL[CAT[it.cid].rarity]||1;
+function findItem(uid){const h=H();return h.inv.find(x=>x.uid===uid)||SLOTS.map(k=>h.eq[k]).find(x=>x&&x.uid===uid)||null}
+function rowX(it,btn,a,i,sellable){const c=CAT[it.cid],lk=!!it.lock;
+ return`<div class="qcard"${lk?' style="border-color:#e5c77b"':''}><div class="qt"><b style="color:${RC[c.rarity]}">${lk?'🔒 ':''}${c.name}</b><span>${cap(c.rarity)} ${TN[c.type]}</span></div><div class="qs">${fmtS(iStat(it))}${it.extra?' · extra +'+it.extra.val+' '+it.extra.stat.toUpperCase():''}</div>`
+ +`<div style="display:flex;gap:6px"><button class="qbtn" style="flex:1;width:auto" data-a="${a}" data-i="${i}">${btn}</button>`
+ +`<button class="qbtn" style="width:48px;padding:10px 0" data-a="lock" data-i="${it.uid}" aria-label="${lk?'Unlock item':'Lock item'}">${lk?'🔒':'🔓'}</button>`
+ +(sellable?`<button class="qbtn" style="flex:1;width:auto${lk?';opacity:.4':''}" data-a="sell" data-i="${it.uid}"${lk?' disabled':''}>Sell 💠${shardOf(it)}</button>`:'')+`</div></div>`}
+function bagTools(h){let o=`<div class="qcard"><button class="qbtn" style="margin-top:0" data-a="sort">⇅ Sort: ${SORT_NAME[invSort]||SORT_NAME.new}</button>`;
+ const rows=['common','uncommon','rare'].map(r=>{const l=h.inv.filter(x=>!x.lock&&CAT[x.cid].rarity===r);return l.length?`<button class="qbtn" style="flex:1 1 45%;width:auto;color:${RC[r]}" data-a="sellr" data-i="${r}">Sell ${l.length} ${cap(r)} · 💠${l.reduce((n,x)=>n+shardOf(x),0)}</button>`:''}).join('');
+ if(rows)o+=`<div class="qs" style="margin-top:8px">Quick sell (locked items are never sold)</div><div style="display:flex;flex-wrap:wrap;gap:6px">${rows}</div>`;
+ return o+'</div>'}
+function sellItems(uids,title){const h=H(),list=uids.map(u=>h.inv.find(x=>x.uid===u)).filter(x=>x&&!x.lock);
+ if(!list.length)return toast('Nothing to sell. Locked items are kept.');
+ const total=list.reduce((n,x)=>n+shardOf(x),0),names=list.slice(0,6).map(x=>'• '+cap(CAT[x.cid].rarity)+' '+CAT[x.cid].name).join('\n')+(list.length>6?'\n…and '+(list.length-6)+' more':'');
+ showModal('sell',{icon:'💠',title:title||'Sell for Rift Shards?',text:names+'\n\nYou receive 💠 '+total+' Rift Shards.',color:'#e5c77b',primary:'Sell ('+total+' 💠)',onPrimary:()=>{hideModal('sell');act('discard',{uids:list.map(x=>x.uid)})},secondary:'Cancel',onSecondary:()=>hideModal('sell')})}
 function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,i)=>{const c=CAT[it.cid];return`<div class="qcard"><div class="qt"><b style="color:${RC[c.rarity]}">${c.name}</b><span>${cap(c.rarity)} ${TN[c.type]}</span></div><div class="qs">${fmtS(iStat(it))}${it.extra?' · extra +'+it.extra.val+' '+it.extra.stat.toUpperCase():''}</div><button class="qbtn" data-a="${a}" data-i="${i}">${btn}</button></div>`};
  let o=`<div class="qcard ms"><div class="qt">${c?c.n:'No class'} · Level ${S.lvl}<span>${h.downed?'DOWNED (need 25%)':Math.floor(h.hp)+' / '+s.hp+' HP'}</span></div><div class="qbar"><i style="width:${Math.max(0,100*h.hp/s.hp)}%"></i></div><div class="qs"><b>ATK ${s.atk} · DEF ${s.def} · HP ${s.hp}</b></div><div class="qs">Level base: ${p.b.atk} ATK · ${p.b.def} DEF · ${p.b.hp} HP</div><div class="qs">Equipment: ${sg(p.g.atk)} ATK · ${sg(p.g.def)} DEF · ${sg(p.g.hp)} HP</div><div class="qs">Class: ${sg(p.cm.atk)} ATK · ${sg(p.cm.def)} DEF · ${sg(p.cm.hp)} HP</div>${c?lines(c):''}${chaosFx()?'<div class="qs">🎲 Chaos: '+fxText(chaosFx())+' ('+Math.ceil((chaosFx().until-Date.now())/6e4)+' min left)</div>':''}${riftFx()?'<div class="qs" style="color:'+((riftFx().pct||riftFx().v)<0?'#ff8a7a':'#c9a8ff')+'">✨ Rift: '+fxText(riftFx())+' ('+Math.ceil((riftFx().until-Date.now())/6e4)+' min left)</div>':''}<button class="qbtn" data-a="cls" style="${S.classChange?'':'display:none'}">🔒 Class Locked</button>${shopOwned().size>=2?'<button class="qbtn" data-a="switch">Switch Class</button>':''}</div><div class="qh"><span>Potions</span></div>`;
  o+=Object.keys(POTS).map(k=>`<div class="qcard"><div class="qt">${POTS[k].icon} ${POTS[k].name}<span>x${potN(k)}</span></div><div class="qs">Earned ${h.pot[k]||0} / ${POT_CAP} · Bought ${h.buy[k]||0}</div>${potN(k)?`<button class="qbtn" data-a="pot" data-i="${k}">Use</button>`:''}</div>`).join('');
- o+='<div class="qh"><span>Equipped</span></div>'+SLOTS.map(k=>h.eq[k]?row(h.eq[k],'Unequip','un',k).replace('<span>','<span>'+SN[k]+' · '):`<div class="qcard" style="opacity:.55"><div class="qt">${SN[k]}<span>Empty</span></div></div>`).join('');
- o+=`<div class="qh"><span>Backpack</span><span>${h.inv.length}</span></div>`+(h.inv.length?h.inv.map(it=>row(it,'Equip','eq',it.uid)).join(''):'<div class="qaw">No items yet. Open chests!</div>')+'';
+ o+='<div class="qh"><span>Equipped</span></div>'+SLOTS.map(k=>h.eq[k]?rowX(h.eq[k],'Unequip','un',k,false).replace('<span>','<span>'+SN[k]+' · '):`<div class="qcard" style="opacity:.55"><div class="qt">${SN[k]}<span>Empty</span></div></div>`).join('');
+ o+=`<div class="qh"><span>Backpack</span><span>${h.inv.length}</span></div>`+(h.inv.length?bagTools(h)+sortedInv(h.inv).map(it=>rowX(it,'Equip','eq',it.uid,true)).join(''):'<div class="qaw">No items yet. Open chests!</div>')+'';
  const st=inv.scrollTop;inv.innerHTML=o;inv.scrollTop=st}
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,i=b.dataset.i;if(a==='switch')return openSwitch();if(a==='cls')return toast('Your class is locked. Use a Class Unlock from the Shop to change it.');   // unlock flow arrives with the Shop
  if(false)openClass(false);if(a==='name'){toast('Your name is set. Name changes are coming soon.');return}if(a==='out')return window.realmCloud&&window.realmCloud.signOut();
+ if(a==='lock'){const it=findItem(i);if(!it)return;act('lock',{uid:i,on:!it.lock});return}
+ if(a==='sell')return sellItems([i]);
+ if(a==='sellr'){return sellItems(H().inv.filter(x=>!x.lock&&CAT[x.cid].rarity===i).map(x=>x.uid),'Sell all '+cap(i)+' items?')}
+ if(a==='sort'){invSort=invSort==='new'?'rar':invSort==='rar'?'low':'new';try{localStorage.setItem('invSort',invSort)}catch(e){}invRender();return}
  if(a==='eq')act('equip',{uid:i});else if(a==='un')act('unequip',{slot:i});else if(a==='pot')act('usepot',{k:i})});   // the server validates and applies; the screen refreshes from its answer
 
 
