@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.62';window.__BUILD=B;
+(function(){var B='1.63';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -98,6 +98,7 @@ html,body{position:fixed!important;left:0;top:0;right:0;bottom:0;width:100%!impo
 .build-tag{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));text-align:center;font:10px Arial,sans-serif;color:#d9b76e66;z-index:2100;pointer-events:none}
 #cbt #cbA img{display:block;margin:0 auto;width:auto;max-width:100%;height:auto;max-height:240px;object-fit:contain;filter:drop-shadow(0 6px 10px #000c)}
 .cc img.emb{width:38px;height:38px;flex:0 0 38px;object-fit:contain;filter:drop-shadow(0 2px 3px #000a)}.portrait img.emb,.portrait.cls img.emb{width:12.6cqw;height:12.6cqw;margin:auto;display:block;object-fit:contain;filter:drop-shadow(0 1px 3px #000)}
+*{-webkit-tap-highlight-color:transparent!important;-webkit-touch-callout:none}html,body,button,.qbtn,.qcard,.cc,.portrait,img,svg,[data-m],[data-a],[data-w],[data-s]{-webkit-user-select:none;user-select:none}button:focus,button:focus-visible,.qbtn:focus,.qbtn:focus-visible,[data-m]:focus,[tabindex]:focus,.portrait:focus{outline:none!important}input,textarea,select{-webkit-user-select:text;user-select:text}img{-webkit-user-drag:none}::selection{background:transparent}input::selection,textarea::selection{background:#b99a5266}
 </style><style id="hud-v4">
 /* ===== HUD v4 — ornate fantasy frame (matches the reference screenshot) ===== */
 :root{--hudh:calc(min(100vw,520px)*.2412)}
