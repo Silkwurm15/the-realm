@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.58';window.__BUILD=B;
+(function(){var B='1.59';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -873,10 +873,17 @@ function rowX(it,btn,a,i,sellable){const c=CAT[it.cid],lk=!!it.lock;
  +`<div style="display:flex;gap:6px"><button class="qbtn" style="flex:1;width:auto" data-a="${a}" data-i="${i}">${btn}</button>`
  +`<button class="qbtn" style="width:48px;padding:10px 0" data-a="lock" data-i="${it.uid}" aria-label="${lk?'Unlock item':'Lock item'}">${lk?'🔒':'🔓'}</button>`
  +(sellable?`<button class="qbtn" style="flex:1;width:auto${lk?';opacity:.4':''}" data-a="sell" data-i="${it.uid}"${lk?' disabled':''}>Sell 💠${shardOf(it)}</button>`:'')+`</div></div>`}
+let sellPick='common';
+function sellList(h,pick){return h.inv.filter(x=>!x.lock&&(pick==='all'||CAT[x.cid].rarity===pick))}
 function bagTools(h){let o=`<div class="qcard"><button class="qbtn" style="margin-top:0" data-a="sort">⇅ Sort: ${SORT_NAME[invSort]||SORT_NAME.new}</button>`;
- let rows=RAR.map(r=>{const l=h.inv.filter(x=>!x.lock&&CAT[x.cid].rarity===r);return l.length?`<button class="qbtn" style="flex:1 1 45%;width:auto;color:${RC[r]}" data-a="sellr" data-i="${r}">Sell ${l.length} ${cap(r)} · 💠${l.reduce((n,x)=>n+shardOf(x),0)}</button>`:''}).join('');
- const all=h.inv.filter(x=>!x.lock);if(all.length>1)rows+=`<button class="qbtn" style="flex:1 1 100%;width:auto;border-color:#ff8a7a" data-a="sellr" data-i="all">Sell ALL unlocked · ${all.length} items · 💠${all.reduce((n,x)=>n+shardOf(x),0)}</button>`;
- if(rows)o+=`<div class="qs" style="margin-top:8px">Mass sell by rarity (locked items are never sold)</div><div style="display:flex;flex-wrap:wrap;gap:6px">${rows}</div>`;
+ const have=RAR.filter(r=>sellList(h,r).length);
+ if(have.length){if(sellPick!=='all'&&!have.includes(sellPick))sellPick=have[0];
+  const tot=sellList(h,sellPick),sh=tot.reduce((n,x)=>n+shardOf(x),0);
+  o+=`<div class="qs" style="margin-top:10px">Mass sell (locked items are never sold)</div><select id="sellSel" aria-label="Rarity to sell" style="width:100%;margin-top:6px;padding:11px 10px;border-radius:5px;border:1px solid #e5c77b;background:#1a140c;color:${sellPick==='all'?'#ff8a7a':RC[sellPick]};font:700 14px Georgia,serif">`
+  +have.map(r=>{const l=sellList(h,r);return`<option value="${r}"${sellPick===r?' selected':''}>${cap(r)} · ${l.length} item${l.length===1?'':'s'} · 💠${l.reduce((n,x)=>n+shardOf(x),0)}</option>`}).join('')
+  +`<option value="all"${sellPick==='all'?' selected':''}>ALL unlocked · ${sellList(h,'all').length} items · 💠${sellList(h,'all').reduce((n,x)=>n+shardOf(x),0)}</option></select>`
+  +`<button class="qbtn" style="border-color:#ff8a7a" data-a="sellpick">Sell ${sellPick==='all'?'ALL unlocked':cap(sellPick)} · ${tot.length} item${tot.length===1?'':'s'} · 💠${sh}</button>`}
+ else o+=`<div class="qs" style="margin-top:8px">Nothing to mass sell. Everything left is locked.</div>`;
  return o+'</div>'}
 function sellItems(uids,title,warn){const h=H(),list=uids.map(u=>h.inv.find(x=>x.uid===u)).filter(x=>x&&!x.lock);
  if(!list.length)return toast('Nothing to sell. Locked items are kept.');
@@ -888,11 +895,12 @@ function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,
  o+='<div class="qh"><span>Equipped</span></div>'+SLOTS.map(k=>h.eq[k]?rowX(h.eq[k],'Unequip','un',k,false).replace('<span>','<span>'+SN[k]+' · '):`<div class="qcard" style="opacity:.55"><div class="qt">${SN[k]}<span>Empty</span></div></div>`).join('');
  o+=`<div class="qh"><span>Backpack</span><span>${h.inv.length}</span></div>`+(h.inv.length?bagTools(h)+sortedInv(h.inv).map(it=>rowX(it,'Equip','eq',it.uid,true)).join(''):'<div class="qaw">No items yet. Open chests!</div>')+'';
  const st=inv.scrollTop;inv.innerHTML=o;inv.scrollTop=st}
+inv.addEventListener('change',e=>{if(e.target&&e.target.id==='sellSel'){sellPick=e.target.value;invRender()}});
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,i=b.dataset.i;if(a==='switch')return openSwitch();if(a==='cls')return toast('Your class is locked. Use a Class Unlock from the Shop to change it.');   // unlock flow arrives with the Shop
  if(false)openClass(false);if(a==='name'){toast('Your name is set. Name changes are coming soon.');return}if(a==='out')return window.realmCloud&&window.realmCloud.signOut();
  if(a==='lock'){const it=findItem(i);if(!it)return;act('lock',{uid:i,on:!it.lock});return}
  if(a==='sell')return sellItems([i]);
- if(a==='sellr'){const all=i==='all',l=H().inv.filter(x=>!x.lock&&(all||CAT[x.cid].rarity===i)).map(x=>x.uid),hi=all||i==='mythic'||i==='legendary';return sellItems(l,(hi?'⚠ ':'')+(all?'Sell ALL unlocked items?':'Sell all '+cap(i)+' items?'),hi)}
+ if(a==='sellpick'){const hi=sellPick==='all'||sellPick==='mythic'||sellPick==='legendary';return sellItems(sellList(H(),sellPick).map(x=>x.uid),(hi?'⚠ ':'')+(sellPick==='all'?'Sell ALL unlocked items?':'Sell all '+cap(sellPick)+' items?'),hi)}
  if(a==='sort'){invSort=invSort==='new'?'rar':invSort==='rar'?'low':'new';try{localStorage.setItem('invSort',invSort)}catch(e){}invRender();return}
  if(a==='eq')act('equip',{uid:i});else if(a==='un')act('unequip',{slot:i});else if(a==='pot')act('usepot',{k:i})});   // the server validates and applies; the screen refreshes from its answer
 
