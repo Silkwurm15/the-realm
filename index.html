@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.703';window.__BUILD=B;
+(function(){var B='1.704';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -423,7 +423,7 @@ map.on('styleimagemissing',e=>{const f=PATTERNS[e.id];if(f&&!map.hasImage(e.id))
 let errShown=false;map.on('error',e=>{console.error(e&&e.error||e);if(!errShown){errShown=true;const m=(e&&e.error&&e.error.message)||'unknown error';toast('Map problem: '+m.slice(0,140))}});
 
 /* ---------- Game layers ---------- */
-const RANGE=30; // meters: radius of the circle around the player (diameter = 2 x RANGE = 60 m)
+const RANGE=60; // meters: radius of the circle around the player (diameter = 2 x RANGE = 120 m)
 let player=FALLBACK.slice(),following=false,watchId=null,playerMarker=null;
 const SVG={
  quest:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 3h3l-.6 11h-1.8zM12 16.6a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8z"/></svg>',
