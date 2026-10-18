@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.710';window.__BUILD=B;
+(function(){var B='1.711';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -967,7 +967,7 @@ const Sound=(()=>{let ctx=null,unlocked=false,want='map',el=null,seq=Promise.res
  function refresh(){if(el)el.volume=vol('music')}
  document.addEventListener('visibilitychange',()=>{if(!el)return;if(document.hidden)el.pause();else el.play().catch(()=>{})});
  ['pointerdown','touchstart','keydown'].forEach(e=>addEventListener(e,unlock,{passive:true}));   // phones only allow sound after the first touch
- document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b&&!b.closest('#setModal'))sfx('tap')},true);
+ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button,.nav-item,[data-act],[data-m],[data-c],[role=button]');if(b&&!b.closest('#setModal'))sfx('tap')},true);   // buttons, the bottom menu tabs and tappable menu cards
  return{sfx,queue,hit,levelUp,fromMsg,music,refresh,unlock}})();
 
 /* Frame-rate limit: wraps the browser's animation timer so the map and every animation obey it. */
