@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.711';window.__BUILD=B;
+(function(){var B='1.712';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1029,7 +1029,7 @@ async function menuAccount(){menuSub('Account Management','<div class="qcard"><d
 async function deleteAccount(){
  if(!confirm('Delete your account and ALL progress? This cannot be undone.'))return;
  const t=prompt('Type DELETE to confirm.');if(t==null)return;if(t.trim()!=='DELETE')return toast('Not deleted. You must type DELETE exactly.');
- const{data,error}=await window.realmCloud.sb.functions.invoke('realm',{body:{action:'delete_account'}});
+ const{data,error}=await window.realmCloud.sb.functions.invoke('realm',{body:{action:'delete_account',build:window.__BUILD}});
  if(error||(data&&data.error))return toast((data&&data.error)||'Could not delete your account. Try again.');
  try{localStorage.removeItem(QK);localStorage.removeItem('realm_owner')}catch(x){}
  try{await window.realmCloud.sb.auth.signOut()}catch(x){}location.reload()}
