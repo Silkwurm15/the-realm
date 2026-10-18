@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.709';window.__BUILD=B;
+(function(){var B='1.710';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -621,8 +621,8 @@ S.taken=S.taken||{};S.hashes=S.hashes||[];S.rnd=S.rnd||{n:0,done:[]};S.loot=S.lo
 /* ---- server-authoritative state: XP, level, loot, claims, potions, quests and Tempt Fate live on the server ---- */
 const CORE_KEYS=['xpv','xp','need','lvl','cls','hero','loot','chaos','enc','k','daily','weekly','monthly','claimed','rnd','lairs','rift','shards','sq','name','look','onboarded','cx','cu'];
 let fighting=false,actChain=Promise.resolve();
-function applyCore(c){if(!c)return;setTimeout(refreshLook,0);CORE_KEYS.forEach(k=>{if(c[k]===undefined)return;if(!c[k]&&S[k]&&(k==='name'||k==='look'||k==='onboarded'))return;S[k]=c[k]});try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}hud();render();try{if(inv.classList.contains('open'))invRender()}catch(e){}}
-function act(action,args){return actChain=actChain.then(async()=>{const r=await window.realmCloud.api(action,args||{});if(r.error){act.err=r.error;if(!(args&&args.quiet))toast(r.error);return null}act.err=null;applyCore(r.core);try{syncQPoints()}catch(e){}(r.msgs||[]).forEach(m=>toast(m));return r}).catch(e=>{console.error('act failed',action,e);act.err='Something went wrong. Try again.';return null})}
+function applyCore(c){if(!c)return;setTimeout(refreshLook,0);const pLvl=S.lvl,pCls=S.cls;CORE_KEYS.forEach(k=>{if(c[k]===undefined)return;if(!c[k]&&S[k]&&(k==='name'||k==='look'||k==='onboarded'))return;S[k]=c[k]});if(pLvl&&pCls&&S.cls===pCls&&S.lvl>pLvl){try{Sound.levelUp()}catch(e){}}try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}hud();render();try{if(inv.classList.contains('open'))invRender()}catch(e){}}
+function act(action,args){return actChain=actChain.then(async()=>{const r=await window.realmCloud.api(action,args||{});if(r.error){act.err=r.error;if(!(args&&args.quiet))toast(r.error);return null}act.err=null;applyCore(r.core);try{syncQPoints()}catch(e){}(r.msgs||[]).forEach(m=>{toast(m);try{Sound.fromMsg(m)}catch(e){}});return r}).catch(e=>{console.error('act failed',action,e);act.err='Something went wrong. Try again.';return null})}
 let tab='daily',rndOffers=[],expl=[],lastWalk=null,acc=0;
 function save(){try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}if(window.realmCloud)window.realmCloud.queue(S)}
 function hud(){const x=document.querySelector('.xptext'),b=document.querySelector('.xpfill'),l=document.querySelector('.level');if(x)x.textContent=S.lvl>=100?'MAX LEVEL':`${Math.floor(S.xp).toLocaleString()} / ${S.need.toLocaleString()} XP`;if(b)b.style.width=(S.lvl>=100?100:Math.min(100,100*S.xp/S.need))+'%';if(l)l.textContent=S.lvl;const d=document.querySelector('.nav-dot');if(d){let n=false;try{n=['daily','weekly','monthly'].some(t=>{const T=S[t];return T&&((T.ms&&T.ms.ready&&!T.ms.done)||(T.q||[]).some(q=>q.ready&&!q.done))})}catch(e){}d.style.display=n?'block':'none'}try{hudPlus()}catch(e){}}
@@ -863,12 +863,12 @@ function retire(it){it.used=true;if(it.key)S.taken[it.key]=it.exp;const i=items.
 async function useMarker(it,call){const r=await call();if(!r){if(['Already claimed.','That marker has vanished.','Marker mismatch.','No marker there.'].includes(act.err))retire(it);return null}retire(it);return r}
 async function markerUse(it){const r=await useMarker(it,()=>act('marker',{t:it.t,key:it.key,exp:it.exp,ll:targetLL}));if(r)toast((POI[it.t]?POI[it.t].go:'Done')+' ✓')}
 async function lootFrom(it){const r=await useMarker(it,()=>act('loot',{t:it.t,key:it.key,exp:it.exp,ll:targetLL}));if(!r)return;const o=r.result;if(o.fight)return cbShow(o.fight);
- showModal('loot',{icon:o.icon,title:o.title,text:o.lines.join('\n')+(o.res?'\n\nUse a Resurrect Potion? You have '+potN('res')+'.':''),primary:o.res?'Use Resurrect Potion':'Continue',onPrimary:()=>{hideModal('loot');if(o.res)act('usepot',{k:'res'}).then(x=>{if(x)toast('You rise again at '+Math.floor(S.hero.hp)+' HP.')})},...(o.res?{secondary:'Stay Downed',onSecondary:()=>hideModal('loot')}:{})})}
+ try{Sound.sfx('chest')}catch(e){}showModal('loot',{icon:o.icon,title:o.title,text:o.lines.join('\n')+(o.res?'\n\nUse a Resurrect Potion? You have '+potN('res')+'.':''),primary:o.res?'Use Resurrect Potion':'Continue',onPrimary:()=>{hideModal('loot');if(o.res)act('usepot',{k:'res'}).then(x=>{if(x)toast('You rise again at '+Math.floor(S.hero.hp)+' HP.')})},...(o.res?{secondary:'Stay Downed',onSecondary:()=>hideModal('loot')}:{})})}
 async function gatherNature(it){const pre=H().hp,r=await useMarker(it,()=>act('nature',{key:it.key,exp:it.exp,ll:targetLL,green:!!it.green}));
  if(!r)return;let lines=(r.result&&r.result.lines||[]).slice();
  /* Nature Discovery heals 5% of max HP when you are hurt (never above 100%). Skipped if the server already healed you. */
  try{const h=H(),mx=stats().hp;if(h&&h.hp<mx&&h.hp<=pre+.5){const add=Math.max(1,Math.round(mx*.05)),before=h.hp;h.hp=Math.min(mx,h.hp+add);upDown();save();hud();lines.push('+'+Math.round(h.hp-before)+' HP')}}catch(e){console.warn('nature heal',e)}
- toast(lines.join(' · '))}
+ toast(lines.join(' · '));try{Sound.sfx(H().hp>pre+.5?'nature_heal':'nature_plain')}catch(e){}}
 /* ---- interactive mimic combat (chest ambush) ---- */
 const mimicArt=strong=>{const B=strong?'#3d2a52':'#7a4a1f',D=strong?'#24162f':'#4a2b10',G=strong?'#b8a0d8':'#d6b050',E=strong?'#ff3b30':'#ffd83a',T='#f6f1e3',sp=strong?'<path d="M45 22l8-24 8 24zM85 14l10-30 10 30zM125 22l8-24 8 24z" fill="'+G+'"/>':'',tt=(a,y,d,n)=>Array.from({length:n},(_,i)=>'<path d="M'+(a+i*22)+' '+y+'l7 '+d+' 7 '+(-d)+'z" fill="'+T+'"/>').join('');
  return'<svg viewBox="0 0 200 150" width="100%" style="max-width:230px"><ellipse cx="100" cy="142" rx="78" ry="6" fill="#0007"/><rect x="30" y="82" width="140" height="54" rx="7" fill="'+B+'" stroke="'+D+'" stroke-width="3"/><rect x="30" y="104" width="140" height="9" fill="'+G+'"/><rect x="92" y="98" width="16" height="20" rx="3" fill="'+G+'" stroke="'+D+'" stroke-width="2"/><ellipse cx="100" cy="83" rx="70" ry="13" fill="#2b0a12"/><path d="M78 84q22 36 44 0z" fill="#d6304a"/>'+tt(40,84,-17,7)+sp+'<path d="M28 62Q28 12 100 12T172 62z" fill="'+B+'" stroke="'+D+'" stroke-width="3"/><path d="M28 40Q100 28 172 40" stroke="'+G+'" stroke-width="7" fill="none"/>'+tt(37,62,17,7)+'<circle cx="72" cy="40" r="11" fill="'+E+'" stroke="#000" stroke-width="2"/><circle cx="128" cy="40" r="11" fill="'+E+'" stroke="#000" stroke-width="2"/><rect x="70" y="32" width="4" height="16" rx="2" fill="#000"/><rect x="126" y="32" width="4" height="16" rx="2" fill="#000"/><path d="M58 26l26 8M142 26l-26 8" stroke="#000" stroke-width="4"/></svg>'};
@@ -880,12 +880,12 @@ const STRONG_MIMIC_IMG='<img alt="Strong Mimic" draggable="false" src="data:imag
 function cbDraw(title,btns,bars){$('cbT').textContent=title;$('cbA').innerHTML=(C.k==='smimic'?STRONG_MIMIC_IMG:MIMIC_IMG);
  $('cbB').innerHTML=bars?'<div class="cbh"><span>'+C.e.n+'</span><span>'+Math.max(0,C.eh)+' / '+C.e.hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*C.eh/C.e.hp)+'%;background:#d6304a"></i></div><div class="cbh"><span>You</span><span>'+Math.floor(H().hp)+' / '+stats().hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*H().hp/stats().hp)+'%;background:#4caf50"></i></div>':'';
  $('cbL').textContent=C.log.slice(-4).join('\n');$('cbR').innerHTML='';btns.forEach(b=>{const x=document.createElement('button');x.textContent=b[0];if(b[2])x.className='alt';x.onclick=b[1];$('cbR').appendChild(x)});cb.style.display='flex'}
-function cbShow(f){fighting=true;C={k:f.strong?'smimic':'mimic',m:{name:f.m.name},e:{n:f.e.n,hp:f.e.hp},eh:f.eh,log:f.log};
+function cbShow(f){fighting=true;try{if(f.phase==='intro')Sound.music(f.strong?'battle_strongmimic':'battle_mimic');else if(f.phase==='fallen')Sound.sfx('lose');else if(f.phase==='end'||!['intro','choice','fallen'].includes(f.phase)){Sound.music('map');if(/victory/i.test(f.title||''))Sound.sfx('win');else if(/defeat/i.test(f.title||''))Sound.sfx('lose')}}catch(e){}C={k:f.strong?'smimic':'mimic',m:{name:f.m.name},e:{n:f.e.n,hp:f.e.hp},eh:f.eh,log:f.log};
  if(f.phase==='intro')cbDraw(f.title,[['Defend Yourself!',()=>cbOp('start')]],false);
  else if(f.phase==='choice')cbDraw('Your move!',[['Attack',()=>cbOp('attack')],['Flee',()=>cbOp('flee'),1]],true);
  else if(f.phase==='fallen')cbDraw('You have fallen!',[['Use Resurrect Potion ('+f.res+')',()=>cbOp('res')],['Give Up',()=>cbOp('giveup'),1]],true);
  else cbDraw(f.title,[['Continue',()=>{cb.style.display='none';C=null;fighting=false;hud();if(inv.classList.contains('open'))invRender()}]],true)}
-async function cbOp(op){const r=await act('fight',{op,ll:targetLL});if(r)cbShow(r.result.fight);else{cb.style.display='none';C=null;fighting=false}}   // every blow is resolved on the server
+async function cbOp(op){const r=await act('fight',{op,ll:targetLL});if(r){if(op==='attack')try{Sound.hit(S.cls)}catch(e){}cbShow(r.result.fight)}else{cb.style.display='none';C=null;fighting=false;try{Sound.music('map')}catch(e){}}}   // every blow is resolved on the server
 /* ---- class selection + character screen ---- */
 const cl=document.createElement('div');cl.style.cssText='position:absolute;inset:0;z-index:900;display:none;overflow-y:auto;padding:14px 12px 24px;background:#0b0a08f8;color:#ead8ac';panel.parentNode.appendChild(cl);
 const lines=c=>{const i=clsInfo(c);return i.P.map(t=>'<div class="qs" style="color:#7be37a">＋ '+t+'</div>').join('')+i.N.map(t=>'<div class="qs" style="color:#ff8a7a">－ '+t+'</div>').join('')};
@@ -947,24 +947,28 @@ const sysReduced=()=>{try{return !!(window.matchMedia&&matchMedia('(prefers-redu
 let SET=(()=>{let o={};try{o=JSON.parse(localStorage.getItem(SET_KEY)||'{}')||{}}catch(e){}return{...SET_DEF,rm:sysReduced(),...o}})();
 function setSave(){try{localStorage.setItem(SET_KEY,JSON.stringify(SET))}catch(e){}}
 
-/* Sound framework. Drop files into the "audio" folder next to index.html using the names below; any missing file is simply silent.
-   To add a sound later: add a line to SFX (or MUSIC), put the file in the folder, then call Sound.sfx('name') / Sound.music('name') wherever it should play. */
+/* Sound framework. Drop files into the "audio" folder next to index.html. Sound effects live in audio/sfx/NAME.mp3, music in audio/music/NAME.mp3.
+   Any file that is missing is simply silent. See audio/README.txt for the full list of names. */
 const SND_BASE='audio/';
-const SFX={tap:'sfx/tap.mp3',chest:'sfx/chest.mp3',nature:'sfx/nature.mp3',quest:'sfx/quest.mp3',rift:'sfx/rift.mp3',levelup:'sfx/levelup.mp3',hit:'sfx/hit.mp3',win:'sfx/win.mp3',lose:'sfx/lose.mp3',error:'sfx/error.mp3'};
-const MUSIC={map:'music/map.mp3',battle:'music/battle.mp3'};
-const Sound=(()=>{let ctx=null,master=null,unlocked=false,want='map',el=null,elName=null;const bufs={},bad=new Set();
+const HIT_GROUP={warrior:'melee',barbarian:'melee',paladin:'melee',antipaladin:'melee',monk:'melee',assassin:'melee',archer:'melee',scout:'melee',wizard:'magic',druid:'magic',healer:'magic',bard:'magic'};   // archer + scout use the melee hit until you add hit_ranged.mp3
+const Sound=(()=>{let ctx=null,unlocked=false,want='map',el=null,seq=Promise.resolve();const bufs={},bad=new Set();
  const vol=k=>SET.mute?0:Math.max(0,Math.min(1,(SET.master/100)*(SET[k]/100)));
- function unlock(){if(unlocked)return;unlocked=true;try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){ctx=new AC();master=ctx.createGain();master.connect(ctx.destination)}if(ctx&&ctx.state==='suspended')ctx.resume()}catch(e){}if(want)music(want)}
- async function load(n){if(bufs[n])return bufs[n];if(bad.has(n)||!SFX[n]||!ctx)return null;try{const r=await fetch(SND_BASE+SFX[n]);if(!r.ok)throw 0;const b=await ctx.decodeAudioData(await r.arrayBuffer());return bufs[n]=b}catch(e){bad.add(n);return null}}
- async function sfx(n){if(!unlocked||vol('sfx')<=0)return;const b=await load(n);if(!b||!ctx)return;try{if(ctx.state==='suspended')ctx.resume();const s=ctx.createBufferSource(),g=ctx.createGain();s.buffer=b;g.gain.value=vol('sfx');s.connect(g);g.connect(ctx.destination);s.start(0)}catch(e){}}
- function music(n){want=n||null;if(!unlocked)return;if(!n||!MUSIC[n]||bad.has('m:'+n)){if(el){el.pause()}el=null;elName=null;return}
-  if(el&&elName===n){refresh();if(el.paused&&!document.hidden)el.play().catch(()=>{});return}
-  if(el)el.pause();elName=n;el=new Audio(SND_BASE+MUSIC[n]);el.loop=true;el.volume=vol('music');el.onerror=()=>{bad.add('m:'+n);el=null;elName=null};if(!document.hidden)el.play().catch(()=>{})}
+ function unlock(){if(unlocked)return;unlocked=true;try{const AC=window.AudioContext||window.webkitAudioContext;if(AC)ctx=new AC();if(ctx&&ctx.state==='suspended')ctx.resume()}catch(e){}if(want)music(want)}
+ async function load(n){if(bufs[n])return bufs[n];if(bad.has(n)||!ctx)return null;try{const r=await fetch(SND_BASE+'sfx/'+n+'.mp3');if(!r.ok)throw 0;const b=await ctx.decodeAudioData(await r.arrayBuffer());return bufs[n]=b}catch(e){bad.add(n);return null}}
+ function play(n){return new Promise(async res=>{if(!unlocked||vol('sfx')<=0)return res(false);const b=await load(n);if(!b||!ctx)return res(false);try{if(ctx.state==='suspended')ctx.resume();const s=ctx.createBufferSource(),g=ctx.createGain();s.buffer=b;g.gain.value=vol('sfx');s.connect(g);g.connect(ctx.destination);let done=false;const fin=()=>{if(!done){done=true;res(true)}};s.onended=fin;setTimeout(fin,(b.duration||3)*1000+400);s.start(0)}catch(e){res(false)}})}
+ const sfx=n=>play(n);                                                  // plays right away
+ const queue=(...names)=>(seq=seq.then(()=>names.reduce((p,n)=>p.then(()=>play(n)),Promise.resolve())));   // plays one after another, each waits for the one before
+ async function first(names){for(const n of names){if(!unlocked)return false;if(await load(n))return play(n)}return false}   // plays the first name that has a file
+ function hit(cls){const g=HIT_GROUP[cls]||'melee',l=['hit_'+cls];if(cls==='archer'||cls==='scout')l.push('hit_ranged');l.push('hit_'+g);if(g!=='melee')l.push('hit_melee');return first(l)}
+ function levelUp(){setTimeout(()=>queue('levelup'),300)}   // always lands after the sound that caused it
+ function fromMsg(m){m=String(m||'');if(/Traveler's Request complete/i.test(m))queue('quest_complete');else if(/Traveler's Request: \d+ \/ \d+/i.test(m))queue('quest_progress');else if(/quest ran out of time/i.test(m))queue('quest_fail')}
+ function music(n){want=n||null;if(!unlocked)return;if(el){el.pause();el=null}if(!n)return;const list=[n];if(n.indexOf('_')>0)list.push(n.split('_')[0]);   // battle_mimic falls back to battle
+  const go=i=>{if(i>=list.length||bad.has('m:'+list[i])){if(i<list.length)go(i+1);return}const a=new Audio(SND_BASE+'music/'+list[i]+'.mp3');a.loop=true;a.volume=vol('music');a.onerror=()=>{bad.add('m:'+list[i]);if(el===a){el=null;go(i+1)}};el=a;if(!document.hidden)a.play().catch(()=>{})};go(0)}
  function refresh(){if(el)el.volume=vol('music')}
  document.addEventListener('visibilitychange',()=>{if(!el)return;if(document.hidden)el.pause();else el.play().catch(()=>{})});
- ['pointerdown','touchstart','keydown'].forEach(e=>addEventListener(e,unlock,{once:false,passive:true}));   // phones only allow sound after the first touch
+ ['pointerdown','touchstart','keydown'].forEach(e=>addEventListener(e,unlock,{passive:true}));   // phones only allow sound after the first touch
  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b&&!b.closest('#setModal'))sfx('tap')},true);
- return{sfx,music,refresh,unlock}})();
+ return{sfx,queue,hit,levelUp,fromMsg,music,refresh,unlock}})();
 
 /* Frame-rate limit: wraps the browser's animation timer so the map and every animation obey it. */
 const FPS=(()=>{let iv=0,last=0,curT=-1,curOk=true,installed=false,nid=1;const raf=window.requestAnimationFrame.bind(window),caf=window.cancelAnimationFrame.bind(window),live=new Map();
@@ -1124,13 +1128,13 @@ const rfs=document.createElement('style');rfs.textContent='#riftOv{position:fixe
 const rf=document.createElement('div');rf.id='riftOv';rf.innerHTML='<div class="rfb"><div class="rfi" id="rfI"></div><div class="rft" id="rfT"></div><div class="rfw" id="rfW" style="display:none"></div><div class="rfx" id="rfX"></div><div class="rfl" id="rfL" style="display:none"></div><div id="rfC"></div></div>';document.body.appendChild(rf);
 function rfDraw(o){$('rfI').textContent=o.icon;$('rfT').textContent=o.title;const w=$('rfW');w.style.display=o.wild?'inline-block':'none';w.textContent=o.wild||'';$('rfX').textContent=o.text||'';const l=$('rfL');l.style.display=o.lines?'block':'none';l.textContent=o.lines?o.lines.join('\n'):'';
  const c=$('rfC');c.innerHTML='';(o.btns||[]).forEach(b=>{const x=document.createElement('button');x.innerHTML=b.html;if(b.alt)x.className='alt';x.onclick=()=>{c.querySelectorAll('button').forEach(y=>y.disabled=true);b.fn()};c.appendChild(x)});rf.style.display='flex'}
-const rfClose=()=>{rf.style.display='none';hud();try{if(inv.classList.contains('open'))invRender()}catch(e){}};
+const rfClose=()=>{rf.style.display='none';try{Sound.music('map')}catch(e){}hud();try{if(inv.classList.contains('open'))invRender()}catch(e){}};
 const esc=t=>String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-function rfRoom(room){rfDraw({icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:room.text+(room.wild?'\n'+room.wild.text:''),
+function rfRoom(room){try{if(room&&room.id==='beast')Sound.music('battle_rift')}catch(e){}rfDraw({icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:room.text+(room.wild?'\n'+room.wild.text:''),
  btns:room.choices.map(c=>{const o=c.fight?(c.odds?'You should win this':'You would likely lose'):c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':''),sub=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' · ');return{html:esc(c.label)+(sub?'<small>'+esc(sub)+'</small>':''),fn:()=>riftPick(c.id)}})})}
 async function riftPick(id){const r=await act('rift',{op:'pick',pick:id});
  if(!r||!r.result||!r.result.rift)return rfDraw({icon:'✨',title:'The rift flickers',text:(act.err||'Could not reach the server.')+'\nIf the rift is still open you can try again.',btns:[{html:'Try again',fn:()=>act('rift',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.rift?rfRoom(x.result.rift.room):rfClose())},{html:'Close',alt:1,fn:rfClose}]});
- const x=r.result.rift;rfDraw({icon:x.ok?'✨':'💥',title:x.ok?'The Rift Yields':'The Rift Snaps Shut',text:x.room,lines:x.lines,btns:[{html:'Continue',fn:rfClose}]})}
+ const x=r.result.rift;try{if(id==='fight')Sound.hit(S.cls)}catch(e){}rfDraw({icon:x.ok?'✨':'💥',title:x.ok?'The Rift Yields':'The Rift Snaps Shut',text:x.room,lines:x.lines,btns:[{html:'Continue',fn:rfClose}]})}
 async function riftEnter(it){const r=await useMarker(it,()=>act('rift',{op:'enter',key:it.key,exp:it.exp,ll:targetLL}));if(r&&r.result&&r.result.rift)rfRoom(r.result.rift.room)}
 /* ---- Story quests: the four quest markers are mini-series. The server picks the quest, places the points, checks every step and pays out. ---- */
 const SQ_ICON={lights:'✨',door:'🚪',satchel:'🎒',traveler:'🧙'};
@@ -1150,10 +1154,11 @@ function sqShow(sq){
  rfDraw({icon:sq.phase==='done'?(sq.ok?'🏆':'🚪'):sq.phase==='progress'?'✨':(SQ_ICON[sq.id]||'📜'),title:sq.phase==='done'?(sq.ok?'Quest Complete':'A Meager Prize'):sq.name,text:sq.phase==='done'?sq.name:'',lines:sq.lines,btns:[{html:'Continue',fn:sqClose}]})}
 async function sqAnswer(qid,i){const r=await act('quest',{op:'answer',qid,pick:i});
  if(!r||!r.result||!r.result.sq)return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',qid,quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});
- sqShow(r.result.sq)}
+ sqSnd(r.result.sq);sqShow(r.result.sq)}
 function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,90+Math.random()*110);if(safeAt(p,c))out.push(p)}return out}   // safe spots 90-200 m away; the server picks from them and checks the distances
-async function questStart(it){const r=await useMarker(it,()=>act('quest',{op:'start',key:it.key,exp:it.exp,ll:targetLL,cands:gatherCands()}));if(r&&r.result&&r.result.sq){sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
-async function questVisit(it){const r=await act('quest',{op:'visit',qid:it.qid,i:it.i,ll:targetLL});if(r&&r.result&&r.result.sq)sqShow(r.result.sq)}
+async function questStart(it){const r=await useMarker(it,()=>act('quest',{op:'start',key:it.key,exp:it.exp,ll:targetLL,cands:gatherCands()}));if(r&&r.result&&r.result.sq){try{Sound.queue('quest_start')}catch(e){}sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
+const sqSnd=sq=>{try{if(sq.phase==='progress')Sound.queue('quest_progress');else if(sq.phase==='done')Sound.queue(sq.ok?'quest_complete':'quest_fail')}catch(e){}};
+async function questVisit(it){const r=await act('quest',{op:'visit',qid:it.qid,i:it.i,ll:targetLL});if(r&&r.result&&r.result.sq){sqSnd(r.result.sq);sqShow(r.result.sq)}}
 function syncQPoints(){const want=new Map();
  sqList().forEach(q=>{if(q.pts)q.pts.forEach((p,i)=>{if(!p.v){const k='sq'+q.qid+'_'+i;want.set(k,{t:'qpoint',ll:p.ll,key:k,i,qid:q.qid,q:q.id,live:1,exp:q.until,name:q.id==='satchel'?'The Owner: '+q.who:'Strange Light '+(i+1)})}})});
  let ch=false;for(let i=items.length-1;i>=0;i--){const it=items[i];if(it.t!=='qpoint')continue;const w=want.get(it.key);if(w&&w.exp===it.exp&&w.ll[0]===it.ll[0]&&w.ll[1]===it.ll[1])want.delete(it.key);else{dropItem(i);ch=true}}
