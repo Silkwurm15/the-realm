@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.706';window.__BUILD=B;
+(function(){var B='1.707';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1078,8 +1078,12 @@ const srvNow=()=>Math.round(clk.base+(performance.now()-clk.t0));
 function installClock(){if(clockOn)return;clockOn=true;
  window.Date=new Proxy(NativeDate,{construct:(t,a,nt)=>Reflect.construct(t,a.length?a:[srvNow()],nt),apply:t=>t(srvNow()),get:(t,k)=>k==='now'?srvNow:k==='nativeNow'?()=>NativeDate.now():Reflect.get(t,k)});
  setInterval(()=>syncClock().catch(()=>{}),3e5);document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncClock().catch(()=>{})})}
-async function api(action,args){let tm;const{data,error}=await Promise.race([sb.functions.invoke('realm',{body:{action,tz:Intl.DateTimeFormat().resolvedOptions().timeZone,...args}}),new Promise(r=>{tm=setTimeout(()=>r({data:null,error:{message:'timeout'}}),20000)})]).finally(()=>clearTimeout(tm));
- if(error){let m='Connection problem. Try again.';try{const j=await error.context.json();if(j&&j.error)m=j.error}catch(e){}return{error:m}}return data&&data.error?{error:data.error}:(data||{error:'No answer from the server.'})}
+async function api(action,args){let tm;const{data,error}=await Promise.race([sb.functions.invoke('realm',{body:{action,build:window.__BUILD,tz:Intl.DateTimeFormat().resolvedOptions().timeZone,...args}}),new Promise(r=>{tm=setTimeout(()=>r({data:null,error:{message:'timeout'}}),20000)})]).finally(()=>clearTimeout(tm));
+ if(error){let m='Connection problem. Try again.';try{const j=await error.context.json();if(j&&j.error)m=j.error}catch(e){}return{error:m}}if(data&&data.update){forceUpdate();return{error:data.error}}return data&&data.error?{error:data.error}:(data||{error:'No answer from the server.'})}
+let updShown=false;
+function forceUpdate(){if(updShown)return;updShown=true;const go=()=>{const jobs=[];try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(r=>Promise.all(r.map(x=>x.unregister()))))}catch(e){}try{if(window.caches&&caches.keys)jobs.push(caches.keys().then(k=>Promise.all(k.map(n=>caches.delete(n)))))}catch(e){}Promise.all(jobs).catch(()=>{}).then(()=>{location.replace(location.pathname+'?u='+Date.now())})};
+ const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(5,10,8,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;color:#f1e3b4;font-family:Georgia,serif';d.innerHTML='<div style="font-size:46px">✨</div><div style="font-size:24px;font-weight:700">Update available</div><div style="font-size:16px;opacity:.85">A new version of the game is ready. Tap to update — your progress is saved.</div><button style="font:inherit;font-weight:700;font-size:18px;padding:14px 34px;border-radius:12px;border:1px solid #d4a94a;background:linear-gradient(#7a5a22,#4a3512);color:#f8ecc4">Update now</button>';d.querySelector('button').onclick=go;document.body.appendChild(d);
+ try{if(!sessionStorage.getItem('tp_forced')){sessionStorage.setItem('tp_forced','1');setTimeout(go,1800)}}catch(e){}}
 async function flush(){if(!lastS||!uid)return true;const s=lastS,json=JSON.stringify(s);if(json===lastJson)return true;const L=Math.max(1,s.lvl|0),xp=Math.floor(s.xp||0);
  const r=await api('save',{state:s});if(r.error){console.warn('save failed',r.error);return false}lastJson=json;return true}
 const queue=s=>{lastS=s;clearTimeout(timer);timer=setTimeout(flush,4000)};
