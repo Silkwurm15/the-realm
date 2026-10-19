@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.713';window.__BUILD=B;
+(function(){var B='1.714';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -740,10 +740,17 @@ function lairTick(){const now=Date.now(),w=lairWindow();
 
 /* ---- World spawning: deterministic grid. Same place + same time = same markers for everyone, nothing stored ---- */
 const GRID={cell:.0025,radius:300,max:60, // cell size in degrees (~900 ft); spawn radius around player (m); max markers on screen
- types:{chest:{n:4,p:.55,life:60},nature:{n:4,p:.60,life:60},quest:{n:3,p:.50,life:120},rift:{n:2,p:.25,life:30}}}; // n = sites per cell, p = chance a site is active, life = minutes
+ types:{chest:{n:3,p:.70,life:60},nature:{n:4,p:.60,life:60},quest:{n:3,p:.50,life:120},rift:{n:2,p:.25,life:30}}}; // n = sites per cell, p = chance a site is active, life = minutes
 const QN=['Investigate the Strange Lights','The Whispering Door','The Lost Satchel',"A Traveler's Request"];
 function h32(t){let h=2166136261;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-const rnd=t=>h32(t)/4294967296,safeMemo={};let lastSync=null,lastSyncT=0;
+const rnd=t=>h32(t)/4294967296,safeMemo={};
+// Markers sit on a loose 3 x 4 grid inside each cell (one slot per marker, shuffled per cell) so they never pile on top of each other. Client and server must use the exact same function; the n values above must add up to 12 or less.
+const SLOT_COLS=3,SLOT_ROWS=4,permMemo={};
+function siteLL(cx,cy,t,j){let q=0;for(const k in GRID.types){if(k===t){q+=j;break}q+=GRID.types[k].n}
+ const N=SLOT_COLS*SLOT_ROWS,ck=cx+','+cy;let perm=permMemo[ck];if(!perm){perm=Array.from({length:N},(_,i)=>i).sort((a,b)=>rnd(ck+'|s'+a)-rnd(ck+'|s'+b));permMemo[ck]=perm;const ks=Object.keys(permMemo);if(ks.length>400)delete permMemo[ks[0]]}
+ const s=perm[q%N],col=s%SLOT_COLS,row=Math.floor(s/SLOT_COLS),sk=`${cx},${cy},${t},${j}`;
+ return[(cx+(col+.5+(rnd(sk+'x')-.5)*.17)/SLOT_COLS)*GRID.cell,(cy+(row+.5+(rnd(sk+'y')-.5)*.17)/SLOT_ROWS)*GRID.cell]}
+let lastSync=null,lastSyncT=0;
 function addItem(it){items.push(it);const el=mkEl(it.t);el.addEventListener('click',e=>{e.stopPropagation();openPoi(it)});markers.push(new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(it.ll).addTo(map))}
 function dropItem(i){if(markers[i])markers[i].remove();items.splice(i,1);markers.splice(i,1)}
 function dropExpired(){const now=Date.now();let ch=false;for(let i=items.length-1;i>=0;i--)if(items[i].exp&&items[i].exp<=now){dropItem(i);ch=true}return ch}
@@ -754,7 +761,7 @@ function syncWorld(){const c=safeCtx();if(!c.ready)return false;const now=Date.n
  for(let cx=Math.floor((lng-dLng)/G.cell);cx<=Math.floor((lng+dLng)/G.cell);cx++)for(let cy=Math.floor((lat-dLat)/G.cell);cy<=Math.floor((lat+dLat)/G.cell);cy++){
   const dens=Math.min(2,Math.max(.7,.7+(cnt[cx+','+cy]||0)*.12)); // busier areas spawn more; rural keeps a 0.7x floor
   for(const t in G.types){const T=G.types[t];for(let j=0;j<T.n;j++){
-   const sk=`${cx},${cy},${t},${j}`,ll=[(cx+.1+.8*rnd(sk+'x'))*G.cell,(cy+.1+.8*rnd(sk+'y'))*G.cell];
+   const sk=`${cx},${cy},${t},${j}`,ll=siteLL(cx,cy,t,j);
    if(dist(ll,targetLL)>G.radius)continue;
    const life=T.life*6e4,ph=rnd(sk+'p')*life,n=Math.floor((now+ph)/life);let p=T.p*dens;
    let gr=false;if(t==='nature'&&c.green.some(f=>inPoly(ll,f.geometry))){gr=true;p*=2} // parks and woods: more nature
