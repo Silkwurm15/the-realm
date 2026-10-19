@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.715';window.__BUILD=B;
+(function(){var B='1.716';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -789,7 +789,7 @@ const BONUS_XP={chest:25,boss:100},EXTRA_PCT=.25;   // bonus-20 extra stat = 25%
 const MIMIC={mimic:{name:'Mimic',xp:10,loot:'common'},smimic:{name:'Strong Mimic',xp:20,loot:'uncommon'}};   // real fights now; win = XP + item, lose = chest forfeited
 // ONE table set, used by chests AND bosses. Ranges are [lo,hi,result]; validated below.
 const TABLES={
- chest:[[1,2,'smimic'],[3,4,'mimic'],[5,6,'h35'],[7,10,'common'],[11,13,'uncommon'],[14,16,'rare'],[17,19,'mythic'],[20,20,'mythic+']],
+ chest:[[1,1,'smimic'],[2,2,'mimic'],[3,6,'h35'],[7,10,'common'],[11,13,'uncommon'],[14,16,'rare'],[17,19,'mythic'],[20,20,'mythic+']],
  boss:[[1,4,'common'],[5,8,'uncommon'],[9,11,'rare'],[12,15,'mythic'],[16,19,'legendary'],[20,20,'legendary+']],
  bonus:[[1,10,'xp'],[11,15,'full'],[16,19,'res'],[20,20,'extra']],
  chaos:[[1,2,'cfail'],[3,5,'omen'],[6,9,'shrug'],[10,12,'blessing'],[13,15,'explore'],[16,17,'potion'],[18,18,'surge'],[19,20,'cwin']]};
