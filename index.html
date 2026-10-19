@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.722';window.__BUILD=B;
+(function(){var B='1.723';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1144,10 +1144,58 @@ async function deleteAccount(){
  if(error||(data&&data.error))return toast((data&&data.error)||'Could not delete your account. Try again.');
  try{localStorage.removeItem(QK);localStorage.removeItem('realm_owner')}catch(x){}
  try{await window.realmCloud.sb.auth.signOut()}catch(x){}location.reload()}
+/* ---------- Help & Safety: Support tickets ---------- */
+const SUPIN='width:100%;box-sizing:border-box;margin-top:6px;padding:9px;border-radius:5px;border:1px solid #77552b;background:#120d07;color:#f6e6b4;font:14px Georgia,serif;outline:none';
+const SUP_CATS=[['bug','Bug report'],['account','Account or login'],['shards','Shards or purchases'],['feedback','Feedback or idea'],['other','Other']];
+const SUP_ST={open:['Waiting for reply','#e5c77b'],answered:['Reply from support','#6fdc7a'],closed:['Closed','#9a8c66']};
+const supCall=async(action,args)=>{try{const{data,error}=await window.realmCloud.sb.functions.invoke('realm',{body:{action,build:window.__BUILD,...args}});if(error)return{error:'Could not reach support. Check your connection and try again.'};return data||{error:'No response.'}}catch(x){return{error:'Could not reach support. Check your connection and try again.'}}};
+function menuHelp(){
+ menuSub('Help &amp; Safety','<div class="qh"><span>Support</span></div><div class="qcard"><button class="qbtn" data-m="sup_new" style="margin-top:0">Contact Support</button><button class="qbtn" data-m="sup_list" id="supMy">My Tickets</button></div>'
+  +'<div class="qh"><span>Help</span></div><div class="qcard"><button class="qbtn" data-m="sup_faq" style="margin-top:0">How to Play &amp; FAQ</button><button class="qbtn" data-m="upd">Check for updates</button></div>'
+  +'<div class="qh"><span>Safety</span></div><div class="qcard"><div class="qs">Play aware of your surroundings. Never enter roads, private property or unsafe places to reach a marker. Do not play while driving. Stop and take a break if you are tired.</div></div>');
+ supCall('support_list').then(r=>{const n=((r&&r.tickets)||[]).filter(t=>t.status==='answered').length,b=document.getElementById('supMy');if(b&&n)b.textContent='My Tickets ('+n+' new repl'+(n>1?'ies':'y')+')'})}
+function supNew(){
+ menuSub('Contact Support','<div class="qcard"><div class="qs">Tell us what happened. We reply inside the game, under <b>My Tickets</b>.</div>'
+  +'<div class="qs" style="margin-top:10px">Topic</div><select id="supCat" style="'+SUPIN+'">'+SUP_CATS.map(c=>'<option value="'+c[0]+'">'+c[1]+'</option>').join('')+'</select>'
+  +'<div class="qs" style="margin-top:10px">Subject (optional)</div><input id="supSub" maxlength="120" style="'+SUPIN+'" placeholder="Short summary">'
+  +'<div class="qs" style="margin-top:10px">What happened?</div><textarea id="supMsg" rows="6" maxlength="2000" style="'+SUPIN+';resize:vertical" placeholder="What did you expect, and what happened instead?"></textarea>'
+  +'<div class="qs" style="margin-top:8px">We automatically attach your game version, level, class and device so you do not have to.</div>'
+  +'<button class="qbtn" data-m="sup_send">Send ticket</button></div>')}
+async function supSend(btn){
+ const msg=(document.getElementById('supMsg').value||'').trim();
+ if(msg.length<10)return toast('Please describe the problem (at least 10 characters).');
+ btn.disabled=true;btn.textContent='Sending…';
+ const r=await supCall('support_create',{category:document.getElementById('supCat').value,subject:document.getElementById('supSub').value,message:msg,
+  meta:{build:window.__BUILD,lvl:S.lvl,cls:S.cls,tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||''),ua:String(navigator.userAgent||'').slice(0,200),screen:innerWidth+'x'+innerHeight}});
+ if(!r||r.error||!r.ok){btn.disabled=false;btn.textContent='Send ticket';return toast((r&&r.error)||'Could not send. Try again.')}
+ menuSub('Ticket sent','<div class="qcard"><div class="qs">Thank you. Your ticket <b>#'+esc(r.id)+'</b> was sent. Check <b>My Tickets</b> for our reply.</div><button class="qbtn" data-m="sup_list">My Tickets</button></div>')}
+async function supList(){
+ menuSub('My Tickets','<div class="qcard"><div class="qs">Loading…</div></div>');
+ const r=await supCall('support_list');
+ if(!r||r.error)return menuSub('My Tickets','<div class="qcard"><div class="qs">'+esc((r&&r.error)||'Could not load tickets.')+'</div></div>');
+ const T=r.tickets||[];
+ const body=T.length?T.map(t=>{const st=SUP_ST[t.status]||SUP_ST.open,d=new Date(t.created_at).toLocaleDateString();
+  return'<div class="qcard"><div class="qt" style="font:700 13px Georgia,serif;color:#f2d795">#'+esc(t.id)+' · '+esc(t.subject)+'</div><div class="qs"><span style="color:'+st[1]+'">'+st[0]+'</span> · '+esc(d)+'</div><div class="qs" style="margin-top:8px;white-space:pre-wrap">'+esc(t.message)+'</div>'
+   +(t.admin_reply?'<div class="qs" style="margin-top:10px;padding:8px;border-left:3px solid #6fdc7a;background:#0e1a10;white-space:pre-wrap"><b>Support:</b> '+esc(t.admin_reply)+'</div>':'')+'</div>'}).join(''):'<div class="qcard"><div class="qs">You have not sent any tickets.</div></div>';
+ menuSub('My Tickets',body+'<div class="qcard"><button class="qbtn" data-m="sup_new" style="margin-top:0">New ticket</button></div>');
+ T.filter(t=>t.status==='answered').forEach(t=>supCall('support_seen',{id:t.id}))}
+function supFaq(){
+ const Q=[['My location is not updating','Allow location access for your browser, turn on precise location, and move to a spot with a clear view of the sky. Then reload the game.'],
+  ['How do quests work?','Daily, weekly and monthly quests refresh on a schedule. Finish quests to fill the milestone bar for bonus XP and potions.'],
+  ['My hero was downed in a fight','A Resurrect Potion revives you at half health. You also recover health over time. Resurrect Potions come from weekly and monthly milestones.'],
+  ['It says a new version is available','Reload the page. If it keeps showing, go to Menu, Account Management, then Check for updates or Clear cache and reload.'],
+  ['I lost my progress','Progress is saved to your account. Make sure you are signed in with the same email you used before. If it is still missing, send us a ticket.'],
+  ['How do I delete my account?','Menu, Account Management, Delete account. This permanently erases your character and any support tickets.']];
+ menuSub('How to Play &amp; FAQ',Q.map(q=>'<div class="qcard"><details><summary style="cursor:pointer;font:700 13px Georgia,serif;color:#f2d795">'+q[0]+'</summary><div class="qs" style="margin-top:8px">'+q[1]+'</div></details></div>').join('')+'<div class="qcard"><div class="qs">Still stuck?</div><button class="qbtn" data-m="sup_new">Contact Support</button></div>')}
+
 mp.addEventListener('click',async e=>{const b=e.target.closest('[data-m]');if(!b)return;const m=b.dataset.m;
  if(m==='home')return menuHome();
  if(m==='settings')return openSettings('home');
- if(m==='help')return menuSub('Help &amp; Safety','<div class="qcard"><div class="qs">Play aware of your surroundings. Never enter roads, private property or unsafe places to reach a marker. Help topics are coming soon.</div></div>');
+ if(m==='help')return menuHelp();
+ if(m==='sup_new')return supNew();
+ if(m==='sup_send')return supSend(b);
+ if(m==='sup_list')return supList();
+ if(m==='sup_faq')return supFaq();
  if(m==='account')return menuAccount();
  if(m==='profile')return menuProfile();
  if(m==='rename')return askRename();
