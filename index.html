@@ -77,7 +77,7 @@ try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
 .bottom-left{left:8px;padding:6px 9px;max-width:200px}.bottom-left .chest{width:28px;height:28px;font-size:18px}.bottom-left strong{font-size:12px}.bottom-left small{font-size:8px;margin-top:2px}
 /* Follow-mode button: glows gold when the camera is NOT locked to you */
 /* Modal (GPS permission / errors) */
-.modal{position:absolute;inset:0;z-index:900;background:rgba(5,8,6,.74);display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}
+.modal{position:absolute;inset:0;z-index:1100;background:rgba(5,8,6,.74);display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}
 .modal-card{max-width:340px;width:100%;padding:22px 20px;text-align:center}.modal-card h2{font:700 20px Georgia,serif;color:#fff0c6;margin:6px 0 8px}.modal-card p{font:14px/1.45 Arial,sans-serif;color:#d7c59f;margin:0 0 14px}.m-icon{font-size:34px}.m-icon img.emb{width:84px;height:84px;display:block;margin:0 auto;object-fit:contain;filter:drop-shadow(0 2px 6px #000)}
 .m-btn{display:block;width:100%;padding:13px;margin-top:8px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 15px Georgia,serif;cursor:pointer}.m-btn.ghost{background:transparent;border-color:#77552b;color:#b9a67d;font-weight:400;font-size:13px}
 @media(min-width:700px){.topbar{left:18px;right:18px;top:18px}.profile{max-width:380px}.quest-card{left:18px;top:84px}.compass{right:18px;top:84px}.side-controls{right:18px;top:140px}.bottom-left{left:18px;bottom:92px}.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(700px,90vw);border:2px solid #8b6937;border-bottom:0;border-radius:7px 7px 0 0}}
@@ -941,16 +941,24 @@ function rowX(it,btn,a,i,sellable){const c=CAT[it.cid],lk=!!it.lock;
  +(sellable?`<button class="qbtn" style="flex:1;width:auto${lk?';opacity:.4':''}" data-a="sell" data-i="${it.uid}"${lk?' disabled':''}>${CAT[it.cid].unique?'Delete':'Sell 💠'+shardOf(it)}</button>`:'')+`</div></div>`}
 let sellPick='common';
 function sellList(h,pick){return h.inv.filter(x=>!x.lock&&!CAT[x.cid].unique&&(pick==='all'||CAT[x.cid].rarity===pick))}
-function bagTools(h){let o=`<div class="qcard"><button class="qbtn" style="margin-top:0" data-a="sort">⇅ Sort: ${SORT_NAME[invSort]||SORT_NAME.new}</button>`;
- const have=RAR.filter(r=>sellList(h,r).length);
- if(have.length){if(sellPick!=='all'&&!have.includes(sellPick))sellPick=have[0];
-  const tot=sellList(h,sellPick),sh=tot.reduce((n,x)=>n+shardOf(x),0);
-  o+=`<div class="qs" style="margin-top:10px">Mass sell (locked items are never sold)</div><select id="sellSel" aria-label="Rarity to sell" style="width:100%;margin-top:6px;padding:11px 10px;border-radius:5px;border:1px solid #e5c77b;background:#1a140c;color:${sellPick==='all'?'#ff8a7a':RC[sellPick]};font:700 14px Georgia,serif">`
-  +have.map(r=>{const l=sellList(h,r);return`<option value="${r}"${sellPick===r?' selected':''}>${cap(r)} · ${l.length} item${l.length===1?'':'s'} · 💠${l.reduce((n,x)=>n+shardOf(x),0)}</option>`}).join('')
-  +`<option value="all"${sellPick==='all'?' selected':''}>ALL unlocked · ${sellList(h,'all').length} items · 💠${sellList(h,'all').reduce((n,x)=>n+shardOf(x),0)}</option></select>`
-  +`<button class="qbtn" style="border-color:#ff8a7a" data-a="sellpick">Sell ${sellPick==='all'?'ALL unlocked':cap(sellPick)} · ${tot.length} item${tot.length===1?'':'s'} · 💠${sh}</button>`}
- else o+=`<div class="qs" style="margin-top:8px">Nothing to mass sell. Everything left is locked.</div>`;
- return o+'</div>'}
+function bagTools(h){const n=sellList(h,'all').length;
+ return`<div class="qcard"><button class="qbtn" style="margin-top:0" data-a="sort">⇅ Sort: ${SORT_NAME[invSort]||SORT_NAME.new}</button><button class="qbtn" data-a="clean">🧹 Clean Up${n?' · '+n+' unlocked':''}</button></div>`}
+/* ---- Clean Up popup (pill dropdown) ---- */
+const cuBox=document.createElement('div');cuBox.className='modal';cuBox.id='cleanup';
+cuBox.innerHTML='<div class="panel modal-card"><div class="m-icon">🧹</div><h2>Clean Up</h2><p style="margin-bottom:10px">Sell unlocked backpack gear for Rift Shards. Locked and equipped items are never touched.</p><select id="cuSel" aria-label="Rarity to sell" style="width:100%;padding:12px 16px;border-radius:999px;border:1px solid #e5c77b;background:#0b0a08;color:#fff0c6;font:700 14px Georgia,serif;text-align:center;text-align-last:center"></select><p id="cuInfo" style="margin:12px 0 4px"></p><button class="m-btn" id="cuGo">Sell</button><button class="m-btn ghost" id="cuNo">Cancel</button></div>';
+modal.parentNode.appendChild(cuBox);
+function cuFill(){const h=H(),sel=document.getElementById('cuSel'),have=RAR.filter(r=>sellList(h,r).length);
+ if(sellPick!=='all'&&!have.includes(sellPick))sellPick=have[0]||'all';
+ sel.innerHTML=have.map(r=>{const l=sellList(h,r);return`<option value="${r}"${sellPick===r?' selected':''}>${cap(r)} · ${l.length} item${l.length===1?'':'s'} · 💠${l.reduce((n,x)=>n+shardOf(x),0)}</option>`}).join('')+(have.length>1?`<option value="all"${sellPick==='all'?' selected':''}>ALL unlocked · ${sellList(h,'all').length} items · 💠${sellList(h,'all').reduce((n,x)=>n+shardOf(x),0)}</option>`:'');
+ if(!have.length)sel.innerHTML='<option>Nothing to sell</option>';
+ const l=have.length?sellList(h,sellPick):[],sh=l.reduce((n,x)=>n+shardOf(x),0),lk=h.inv.filter(x=>x.lock).length,go=document.getElementById('cuGo');
+ document.getElementById('cuInfo').textContent=l.length?'Sell '+l.length+' item'+(l.length===1?'':'s')+' for 💠 '+sh+' Rift Shards'+(lk?' ('+lk+' locked kept)':''):'Nothing to sell. Everything left is locked.';
+ go.disabled=!l.length;go.style.opacity=l.length?'':'.45'}
+function openClean(){cuFill();cuBox.classList.add('open')}
+document.getElementById('cuSel').onchange=e=>{sellPick=e.target.value;cuFill()};
+document.getElementById('cuNo').onclick=()=>cuBox.classList.remove('open');
+document.getElementById('cuGo').onclick=()=>{const l=sellList(H(),sellPick);if(!l.length)return;cuBox.classList.remove('open');const hi=sellPick==='all'||sellPick==='mythic'||sellPick==='legendary',u=l.map(x=>x.uid);
+ if(hi)return sellItems(u,'⚠ '+(sellPick==='all'?'Sell ALL unlocked items?':'Sell all '+cap(sellPick)+' items?'),true);act('discard',{uids:u})};
 function sellItems(uids,title,warn){const h=H(),list=uids.map(u=>h.inv.find(x=>x.uid===u)).filter(x=>x&&!x.lock);
  if(!list.length)return toast('Nothing to sell. Locked items are kept.');
  const total=list.reduce((n,x)=>n+shardOf(x),0),names=list.slice(0,6).map(x=>'• '+cap(CAT[x.cid].rarity)+' '+CAT[x.cid].name).join('\n')+(list.length>6?'\n…and '+(list.length-6)+' more':'');
@@ -991,6 +999,7 @@ inv.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)retu
  if(a==='lock'){const it=findItem(i);if(!it)return;act('lock',{uid:i,on:!it.lock});return}
  if(a==='sell')return sellItems([i]);
  if(a==='sellpick'){const hi=sellPick==='all'||sellPick==='mythic'||sellPick==='legendary';return sellItems(sellList(H(),sellPick).map(x=>x.uid),(hi?'⚠ ':'')+(sellPick==='all'?'Sell ALL unlocked items?':'Sell all '+cap(sellPick)+' items?'),hi)}
+ if(a==='clean')return openClean();
  if(a==='sort'){invSort=invSort==='new'?'rar':invSort==='rar'?'low':'new';try{localStorage.setItem('invSort',invSort)}catch(e){}invRender();return}
  if(a==='eq')act('equip',{uid:i});else if(a==='un')act('unequip',{slot:i});else if(a==='pot')act('usepot',{k:i})});   // the server validates and applies; the screen refreshes from its answer
 
@@ -1301,7 +1310,7 @@ function switchRender(){const o=shopOwned();sw.innerHTML='<div class="qh" style=
 function openSwitch(){if(shopOwned().size<2)return;switchRender();sw.style.display='block'}
 sw.addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;if(b.dataset.w==='x'){sw.style.display='none';return}
  const k=b.dataset.k;if(!CLASSES[k]||k===S.cls)return;
- showModal('switch',{icon:'🎭',iconHtml:clsIcon(k),title:'Switch to '+CLASSES[k].n+'?',text:'',color:'#e5c77b',primary:'Switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){sw.style.display='none';invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'Cancel',onSecondary:()=>hideModal('switch')})});
+ showModal('switch',{icon:'🎭',iconHtml:clsIcon(k),title:'Switch to '+CLASSES[k].n,text:'',color:'#e5c77b',primary:'Switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){sw.style.display='none';invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'Cancel',onSecondary:()=>hideModal('switch')})});
 
 /* ---- Chaos: Tempt Fate (virtual d20) ---- */
 const CHAOS_CD=36e5,CHAOS_DUR=36e5;   // one roll per hour; effects last 1 hour (so only one effect is ever active)
