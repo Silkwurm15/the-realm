@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.728';window.__BUILD=B;
+(function(){var B='1.729';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -57,6 +57,8 @@ try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes ring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.15);opacity:.15}}
 .mk.quest{--c:#62c8ff;--bg:#0f2f4d}.mk.chest{--c:#ffc24a;--bg:#3a2506}.mk.nature{--c:#7be37a;--bg:#12301a}.mk.boss{--c:#ff5a4d;--bg:#3a0f0d}.mk.rift{--c:#b184ff;--bg:#24123f}.mk.qpoint{--c:#ff4fd8;--bg:#3d0f35}
 .mk.boss .badge{width:42px;height:42px;left:7px;box-shadow:0 0 22px var(--c),0 0 0 3px #0a0907aa}
+/* Dark Lair marker: 2x bigger and lifted so it stands above the ground ring */
+.mk.boss{width:112px;height:160px}.mk.boss .art{width:90px!important;bottom:44px}.mk.boss .beam{height:130px;bottom:14px}.mk.boss .ground{left:14px;width:84px;height:32px;bottom:-14px}
 .mk{transition:opacity .3s,filter .3s}.mk.far{opacity:.5;filter:grayscale(.65)}
 /* Player */
 .pl{width:80px;height:92px;position:absolute;top:0;left:0;pointer-events:none}.pl .disc{position:absolute;left:5px;bottom:-6px;width:70px;height:30px;border-radius:50%;border:2px solid #66e1f2;background:radial-gradient(ellipse,#55c9ff66,#55c9ff10 70%);box-shadow:0 0 18px #48bfffaa,inset 0 0 12px #48bfff88}.pl .col{position:absolute;left:50%;bottom:8px;width:5px;height:84px;transform:translateX(-50%);background:linear-gradient(to top,#6fdcff,transparent);opacity:.55;filter:blur(1.5px)}.pl svg{position:absolute;left:22px;bottom:6px;width:36px;height:62px;filter:drop-shadow(0 3px 4px #000)}.pl .plimg{position:absolute;left:2px;bottom:5px;width:76px;height:76px;filter:drop-shadow(0 3px 4px #000)}
