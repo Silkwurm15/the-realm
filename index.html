@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.726';window.__BUILD=B;
+(function(){var B='1.727';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1199,7 +1199,7 @@ async function menuMail(){
  MAILS=r.mail;mailRender()}
 function mailRender(){
  const d=t=>{try{return new Date(t).toLocaleDateString()}catch(x){return''}};
- menuSub('Mail',MAILS.length?MAILS.map(m=>'<div class="qcard"><button class="qbtn" data-m="mail_open" data-id="'+esc(m.id)+'" style="margin-top:0;text-align:left;'+(m.read?'opacity:.75':'')+'">'+(m.read?'':'● ')+esc(m.title)+'<span style="float:right;font:10px Arial,sans-serif;color:#c8b894">'+esc(d(m.created_at))+'</span></button></div>').join(''):'<div class="qcard"><div class="qs">No messages.</div></div>')}
+ menuSub('Mail',MAILS.length?MAILS.map(m=>'<div class="qcard"><button class="qbtn" data-m="mail_open" data-id="'+esc(m.id)+'" style="margin-top:0;text-align:left;'+(m.read?'opacity:.75':'')+'">'+(m.read?'':'● ')+esc(m.title)+'<span style="float:right;font:10px Arial,sans-serif;color:#c8b894">'+esc(d(m.created_at))+'</span></button></div>').join(''):'<div class="qcard"><div class="qs" style="font-size:13px;line-height:1.5;font-style:italic">A tiny goblin emerges from the mailbox, looks you dead in the eyes, and whispers, &quot;Skill Issue.&quot; Then vanishes.</div></div>')}
 async function mailOpen(id){
  const m=MAILS.find(x=>String(x.id)===String(id));if(!m)return mailRender();
  menuSub(esc(m.title),'<div class="qcard"><div class="qs" style="white-space:pre-wrap;font-size:13px;line-height:1.45">'+esc(m.body)+'</div><button class="qbtn" data-m="mail_del" data-id="'+esc(m.id)+'" style="border-color:#ff5a4d;background:linear-gradient(180deg,#6a1f1a,#2c0f0c)">Delete</button></div>'
