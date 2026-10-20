@@ -158,25 +158,38 @@ html.hc .mk .tip{border-top-color:#fff}
 html.hc .mk.far{opacity:.9;filter:none}
 html.hc .mk .badge svg{width:24px;height:24px}
 
-/* ---- Tutorial Quest ---- */
 #tut{position:fixed;inset:0;z-index:1200;font-family:Georgia,serif;color:var(--parchment)}
-#tut.mid{display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));background:radial-gradient(ellipse at 50% 30%,#2c200fee,#070605f2)}
-#tut .tcard{width:100%;max-width:400px;box-sizing:border-box;padding:20px 18px 16px;text-align:center;background:linear-gradient(180deg,#342718,#0e0c09);border:1px solid var(--gold);border-radius:8px;box-shadow:0 0 26px #000,0 0 18px #d9b76e44}
+#tut.mid{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));background:radial-gradient(ellipse at 50% 30%,#2c200fee,#070605f2)}
+#tut .tstage{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center}
 #tut.tab .tcard{position:absolute}
-#tut .tcount{font:11px Arial,sans-serif;color:#b8a77f;letter-spacing:.6px;margin-bottom:6px}
-#tut h2{font:700 21px Georgia,serif;color:#fff0c6;margin:6px 0 8px}
-#tut p{font:14.5px/1.5 Georgia,serif;color:#d7c59f;margin:0 0 14px}
+#tut .tcard{max-width:400px;box-sizing:border-box}
 #tut .tart{height:100px;display:flex;align-items:center;justify-content:center;margin:2px 0 4px}
 #tut .tart img{max-height:100px;max-width:130px;object-fit:contain;filter:drop-shadow(0 4px 8px #000)}
-#tut .tpill{display:inline-block;font:700 11px Arial,sans-serif;letter-spacing:.6px;color:#1b1407;background:linear-gradient(180deg,#ffe27a,#d9b76e);border-radius:99px;padding:4px 10px;margin-bottom:4px}
-#tut .trew{margin:0 0 14px;padding:10px;border:1px solid #ffd34a88;border-radius:6px;background:#ffd34a14;font:700 14px Georgia,serif;color:#ffe27a;line-height:1.6}
-#tut .trow{display:flex;gap:10px}
-#tut .tbtn{flex:1;padding:12px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 15px Georgia,serif;cursor:pointer}
-#tut .tbtn.ghost{background:transparent;flex:0 0 34%}
-#tut .tbtn:disabled{opacity:.5}
 #tut .tspot{position:absolute;box-sizing:border-box;border:2px solid #ffe27a;border-radius:8px;box-shadow:0 0 0 100vmax rgba(5,8,6,.82),0 0 18px 4px #ffd34aaa;pointer-events:none}
 #tut .tarrow{position:absolute;width:28px;text-align:center;font-size:26px;line-height:28px;color:#ffd34a;text-shadow:0 0 10px #000;animation:tbob .8s ease-in-out infinite;pointer-events:none}
 @keyframes tbob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+/* ---- Tutorial Quest (ornate boxes) ---- */
+#tut .tpill{position:relative;z-index:3;display:inline-block;margin:0 0 -15px;padding:5px 26px 6px;font:700 13px Georgia,serif;letter-spacing:.14em;color:#2a1a04;text-shadow:0 1px 0 #ffeeb0;background:linear-gradient(180deg,#ffeaa6,#e2b04a 55%,#b27a1e);clip-path:polygon(0 50%,12px 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,12px 100%);box-shadow:inset 0 0 0 2px #7a5212}
+#tut .tcard{position:relative;z-index:1;width:100%;padding:20px 18px 16px;text-align:center;background:linear-gradient(180deg,#0a1220f4,#04060cf7);border:2px solid #c9972f;border-radius:10px;box-shadow:0 0 0 1px #000,0 10px 28px #000c,0 0 22px #d9a84050,inset 0 0 0 3px #04060c,inset 0 0 0 4px #8a6420aa,inset 0 0 46px #000}
+#tut .tcard.hp{padding-top:32px}
+#tut .tcard:before{content:"";position:absolute;left:50%;top:-8px;width:12px;height:12px;margin-left:-6px;transform:rotate(45deg);background:linear-gradient(135deg,#ffe08a,#b8801f);border:1px solid #3a2608}
+#tut .tc{position:absolute;width:38px;height:38px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 38V15Q3 3 15 3H38' stroke='%23f0c868' stroke-width='2.6'/%3E%3Cpath d='M9 38V19Q9 9 19 9H38' stroke='%23b88a2e' stroke-width='1.2'/%3E%3Cpath d='M14 14 20 20M3 26Q12 26 12 17' stroke='%23f0c868' stroke-width='1.4'/%3E%3C/g%3E%3Ccircle cx='5' cy='5' r='3.2' fill='%23ffe08a'/%3E%3C/svg%3E") center/contain no-repeat;filter:drop-shadow(0 0 4px #d9a84088)}
+#tut .tc.tl{left:-7px;top:-7px}#tut .tc.tr{right:-7px;top:-7px;transform:scaleX(-1)}#tut .tc.bl{left:-7px;bottom:-7px;transform:scaleY(-1)}#tut .tc.br{right:-7px;bottom:-7px;transform:scale(-1,-1)}
+#tut .tban{position:absolute;top:12%;bottom:26%;width:28px;z-index:-1;background:linear-gradient(180deg,#3a72d8,#18378a 60%,#0c2058);border:2px solid #c9972f;clip-path:polygon(0 0,100% 0,100% 90%,50% 100%,0 90%)}
+#tut .tban.l{left:-16px}#tut .tban.r{right:-16px}
+#tut .tcount{font:13px Georgia,serif;color:#e0cc96;letter-spacing:.04em;margin:0 0 4px;text-shadow:0 1px 2px #000}
+#tut h2{font:700 27px/1.15 Georgia,serif;color:#fff1c4;margin:2px 0 9px;text-shadow:0 0 14px #ffcf5a77,0 2px 2px #000}
+#tut p{font:15.5px/1.45 Georgia,serif;color:#f0e3c0;margin:0 0 14px;text-shadow:0 1px 2px #000}
+#tut .trew{margin:0 0 12px;padding:9px 10px;border:2px solid #d6a23a;border-radius:6px;background:linear-gradient(180deg,#1b1408,#0a0705);box-shadow:inset 0 0 0 2px #000,inset 0 0 0 3px #8a642077,0 0 12px #d9a84040;font:700 16px/1.5 Georgia,serif;color:#ffe08a;text-shadow:0 0 8px #ffbf4a66,0 1px 2px #000}
+#tut .trow{display:flex;gap:14px;padding:0 6px}
+#tut .trow.one{justify-content:center}#tut .trow.one .tbtn{flex:0 0 64%}
+#tut .tbtn{position:relative;flex:1;height:50px;padding:0 10px;border:2px solid #d6a23a;border-radius:7px;background:linear-gradient(180deg,#2c2011,#0d0905);color:#ffe3a0;font:700 20px Georgia,serif;text-shadow:0 0 8px #ffbf4a77,0 2px 2px #000;box-shadow:0 0 0 1px #000,inset 0 0 0 2px #000,inset 0 0 0 3px #8a6420,0 0 12px #d9a84044;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#tut .tbtn:before,#tut .tbtn:after{content:"";position:absolute;top:50%;width:11px;height:11px;margin-top:-6px;transform:rotate(45deg);background:linear-gradient(135deg,#ffe08a,#b8801f);border:1px solid #3a2608}
+#tut .tbtn:before{left:-9px}#tut .tbtn:after{right:-9px}
+#tut .tbtn:active{transform:translateY(1px);filter:brightness(1.25)}
+#tut .tbtn:disabled{opacity:.55}
+#tut .tbtn.ghost{color:#e9cf93}
+@media(max-height:640px){#tut h2{font-size:23px}#tut p{font-size:14px;margin-bottom:10px}#tut .tcard{padding:16px 14px 12px}}
 </style></head><body>
 <div id="auth"><div class="build-tag" id="buildTag"></div><canvas id="aFx"></canvas>
 <div class="amain">
@@ -1108,10 +1121,10 @@ function tutRender(){
    spot='<div class="tspot" style="left:'+(r.left-2)+'px;top:'+(r.top-2)+'px;width:'+(r.width+4)+'px;height:'+(r.height+4)+'px"></div><div class="tarrow" style="left:'+(r.left+r.width/2-14)+'px;top:'+(r.top-38)+'px">▼</div>';
    cardStyle='left:'+L+'px;width:'+W+'px;bottom:'+(window.innerHeight-r.top+44)+'px'}
   else cardStyle='left:'+L+'px;width:'+W+'px;bottom:120px'}
- if(p.k==='marker'){const A=MK_ART[p.m];top='<div class="tart">'+(A?'<img alt="" draggable="false" src="'+A.u+'">':'')+'</div><div class="tpill">🔓 UNLOCKED</div>'}
+ if(p.k==='marker'){const A=MK_ART[p.m];top='<div class="tart">'+(A?'<img alt="" draggable="false" src="'+A.u+'">':'')+'</div><div class="tpill">UNLOCKED</div>'}
  if(p.k==='end')top='<div class="tart">'+CLOAK_SVG+'</div>';
  const rew=p.k==='end'?'<div class="trew">+25 XP<br>Cloak of First Steps</div>':'';
- tutEl.innerHTML=spot+'<div class="tcard" style="'+cardStyle+'"><div class="tcount">Page '+(i+1)+' / '+TUT_PAGES.length+'</div>'+top+'<h2>'+esc(title)+'</h2><p>'+esc(p.x)+'</p>'+rew+'<div class="trow">'+(i>0?'<button class="tbtn ghost" id="tutBack">← Back</button>':'')+'<button class="tbtn" id="tutNext">'+(last?'Complete':'Next →')+'</button></div></div>';
+ const hasP=p.k==='marker';tutEl.innerHTML=spot+(p.k==='tab'?'':'<div class="tstage">'+top)+'<div class="tcard'+(hasP?' hp':'')+'" style="'+cardStyle+'"><i class="tc tl"></i><i class="tc tr"></i><i class="tc bl"></i><i class="tc br"></i>'+(i===0?'<i class="tban l"></i><i class="tban r"></i>':'')+''+((i===0||last)?'<div class="tcount">Page '+(i+1)+' / '+TUT_PAGES.length+'</div>':'')+'<h2>'+esc(title)+'</h2><p>'+esc(p.x)+'</p>'+rew+'<div class="trow">'+(i>0?'<button class="tbtn ghost" id="tutBack">← Back</button>':'')+'<button class="tbtn" id="tutNext">'+(last?'Complete':'Next →')+'</button></div></div>'+(p.k==='tab'?'':'</div>');
  const nx=tutEl.querySelector('#tutNext'),bk=tutEl.querySelector('#tutBack');
  nx.onclick=()=>last?tutFinish(nx):tutGo(1);if(bk)bk.onclick=()=>tutGo(-1)}
 function tutLocalReward(){   // only used while the server has no 'tutorial' action yet
