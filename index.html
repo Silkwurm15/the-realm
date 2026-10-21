@@ -1351,12 +1351,12 @@ function shopCoins(){shopBundles('coin','🪙','Arena Coins','Each Arena challen
 function shopUnlocks(){const lo=S.los||3,cap=bagCap();
  const tile=(ic,t,d,st,btn)=>'<div class="st nc"><img alt="" draggable="false" src="'+ic+'"><b>'+t+'</b><small>'+d+'</small><span class="sp">'+st+'</span>'+btn+'</div>';
  const dis='<button class="qbtn" disabled style="opacity:.5">Maximum reached</button>';
- sp.innerHTML='<div class="qh"><span><span data-s="home" style="cursor:pointer;margin-right:10px">‹</span>Player Unlocks</span><span>'+bal()+'</span></div><div class="sg">'
+ sp.innerHTML='<div class="qh"><span>Player Unlocks</span><span>'+bal()+'</span></div><div class="sg">'
   +tile(ICO.rename,'Name Change','Change your character name.',priceTxt(SHOP_PRICE.rename),'<button class="qbtn" data-s="rename">Rename</button>')
   +tile(CC_SRC,'Class Change','Unlock new classes, one at a time or in packs.',shopOwned().size+' / 12 owned','<button class="qbtn cr" data-s="cc">Class Change</button>')
   +tile(ICO.equip,'Equipment Slots','Saved gear loadouts. '+lo+' / '+LO_MAX+' owned.',priceTxt(SHOP_PRICE2.lo),lo<LO_MAX?'<button class="qbtn go" data-s="buy" data-i="lo" data-n="1">Add 1 slot</button>':dis)
   +tile(ICO.bag,'Backpack Expansion','+10 backpack slots. You have '+cap+' of '+BAG_MAX+'.',priceTxt(SHOP_PRICE2.bag),cap<BAG_MAX?'<button class="qbtn gr" data-s="buy" data-i="bag" data-n="1">Expand by 10</button>':dis)
-  +'<div class="st nc wide"><img alt="" draggable="false" src="'+ICO.cosm+'"><div style="flex:1;min-width:0"><b>Cosmetics</b><small style="display:block;margin-top:4px">Emblem frames, portrait borders and name colors.</small><span class="sp">Soon</span><button class="qbtn" disabled style="opacity:.5">Coming soon</button></div></div></div>'}
+  +'<div class="st nc wide"><img alt="" draggable="false" src="'+ICO.cosm+'"><div style="flex:1;min-width:0"><b>Cosmetics</b><small style="display:block;margin-top:4px">Emblem frames, portrait borders and name colors.</small><span class="sp">Soon</span><button class="qbtn" disabled style="opacity:.5">Coming soon</button></div></div></div>'+shopBack('home')}
 function shopBuy(item,n){const o={bag:{icon:'📦',title:'Expand your backpack?',text:'+10 backpack slots ('+bagCap()+' → '+Math.min(BAG_MAX,bagCap()+10)+').',price:SHOP_PRICE2.bag,after:shopUnlocks},
   lo:{icon:'🎒',title:'Add a loadout slot?',text:'You will have '+((S.los||3)+1)+' of '+LO_MAX+' loadout slots.',price:SHOP_PRICE2.lo,after:shopUnlocks},
   key:{icon:'🗝️',iconHtml:keyImg('64px'),title:'Get '+n+' Key'+(n>1?'s':'')+' of the Forsaken?',text:'Each key opens one Dark Lair.',price:SHOP_PRICE2.key[n],after:shopKeys},
