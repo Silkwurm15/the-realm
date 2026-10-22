@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.748';window.__BUILD=B;
+(function(){var B='1.749';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1114,16 +1114,15 @@ const achVal=d=>d.c==='lvl'?(S.lvl|0):d.c==='m'?(achC().m||0)/MI_M:(achC()[d.c]|
 const achTier=d=>Math.min(d.t.length,achK()[d.id]|0);
 const achOk=d=>achTier(d)<d.t.length&&achVal(d)>=d.t[achTier(d)];
 const achReady=()=>ACH.reduce((n,d)=>n+Math.max(0,d.t.filter(x=>achVal(d)>=x).length-achTier(d)),0);
-let achCat='All',achOwn='all';
+let achCat='All';
 function heroAch(){
  const done=ACH.reduce((n,d)=>n+achTier(d),0),all=ACH.reduce((n,d)=>n+d.t.length,0),rdy=achReady();
  let o='<div class="qcard ms"><div class="qt"><b>Tiers earned</b><span>'+done+' / '+all+'</span></div><div class="qbar"><i style="width:'+Math.round(100*done/all)+'%"></i></div><div class="qs">'+(rdy?'<b style="color:#e5c77b">'+rdy+' reward'+(rdy>1?'s':'')+' ready to claim</b>':'Progress counts from the day Achievements launched.')+'</div>'+(rdy>1?'<button class="qbtn" data-ac="all">Claim all ('+rdy+')</button>':'')+'</div>';
   const CATS=['General','Collections','Combat','Questlines'],cats=['All'].concat(CATS);
- o+='<select id="achCat" aria-label="Achievement category" style="display:block;width:100%;margin-top:10px;padding:12px 10px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 14px Georgia,serif;color-scheme:dark">'+cats.map(c=>'<option value="'+c+'"'+(c===achCat?' selected':'')+'>'+(c==='All'?'All Categories':c)+'</option>').join('')+'</select>'
-  +'<div class="qtabs" style="margin-top:8px">'+[['all','All'],['own','Owned'],['not','Not Owned']].map(x=>'<div class="qtab'+(achOwn===x[0]?' on':'')+'" data-aown="'+x[0]+'" style="padding:9px 2px;font-size:12.5px">'+x[1]+'</div>').join('')+'</div>';
+ o+='<select id="achCat" aria-label="Achievement category" style="display:block;width:100%;margin-top:10px;padding:12px 10px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 14px Georgia,serif;color-scheme:dark">'+cats.map(c=>'<option value="'+c+'"'+(c===achCat?' selected':'')+'>'+(c==='All'?'All Categories':c)+'</option>').join('')+'</select>';
  let cat='',shown=0;
  ACH.slice().sort((a,b)=>CATS.indexOf(a.cat)-CATS.indexOf(b.cat)).forEach(d=>{
-  if(achCat!=='All'&&d.cat!==achCat)return;const tt=achTier(d);if(achOwn==='own'&&!tt)return;if(achOwn==='not'&&tt)return;shown++;
+  if(achCat!=='All'&&d.cat!==achCat)return;shown++;
   if(d.cat!==cat){cat=d.cat;o+='<div class="qh" style="margin-top:18px"><span>'+cat+'</span></div>'}
   const t=achTier(d),fin=t>=d.t.length,v=achVal(d),goal=fin?d.t[d.t.length-1]:d.t[t],ready=achOk(d);
   const fmt=x=>d.mi?(Math.round(x*10)/10).toLocaleString():Math.floor(x).toLocaleString();
@@ -1137,7 +1136,6 @@ function heroAch(){
  if(!shown)o+='<div class="qcard"><div class="qs" style="text-align:center">'+(achCat==='Questlines'?'Questline achievements are coming soon.':'No achievements match this filter.')+'</div></div>';
  return o}
 inv.addEventListener('change',e=>{if(e.target&&e.target.id==='achCat'){achCat=e.target.value;invRender()}});
-inv.addEventListener('click',e=>{const b=e.target.closest('[data-aown]');if(!b)return;achOwn=b.dataset.aown;invRender()});
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-ac]');if(!b)return;b.disabled=true;
  act('ach',b.dataset.ac==='all'?{op:'claimall'}:{op:'claim',id:b.dataset.ac}).then(r=>{if(r&&r.result&&r.result.lines)toast(r.result.title+': '+r.result.lines.join(', '));try{invRender()}catch(x){}})});
 function heroPH(k){const d=HERO_PH[k];return d?'<div class="qcard ms" style="text-align:center;padding:30px 16px"><div style="display:grid;place-items:center">'+(HERO_IMG[k]?heroImg(k,84):'<span style="font-size:60px;line-height:1">'+d[0]+'</span>')+'</div><div class="qt" style="justify-content:center;margin-top:8px"><b>'+d[1]+'</b></div><div class="qs" style="margin-top:8px">'+d[2]+'</div><div class="qs" style="margin-top:14px;color:#e5c77b"><b>Coming soon</b></div></div>':''}
