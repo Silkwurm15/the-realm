@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.749';window.__BUILD=B;
+(function(){var B='1.750';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1117,7 +1117,7 @@ const achReady=()=>ACH.reduce((n,d)=>n+Math.max(0,d.t.filter(x=>achVal(d)>=x).le
 let achCat='All';
 function heroAch(){
  const done=ACH.reduce((n,d)=>n+achTier(d),0),all=ACH.reduce((n,d)=>n+d.t.length,0),rdy=achReady();
- let o='<div class="qcard ms"><div class="qt"><b>Tiers earned</b><span>'+done+' / '+all+'</span></div><div class="qbar"><i style="width:'+Math.round(100*done/all)+'%"></i></div><div class="qs">'+(rdy?'<b style="color:#e5c77b">'+rdy+' reward'+(rdy>1?'s':'')+' ready to claim</b>':'Progress counts from the day Achievements launched.')+'</div>'+(rdy>1?'<button class="qbtn" data-ac="all">Claim all ('+rdy+')</button>':'')+'</div>';
+ let o='';
   const CATS=['General','Collections','Combat','Questlines'],cats=['All'].concat(CATS);
  o+='<select id="achCat" aria-label="Achievement category" style="display:block;width:100%;margin-top:10px;padding:12px 10px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 14px Georgia,serif;color-scheme:dark">'+cats.map(c=>'<option value="'+c+'"'+(c===achCat?' selected':'')+'>'+(c==='All'?'All Categories':c)+'</option>').join('')+'</select>';
  let cat='',shown=0;
