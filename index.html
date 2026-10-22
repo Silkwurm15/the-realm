@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.750';window.__BUILD=B;
+(function(){var B='1.751';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -537,10 +537,11 @@ layers:[
 
 const map=new maplibregl.Map({container:'map',style,center:FALLBACK,zoom:START.zoom,pitch:START.pitch,bearing:START.bearing,maxPitch:75,minZoom:14,maxZoom:19,attributionControl:{compact:true},dragRotate:true,touchPitch:false});
 map.dragPan.disable();map.doubleClickZoom.disable();map.scrollZoom.enable({around:'center'});map.touchZoomRotate.enable({around:'center'});
-/* One finger drag spins the camera around the player (the camera stays locked on the player); two fingers pinch to zoom. */
-(function(){const el=map.getCanvasContainer();let x0=0,xl=0,on=false,spin=false;
- el.addEventListener('touchstart',e=>{if(e.touches.length===1){x0=xl=e.touches[0].clientX;on=true;spin=false}else on=false},{passive:true});
- el.addEventListener('touchmove',e=>{if(!on||e.touches.length!==1)return;const x=e.touches[0].clientX;if(!spin&&Math.abs(x-x0)<6)return;spin=true;map.jumpTo({bearing:map.getBearing()-(x-xl)*0.4});xl=x},{passive:true});
+/* One finger drag spins the camera around the player (left/right) and tilts it (up/down). The camera stays locked on the player; two fingers pinch to zoom. */
+(function(){const el=map.getCanvasContainer();let x0=0,y0=0,xl=0,yl=0,on=false,spin=false;
+ el.addEventListener('touchstart',e=>{if(e.touches.length===1){x0=xl=e.touches[0].clientX;y0=yl=e.touches[0].clientY;on=true;spin=false}else on=false},{passive:true});
+ el.addEventListener('touchmove',e=>{if(!on||e.touches.length!==1)return;const x=e.touches[0].clientX,y=e.touches[0].clientY;if(!spin&&Math.hypot(x-x0,y-y0)<6)return;spin=true;
+  map.jumpTo({bearing:map.getBearing()-(x-xl)*0.4,pitch:Math.max(0,Math.min(map.getMaxPitch(),map.getPitch()-(y-yl)*0.25))});xl=x;yl=y},{passive:true});
  ['touchend','touchcancel'].forEach(ev=>el.addEventListener(ev,()=>{on=false},{passive:true}))})();
 let gesturing=false;
 ['touchstart','pointerdown'].forEach(ev=>map.getCanvasContainer().addEventListener(ev,()=>{gesturing=true},{passive:true}));
