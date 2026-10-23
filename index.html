@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.754';window.__BUILD=B;
+(function(){var B='1.755';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -656,7 +656,19 @@ function startGPS(){hideModal();gpsLost=false;
  if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null}
  gpsState('Locating…','#e5b94c');watchId=navigator.geolocation.watchPosition(onFix,onGpsErr,GOPTS)}
 let anchorLL=null,fixBuf=[],fixT=0;   // Standing still: GPS wobbles by 10-30 m. We average the last 8 fixes and only move the player once the average has shifted by more than the wobble (1.2 x the reported accuracy, 12-40 m). Walking still tracks normally.
-function onFix(pos){const nowT=Date.now();lastFix=nowT;const ll=[pos.coords.longitude,pos.coords.latitude];if(nowT-fixT>10000)fixBuf=[];fixT=nowT;fixBuf.push(ll);if(fixBuf.length>8)fixBuf.shift();
+// ---- Motor-vehicle safety warning: shown when sustained GPS speed passes WARN_MPH; re-arms after SPD_REARM_MS well below it ----
+const WARN_MPH=15,WARN_MS=WARN_MPH*0.44704,SPD_REARM_MS=5*60000,SPD_FIXES=3;
+let spdPrev=null,spdHits=0,spdLow=0,spdArmed=true;
+function speedCheck(pos,ll,nowT){
+ const c=pos.coords,acc=c.accuracy||0;let v=Number.isFinite(c.speed)&&c.speed>=0?c.speed:null;
+ if(v===null&&spdPrev&&acc<=50){const dt=(nowT-spdPrev.t)/1000;if(dt>=1&&dt<=15)v=dist(spdPrev.ll,ll)/dt}   // no reported speed: derive it from the last fix
+ spdPrev={ll:ll.slice(),t:nowT};
+ if(v===null||acc>60)return;   // ignore poor fixes
+ if(v>=WARN_MS){spdLow=0;spdHits++;
+  if(spdArmed&&spdHits>=SPD_FIXES&&!modalKind){spdArmed=false;
+   showModal('drive',{icon:'🚗',title:'Stay Safe!',text:'It looks like you are travelling in a motor vehicle. Never play while driving. Keep your eyes on the road and your hands on the wheel. If you are a passenger, enjoy the ride!',color:'#e5c77b',primary:'OK',onPrimary:()=>hideModal('drive')})}}
+ else{spdHits=0;if(v<WARN_MS*.5){if(!spdLow)spdLow=nowT;else if(nowT-spdLow>=SPD_REARM_MS)spdArmed=true}else spdLow=0}}
+function onFix(pos){const nowT=Date.now();lastFix=nowT;const ll=[pos.coords.longitude,pos.coords.latitude];try{speedCheck(pos,ll,nowT)}catch(e){}if(nowT-fixT>10000)fixBuf=[];fixT=nowT;fixBuf.push(ll);if(fixBuf.length>8)fixBuf.shift();
  if(!gotFirst){gotFirst=true;hideModal();spawnAt=ll;targetLL=ll.slice();spawn(ll);
   anchorLL=ll.slice();fixBuf=[ll.slice()];player=ll.slice();targetLL=ll.slice();rangeAt=ll.slice();playerMarker.setLngLat(ll);map.getSource('range').setData(ringPoly(ll,RANGE));
   setFollow(true);intro=true;map.flyTo({center:ll,zoom:16,pitch:START.pitch,duration:1400});setTimeout(()=>{intro=false},1500);
