@@ -647,14 +647,22 @@ function hideModal(kind){if(!kind||modalKind===kind){modal.classList.remove('ope
 
 /* ---------- GPS ---------- */
 function gpsState(){} // status pill removed; errors are shown as pop-ups
-const GOPTS={enableHighAccuracy:true,maximumAge:2000,timeout:15000};
+const GOPTS={enableHighAccuracy:true,maximumAge:0,timeout:20000};
 function showStart(){showModal('start',{icon:'🧭',title:'Enable Location',text:'The Realm is built on the real world. Allow location access so your adventurer can walk the map as you move.',primary:'Allow Location & Begin',onPrimary:startGPS})}
 function showDenied(){gpsState('GPS blocked','#ed6d63');showModal('denied',{icon:'🚫',title:'Location is blocked',text:'Location access is turned off for this page. In Chrome, tap the icon at the left of the address bar, then Permissions, then Location, and choose Allow. Then tap Try Again.',primary:'Try Again',onPrimary:startGPS})}
 function triggerLost(reason){if(gpsLost)return;gpsLost=true;gpsState('GPS signal lost','#ed6d63');
  if(modalKind!=='offline')showModal('lost',{icon:'📡',title:'GPS signal lost',text:reason+' Move to an open area. The game reconnects automatically.',primary:'Retry GPS',onPrimary:startGPS})}
-function startGPS(){hideModal();gpsLost=false;
+// First-fix gate: the browser often hands back a rough Wi-Fi/cell/IP fix first (can be tens of km off). The server's anti-teleport check
+// would then flag the real position as a "location jump", so we hold out for an accurate fix and ignore coarse ones afterwards.
+const ACC_GOOD=100,ACC_OK=500,FIRST_WAIT=6000,ROUGH_WAIT=25000;
+let bestFirst=null,firstTimer=null,roughTimer=null;
+function startGPS(){hideModal();gpsLost=false;bestFirst=null;clearTimeout(firstTimer);firstTimer=null;clearTimeout(roughTimer);roughTimer=null;
  if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null}
- gpsState('Locating…','#e5b94c');watchId=navigator.geolocation.watchPosition(onFix,onGpsErr,GOPTS)}
+ gpsState('Locating…','#e5b94c');
+ if(!gotFirst){try{toast('Finding your location…')}catch(e){}
+  roughTimer=setTimeout(()=>{if(!gotFirst)triggerLost('Only a rough location is available, not an accurate GPS fix.')},ROUGH_WAIT)}
+ watchId=navigator.geolocation.watchPosition(onFix,onGpsErr,GOPTS);
+ if(!gotFirst)navigator.geolocation.getCurrentPosition(onFix,()=>{},{enableHighAccuracy:true,maximumAge:0,timeout:20000})}   // parallel one-shot so the first fix lands as fast as possible
 let anchorLL=null,fixBuf=[],fixT=0;   // Standing still: GPS wobbles by 10-30 m. We average the last 8 fixes and only move the player once the average has shifted by more than the wobble (1.2 x the reported accuracy, 12-40 m). Walking still tracks normally.
 // ---- Motor-vehicle safety warning: shown when sustained GPS speed passes WARN_MPH; re-arms after SPD_REARM_MS well below it ----
 const WARN_MPH=15,WARN_MS=WARN_MPH*0.44704,SPD_REARM_MS=5*60000,SPD_FIXES=3;
@@ -668,8 +676,16 @@ function speedCheck(pos,ll,nowT){
   if(spdArmed&&spdHits>=SPD_FIXES&&!modalKind){spdArmed=false;
    showModal('drive',{icon:'🚗',title:'Stay Safe!',text:'It looks like you are travelling in a motor vehicle. Never play while driving. Keep your eyes on the road and your hands on the wheel. If you are a passenger, enjoy the ride!',color:'#e5c77b',primary:'OK',onPrimary:()=>hideModal('drive')})}}
  else{spdHits=0;if(v<WARN_MS*.5){if(!spdLow)spdLow=nowT;else if(nowT-spdLow>=SPD_REARM_MS)spdArmed=true}else spdLow=0}}
-function onFix(pos){const nowT=Date.now();lastFix=nowT;const ll=[pos.coords.longitude,pos.coords.latitude];try{speedCheck(pos,ll,nowT)}catch(e){}if(nowT-fixT>10000)fixBuf=[];fixT=nowT;fixBuf.push(ll);if(fixBuf.length>8)fixBuf.shift();
- if(!gotFirst){gotFirst=true;hideModal();spawnAt=ll;targetLL=ll.slice();spawn(ll);
+function onFix(pos){lastFix=Date.now();const acc=pos.coords.accuracy||0;
+ if(!gotFirst){
+  if(!bestFirst||acc<(bestFirst.coords.accuracy||1e9))bestFirst=pos;
+  if(acc>ACC_GOOD){   // not accurate enough yet: wait briefly for a better fix, then settle for the best one if it is at least decent
+   if(!firstTimer)firstTimer=setTimeout(()=>{firstTimer=null;if(!gotFirst&&bestFirst&&(bestFirst.coords.accuracy||0)<=ACC_OK)applyFix(bestFirst)},FIRST_WAIT);
+   return}}
+ else if(acc>ACC_OK)return;   // ignore coarse fixes once locked, so the player never jumps to a wrong place
+ applyFix(pos)}
+function applyFix(pos){const nowT=Date.now();lastFix=nowT;const ll=[pos.coords.longitude,pos.coords.latitude];try{speedCheck(pos,ll,nowT)}catch(e){}if(nowT-fixT>10000)fixBuf=[];fixT=nowT;fixBuf.push(ll);if(fixBuf.length>8)fixBuf.shift();
+ if(!gotFirst){gotFirst=true;gpsLost=false;clearTimeout(firstTimer);firstTimer=null;clearTimeout(roughTimer);roughTimer=null;hideModal();spawnAt=ll;targetLL=ll.slice();spawn(ll);
   anchorLL=ll.slice();fixBuf=[ll.slice()];player=ll.slice();targetLL=ll.slice();rangeAt=ll.slice();playerMarker.setLngLat(ll);map.getSource('range').setData(ringPoly(ll,RANGE));
   setFollow(true);intro=true;map.flyTo({center:ll,zoom:16,pitch:START.pitch,duration:1400});setTimeout(()=>{intro=false},1500);
   updateCards();toast('Location locked. Adventure awaits!')}
@@ -680,6 +696,7 @@ function onFix(pos){const nowT=Date.now();lastFix=nowT;const ll=[pos.coords.long
  gpsState('GPS Connected','#8fd18b')}
 function onGpsErr(err){
  if(err.code===1){showDenied();return}
+ if(!gotFirst)return;   // still acquiring the first fix: keep waiting quietly; the rough-fix timer warns if it drags on
  triggerLost(err.code===3?'GPS is taking too long to respond.':'Your device could not determine its position.')}
 function probe(){if(probing)return;probing=true;
  navigator.geolocation.getCurrentPosition(p=>{probing=false;onFix(p)},()=>{probing=false;triggerLost('No GPS updates were received.')},{enableHighAccuracy:true,maximumAge:0,timeout:8000})}
