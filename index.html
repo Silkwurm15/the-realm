@@ -1059,16 +1059,16 @@ function cbShow(f){fighting=true;try{if(f.phase==='intro')Sound.music(f.strong?'
 async function cbOp(op){const r=await act('fight',{op,ll:targetLL});if(r){if(op==='attack')try{Sound.hit(S.cls)}catch(e){}cbShow(r.result.fight)}else{cb.style.display='none';C=null;fighting=false;try{Sound.music('map')}catch(e){}}}   // every blow is resolved on the server
 /* ---- ARENA (phase 2): spawn list, round-by-round fight screen (reuses the mimic overlay), post-fight hints. Server: arena_list / arena_start / arena_fight. ---- */
 const aps=document.createElement('style');aps.textContent='#apanel .qbtn:disabled{opacity:.45;filter:grayscale(.6);cursor:default}#apanel .arlock{border-color:#ff8a7a;color:#ffb3a8}#apanel .arch{border-color:#ffd27a;box-shadow:inset 0 0 0 2px #4b371d}#apanel .arrow{display:flex;align-items:center;gap:10px}#apanel .arrow .emb{width:38px;height:38px;flex:0 0 38px;margin:0}#apanel .arrow>div{flex:1;min-width:0}#apanel .arrow .qbtn{width:auto;flex:0 0 auto;margin:0;padding:9px 12px}#cbt .arhint{margin-top:8px;color:#ffd27a;font-style:italic}';document.head.appendChild(aps);
-const ap=$('apanel'),AR={state:'idle',d:null,busy:false,on:false};
+const ap=$('apanel'),AR={state:'idle',d:null,busy:false,on:false,err:''};
 const arEsc=t=>String(t==null?'':t).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function arenaOpen(){arenaLoad()}
 async function arenaLoad(){if(AR.state!=='ok')AR.state='loading';arenaDraw();
  const r=await act('arena_list',{quiet:true}),a=r&&r.result&&r.result.arena;
- if(a){AR.d=a;AR.state='ok';if(a.resume&&!AR.on)arShow(a.resume)}else AR.state='error';arenaDraw()}
+ if(a){AR.d=a;AR.state='ok';AR.err='';if(a.resume&&!AR.on)arShow(a.resume)}else{AR.state='error';AR.err=act.err||'No answer from the server.'}arenaDraw()}
 function arenaDraw(){
  const say=(t,b)=>'<div class="qcard"><div class="qs">'+t+'</div>'+(b||'')+'</div>';
  if(AR.state==='loading'&&!AR.d){ap.innerHTML=say('Loading…');return}
- if(AR.state==='error'&&!AR.d){ap.innerHTML=say('Could not reach the Arena.','<button class="qbtn" data-ar="reload">Try again</button>');return}
+ if(AR.state==='error'&&!AR.d){ap.innerHTML=say('Could not reach the Arena.<br><span style="color:#ffb3a8">'+arEsc(AR.err)+'</span>','<button class="qbtn" data-ar="reload">Try again</button>');return}
  const d=AR.d;if(!d)return;
  const row=(o,kind)=>{const champ=kind==='champ',cost=o.cost|0,broke=(d.coins|0)<cost,off=!!d.lock||broke;
   return '<div class="qcard'+(champ?' arch':'')+'"><div class="arrow">'+clsIcon(o.cls)+'<div><div class="qt"><b>'+arEsc(o.name)+(champ?' (Champion)':'')+'</b></div><div class="qs">'+arEsc(o.cn||'Adventurer')+'</div></div>'
