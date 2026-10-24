@@ -100,7 +100,8 @@ try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
 .modal-card{max-width:340px;width:100%;padding:22px 20px;text-align:center}.modal-card h2{font:700 20px Georgia,serif;color:#fff0c6;margin:6px 0 8px}.modal-card p{font:14px/1.45 Arial,sans-serif;color:#d7c59f;margin:0 0 14px}.m-icon{font-size:34px}.m-icon img.emb{width:84px;height:84px;display:block;margin:0 auto;object-fit:contain;filter:drop-shadow(0 2px 6px #000)}
 .m-btn{display:block;width:100%;padding:13px;margin-top:8px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 15px Georgia,serif;cursor:pointer}.m-btn.ghost{background:transparent;border-color:#77552b;color:#b9a67d;font-weight:400;font-size:13px}
 @media(min-width:700px){.topbar{left:18px;right:18px;top:18px}.profile{max-width:380px}.quest-card{left:18px;top:84px}.compass{right:18px;top:84px}.side-controls{right:18px;top:140px}.bottom-left{left:18px;bottom:92px}.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(700px,90vw);border:2px solid #8b6937;border-bottom:0;border-radius:7px 7px 0 0}}
-@media(max-width:390px){.gps-pill{padding:0 6px;font-size:8px}.topbar{gap:5px}.player-name{font-size:14px}.nav-icon{font-size:19px}.nav-label{font-size:8px}.nav-icon{height:42px!important;width:42px}.nav-icon .ni{width:42px;height:42px;display:block;object-fit:contain;opacity:.72;filter:saturate(.85) brightness(.9) drop-shadow(0 2px 3px #000a);transition:opacity .2s,filter .25s,transform .2s;-webkit-user-drag:none;pointer-events:none}.nav-item.active .ni{opacity:1;filter:saturate(1.08) brightness(1.08) drop-shadow(0 0 7px #f0c46a99) drop-shadow(0 2px 3px #000a);transform:translateY(-1px) scale(1.06)}.nav-item .nav-label{font:600 9.5px Georgia,serif;letter-spacing:.5px;margin-top:-1px}.bottom-nav .nav-dot{top:2px;right:-4px}.bottom-left{max-width:190px}}
+@media(max-width:390px){.gps-pill{padding:0 6px;font-size:8px}.topbar{gap:5px}.player-name{font-size:14px}.nav-icon{font-size:19px}.nav-label{font-size:8px}.bottom-left{max-width:190px}}
+.nav-icon{height:42px!important;width:42px}.nav-icon .ni{width:42px;height:42px;display:block;object-fit:contain;opacity:.72;filter:saturate(.85) brightness(.9) drop-shadow(0 2px 3px #000a);transition:opacity .2s,filter .25s,transform .2s;-webkit-user-drag:none;pointer-events:none}.nav-item.active .ni{opacity:1;filter:saturate(1.08) brightness(1.08) drop-shadow(0 0 7px #f0c46a99) drop-shadow(0 2px 3px #000a);transform:translateY(-1px) scale(1.06)}.nav-item .nav-label{font:600 9.5px Georgia,serif;letter-spacing:.5px;margin-top:-1px}.bottom-nav .nav-dot{top:2px;right:-4px}
 
 .qpanel{position:absolute;z-index:505;left:0;right:0;top:calc(max(6px,env(safe-area-inset-top)) + 58px);bottom:calc(72px + env(safe-area-inset-bottom));display:none;overflow-y:auto;padding:10px 10px 18px;background:linear-gradient(180deg,#120f0bf2,#0b0a08f7);-webkit-overflow-scrolling:touch;overscroll-behavior:contain}.qpanel.open{display:block}
 .qtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.qtab{padding:14px 4px;text-align:center;font:700 15px Georgia,serif;color:#cdb98a;background:linear-gradient(145deg,#34291b,#0b0b09);border:1px solid #77552b;border-radius:5px;cursor:pointer}.qtab.on{color:#fff0c6;border-color:#e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);box-shadow:0 0 12px #d6ad5d44}
@@ -780,7 +781,7 @@ if(S.xpv!==2){S.lvl=Math.min(100,Math.max(1,S.lvl|0));S.need=needFor(S.lvl);S.xp
 S.chaos=S.chaos||{last:0,fx:null};S.rift=S.rift||{fx:null,run:null};S.shards=S.shards||0;S.sq=S.sq||{list:[],n:0};
 S.taken=S.taken||{};S.hashes=S.hashes||[];S.rnd=S.rnd||{n:0,done:[]};S.loot=S.loot||{claimed:{}};S.hero=S.hero||{hp:100,eq:{},inv:[],pot:{h35:0,full:0,res:0}};S.hero.buy=S.hero.buy||{h35:0,full:0,res:0};   // pot = earned stack (cap 20 each), buy = purchased stack (separate, never capped)
 /* ---- server-authoritative state: XP, level, loot, claims, potions, quests and Tempt Fate live on the server ---- */
-const CORE_KEYS=['xpv','xp','need','lvl','cls','hero','loot','chaos','enc','k','daily','weekly','monthly','claimed','rnd','lairs','rift','shards','sq','name','look','onboarded','cx','cu','tut','bag','keys','coins','cd','lo','los','ach','slm','cal','sel'];
+const CORE_KEYS=['xpv','xp','need','lvl','cls','hero','loot','chaos','enc','k','daily','weekly','monthly','claimed','rnd','lairs','rift','shards','sq','name','look','onboarded','cx','cu','tut','bag','keys','coins','cd','lo','los','ach','slm','cal','sel','gf'];
 let fighting=false,actChain=Promise.resolve();
 function applyCore(c){if(!c)return;setTimeout(refreshLook,0);const pLvl=S.lvl,pCls=S.cls;CORE_KEYS.forEach(k=>{if(c[k]===undefined)return;if(!c[k]&&S[k]&&(k==='name'||k==='look'||k==='onboarded'))return;S[k]=c[k]});if(pLvl&&pCls&&S.cls===pCls&&S.lvl>pLvl){try{Sound.levelUp()}catch(e){}}try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}hud();render();try{if(inv.classList.contains('open'))invRender()}catch(e){}}
 function act(action,args){return actChain=actChain.then(async()=>{let fixed=false;try{fixed=gotFirst}catch(e){}
@@ -1110,7 +1111,7 @@ function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,
  const st=inv.scrollTop,sub=heroSub[heroSec]||'';let o;
  if(heroSec==='hub')o=heroHub();
  else if(heroSec==='character')o=(sub==='potions'?po:sub==='loadouts'?heroLoadouts():ge);
- else if(heroSec==='social')o=sub==='mail'?heroMail():heroPH(sub);
+ else if(heroSec==='social')o=sub==='mail'?heroMail():sub==='friends'?heroFriends():heroPH(sub);
  else o=sub==='achievements'?heroAch():sub==='cosmetics'?heroCosm():heroClasses();
  inv.innerHTML=(heroSec==='hub'?'':heroTabs())+o;inv.scrollTop=st}
 /* ---- Hero tab: opens on a hub of buttons; pick Character | Friends | Mailbox | Scores (placeholders for the last three) ---- */
@@ -1124,9 +1125,9 @@ const loOf=uid=>{const L=loList();for(let i=0;i<L.length;i++)if(L[i]&&L[i].s&&Ob
 let heroSub={character:'gear',social:'friends',profile:'classes'};
 const HERO_PH={friends:['👥','Friends','Add friends with a friend code, see their class and level, and send a free gift each day.'],mail:['✉️','Mailbox','Rewards, compensation and announcements from the realm will arrive here.'],titles:['📛','Titles','Titles you earn will appear here.'],flairs:['✨','Flairs','Flairs you unlock will appear here.'],scores:['🏆','Scores','Compare chests opened, Dark Lairs cleared, Nature Discoveries, Rifts closed, distance walked, Mimics defeated and Chaos rolls with your friends.']};
 function heroTabs(){
- const u=MAILS.filter(x=>!x.read).length,ar=achReady();
+ const u=MAILS.filter(x=>!x.read).length+fbN(),ar=achReady();
  const TOP=[['character','Inventory',0],['social','Social',u],['profile','Profile',ar]];
- const SUB={character:[['potions','Potions',0],['gear','Gear',0],['loadouts','Loadouts',0]],social:[['friends','Friends',0],['mail','Mailbox',u],['scores','Scores',0]],profile:[['classes','Classes',0],['achievements','Achievements',ar],['cosmetics','Cosmetics',0]]};
+ const SUB={character:[['potions','Potions',0],['gear','Gear',0],['loadouts','Loadouts',0]],social:[['friends','Friends',fbN()],['mail','Mailbox',u],['scores','Scores',0]],profile:[['classes','Classes',0],['achievements','Achievements',ar],['cosmetics','Cosmetics',0]]};
  const dot=b=>b?'<i style="position:absolute;top:5px;right:6px;min-width:16px;padding:0 4px;border-radius:8px;background:#e5c77b;color:#241a0c;font:700 10px/16px Arial,sans-serif;font-style:normal">'+b+'</i>':'';
  const btn=(at,k,n,b,on,sm)=>'<div class="qtab'+(on?' on':'')+'" '+at+'="'+k+'" style="position:relative;white-space:nowrap'+(sm?';padding:9px 2px;font-size:12.5px':'')+'">'+n+dot(b)+'</div>';
  return'<div style="position:sticky;top:0;z-index:5;padding:2px 0 8px;margin:0 0 4px;background:linear-gradient(#0b0a08 88%,#0b0a0800)">'+('<div style="display:flex;align-items:center;gap:10px;margin:0 0 8px"><button data-hback="1" style="padding:9px 14px;border-radius:5px;border:1px solid #77552b;background:linear-gradient(145deg,#34291b,#0b0b09);color:#cdb98a;font:700 13px Georgia,serif;cursor:pointer">← Hero</button><b style="font:700 16px Georgia,serif;color:#e5c77b">'+({character:'Inventory',social:'Social',profile:'Profile'}[heroSec])+'</b></div>')+'<div class="qtabs">'+SUB[heroSec].map(t=>btn('data-hsub',t[0],t[1],t[2],t[0]===heroSub[heroSec],0)).join('')+'</div></div>'}
@@ -1149,7 +1150,7 @@ function goShop(fn){const t=document.querySelector('.nav-item[data-tab="Shop"]')
 function heroRow(k,ic,n,b){
  return'<div class="qcard" data-hs="'+k+'" style="position:relative;display:flex;align-items:center;gap:14px;cursor:pointer;padding:16px 14px"><div style="width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center">'+(HERO_IMG[k]?heroImg(k,52):'<span style="font-size:40px;line-height:1">'+ic+'</span>')+'</div><div class="qt" style="margin:0"><b>'+n+'</b></div>'
   +(b?'<span style="margin-left:auto;min-width:18px;padding:1px 6px;border-radius:9px;background:#e5c77b;color:#241a0c;font:700 11px Arial,sans-serif;text-align:center">'+b+'</span><span style="color:#e5c77b;font-size:20px">›</span>':'<span style="margin-left:auto;color:#e5c77b;font-size:20px">›</span>')+'</div>'}
-function heroHub(){const u=MAILS.filter(x=>!x.read).length;
+function heroHub(){const u=MAILS.filter(x=>!x.read).length+fbN();
  return'<div class="qh" style="margin-top:6px"><span>Hero</span></div>'+heroRow('character','🎒','Inventory',0)+heroRow('social','👥','Social',u)+heroRow('profile','🏅','Profile',achReady())}
 function pickClass(k){if(!CLASSES[k]||k===S.cls||!shopOwned().has(k))return;
  showModal('switch',{icon:'🎭',iconHtml:clsIcon(k),title:'Switch to '+CLASSES[k].n+'?',text:'Do you want to switch to the '+CLASSES[k].n+' class?\n\nEach class keeps its own level.',color:'#e5c77b',primary:'Yes, switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'No',onSecondary:()=>hideModal('switch')})}
@@ -1207,6 +1208,89 @@ inv.addEventListener('change',e=>{if(e.target&&e.target.id==='achCat'){achCat=e.
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-ac]');if(!b)return;b.disabled=true;
  act('ach',b.dataset.ac==='all'?{op:'claimall'}:{op:'claim',id:b.dataset.ac}).then(r=>{if(r&&r.result&&r.result.lines)toast(r.result.title+': '+r.result.lines.join(', '));try{invRender()}catch(x){}})});
 function heroPH(k){const d=HERO_PH[k];return d?'<div class="qcard ms" style="text-align:center;padding:30px 16px"><div style="display:grid;place-items:center">'+(HERO_IMG[k]?heroImg(k,84):'<span style="font-size:60px;line-height:1">'+d[0]+'</span>')+'</div><div class="qt" style="justify-content:center;margin-top:8px"><b>'+d[1]+'</b></div><div class="qs" style="margin-top:8px">'+d[2]+'</div><div class="qs" style="margin-top:14px;color:#e5c77b"><b>Coming soon</b></div></div>':''}
+/* ---- Friends (Hero > Social > Friends). Server: friend_* actions. Players are identified only by the friendship id. ---- */
+var FB={req:0,gifts:0,pay:0};   // Mailbox badge: friend requests + gifts waiting (var: read by hero tabs that are defined earlier)
+function fbN(){return(FB.req|0)+(FB.gifts|0)}
+function fbSet(f){if(!f||typeof f!=='object')return;FB.req=f.req|0;FB.gifts=f.gifts|0;FB.pay=f.pay|0;try{mailDot()}catch(e){}if(FB.pay>0)friendsPay()}
+function friendsPay(){if(FR.paying)return;FR.paying=true;act('gift',{op:'collect',quiet:true}).then(x=>{FR.paying=false;if(x)FB.pay=0;const l=x&&x.result&&x.result.lines;if(l&&l.length)toast(l.join('  '))}).catch(()=>{FR.paying=false})}   // shards for gifts you sent that friends opened
+function fbRows(){if(!fbN())return'';const row=(k,t)=>'<div class="qcard"><button class="qbtn" data-fb="'+k+'" style="margin-top:0;text-align:left">'+t+'<span style="float:right;color:#e5c77b">Open ›</span></button></div>';
+ return(FB.req?row('req','👥 '+FB.req+' friend request'+(FB.req>1?'s':'')+' waiting'):'')+(FB.gifts?row('gift','🎁 '+FB.gifts+' gift'+(FB.gifts>1?'s':'')+' waiting'):'')}
+const FR={state:'idle',code:'',f:[],inc:[],out:[],blk:[],max:50,cap:10,tab:'friends',draft:'',busy:false};
+const FR_AGO={today:'Active today',week:'Active this week',older:'Active longer ago'};
+const frNorm=v=>{v=String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'');return v.length===8?v:''};
+const frUrl=()=>location.origin+location.pathname+'?friend='+FR.code;
+function frQr(txt){try{if(typeof qrcode!=='function')return'';const q=qrcode(0,'M');q.addData(txt);q.make();const n=q.getModuleCount(),m=4;let d='';
+ for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+='M'+(c+m)+' '+(r+m)+'h1v1h-1z';
+ return'<svg viewBox="0 0 '+(n+2*m)+' '+(n+2*m)+'" shape-rendering="crispEdges" style="display:block;width:100%;max-width:210px;margin:8px auto;border-radius:6px;background:#fff"><path d="'+d+'" fill="#000"/></svg>'}catch(e){return''}}
+function frWho(c){const k=c.cls&&CLASSES[c.cls]?CLASSES[c.cls].n:'No class',t=c.ttl&&typeof TTL!=='undefined'&&TTL[c.ttl]?' · '+esc(TTL[c.ttl]):'';return esc(k)+' · Level '+(c.lvl|0)+t}
+function frBtn(a,id,label,red,full,dis){return'<button class="qbtn" data-fr="'+a+'" data-id="'+(+id||0)+'"'+(dis?' disabled':'')+' style="flex:'+(full?'1 1 100%':'1')+';width:auto;margin-top:0'+(red?';border-color:#ff5a4d;background:linear-gradient(180deg,#6a1f1a,#2c0f0c)':'')+(dis?';opacity:.55':'')+'">'+label+'</button>'}
+function frGiftBtn(c){return c.gid?frBtn('open',c.gid,'🎁 Open gift',0,1):c.sent?frBtn('giftx',0,'🎁 Gift sent today',0,1,1):frBtn('gift',c.id,'🎁 Send daily gift',0,1)}
+function frRow(c,top,sub,btns){return'<div class="qcard"><div class="qt"><b>'+esc(c.name)+'</b><span>'+top+'</span></div><div class="qs">'+sub+'</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">'+btns+'</div></div>'}
+function heroFriends(){
+ const say=(t,b)=>'<div class="qcard"><div class="qs">'+t+'</div>'+(b||'')+'</div>';
+ if(FR.state==='idle'){setTimeout(friendsLoad,0);return say('Loading…')}
+ if(FR.state==='loading')return say('Loading…');
+ if(FR.state==='error')return say('Could not load your friends.','<button class="qbtn" data-fr="reload">Try again</button>');
+ const qr=frQr(frUrl());
+ let o='<div class="qcard ms" style="text-align:center"><div class="qt" style="justify-content:center"><b>My friend code</b></div>'+qr
+  +'<div style="font:700 24px Georgia,serif;letter-spacing:3px;color:#e5c77b;margin:4px 0">'+FR.code.slice(0,4)+'-'+FR.code.slice(4)+'</div>'
+  +'<div class="qs">Friends can scan this with their phone camera. Your code never changes.</div><button class="qbtn" data-fr="share">Share my code</button></div>'
+  +'<div class="qcard"><div class="qt"><b>Add a friend</b></div><input id="frIn" type="text" inputmode="text" autocapitalize="characters" autocomplete="off" spellcheck="false" maxlength="12" placeholder="Friend code" value="'+esc(FR.draft).replace(/"/g,'&quot;')+'" style="width:100%;box-sizing:border-box;margin-top:6px;padding:11px;border-radius:5px;border:1px solid #77552b;background:#0b0b09;color:#e5c77b;font:700 16px Georgia,serif;letter-spacing:2px;text-transform:uppercase"><button class="qbtn" data-fr="add">Send request</button></div>';
+ const tab=(k,n)=>'<div class="qtab'+(FR.tab===k?' on':'')+'" data-fr="tab" data-t="'+k+'" style="white-space:nowrap">'+n+'</div>';
+ o+='<div class="qtabs" style="margin:6px 0">'+tab('friends','Friends '+FR.f.length+'/'+FR.max)+tab('req','Requests'+(FR.inc.length?' ('+FR.inc.length+')':''))+tab('blk','Blocked')+'</div>';
+ if(FR.tab==='friends'){if(FR.f.length){const waiting=FR.f.filter(c=>c.gid).length,used=(S.gf&&S.k&&S.gf.d===S.k.daily)?(S.gf.n|0):0;
+   o+='<div class="qcard"><div class="qt"><b>Daily gifts</b><span>'+used+' / '+FR.cap+' opened today</span></div><div class="qs">Send each friend one free gift a day. Opening a gift gives you XP. When a friend opens yours, you earn Rift Shards.</div>'+(waiting>1?'<button class="qbtn" data-fr="openall">Open all ('+waiting+')</button>':'')+'</div>'}
+  o+=FR.f.length?FR.f.map(c=>frRow(c,esc(FR_AGO[c.ago]||FR_AGO.older),frWho(c),frGiftBtn(c)+frBtn('remove',c.id,'Remove')+frBtn('block',c.id,'Block',1))).join(''):say('No friends yet. Share your code or enter a friend\'s code above.')}
+ else if(FR.tab==='req'){
+  o+='<div class="qh"><span>Incoming</span><span>'+FR.inc.length+'</span></div>'+(FR.inc.length?FR.inc.map(c=>frRow(c,'Wants to be friends',frWho(c),frBtn('accept',c.id,'Accept')+frBtn('decline',c.id,'Decline')+frBtn('block',c.id,'Block',1))).join(''):say('No incoming requests.'));
+  o+='<div class="qh"><span>Sent</span><span>'+FR.out.length+' / 10</span></div>'+(FR.out.length?FR.out.map(c=>frRow(c,'Waiting',frWho(c),frBtn('remove',c.id,'Cancel request'))).join(''):say('No pending requests. They expire after 30 days.'))}
+ else o+=FR.blk.length?FR.blk.map(c=>frRow(c,'Blocked','They cannot send you requests.',frBtn('unblock',c.id,'Unblock'))).join(''):say('Nobody is blocked.');
+ return o}
+async function friendsLoad(quiet,nopay){
+ if(!quiet){FR.state='loading';invRender()}
+ const r=await supCall('friend_list');
+ if(!r||r.error||!r.ok||!r.code)FR.state='error';
+ else{FR.code=r.code;FR.f=r.friends||[];FR.inc=r.incoming||[];FR.out=r.outgoing||[];FR.blk=r.blocked||[];FR.max=r.max||50;FR.cap=r.giftCap||10;FR.state='ok';FB.req=FR.inc.length;FB.gifts=FR.f.filter(c=>c.gid).length;FB.pay=r.pay|0;try{mailDot()}catch(e){}}
+ if(r&&r.pay>0&&!nopay)friendsPay()
+ if(heroSec==='social'&&heroSub.social==='friends')invRender()}
+async function frShare(){
+ const url=frUrl(),text='Add me as a friend in The Realm! My friend code: '+FR.code;
+ if(navigator.share){try{await navigator.share({title:'The Realm',text,url});return}catch(e){if(e&&e.name==='AbortError')return}}
+ try{await navigator.clipboard.writeText(text+'\n'+url);toast('Link copied')}catch(e){prompt('Copy your friend link',url)}}
+function frMsg(r,name){return r.status==='accepted'?'You are now friends with '+(r.name||name||'them')+'!':r.status==='already'?'You are already friends with '+r.name+'.':'Friend request sent to '+r.name+'.'}
+async function frAdd(){
+ const el=document.getElementById('frIn'),code=frNorm(el?el.value:FR.draft);if(!code)return toast('Friend codes have 8 letters and numbers.');
+ if(FR.busy)return;FR.busy=true;const r=await supCall('friend_request',{code});FR.busy=false;
+ if(!r||r.error||!r.ok)return toast((r&&r.error)||'Could not send the request.');
+ FR.draft='';toast(frMsg(r));friendsLoad(true)}
+// A scanned link (?friend=CODE) is saved before login (see the head script) and offered here once the game has started.
+window.friendLinkCheck=async function(){
+ let c='';try{c=frNorm(localStorage.getItem('realm_friend'))}catch(e){}if(!c)return;
+ const r=await supCall('friend_lookup',{code:c});
+ if(r&&r.error&&/^Could not reach/.test(r.error))return;   // offline: keep the code and try again next launch
+ try{localStorage.removeItem('realm_friend')}catch(e){}
+ if(!r||r.error||!r.name)return toast((r&&r.error)||'That friend code was not found.');
+ if(!confirm('Send a friend request to '+r.name+'?'))return;
+ const q=await supCall('friend_request',{code:c});toast(q&&q.ok?frMsg(q):((q&&q.error)||'Could not send the request.'));
+ if(FR.state==='ok')friendsLoad(true)};
+inv.addEventListener('click',e=>{const b=e.target.closest('[data-fb]');if(!b)return;heroSub.social='friends';FR.tab=b.dataset.fb==='req'?'req':'friends';invRender();inv.scrollTop=0;friendsLoad()});
+inv.addEventListener('input',e=>{if(e.target&&e.target.id==='frIn')FR.draft=e.target.value});
+inv.addEventListener('click',async e=>{const b=e.target.closest('[data-fr]');if(!b)return;const a=b.dataset.fr,id=+b.dataset.id||0;
+ if(a==='tab'){FR.tab=b.dataset.t;invRender();return}
+ if(a==='reload')return friendsLoad();
+ if(a==='share')return frShare();
+ if(a==='add')return frAdd();
+ if(a==='gift'){if(FR.busy||!id)return;FR.busy=true;const r=await supCall('friend_gift',{id});FR.busy=false;toast(r&&r.ok?'Gift sent to '+r.name+'!':((r&&r.error)||'Could not send the gift.'));friendsLoad(true,true);return}
+ if(a==='open'||a==='openall'){if(FR.busy)return;FR.busy=true;const r=await act('gift',a==='open'?{op:'claim',id}:{op:'claim'});FR.busy=false;if(r&&r.result&&r.result.lines)toast(r.result.lines.join('  '));friendsLoad(true,true);return}
+ const find=l=>l.find(x=>x.id===id),nm=(find(FR.f)||find(FR.inc)||find(FR.out)||find(FR.blk)||{}).name||'this player';
+ const T={accept:['friend_respond',{id,accept:true},null],decline:['friend_respond',{id,accept:false},null],remove:['friend_remove',{id},null],unblock:['friend_unblock',{id},null],
+  block:['friend_block',{id},'Block '+nm+'? They will no longer be able to send you requests, and any friendship ends.']};
+ const t=T[a];if(!t||!id||FR.busy)return;
+ if(a==='remove'&&find(FR.f)&&!confirm('Remove '+nm+' from your friends?'))return;
+ if(t[2]&&!confirm(t[2]))return;
+ FR.busy=true;const r=await supCall(t[0],t[1]);FR.busy=false;
+ if(!r||r.error||!r.ok)toast((r&&r.error)||'Something went wrong.');else if(a==='accept')toast('You are now friends with '+nm+'!');
+ friendsLoad(true)});
 let mailState='idle',mailOpenId=null;
 const mailD=t=>{try{return new Date(t).toLocaleDateString()}catch(x){return''}};
 function heroMail(){
@@ -1214,16 +1298,16 @@ function heroMail(){
  if(mailState==='error')return'<div class="qcard"><div class="qs">Could not load mail.</div><button class="qbtn" data-hm="reload">Try again</button></div>';
  const m=mailOpenId!=null?MAILS.find(x=>String(x.id)===String(mailOpenId)):null;
  if(m)return'<div class="qcard"><div class="qt"><b>'+esc(m.title)+'</b><span>'+esc(mailD(m.created_at))+'</span></div><div class="qs" style="white-space:pre-wrap;font-size:13px;line-height:1.45;margin-top:6px">'+esc(m.body)+'</div><button class="qbtn" data-hm="del" data-id="'+esc(m.id)+'" style="border-color:#ff5a4d;background:linear-gradient(180deg,#6a1f1a,#2c0f0c)">Delete</button></div><div class="qcard"><button class="qbtn" data-hm="list" style="margin-top:0">← Inbox</button></div>';
- return MAILS.length?MAILS.map(m=>'<div class="qcard"><button class="qbtn" data-hm="open" data-id="'+esc(m.id)+'" style="margin-top:0;text-align:left;'+(m.read?'opacity:.75':'')+'">'+(m.read?'':'● ')+esc(m.title)+'<span style="float:right;font:10px Arial,sans-serif;color:#c8b894">'+esc(mailD(m.created_at))+'</span></button></div>').join(''):'<div class="qcard"><div class="qs" style="font-size:13px;line-height:1.5;font-style:italic">A tiny goblin emerges from the mailbox, looks you dead in the eyes, and whispers, &quot;Skill Issue.&quot; Then vanishes.</div></div>'}
-async function heroMailLoad(){mailState='loading';mailOpenId=null;invRender();const r=await supCall('mail_list');if(!r||r.error||!r.mail){mailState='error'}else{MAILS=r.mail;mailState='ok';mailDot()}if(heroSec==='social'&&heroSub.social==='mail')invRender()}
+ return fbRows()+(MAILS.length||fbN()?MAILS.map(m=>'<div class="qcard"><button class="qbtn" data-hm="open" data-id="'+esc(m.id)+'" style="margin-top:0;text-align:left;'+(m.read?'opacity:.75':'')+'">'+(m.read?'':'● ')+esc(m.title)+'<span style="float:right;font:10px Arial,sans-serif;color:#c8b894">'+esc(mailD(m.created_at))+'</span></button></div>').join(''):'<div class="qcard"><div class="qs" style="font-size:13px;line-height:1.5;font-style:italic">A tiny goblin emerges from the mailbox, looks you dead in the eyes, and whispers, &quot;Skill Issue.&quot; Then vanishes.</div></div>')}
+async function heroMailLoad(){mailState='loading';mailOpenId=null;invRender();const r=await supCall('mail_list');if(!r||r.error||!r.mail){mailState='error'}else{MAILS=r.mail;fbSet(r.friends);mailState='ok';mailDot()}if(heroSec==='social'&&heroSub.social==='mail')invRender()}
 inv.addEventListener('click',async e=>{const b=e.target.closest('[data-hm]');if(!b)return;const a=b.dataset.hm;
  if(a==='reload')return heroMailLoad();
  if(a==='list'){mailOpenId=null;invRender();return}
  if(a==='open'){const m=MAILS.find(x=>String(x.id)===String(b.dataset.id));if(!m)return;mailOpenId=m.id;invRender();inv.scrollTop=0;if(!m.read){m.read=true;mailDot();supCall('mail_read',{id:m.id})}return}
  if(a==='del'){const r=await supCall('mail_delete',{id:b.dataset.id});if(!r||r.error||!r.ok)return toast((r&&r.error)||'Could not delete.');MAILS=MAILS.filter(x=>String(x.id)!==String(b.dataset.id));mailOpenId=null;mailDot();invRender()}});
 inv.addEventListener('click',e=>{if(e.target.closest('[data-hback]')){heroSec='hub';invRender();inv.scrollTop=0;return}
- const h=e.target.closest('[data-hs]');if(h){heroSec=h.dataset.hs;invRender();inv.scrollTop=0;return}
- const b=e.target.closest('[data-hsub]');if(!b)return;heroSub[heroSec]=b.dataset.hsub;invRender();inv.scrollTop=0;if(heroSec==='social'&&heroSub.social==='mail')heroMailLoad()});
+ const h=e.target.closest('[data-hs]');if(h){heroSec=h.dataset.hs;invRender();inv.scrollTop=0;if(heroSec==='social'&&heroSub.social==='friends')friendsLoad();return}
+ const b=e.target.closest('[data-hsub]');if(!b)return;heroSub[heroSec]=b.dataset.hsub;invRender();inv.scrollTop=0;if(heroSec==='social'&&heroSub.social==='mail')heroMailLoad();if(heroSec==='social'&&heroSub.social==='friends')friendsLoad()});
 inv.addEventListener('change',e=>{if(e.target&&e.target.id==='sellSel'){sellPick=e.target.value;invRender()}});
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,i=b.dataset.i;if(a==='clspick')return pickClass(b.dataset.k);if(a==='switch')return openSwitch();if(a==='cls')return toast('Your class is locked. Use a Class Unlock from the Shop to change it.');   // unlock flow arrives with the Shop
  if(false)openClass(false);if(a==='name'){toast('Your name is set. Name changes are coming soon.');return}if(a==='out')return window.realmCloud&&window.realmCloud.signOut();
@@ -1446,8 +1530,8 @@ function supFaq(){
 
 /* ---------- Menu > Mail (text only) ---------- */
 let MAILS=[];
-function mailDot(){const d=document.getElementById('mailDot');if(d)d.classList.toggle('on',MAILS.some(m=>!m.read))}
-async function mailBadge(){const r=await supCall('mail_list');if(!r||!r.mail)return;MAILS=r.mail;mailDot();if(heroSec==='hub'||heroSec==='social')try{invRender()}catch(x){}}
+function mailDot(){const d=document.getElementById('mailDot');if(d)d.classList.toggle('on',MAILS.some(m=>!m.read)||fbN()>0)}
+async function mailBadge(){const r=await supCall('mail_list');if(!r||!r.mail)return;MAILS=r.mail;fbSet(r.friends);mailDot();if(heroSec==='hub'||heroSec==='social')try{invRender()}catch(x){}}
 setTimeout(mailBadge,4000);setInterval(mailBadge,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)mailBadge()});
 async function menuMail(){
  menuSub('Mail','<div class="qcard"><div class="qs">Loading…</div></div>');
@@ -1793,6 +1877,11 @@ H().hp=Math.min(H().hp,stats().hp);if(H().hp<=0)H().downed=true;recover();hud();
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+// A friend link (?friend=CODE) is saved at once: the login redirect would otherwise lose it. The game offers it after sign-in.
+(function(){try{var u=new URL(location.href),c=u.searchParams.get('friend');if(c){c=c.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);if(c.length===8)localStorage.setItem('realm_friend',c);u.searchParams.delete('friend');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}})();
+</script>
 <script>
 (()=>{'use strict';
 // Supabase URL + publishable key are safe in front-end code: row-level security protects the data. NEVER put a secret/service_role key here.
@@ -1829,7 +1918,7 @@ async function begin(session){if(started)return;started=true;uid=session.user.id
   const sr=await api('sync');if(sr.error)throw new Error(sr.error);   // XP, loot and quests come from the server, never from the saved file
   let cur=null;try{cur=JSON.parse(localStorage.getItem(QK))}catch(e){}localStorage.setItem(QK,JSON.stringify({...(cur||{}),...sr.core}));                                     // (an old unowned local save is adopted by the first account)
  }catch(e){started=false;busyUi(false);say(e&&e.message&&e.message.length<120?e.message:'Could not load your save. Check your connection and try again.',1);return}
- window.realmCloud={queue,flush,signOut,api,sb,uid:()=>uid};el('auth').style.display='none';window.startRealm()}
+ window.realmCloud={queue,flush,signOut,api,sb,uid:()=>uid};el('auth').style.display='none';window.startRealm();setTimeout(()=>{try{window.friendLinkCheck&&window.friendLinkCheck()}catch(e){}},3500)}
 async function run(fn){if(busy)return;busy=true;busyUi(true);say('');try{await fn()}catch(e){say(e.message||'Something went wrong.',1)}busy=false;if(!started)busyUi(false)}
 const creds=()=>{const email=el('aEmail').value.trim(),password=el('aPass').value;if(!email||password.length<8)throw new Error('Enter your email and a password of 8+ characters.');return{email,password}};
 el('aGoogle').onclick=()=>run(async()=>{const{data,error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:back,skipBrowserRedirect:true}});if(error)throw error;if(data&&data.url){window.location.replace(data.url);await new Promise(()=>{})}});
