@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.764';window.__BUILD=B;
+(function(){var B='1.765';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1089,7 +1089,7 @@ function arenaDraw(){ap.classList.remove('arfull');
  if(AR.state==='error'&&!AR.d){ap.innerHTML=say('Could not reach the Arena.<br><span style="color:#ffb3a8">'+arEsc(AR.err)+'</span>','<button class="qbtn" data-ar="reload">Try again</button>');return}
  const d=AR.d;if(!d)return;
  const row=(o,kind)=>{const champ=kind==='champ',cost=o.cost|0,broke=(d.coins|0)<cost,off=!!d.lock||broke;
-  return '<div class="qcard'+(champ?' arch':'')+'"><div class="arrow">'+clsIcon(o.cls)+'<div><div class="qt"><b>'+arEsc(o.name)+(champ?' (Champion)':'')+'</b></div><div class="qs">'+arEsc(o.cn||'Adventurer')+'</div></div>'
+  return '<div class="qcard'+(champ?' arch':'')+'"><div class="arrow">'+clsIcon(o.cls)+'<div><div class="qt"><b style="min-width:0;overflow-wrap:anywhere">'+arEsc(o.name)+(champ?' (Champion)':'')+'</b></div>'+arTtl(o.ttl)+'<div class="qs">'+arEsc(o.cn||'Adventurer')+'</div></div>'
    +'<button class="qbtn" data-ar="start" data-kind="'+kind+'" data-id="'+arEsc(o.id)+'"'+(off?' disabled':'')+'>'+(d.lock?'Heal first':broke?'Need '+coinImg('1.1em')+' '+cost:'Fight · '+coinImg('1.1em')+' '+cost)+'</button></div></div>'};
  const V=AR.view==='home'?'npc':AR.view,TT={npc:'NPCs',friend:'Friends',champ:'Champions'};
  let o='<div style="display:flex;align-items:center;gap:10px;margin:0 0 8px"><button class="qbtn" data-ar="home" style="width:auto;margin:0;padding:9px 14px">← Arena</button><b style="font:700 16px Georgia,serif;color:#e5c77b">'+TT[V]+'</b><div class="arcoin2" data-ar="shop" role="button" tabindex="0" aria-label="Arena Coins: '+(d.coins|0)+'. Get more coins">'+coinImg('1.9em')+'<span>'+(d.coins|0)+'</span><i>+</i></div></div>';
@@ -1110,10 +1110,12 @@ function arShow(f){fighting=true;AR.on=true;
  try{if(f.phase==='end'){Sound.music('map');Sound.sfx(f.result==='win'?'win':f.result==='loss'?'lose':'tap')}else Sound.music('battle_arena')}catch(e){}
  arDraw(f)}
 function arClose(){cb.style.display='none';fighting=false;AR.on=false;try{Sound.music('map')}catch(e){}hud();if(inv.classList.contains('open'))invRender();if(ap.classList.contains('open'))arenaLoad()}
+/* An opponent's equipped title (a catalog id from the server), shown under their name. Nothing at all when they have none or the id is unknown to this client. */
+function arTtl(id,big){const n=id&&typeof TTL!=='undefined'&&TTL[id];return n?'<div style="font-style:italic;color:#e6c77e;font-size:'+(big?'13':'12')+'px;line-height:1.25;overflow-wrap:anywhere">'+arEsc(n)+'</div>':''}
 function arDraw(f){
  const champ=f.opp.kind==='champ',pot=k=>{const n=(f.pots&&f.pots[k])|0;return n>0&&f.hp<f.mhp?['<span>'+POTS[k].icon+'</span> '+POTS[k].name+' ('+n+')',()=>arOp('pot',k),1]:null};
  $('cbT').textContent=f.title||'';
- $('cbA').innerHTML='<div style="width:112px;height:112px;margin:4px auto 6px;display:flex;align-items:center;justify-content:center;border:2px solid '+(champ?'#ffd27a':'#6b5a33')+';border-radius:8px;background:radial-gradient(#3a2d18,#0e0c09)"><div style="width:84px">'+clsIcon(f.opp.cls)+'</div></div><div style="font-weight:700;color:#fff0c6">'+arEsc(f.opp.name)+(champ?' (Champion)':'')+'</div><div style="font-size:12px;color:#c9b88a">'+arEsc(f.opp.cn)+'</div>';
+ $('cbA').innerHTML='<div style="width:112px;height:112px;margin:4px auto 6px;display:flex;align-items:center;justify-content:center;border:2px solid '+(champ?'#ffd27a':'#6b5a33')+';border-radius:8px;background:radial-gradient(#3a2d18,#0e0c09)"><div style="width:84px">'+clsIcon(f.opp.cls)+'</div></div><div style="font-weight:700;color:#fff0c6">'+arEsc(f.opp.name)+(champ?' (Champion)':'')+'</div>'+arTtl(f.opp.ttl,1)+'<div style="font-size:12px;color:#c9b88a">'+arEsc(f.opp.cn)+'</div>';
  $('cbB').innerHTML='<div class="cbh"><span>'+arEsc(f.opp.name)+'</span><span>'+f.eh+'%</span></div><div class="cbbar"><i style="width:'+f.eh+'%;background:#d6304a"></i></div><div class="cbh"><span>You</span><span>'+f.hp+' / '+f.mhp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,Math.min(100,100*f.hp/f.mhp))+'%;background:#4caf50"></i></div>';
  let btns;
  if(f.phase==='end'){
