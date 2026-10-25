@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.765';window.__BUILD=B;
+(function(){var B='1.766';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1088,9 +1088,9 @@ function arenaDraw(){ap.classList.remove('arfull');
  if(AR.state==='loading'&&!AR.d){ap.innerHTML=say('<button class="qbtn" data-ar="home" style="width:auto;padding:8px 12px">← Arena</button> Loading…');return}
  if(AR.state==='error'&&!AR.d){ap.innerHTML=say('Could not reach the Arena.<br><span style="color:#ffb3a8">'+arEsc(AR.err)+'</span>','<button class="qbtn" data-ar="reload">Try again</button>');return}
  const d=AR.d;if(!d)return;
- const row=(o,kind)=>{const champ=kind==='champ',cost=o.cost|0,broke=(d.coins|0)<cost,off=!!d.lock||broke;
-  return '<div class="qcard'+(champ?' arch':'')+'"><div class="arrow">'+clsIcon(o.cls)+'<div><div class="qt"><b style="min-width:0;overflow-wrap:anywhere">'+arEsc(o.name)+(champ?' (Champion)':'')+'</b></div>'+arTtl(o.ttl)+'<div class="qs">'+arEsc(o.cn||'Adventurer')+'</div></div>'
-   +'<button class="qbtn" data-ar="start" data-kind="'+kind+'" data-id="'+arEsc(o.id)+'"'+(off?' disabled':'')+'>'+(d.lock?'Heal first':broke?'Need '+coinImg('1.1em')+' '+cost:'Fight · '+coinImg('1.1em')+' '+cost)+'</button></div></div>'};
+ const row=(o,kind)=>{const champ=kind==='champ',cost=o.cost|0,broke=(d.coins|0)<cost,cl=!!o.lock,off=!!d.lock||broke||cl;
+  return '<div class="qcard'+(champ?' arch':'')+'"><div class="arrow">'+clsIcon(o.cls)+'<div><div class="qt"><b style="min-width:0;overflow-wrap:anywhere">'+arEsc(o.name)+(champ?' (Champion)':'')+'</b></div>'+arTtl(o.ttl)+'<div class="qs">'+arEsc(o.cn||'Adventurer')+'</div>'+(cl?'<div class="qs" style="color:#ffb3a8">'+arEsc(o.lock)+'</div>':'')+'</div>'
+   +'<button class="qbtn" data-ar="start" data-kind="'+kind+'" data-id="'+arEsc(o.id)+'"'+(off?' disabled':'')+'>'+(cl?'Locked':d.lock?'Heal first':broke?'Need '+coinImg('1.1em')+' '+cost:'Fight · '+coinImg('1.1em')+' '+cost)+'</button></div></div>'};
  const V=AR.view==='home'?'npc':AR.view,TT={npc:'NPCs',friend:'Friends',champ:'Champions'};
  let o='<div style="display:flex;align-items:center;gap:10px;margin:0 0 8px"><button class="qbtn" data-ar="home" style="width:auto;margin:0;padding:9px 14px">← Arena</button><b style="font:700 16px Georgia,serif;color:#e5c77b">'+TT[V]+'</b><div class="arcoin2" data-ar="shop" role="button" tabindex="0" aria-label="Arena Coins: '+(d.coins|0)+'. Get more coins">'+coinImg('1.9em')+'<span>'+(d.coins|0)+'</span><i>+</i></div></div>';
  if(d.lock)o+='<div class="qcard arlock"><div class="qs" style="color:#ffb3a8">'+arEsc(d.lock)+'</div></div>';
