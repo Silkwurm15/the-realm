@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.755';window.__BUILD=B;
+(function(){var B='1.756';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1219,7 +1219,7 @@ function heroCosm(){const own=(S.ach&&S.ach.tt)||{},eq=(S.ach&&S.ach.eq)||'',com
   o+='<div class="qh" style="margin-top:6px"><span>'+esc(g)+' · '+n+'/'+L.length+'</span></div>'+L.map(t=>own[t.id]?'<div class="qcard'+(t.id===eq?' rdy':'')+'"><div class="qt"><b>'+esc(t.n)+'</b><span>'+(t.id===eq?'Equipped ✔':'Owned')+'</span></div><div class="qs">'+esc(t.h)+'</div><button class="qbtn" data-tt="'+esc(t.id)+'">'+(t.id===eq?'Remove Title':'Equip Title')+'</button></div>':'<div class="qcard" style="opacity:.55"><div class="qt"><b>'+esc(t.n)+'</b><span>Locked</span></div><div class="qs">'+esc(t.h)+(t.soon?' <span style="color:#e5c77b">· Coming soon</span>':'')+'</div></div>').join('')}
  return o+coming('flairs')}
 /* ---- Achievements: lifetime counters are kept by the server (S.ach); tiers are claimed once each. Keep ACH / ACH_RW identical to the server copy. ---- */
-const MI_M=1609.344,ROMAN=['I','II','III','IV'];
+const MI_M=1609.344,ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX'];
 const ACH=[
  {id:'chests',cat:'Collections',ic:'🧰',n:'Treasure Hunter',d:'Open treasure chests',c:'chests',t:[10,50,200,1000]},
  {id:'mimics',cat:'Combat',ic:'👹',n:'Mimic Slayer',d:'Defeat Mimics',c:'mimics',t:[3,15,50,150]},
@@ -1231,13 +1231,20 @@ const ACH=[
  {id:'level',cat:'General',ic:'⭐',n:'Rising Hero',d:'Reach hero level',c:'lvl',t:[10,25,50,100]},
  {id:'slm',cat:'Questlines',ic:'😴',n:'Let Sleeping Titans Lie',d:'Find Titan Ulfur asleep at all 10 locations',c:'slm',t:[10],rw:[{xp:150,ttl:'ulfur'}]},
  {id:'cal',cat:'Questlines',ic:'🐉',n:'The Dragon\'s Final Gambit',d:'Complete the Sir Calaun Dawnblight questline',c:'cal',t:[8],rw:[{xp:400,ttl:'calaun'}]},
- {id:'sel',cat:'Questlines',ic:'🏴‍☠️',n:'Accepted into the Clowder',d:'Complete all 8 quests in Sterling Dread Pirate Selora Dawnblight\'s questline',c:'sel',t:[8],rw:[{xp:400,ttl:'selora'}]}];
+ {id:'sel',cat:'Questlines',ic:'🏴‍☠️',n:'Accepted into the Clowder',d:'Complete all 8 quests in Sterling Dread Pirate Selora Dawnblight\'s questline',c:'sel',t:[8],rw:[{xp:400,ttl:'selora'}]},
+ {id:'arena',cat:'Arena',ic:'⚔️',n:'Defeat Enemies',d:'Win Arena matches',c:'arenaWin',t:[1,5,10,25,50,100,250,500,1000],rw:[{xp:40,ttl:'onedone'},{xp:60},{xp:90,pot:'full',x:' + Full Health Potion'},{xp:120,ttl:'crowd'},{xp:180,key:1,x:' + Key of the Forsaken'},{xp:250,ttl:'regular'},{xp:350,pot:'res',ttl:'blood',x:' + Resurrect Potion'},{xp:500},{xp:750,key:1,ttl:'immortal',x:' + Key of the Forsaken'}]},
+ {id:'fighters',cat:'Arena',ic:'🛡️',n:'Arena Fighters',d:'Defeat Arena fighters',c:'arenaNpc',t:[5,15,30,60,100],rw:[{xp:50},{xp:100,pot:'full',x:' + Full Health Potion'},{xp:180,key:1,x:' + Key of the Forsaken'},{xp:300,pot:'res',x:' + Resurrect Potion'},{xp:450,ttl:'gladiator'}]},
+ {id:'beef',cat:'Arena',ic:'🥊',n:'Personal Beef',d:'Beat the same friend in the Arena',c:'arenaBeef',t:[1,5,10,25],rw:[{xp:60,ttl:'frenemy'},{xp:120,pot:'full',ttl:'foeever',x:' + Full Health Potion'},{xp:220,key:1,ttl:'nemesis',x:' + Key of the Forsaken'},{xp:400,pot:'res',ttl:'friendender',x:' + Resurrect Potion'}]},
+ {id:'friendpoc',cat:'Arena',ic:'💥',n:'Friendslopocalypse',d:'Beat friends in the Arena',c:'arenaFriend',t:[1,5,10,25,50,100],rw:[{xp:60,ttl:'friendlyfire'},{xp:100,pot:'full',ttl:'foebuster',x:' + Full Health Potion'},{xp:160,ttl:'unfriender'},{xp:260,key:1,ttl:'palpulv',x:' + Key of the Forsaken'},{xp:400,ttl:'socialmenace'},{xp:600,pot:'res',ttl:'friendreaper',x:' + Resurrect Potion'}]},
+ {id:'dethcal',cat:'Arena',ic:'🐉',n:'Dethrone Calaun',d:'Defeat Sir Calaun Dawnblight in the Arena',c:'arenaCal',t:[1,5,10,25],rw:[{xp:100},{xp:200,pot:'full',x:' + Full Health Potion'},{xp:350,key:1,x:' + Key of the Forsaken'},{xp:600,pot:'res',ttl:'pubenemy',x:' + Resurrect Potion'}]},
+ {id:'dethsel',cat:'Arena',ic:'😼',n:'Dethrone Selora',d:'Defeat Sterling Dread Pirate Selora Dawnblight in the Arena',c:'arenaSel',t:[1,5,10,25],rw:[{xp:100},{xp:200,pot:'full',x:' + Full Health Potion'},{xp:350,key:1,x:' + Key of the Forsaken'},{xp:600,pot:'res',ttl:'scourge',x:' + Resurrect Potion'}]},
+ {id:'league',cat:'Arena',ic:'👑',n:'A League of Their Own',d:'Defeat every Arena champion at least once',c:'champs',t:[2],rw:[{xp:500,pot:'res',ttl:'champbreak',x:' + Resurrect Potion'}]}];
 const TTL={ulfur:"Ulfur's Wake-Up Crew",calaun:"Dawnblight's Co-Conspirator",selora:"Clawbound"};let TCAT=[];   // TTL = id -> name, TCAT = ordered catalog; both are filled from the server (r.titles)
 function setTitles(l){if(!Array.isArray(l)||!l.length)return;TCAT=l;for(const k in TTL)delete TTL[k];l.forEach(t=>{TTL[t.id]=t.n});try{localStorage.setItem('realm_tcat',JSON.stringify(l))}catch(e){}}
 try{setTitles(JSON.parse(localStorage.getItem('realm_tcat')||'null'))}catch(e){}
 const ACH_RW=[{xp:40,x:''},{xp:90,x:' + Full Health Potion'},{xp:180,x:' + Key of the Forsaken'},{xp:350,x:' + Resurrect Potion'}];
 const achC=()=>(S.ach&&S.ach.c)||{},achK=()=>(S.ach&&S.ach.k)||{};
-const achVal=d=>d.c==='lvl'?(S.lvl|0):d.c==='m'?(achC().m||0)/MI_M:d.c==='slm'?Object.keys((S.ach&&S.ach.f)||{}).length:d.c==='cal'?((S.cal&&S.cal.n)|0):d.c==='sel'?((S.sel&&S.sel.n)|0):(achC()[d.c]||0);
+const achVal=d=>d.c==='champs'?((achC().arenaCal>0?1:0)+(achC().arenaSel>0?1:0)):d.c==='lvl'?(S.lvl|0):d.c==='m'?(achC().m||0)/MI_M:d.c==='slm'?Object.keys((S.ach&&S.ach.f)||{}).length:d.c==='cal'?((S.cal&&S.cal.n)|0):d.c==='sel'?((S.sel&&S.sel.n)|0):(achC()[d.c]||0);
 const achTier=d=>Math.min(d.t.length,achK()[d.id]|0);
 const achOk=d=>achTier(d)<d.t.length&&achVal(d)>=d.t[achTier(d)];
 const achReady=()=>ACH.reduce((n,d)=>n+Math.max(0,d.t.filter(x=>achVal(d)>=x).length-achTier(d)),0);
@@ -1245,7 +1252,7 @@ let achCat='All';
 function heroAch(){
  const done=ACH.reduce((n,d)=>n+achTier(d),0),all=ACH.reduce((n,d)=>n+d.t.length,0),rdy=achReady();
  let o='';
-  const CATS=['General','Collections','Combat','Questlines'],cats=['All'].concat(CATS);
+  const CATS=['General','Collections','Combat','Arena','Questlines'],cats=['All'].concat(CATS);
  o+='<select id="achCat" aria-label="Achievement category" style="display:block;width:100%;margin-top:10px;padding:12px 10px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 14px Georgia,serif;color-scheme:dark">'+cats.map(c=>'<option value="'+c+'"'+(c===achCat?' selected':'')+'>'+(c==='All'?'All Categories':c)+'</option>').join('')+'</select>';
  let cat='',shown=0;
  ACH.slice().sort((a,b)=>CATS.indexOf(a.cat)-CATS.indexOf(b.cat)).forEach(d=>{
@@ -1255,11 +1262,11 @@ function heroAch(){
   const fmt=x=>d.mi?(Math.round(x*10)/10).toLocaleString():Math.floor(x).toLocaleString();
   const pips=d.t.map((_,i)=>'<span style="color:'+(i<t?'#e5c77b':'#5b4a2c')+'">●</span>').join(' ');
   const rw=d.rw?d.rw[Math.min(t,d.rw.length-1)]:ACH_RW[Math.min(t,3)];
-  o+='<div class="qcard'+(ready?' rdy':'')+(fin?' done':'')+'"><div class="qt"><b>'+d.ic+' '+d.n+(t&&d.t.length>1?' · '+ROMAN[Math.min(t,4)-1]:'')+'</b><span style="letter-spacing:2px">'+pips+'</span></div>'
+  o+='<div class="qcard'+(ready?' rdy':'')+(fin?' done':'')+'"><div class="qt"><b>'+d.ic+' '+d.n+(t&&d.t.length>1?' · '+ROMAN[t-1]:'')+'</b><span style="letter-spacing:2px">'+pips+'</span></div>'
    +'<div class="qs" style="margin-top:3px">'+d.d+'</div>'
    +'<div class="qbar"><i style="width:'+Math.round(100*Math.min(1,v/goal))+'%"></i></div>'
-   +'<div class="qs">'+(fin?'Complete ✔':fmt(Math.min(v,goal))+' / '+fmt(goal)+' · Reward: '+Math.max(1,Math.round(rw.xp*lvlScale()))+' XP'+(rw.x||(rw.ttl?' + Title: '+TTL[rw.ttl]:'')))+'</div>'
-   +(ready?'<button class="qbtn" data-ac="'+d.id+'">Claim '+d.n+(d.t.length>1?' '+ROMAN[t]:'')+'</button>':'')+(d.rw&&fin&&d.rw[0].ttl?'<button class="qbtn" data-tt="'+d.rw[0].ttl+'">'+((S.ach&&S.ach.eq===d.rw[0].ttl)?'Remove Title':'Equip Title: '+TTL[d.rw[0].ttl])+'</button>':'')+'</div>'});
+   +'<div class="qs">'+(fin?'Complete ✔':fmt(Math.min(v,goal))+' / '+fmt(goal)+' · Reward: '+Math.max(1,Math.round(rw.xp*lvlScale()))+' XP'+(rw.x||'')+(rw.ttl?' + Title: '+TTL[rw.ttl]:''))+'</div>'
+   +(ready?'<button class="qbtn" data-ac="'+d.id+'">Claim '+d.n+(d.t.length>1?' '+ROMAN[t]:'')+'</button>':'')+(d.rw&&fin&&d.t.length===1&&d.rw[0].ttl?'<button class="qbtn" data-tt="'+d.rw[0].ttl+'">'+((S.ach&&S.ach.eq===d.rw[0].ttl)?'Remove Title':'Equip Title: '+TTL[d.rw[0].ttl])+'</button>':'')+'</div>'});
  if(!shown)o+='<div class="qcard"><div class="qs" style="text-align:center">'+(achCat==='Questlines'?'Questline achievements are coming soon.':'No achievements match this filter.')+'</div></div>';
  return o}
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-tt]');if(!b)return;b.disabled=true;const id=b.dataset.tt;act('ach',{op:'title',id:(S.ach&&S.ach.eq===id)?'':id}).then(()=>{try{invRender()}catch(x){}hud()})});
