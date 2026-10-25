@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.757';window.__BUILD=B;
+(function(){var B='1.758';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -273,8 +273,8 @@ html.hc .mk .badge svg{width:24px;height:24px}
 
 /* title cards are tappable; the equipped title shows in the top bar under the name */
 .tap{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}.tap:active{filter:brightness(1.18)}.tap:focus-visible{outline:2px solid #e5c77b;outline-offset:2px}
-.topbar.has-ttl .player-name{top:16%;font-size:4.2cqw!important;line-height:1.05!important}
-.topbar.has-ttl .eyebrow{display:block!important;position:absolute;left:24.2%;top:33%;width:57%;margin:0;font:italic 600 2.8cqw/1.1 Georgia,'Palatino Linotype',serif;letter-spacing:.04em;text-transform:none;color:#e6c77e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
+.topbar.has-ttl .player-name{top:14.5%;font-size:4.3cqw!important;line-height:1.05!important}.topbar.has-ttl .hpbar{top:49.5%}.topbar.has-ttl .xpbar{top:71.5%}
+.topbar.has-ttl .eyebrow{display:block!important;position:absolute;left:24.2%;top:31.5%;width:57%;margin:0;font:italic 600 3.5cqw/1.1 Georgia,'Palatino Linotype',serif;letter-spacing:.04em;text-transform:none;color:#e6c77e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
 </style></head><body>
 <div id="auth"><div class="build-tag" id="buildTag"></div><canvas id="aFx"></canvas>
 <div class="amain">
@@ -1079,7 +1079,6 @@ function arenaDraw(){
   return '<div class="qcard'+(champ?' arch':'')+'"><div class="arrow">'+clsIcon(o.cls)+'<div><div class="qt"><b>'+arEsc(o.name)+(champ?' (Champion)':'')+'</b></div><div class="qs">'+arEsc(o.cn||'Adventurer')+'</div></div>'
    +'<button class="qbtn" data-ar="start" data-kind="'+kind+'" data-id="'+arEsc(o.id)+'"'+(off?' disabled':'')+'>'+(d.lock?'Heal first':broke?'Need 🪙 '+cost:'Fight · 🪙 '+cost)+'</button></div></div>'};
  let o='<div class="qcard ms"><div class="qt"><b>🪙 Arena Coins</b><span>'+(d.coins|0)+'</span></div><div class="qs">Each fight costs coins, spent the moment it starts. You get 3 free coins every day.</div>'
-  +'<div class="qt" style="margin-top:6px"><b>❤️ Your health</b><span>'+d.hp+' / '+d.mhp+'</span></div>'
   +'<button class="qbtn" data-ar="shop">Get more coins</button></div>';
  if(d.lock)o+='<div class="qcard arlock"><div class="qs" style="color:#ffb3a8">'+arEsc(d.lock)+'</div></div>';
  o+='<div class="qh"><span>Class Fighters</span><span>'+d.npcs.length+'</span></div>'+d.npcs.map(n=>row(n,'npc')).join('');
