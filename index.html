@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.776';window.__BUILD=B;
+(function(){var B='1.777';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -874,7 +874,7 @@ function qHub(){const u=QFULL+'?v='+window.__BUILD,h=QFH.map(x=>'<button class="
  return'<div class="qwrap" id="qhub"><img class="qbg" src="'+u+'" alt=""><div class="qfull"><img src="'+u+'" alt="Quests" draggable="false">'+h+'</div></div>'}
 
 /* ---- Red dots on the Quests menu: which category has a quest to turn in, or a new quest you have not opened yet ---- */
-(()=>{const e=document.createElement('style');e.textContent='#qpanel .qhot{position:absolute}#qpanel .qhot .qdot{display:none;position:absolute;top:2%;right:2%;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff7b6e,#e0281d 60%,#8d140d);border:2.5px solid #1a120a;box-shadow:0 0 8px #ff3b30cc,0 1px 3px #000;pointer-events:none;z-index:4;animation:qdp 1.6s ease-in-out infinite}#qpanel .qhot .qdot.on{display:block}@keyframes qdp{50%{transform:scale(1.18)}}';document.head.appendChild(e)})();
+(()=>{const e=document.createElement('style');e.textContent='#qpanel .qhot{position:absolute}#qpanel .qhot .qdot{display:none;position:absolute;top:2%;right:2%;width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff7b6e,#e0281d 60%,#8d140d);border:1.25px solid #1a120a;box-shadow:0 0 4px #ff3b30cc,0 1px 2px #000;pointer-events:none;z-index:4;animation:qdp 1.6s ease-in-out infinite}#qpanel .qhot .qdot.on{display:block}@keyframes qdp{50%{transform:scale(1.18)}}';document.head.appendChild(e)})();
 function sqSeenGet(){try{return JSON.parse(localStorage.getItem('realm_sq_seen')||'{}')}catch(e){return{}}}
 function qNewSq(g){const seen=sqSeenGet();return sqList().some(q=>!!QLINES[q.id]===(g==='lines')&&!seen[q.qid])}
 function sqMarkSeen(g){try{const seen=sqSeenGet();sqList().forEach(q=>{if(!!QLINES[q.id]===(g==='lines'))seen[q.qid]=1});const live={};sqList().forEach(q=>{if(seen[q.qid])live[q.qid]=1});localStorage.setItem('realm_sq_seen',JSON.stringify(live))}catch(e){}try{qHubDots()}catch(e){}}
@@ -902,13 +902,13 @@ const QCARDS='quest_cards.webp',QBGI='quest_bg.webp',QORD=['walk1','nature','cha
 (()=>{const e=document.createElement('style');e.textContent='#qpop{position:absolute;inset:0;z-index:1095;background:rgba(5,8,6,.78);display:none;align-items:center;justify-content:center;padding:20px}#qpop.open{display:flex}'
 +'#qpop .qpc{position:relative;container-type:inline-size;width:min(92vw,400px,calc(86vh * 300 / 344));aspect-ratio:300/344;background-repeat:no-repeat;background-size:400% 200%;filter:drop-shadow(0 8px 18px #000d)}'
 +'#qpop .qpx{position:absolute;top:-2.2%;right:-2.2%;width:9.5cqw;height:9.5cqw;min-width:34px;min-height:34px;border-radius:50%;border:2px solid #f3d27a;background:radial-gradient(circle at 35% 30%,#ff7b6e,#d02a20 55%,#7d130d);color:#fff;font:700 5.4cqw/1 Arial,sans-serif;display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 2px 6px #000c,inset 0 1px 2px #ffffff66;text-shadow:0 1px 2px #000;z-index:3;-webkit-tap-highlight-color:transparent}#qpop .qpx:active{filter:brightness(1.2)}'
-+'#qpop .qpp{position:absolute;left:8.5%;right:8.5%;top:49%;bottom:6.5%;border-radius:10px;background:linear-gradient(180deg,#2c200ff7,#120d07fa);border:1.5px solid #c99a3b;box-shadow:inset 0 0 0 1px #000a,inset 0 0 14px #000;padding:2.2cqw 3.4cqw 3cqw;display:flex;flex-direction:column;align-items:stretch;gap:1.5cqw;text-align:center;color:#fff1cf;font-family:Georgia,serif}'
-+'#qpop .qpt{font:700 5.5cqw/1.1 Georgia,serif;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 4px #000;flex:none}'
-+'#qpop .qpd{font:italic 3.5cqw/1.22 Georgia,serif;color:#e6d3a2;text-shadow:0 1px 2px #000;flex:none}'
++'#qpop .qpp{position:absolute;left:8.5%;right:8.5%;top:49%;bottom:6.5%;border-radius:10px;background:none;border:0;box-shadow:none;padding:2.2cqw 3.4cqw 3cqw;display:flex;flex-direction:column;align-items:stretch;gap:1.5cqw;text-align:center;color:#fff1cf;font-family:Georgia,serif}'
++'#qpop .qpt{font:700 5.5cqw/1.1 Georgia,serif;color:#2a1706;text-shadow:0 1px 0 #ffe9b866;flex:none}'
++'#qpop .qpd{font:italic 3.5cqw/1.22 Georgia,serif;color:#4a3216;text-shadow:0 1px 0 #ffe9b855;flex:none}'
 +'#qpop .qpb{position:relative;height:6.2cqw;border:1.5px solid #e0b655;border-radius:999px;background:#0b0805;overflow:hidden;box-shadow:inset 0 0 6px #000;flex:none}#qpop .qpb i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#63e05b,#1d8a2a)}#qpop .qpb span{position:absolute;inset:0;display:grid;place-items:center;font:700 3.9cqw Georgia,serif;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 3px #000}'
-+'#qpop .qpr{font:700 4cqw/1.25 Georgia,serif;color:#ffd77a;text-shadow:0 1px 2px #000;flex:none}#qpop .qpr small{display:block;font:600 3.3cqw/1.2 Georgia,serif;color:#e6d3a2}'
-+'#qpop .qpbt{margin-top:auto;display:flex;gap:2cqw;flex:none}'
-+'#qpop .qpbtn{flex:1;min-height:11cqw;border-radius:9px;border:2px solid #f3d27a;background:linear-gradient(180deg,#f5d77f,#c8922f 55%,#8a5e1a);color:#2a1706;font:700 5cqw Georgia,serif;text-shadow:0 1px 0 #ffe9a8;box-shadow:0 0 12px #e0b04e88,inset 0 1px 2px #fff8;cursor:pointer;-webkit-tap-highlight-color:transparent}#qpop .qpbtn:active:not(:disabled){filter:brightness(1.15)}'
++'#qpop .qpr{font:700 4cqw/1.25 Georgia,serif;color:#5a3a0a;text-shadow:0 1px 0 #ffe9b855;flex:none}#qpop .qpr small{display:block;font:600 3.3cqw/1.2 Georgia,serif;color:#4a3216}'
++'#qpop .qpbt{margin-top:auto;display:flex;justify-content:center;align-items:center;gap:2cqw;flex:none}'
++'#qpop .qpbtn{flex:none;display:inline-flex;align-items:center;justify-content:center;padding:0 4cqw;line-height:1;white-space:nowrap;min-height:11cqw;border-radius:9px;border:2px solid #f3d27a;background:linear-gradient(180deg,#f5d77f,#c8922f 55%,#8a5e1a);color:#2a1706;font:700 5cqw Georgia,serif;text-shadow:0 1px 0 #ffe9a8;box-shadow:0 0 12px #e0b04e88,inset 0 1px 2px #fff8;cursor:pointer;-webkit-tap-highlight-color:transparent}#qpop .qpbtn:active:not(:disabled){filter:brightness(1.15)}'
 +'#qpop .qpbtn:disabled{background:linear-gradient(180deg,#5a5750,#3b3934);border-color:#6d6a62;color:#98938a;text-shadow:none;box-shadow:inset 0 1px 2px #0008;cursor:not-allowed}'
 +'#qpop .qpbtn.alt{background:linear-gradient(180deg,#3a4a2c,#1e2a15);border-color:#8fb66a;color:#e9f6d4;text-shadow:0 1px 2px #000;box-shadow:none;font-size:4.2cqw}';document.head.appendChild(e)})();
 const QPOP=document.createElement('div');QPOP.id='qpop';QPOP.setAttribute('role','dialog');QPOP.setAttribute('aria-modal','true');
@@ -923,7 +923,7 @@ function qpData(tr,i){const T=S[tr],M=MULT[tr];
  return{title:q.title,hint:HINT[q.kind]||'',prog:q.kind==='walk'?`${(q.p/1609.344).toFixed(2)} / ${mi(q.goal)}`:`${Math.floor(q.p)} / ${q.goal}`,pct:Math.min(100,100*q.p/q.goal),xp:Math.round(q.xp*M*lvlScale()),pots:'',done:!!q.done,ready:!!q.ready&&!q.done,photo:q.kind==='photo'&&!q.done&&!q.ready}}
 function qpFill(){if(!qpS)return;const d=qpData(qpS.tr,qpS.i);if(!d)return qpClose();
  const $q=x=>QPOP.querySelector(x);$q('.qpt').textContent=d.title;$q('.qpd').textContent=d.done?'This quest has been turned in.':d.ready?'Quest complete! Turn it in to claim your reward.':d.hint;
- $q('.qpb i').style.width=(d.done?100:d.pct)+'%';$q('.qpb span').textContent=d.prog;
+ $q('.qpb i').style.width=(d.done?100:d.pct)+'%';$q('.qpb span').textContent=d.ready?'Ready to Claim':d.prog;
  $q('.qpr').innerHTML='Reward: +'+d.xp.toLocaleString()+' XP'+(d.pots?'<small>'+d.pots+'</small>':'');
  const t=$q('.qpturn');t.disabled=!d.ready;t.textContent=d.done?'Turned In ✔':'Turn In';
  const ph=$q('.alt');ph.style.display=d.photo?'':'none'}
