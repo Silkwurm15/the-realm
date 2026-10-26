@@ -278,12 +278,6 @@ html.hc .mk .badge svg{width:24px;height:24px}
 .topbar.has-ttl .eyebrow{display:block!important;position:absolute;left:24.2%;top:41.5%;width:57%;height:3.1cqw;margin:0;font:italic 600 2.8cqw/3.1cqw Georgia,'Palatino Linotype',serif;letter-spacing:.03em;text-transform:none;color:#e6c77e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
 .topbar.has-ttl .hpbar{top:55%;height:13.6%!important}.topbar.has-ttl .xpbar{top:71%;height:13.6%!important}
 .topbar.has-ttl .hptext,.topbar.has-ttl .xptext{font-size:3cqw!important}
-</style><style id="hud-noxp">
-/* XP bar removed from the status bar; HP bar re-centred in the frame */
-.xpbar,.topbar.has-ttl .xpbar{display:none!important}
-.hpbar{top:57%!important;height:17.5%!important}
-.topbar.has-ttl .hpbar{top:64%!important;height:15%!important}
-.hptext,.topbar.has-ttl .hptext{font-size:4cqw!important}
 </style></head><body>
 <div id="auth"><div class="build-tag" id="buildTag"></div><canvas id="aFx"></canvas>
 <div class="amain">
@@ -893,7 +887,7 @@ const QCARDS='quest_cards.webp',QBGI='quest_bg.webp',QORD=['walk1','nature','cha
 (()=>{const e=document.createElement('style');e.textContent='#qpanel .qk:before{content:"";position:absolute;left:8.5%;right:8.5%;top:49.5%;height:34.5%;border-radius:7px;background:linear-gradient(180deg,#2c200ff5,#120d07f8);border:1.5px solid #c99a3b;box-shadow:inset 0 0 0 1px #000a,inset 0 0 10px #000,0 1px 3px #000a;pointer-events:none}'
 +'#qpanel .qk .t{left:11%;right:11%;top:50.8%;height:19.5%;font:700 8.8cqw/1.12 Georgia,serif;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 4px #000,0 0 2px #000}#qpanel .qk .t.sm{font-size:7.7cqw}'
 +'#qpanel .qk .b{left:11%;width:78%;top:71.2%;height:10.4%;border:1.5px solid #e0b655;border-radius:999px;background:#0b0805;box-shadow:inset 0 0 6px #000,0 0 0 1px #000a}#qpanel .qk .b i{border-radius:999px}'
-+'#qpanel .qk .b span{font:700 6.4cqw Georgia,serif;padding:0 4.2cqw;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 3px #000}#qpanel .qk .b span em{color:#ffd77a}'
++'#qpanel .qk .b span{justify-content:center;font:700 6.4cqw Georgia,serif;padding:0 4.2cqw;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 3px #000}#qpanel .qk .b span em{color:#ffd77a}'
 +'#qpanel .qk.done .b span b{color:#cfd8c4}';document.head.appendChild(e)})();
 
 /* ---- Quest pop-up: same ornate card frame as the quest slips, red X, Turn In button ---- */
@@ -940,7 +934,7 @@ setInterval(()=>{if(qpS)qpFill()},1000);
 function renderList(){const T=S[tab],M=MULT[tab],v='?v='+window.__BUILD,tn={daily:'Daily',weekly:'Weekly',monthly:'Monthly'};
  const lab=t=>t.done?'Completed ✔':t.ready?'Ready to claim':t.kind==='walk'?`${(t.p/1609.344).toFixed(2)} / ${mi(t.goal)}`:`${Math.floor(t.p)} / ${t.goal}`;
  const cardH=(t,o,si)=>{const sp=QSL[si],cx=sp[0],cy=sp[1],pct=Math.round(100*Math.min(1,t.p/t.goal)),col=si%4,row=si>>2;
-  return `<div class="qk${t.done?' done':''}${t.ready&&!t.done?' rdy':''}" data-act="${o.act}" data-i="${o.i==null?'':o.i}" style="left:${(cx-150)/10.24}%;top:${(cy-172)/15.36}%;width:${300/10.24}%;height:${344/15.36}%;background-image:url(${QCARDS}${v});background-position:${col*100/3}% ${row*100}%"><div class="t${t.title.length>24?' sm':''}">${t.title}</div><div class="b"><i style="width:${pct}%"></i><span><b>${lab(t)}</b><em>+${o.xp} XP</em></span></div></div>`};
+  return `<div class="qk${t.done?' done':''}${t.ready&&!t.done?' rdy':''}" data-act="${o.act}" data-i="${o.i==null?'':o.i}" style="left:${(cx-150)/10.24}%;top:${(cy-172)/15.36}%;width:${300/10.24}%;height:${344/15.36}%;background-image:url(${QCARDS}${v});background-position:${col*100/3}% ${row*100}%"><div class="t${t.title.length>24?' sm':''}">${t.title}</div><div class="b"><i style="width:${pct}%"></i><span><b>${lab(t)}</b></span></div></div>`};
  const used={};let free=QORD.length;
  let h='<div class="qwrap"><img class="qbg" src="'+QBGI+v+'" alt=""><div class="qlist"><img class="bgi" src="'+QBGI+v+'" alt="" draggable="false">';
  const tt=QTT[tab];h+='<svg class="qttl2" viewBox="0 0 350 105"><defs><linearGradient id="qg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3b8"/><stop offset=".45" stop-color="#f0bd4a"/><stop offset="1" stop-color="#9a6416"/></linearGradient></defs><text x="175" y="82" text-anchor="middle" textLength="318" lengthAdjust="spacingAndGlyphs" font-family="Georgia,serif" font-weight="700" font-size="'+tt[1]+'" fill="url(#qg)" stroke="#3a2208" stroke-width="2.2" paint-order="stroke" style="filter:drop-shadow(0 3px 3px #000a)">'+tt[0]+'</text></svg>';
