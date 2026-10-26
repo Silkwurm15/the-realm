@@ -278,6 +278,12 @@ html.hc .mk .badge svg{width:24px;height:24px}
 .topbar.has-ttl .eyebrow{display:block!important;position:absolute;left:24.2%;top:41.5%;width:57%;height:3.1cqw;margin:0;font:italic 600 2.8cqw/3.1cqw Georgia,'Palatino Linotype',serif;letter-spacing:.03em;text-transform:none;color:#e6c77e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
 .topbar.has-ttl .hpbar{top:55%;height:13.6%!important}.topbar.has-ttl .xpbar{top:71%;height:13.6%!important}
 .topbar.has-ttl .hptext,.topbar.has-ttl .xptext{font-size:3cqw!important}
+</style><style id="hud-noxp">
+/* XP bar removed from the status bar; HP bar re-centred in the frame */
+.xpbar,.topbar.has-ttl .xpbar{display:none!important}
+.hpbar{top:57%!important;height:17.5%!important}
+.topbar.has-ttl .hpbar{top:64%!important;height:15%!important}
+.hptext,.topbar.has-ttl .hptext{font-size:4cqw!important}
 </style></head><body>
 <div id="auth"><div class="build-tag" id="buildTag"></div><canvas id="aFx"></canvas>
 <div class="amain">
@@ -807,8 +813,8 @@ function lvlScale(){return 1+(S.lvl-1)*.02}   // quest + milestone XP grows ~3x 
 function award(tier,id,base){const c=`${tier}|${S.k[tier]}|${id}`;if(S.claimed[c])return false;S.claimed[c]=1;const x=Math.round(base*MULT[tier]*lvlScale());addXp(x);toast(`+${x} XP`);return true}
 function tick(tier){const m=S[tier].ms;if(m.done)return;m.p=Math.min(5,m.p+1);if(m.p>=5)m.ready=true}
 const MSPOT={daily:{h35:1,full:1,res:0},weekly:{h35:2,full:2,res:2},monthly:{h35:3,full:3,res:3}},PN={h35:'Small HP',full:'Full Health',res:'Resurrect'};   // potions granted per milestone (earned stack caps at 20); Resurrect only from weekly + monthly
-function claimMs(tier){act('claimms',{tier})}
-function claim(tier,q){const i=S[tier].q.indexOf(q);if(i>=0)act('claim',{tier,i})}
+function claimMs(tier){return act('claimms',{tier})}
+function claim(tier,q){const i=S[tier].q.indexOf(q);if(i>=0)return act('claim',{tier,i})}
 function finish(tier,q){if(q.done)return;q.done=true;q.ready=false;q.p=q.goal;award(tier,q.id,q.xp);
  if(tier==='daily'){const n=S.daily.q.filter(x=>x.done).length,m=S.daily.ms;m.p=Math.min(5,n);if(n>=5&&!m.done)m.ready=true}
 }
@@ -883,10 +889,58 @@ function render(){if(!panel.classList.contains('open'))return;panel.classList.to
  renderList()}
 const QCARDS='quest_cards.webp',QBGI='quest_bg.webp',QORD=['walk1','nature','chaos','walk3','quest','chest','walk2'],QSL=[[205.5,526],[513.5,524],[819.5,525],[205.5,883.5],[513.5,883.5],[819.5,883.5],[346,1244],[677.5,1244]],QTT={daily:['DAILY',88],weekly:['WEEKLY',76],monthly:['MONTHLY',66]};   // list screen: painted background + card sprites (8 slots on a 1024x1536 canvas) with live text on top
 (()=>{const e=document.createElement('style');e.textContent='#qpanel .qlist{position:relative;width:max(100cqw,calc(100cqh * .6667));height:max(100cqh,calc(100cqw * 1.5));flex:none;container-type:size;box-shadow:0 0 30px #000c}#qpanel .qlist>.bgi{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}#qpanel .qttl2{position:absolute;left:36.5%;top:11.6%;width:37.5%;height:8%;pointer-events:none;overflow:visible}#qpanel .qk{position:absolute;background-repeat:no-repeat;background-size:400% 200%;cursor:pointer;container-type:size;filter:drop-shadow(0 4px 6px #0009);-webkit-tap-highlight-color:rgba(229,199,123,.3)}#qpanel .qk:active{transform:scale(.98)}#qpanel .qk.done{filter:grayscale(.75) brightness(.72)}#qpanel .qk.rdy{filter:drop-shadow(0 0 3px #8dff8a) drop-shadow(0 0 12px #5fe05c)}#qpanel .qk .t{position:absolute;left:10%;right:10%;top:51%;height:19%;display:flex;align-items:center;justify-content:center;text-align:center;font:700 6.9cqw/1.12 Georgia,serif;color:#2b1a0b;text-shadow:0 1px 0 #f6e0aa;pointer-events:none}#qpanel .qk .b{position:absolute;left:12%;width:76%;top:70.5%;height:8.8%;border:1.5px solid #c99a3b;border-radius:6px;background:#17110a;overflow:hidden;box-shadow:inset 0 0 6px #000;pointer-events:none}#qpanel .qk .b i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#63e05b,#1d8a2a)}#qpanel .qk .b span{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 3cqw;font:700 5.4cqw Georgia,serif;color:#f4e6c0;text-shadow:0 1px 2px #000}#qpanel .qk .b span em{font-style:normal;color:#ffd77a}#qpanel .qnav{position:absolute;left:5%;right:5%;top:94.2%;height:4.4%;display:flex;gap:2%}#qpanel .qnav div{flex:1;display:grid;place-items:center;font:700 3.5cqw Georgia,serif;color:#cdb98a;background:linear-gradient(145deg,#34291bee,#0b0b09ee);border:1px solid #c99a3b;border-radius:6px;cursor:pointer}#qpanel .qnav div.on{color:#fff0c6;background:linear-gradient(180deg,#7a5a26,#2c200f);box-shadow:0 0 10px #d6ad5d66}#qpanel .qnav div.bk{flex:.85}';document.head.appendChild(e)})();
+/* ---- Readable quest slips: dark plate over the tan parchment, bold cream text, roomier progress pill ---- */
+(()=>{const e=document.createElement('style');e.textContent='#qpanel .qk:before{content:"";position:absolute;left:8.5%;right:8.5%;top:49.5%;height:34.5%;border-radius:7px;background:linear-gradient(180deg,#2c200ff5,#120d07f8);border:1.5px solid #c99a3b;box-shadow:inset 0 0 0 1px #000a,inset 0 0 10px #000,0 1px 3px #000a;pointer-events:none}'
++'#qpanel .qk .t{left:11%;right:11%;top:50.8%;height:19.5%;font:700 8.8cqw/1.12 Georgia,serif;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 4px #000,0 0 2px #000}#qpanel .qk .t.sm{font-size:7.7cqw}'
++'#qpanel .qk .b{left:11%;width:78%;top:71.2%;height:10.4%;border:1.5px solid #e0b655;border-radius:999px;background:#0b0805;box-shadow:inset 0 0 6px #000,0 0 0 1px #000a}#qpanel .qk .b i{border-radius:999px}'
++'#qpanel .qk .b span{font:700 6.4cqw Georgia,serif;padding:0 4.2cqw;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 3px #000}#qpanel .qk .b span em{color:#ffd77a}'
++'#qpanel .qk.done .b span b{color:#cfd8c4}';document.head.appendChild(e)})();
+
+/* ---- Quest pop-up: same ornate card frame as the quest slips, red X, Turn In button ---- */
+(()=>{const e=document.createElement('style');e.textContent='#qpop{position:absolute;inset:0;z-index:1095;background:rgba(5,8,6,.78);display:none;align-items:center;justify-content:center;padding:20px}#qpop.open{display:flex}'
++'#qpop .qpc{position:relative;container-type:inline-size;width:min(92vw,400px,calc(86vh * 300 / 344));aspect-ratio:300/344;background-repeat:no-repeat;background-size:400% 200%;filter:drop-shadow(0 8px 18px #000d)}'
++'#qpop .qpx{position:absolute;top:-2.2%;right:-2.2%;width:9.5cqw;height:9.5cqw;min-width:34px;min-height:34px;border-radius:50%;border:2px solid #f3d27a;background:radial-gradient(circle at 35% 30%,#ff7b6e,#d02a20 55%,#7d130d);color:#fff;font:700 5.4cqw/1 Arial,sans-serif;display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 2px 6px #000c,inset 0 1px 2px #ffffff66;text-shadow:0 1px 2px #000;z-index:3;-webkit-tap-highlight-color:transparent}#qpop .qpx:active{filter:brightness(1.2)}'
++'#qpop .qpp{position:absolute;left:8.5%;right:8.5%;top:49%;bottom:6.5%;border-radius:10px;background:linear-gradient(180deg,#2c200ff7,#120d07fa);border:1.5px solid #c99a3b;box-shadow:inset 0 0 0 1px #000a,inset 0 0 14px #000;padding:2.2cqw 3.4cqw 3cqw;display:flex;flex-direction:column;align-items:stretch;gap:1.5cqw;text-align:center;color:#fff1cf;font-family:Georgia,serif}'
++'#qpop .qpt{font:700 5.5cqw/1.1 Georgia,serif;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 4px #000;flex:none}'
++'#qpop .qpd{font:italic 3.5cqw/1.22 Georgia,serif;color:#e6d3a2;text-shadow:0 1px 2px #000;flex:none}'
++'#qpop .qpb{position:relative;height:6.2cqw;border:1.5px solid #e0b655;border-radius:999px;background:#0b0805;overflow:hidden;box-shadow:inset 0 0 6px #000;flex:none}#qpop .qpb i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#63e05b,#1d8a2a)}#qpop .qpb span{position:absolute;inset:0;display:grid;place-items:center;font:700 3.9cqw Georgia,serif;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 3px #000}'
++'#qpop .qpr{font:700 4cqw/1.25 Georgia,serif;color:#ffd77a;text-shadow:0 1px 2px #000;flex:none}#qpop .qpr small{display:block;font:600 3.3cqw/1.2 Georgia,serif;color:#e6d3a2}'
++'#qpop .qpbt{margin-top:auto;display:flex;gap:2cqw;flex:none}'
++'#qpop .qpbtn{flex:1;min-height:11cqw;border-radius:9px;border:2px solid #f3d27a;background:linear-gradient(180deg,#f5d77f,#c8922f 55%,#8a5e1a);color:#2a1706;font:700 5cqw Georgia,serif;text-shadow:0 1px 0 #ffe9a8;box-shadow:0 0 12px #e0b04e88,inset 0 1px 2px #fff8;cursor:pointer;-webkit-tap-highlight-color:transparent}#qpop .qpbtn:active:not(:disabled){filter:brightness(1.15)}'
++'#qpop .qpbtn:disabled{background:linear-gradient(180deg,#5a5750,#3b3934);border-color:#6d6a62;color:#98938a;text-shadow:none;box-shadow:inset 0 1px 2px #0008;cursor:not-allowed}'
++'#qpop .qpbtn.alt{background:linear-gradient(180deg,#3a4a2c,#1e2a15);border-color:#8fb66a;color:#e9f6d4;text-shadow:0 1px 2px #000;box-shadow:none;font-size:4.2cqw}';document.head.appendChild(e)})();
+const QPOP=document.createElement('div');QPOP.id='qpop';QPOP.setAttribute('role','dialog');QPOP.setAttribute('aria-modal','true');
+QPOP.innerHTML='<div class="qpc"><button class="qpx" type="button" aria-label="Close">✕</button><div class="qpp"><div class="qpt"></div><div class="qpd"></div><div class="qpb"><i></i><span></span></div><div class="qpr"></div><div class="qpbt"><button class="qpbtn alt" type="button" style="display:none">📷 Enter Photo</button><button class="qpbtn qpturn" type="button">Turn In</button></div></div></div>';
+(modal.parentElement||document.body).insertBefore(QPOP,modal);
+let qpS=null;
+function qpClose(){QPOP.classList.remove('open');qpS=null}
+function qpData(tr,i){const T=S[tr],M=MULT[tr];
+ if(i==='ms'){const m=T.ms,pots=Object.keys(MSPOT[tr]).filter(k=>MSPOT[tr][k]).map(k=>{const n=MSPOT[tr][k];return '+'+n+' '+PN[k]+' Potion'+(n>1?'s':'')}).join(', ');
+  return{title:MS[tr],hint:'Finish all 5 quests on this tab.',prog:m.p+' / 5',pct:100*m.p/5,xp:Math.round(m.xp*M*lvlScale()),pots,done:!!m.done,ready:!!m.ready&&!m.done}}
+ const q=T.q[i];if(!q)return null;
+ return{title:q.title,hint:HINT[q.kind]||'',prog:q.kind==='walk'?`${(q.p/1609.344).toFixed(2)} / ${mi(q.goal)}`:`${Math.floor(q.p)} / ${q.goal}`,pct:Math.min(100,100*q.p/q.goal),xp:Math.round(q.xp*M*lvlScale()),pots:'',done:!!q.done,ready:!!q.ready&&!q.done,photo:q.kind==='photo'&&!q.done&&!q.ready}}
+function qpFill(){if(!qpS)return;const d=qpData(qpS.tr,qpS.i);if(!d)return qpClose();
+ const $q=x=>QPOP.querySelector(x);$q('.qpt').textContent=d.title;$q('.qpd').textContent=d.done?'This quest has been turned in.':d.ready?'Quest complete! Turn it in to claim your reward.':d.hint;
+ $q('.qpb i').style.width=(d.done?100:d.pct)+'%';$q('.qpb span').textContent=d.prog;
+ $q('.qpr').innerHTML='Reward: +'+d.xp.toLocaleString()+' XP'+(d.pots?'<small>'+d.pots+'</small>':'');
+ const t=$q('.qpturn');t.disabled=!d.ready;t.textContent=d.done?'Turned In ✔':'Turn In';
+ const ph=$q('.alt');ph.style.display=d.photo?'':'none'}
+function qpShow(el,tr,i){const d=qpData(tr,i);if(!d)return;qpS={tr,i};
+ const c=QPOP.firstElementChild;c.style.backgroundImage=el.style.backgroundImage;c.style.backgroundPosition=el.style.backgroundPosition;
+ qpFill();QPOP.classList.add('open')}
+QPOP.addEventListener('click',e=>{if(e.target===QPOP||e.target.closest('.qpx')){qpClose();return}
+ if(e.target.closest('.alt')){qpClose();askPhoto({done:()=>act('photo',{path:lastPhoto,ll:targetLL})});return}
+ const b=e.target.closest('.qpturn');if(!b||b.disabled||!qpS)return;
+ const {tr,i}=qpS,d=qpData(tr,i);if(!d||!d.ready)return;
+ qpClose();   // window closes first, then the slip grays out once the server confirms the claim
+ const p=i==='ms'?claimMs(tr):claim(tr,S[tr].q[i]);
+ Promise.resolve(p).then(()=>{try{render()}catch(e){}})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&qpS)qpClose()});
+setInterval(()=>{if(qpS)qpFill()},1000);
 function renderList(){const T=S[tab],M=MULT[tab],v='?v='+window.__BUILD,tn={daily:'Daily',weekly:'Weekly',monthly:'Monthly'};
  const lab=t=>t.done?'Completed ✔':t.ready?'Ready to claim':t.kind==='walk'?`${(t.p/1609.344).toFixed(2)} / ${mi(t.goal)}`:`${Math.floor(t.p)} / ${t.goal}`;
  const cardH=(t,o,si)=>{const sp=QSL[si],cx=sp[0],cy=sp[1],pct=Math.round(100*Math.min(1,t.p/t.goal)),col=si%4,row=si>>2;
-  return `<div class="qk${t.done?' done':''}${t.ready&&!t.done?' rdy':''}" data-act="${o.act}" data-i="${o.i==null?'':o.i}" style="left:${(cx-150)/10.24}%;top:${(cy-172)/15.36}%;width:${300/10.24}%;height:${344/15.36}%;background-image:url(${QCARDS}${v});background-position:${col*100/3}% ${row*100}%"><div class="t">${t.title}</div><div class="b"><i style="width:${pct}%"></i><span><b>${lab(t)}</b><em>+${o.xp} XP</em></span></div></div>`};
+  return `<div class="qk${t.done?' done':''}${t.ready&&!t.done?' rdy':''}" data-act="${o.act}" data-i="${o.i==null?'':o.i}" style="left:${(cx-150)/10.24}%;top:${(cy-172)/15.36}%;width:${300/10.24}%;height:${344/15.36}%;background-image:url(${QCARDS}${v});background-position:${col*100/3}% ${row*100}%"><div class="t${t.title.length>24?' sm':''}">${t.title}</div><div class="b"><i style="width:${pct}%"></i><span><b>${lab(t)}</b><em>+${o.xp} XP</em></span></div></div>`};
  const used={};let free=QORD.length;
  let h='<div class="qwrap"><img class="qbg" src="'+QBGI+v+'" alt=""><div class="qlist"><img class="bgi" src="'+QBGI+v+'" alt="" draggable="false">';
  const tt=QTT[tab];h+='<svg class="qttl2" viewBox="0 0 350 105"><defs><linearGradient id="qg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3b8"/><stop offset=".45" stop-color="#f0bd4a"/><stop offset="1" stop-color="#9a6416"/></linearGradient></defs><text x="175" y="82" text-anchor="middle" textLength="318" lengthAdjust="spacingAndGlyphs" font-family="Georgia,serif" font-weight="700" font-size="'+tt[1]+'" fill="url(#qg)" stroke="#3a2208" stroke-width="2.2" paint-order="stroke" style="filter:drop-shadow(0 3px 3px #000a)">'+tt[0]+'</text></svg>';
@@ -902,6 +956,7 @@ panel.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b|
  if(a==='tab'){tab=i;render();return}
  if(a==='sq')return sqPanel(i);
  const tr=tab,M=MULT[tr];
+ if(a==='q'||a==='ms')return qpShow(b,tr,a==='q'?parseInt(i,10):'ms');
  if(a==='q'){const q=S[tr].q[i];if(!q)return;const xp=Math.round(q.xp*M*lvlScale()),prog=q.kind==='walk'?`${(q.p/1609.344).toFixed(2)} / ${mi(q.goal)}`:`${Math.floor(q.p)} / ${q.goal}`,
   base={icon:q.kind==='photo'?'📷':'📜',title:q.title,text:`${prog}\nReward: +${xp} XP${q.done?'':'\n'+HINT[q.kind]}`};
   if(q.done)return popup({...base,btn:'Completed'});
