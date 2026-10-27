@@ -646,6 +646,7 @@ function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(it.t==='slumber'){slmIntro(it);return}
  if(it.t==='calaun'){calIntro(it);return}
  if(it.t==='selora'){selIntro(it);return}
+ if(it.t==='rift'){portalOpen(it);return}   // Arcane Rift: portal screen replaces the pop-up box
  const c=POI[it.t];
  showModal('poi',{skin:({nature:'nature',chest:'chest',rift:'rift',quest:'quest',boss:'lair'})[it.t],icon:c.icon,title:c.title(it),color:it.t==='qpoint'?'#ff4fd8':'',text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+(it.t==='boss'?'\n\nCosts 1 🗝️ Key of the Forsaken (you have '+keysN()+').':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));if(it.used||it.busy)return;it.busy=true;(it.t==='chest'||it.t==='boss'?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
@@ -1544,10 +1545,14 @@ const Sound=(()=>{let ctx=null,unlocked=false,want='map',el=null,seq=Promise.res
  function music(n){want=n||null;if(!unlocked)return;if(el){el.pause();el=null}if(!n)return;const list=[n];if(n.indexOf('_')>0)list.push(n.split('_')[0]);   // battle_mimic falls back to battle
   const go=i=>{if(i>=list.length||bad.has('m:'+list[i])){if(i<list.length)go(i+1);return}const a=new Audio(SND_BASE+'music/'+list[i]+'.mp3');a.loop=true;a.volume=vol('music');a.onerror=()=>{bad.add('m:'+list[i]);if(el===a){el=null;go(i+1)}};el=a;if(!document.hidden)a.play().catch(()=>{})};go(0)}
  function refresh(){if(el)el.volume=vol('music')}
+ let fT=0;   // music fades: fadeOut ramps the current track to silence, fadeIn starts a track at 0 and ramps it up
+ function fadeOut(ms){return new Promise(res=>{clearInterval(fT);const a=el;if(!a||ms<=0){if(a&&el===a){a.pause();el=null}return res()}const v0=a.volume,t0=performance.now();fT=setInterval(()=>{const k=Math.min(1,(performance.now()-t0)/ms);a.volume=v0*(1-k);if(k>=1){clearInterval(fT);if(el===a){a.pause();el=null}res()}},40)})}
+ function fadeIn(n,ms){clearInterval(fT);music(n);const a=el;if(!a)return;const t=vol('music');a.volume=0;const t0=performance.now();fT=setInterval(()=>{if(el!==a){clearInterval(fT);return}const k=Math.min(1,(performance.now()-t0)/ms);a.volume=t*k;if(k>=1)clearInterval(fT)},40)}
+ const now=()=>el?want:null;
  document.addEventListener('visibilitychange',()=>{if(!el)return;if(document.hidden)el.pause();else el.play().catch(()=>{})});
  ['pointerdown','touchstart','keydown'].forEach(e=>addEventListener(e,unlock,{passive:true}));   // phones only allow sound after the first touch
  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button,.nav-item,[data-act],[data-m],[data-c],[role=button]');if(b&&!b.closest('#setModal'))sfx('tap')},true);   // buttons, the bottom menu tabs and tappable menu cards
- return{sfx,queue,hit,levelUp,fromMsg,music,refresh,unlock}})();
+ return{sfx,queue,hit,levelUp,fromMsg,music,refresh,unlock,fadeOut,fadeIn,now}})();
 
 /* Frame-rate limit: wraps the browser's animation timer so the map and every animation obey it. */
 const FPS=(()=>{let iv=0,last=0,curT=-1,curOk=true,installed=false,nid=1;const raf=window.requestAnimationFrame.bind(window),caf=window.cancelAnimationFrame.bind(window),live=new Map();
@@ -1891,14 +1896,190 @@ async function tempt(){if(CD.busy)return;CD.busy=true;cdSet({name:'Fate is turni
   $('cdie').classList.add('land');hud();if(inv.classList.contains('open'))invRender()})}
 $('chaosButton').addEventListener('click',chaosOpen);
 
+/* ---- Arcane Rift Portal: replaces the old "Enter Rift" box. Portal music (audio/music/portal.mp3) loops until the player taps the gate.
+   When the screen goes black the portal music fades out, then the room's own track fades in (battle_rift for the creature room, map music for every other room). ---- */
+var PT={el:null,open:false,state:'idle',it:null,raf:0,timers:[],boost:1,last:0,room:null};
+const PT_MUSIC={beast:'battle_rift'};   // rooms with their own track. Any room not listed keeps the map music.
+const PT_CSS=`
+#portalOv{--void:#05040a;--cyan:#4fe3ff;--violet:#8a5cff;--img:url("art/rift_portal.jpg");position:fixed;inset:0;z-index:1490;display:none;opacity:0;transition:opacity .55s ease;background:var(--void);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden;font-family:Cinzel,Georgia,serif;color-scheme:dark}
+#portalOv.on{opacity:1}
+#portalOv *,#portalOv *::before,#portalOv *::after{box-sizing:border-box}
+#portalOv .ptScene{position:absolute;inset:0;perspective:1200px;display:grid;place-items:center}
+#portalOv .ptStage{position:relative;width:min(100%,calc(100dvh * .94));aspect-ratio:1080/1149;transform-style:preserve-3d;transition:transform .25s ease-out;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+#portalOv .ptStage>*{position:absolute;pointer-events:none}
+#portalOv .ptBase{inset:0;background:var(--img) center/100% 100% no-repeat}
+#portalOv .ptGate{left:31%;top:21.3%;width:36.6%;height:62.7%;border-radius:50% 50% 46% 46% / 40% 40% 50% 50%;overflow:hidden;animation:ptBreathe 4.5s ease-in-out infinite}
+#portalOv .ptWarp{position:absolute;inset:0;background:var(--img) 48.9% 57.1%/273% auto no-repeat;filter:url(#ptRipple)}
+#portalOv .ptSwirl{position:absolute;inset:-35%;mix-blend-mode:screen;opacity:.55;filter:blur(8px);background:conic-gradient(from 0deg,transparent,rgba(79,227,255,.8),transparent 20%,rgba(138,92,255,.9) 42%,transparent 60%,rgba(255,200,120,.7) 80%,transparent);-webkit-mask:radial-gradient(circle,transparent 18%,#000 62%,transparent 100%);mask:radial-gradient(circle,transparent 18%,#000 62%,transparent 100%);animation:ptSpin 14s linear infinite}
+#portalOv .ptSwirl.b{opacity:.35;animation-duration:9s;animation-direction:reverse;transform:scale(.8)}
+#portalOv .ptCore{position:absolute;left:50%;top:52%;width:50%;height:36%;transform:translate(-50%,-50%);border-radius:50%;mix-blend-mode:screen;background:radial-gradient(circle,rgba(190,220,255,.55),transparent 70%);animation:ptPulse 3s ease-in-out infinite}
+#portalOv .ptSurge .ptGate{animation:ptSurge 1.6s ease-in-out}
+#portalOv .ptGlow{mix-blend-mode:color-dodge}
+#portalOv .ptFlame{width:14%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,170,60,.9),rgba(255,120,20,.35) 40%,transparent 70%);animation:ptFlick 1.3s infinite}
+#portalOv .ptRunes{overflow:hidden}
+#portalOv .ptRunes::before{content:"";position:absolute;left:0;right:0;top:0;height:40%;will-change:transform;background:linear-gradient(180deg,transparent,rgba(79,227,255,.9) 50%,transparent);animation:ptSweep 3.4s ease-in-out infinite alternate}
+#portalOv .ptRunes+.ptRunes::before{animation-delay:-1.7s}
+#portalOv .ptHalo{left:20%;top:12%;width:60%;height:80%;border-radius:50%;mix-blend-mode:screen;background:radial-gradient(ellipse,rgba(138,92,255,.35),transparent 65%);animation:ptPulse 3s ease-in-out infinite}
+#portalOv canvas{inset:0;width:100%;height:100%}
+#portalOv .ptCaption{left:0;right:0;bottom:0;padding:16% 9% 5%;text-align:center;color:#eef6ff;background:linear-gradient(transparent,rgba(5,4,10,.85) 60%);transition:opacity .9s ease,transform .9s ease}
+#portalOv .ptCaption h1{margin:0 0 .35em;font:600 clamp(26px,8.4vw,46px)/1.1 Cinzel,Georgia,serif;letter-spacing:.03em;text-shadow:0 0 18px var(--violet),0 0 4px rgba(79,227,255,.7),0 2px 4px #000}
+#portalOv .ptCaption p{margin:0 auto;max-width:24ch;font:clamp(15px,4.4vw,21px)/1.35 "IM Fell English",Georgia,serif;color:#d8e8ff;text-shadow:0 1px 4px #000,0 0 10px rgba(5,4,10,.9)}
+#portalOv .ptCaption.gone{opacity:0;transform:translateY(14px)}
+#portalOv .ptCaption .ptTap{display:block;margin-top:1.1em;font:600 clamp(13px,3.6vw,16px) Cinzel,Georgia,serif;letter-spacing:.14em;color:var(--cyan);text-shadow:0 0 10px var(--violet),0 1px 3px #000;animation:ptPulse 2.4s ease-in-out infinite}
+#portalOv .ptVoid{position:absolute;inset:0;z-index:5;opacity:0;pointer-events:none;transition:opacity 1.5s ease-in;background:#000}
+#portalOv .ptVoid.on{opacity:1;pointer-events:auto}
+#portalOv .ptFlash{inset:0;background:radial-gradient(ellipse at 50% 50%,#fff,var(--cyan) 25%,var(--violet) 55%,transparent 80%);opacity:0;mix-blend-mode:screen}
+#portalOv .ptBack{position:absolute;z-index:6;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;padding:8px 14px;border:1px solid rgba(138,92,255,.7);border-radius:18px;background:rgba(5,4,10,.6);color:#cfe2ff;font:600 13px Cinzel,Georgia,serif;letter-spacing:.08em;cursor:pointer;transition:opacity .4s}
+#portalOv .ptBack.hide{opacity:0;pointer-events:none}
+@keyframes ptSpin{to{transform:rotate(360deg)}}
+@keyframes ptBreathe{50%{filter:brightness(1.28) saturate(1.2)}}
+@keyframes ptPulse{50%{opacity:.45}}
+@keyframes ptFlick{0%,100%{opacity:.9;transform:translate(-50%,-50%) scale(1)}20%{opacity:.55;transform:translate(-50%,-52%) scale(.9)}45%{opacity:1;transform:translate(-50%,-49%) scale(1.12)}70%{opacity:.65;transform:translate(-50%,-51%) scale(.95)}}
+@keyframes ptSweep{from{transform:translateY(-60%)}to{transform:translateY(150%)}}
+@keyframes ptSurge{35%{filter:brightness(2.6) saturate(1.6)}100%{filter:brightness(1)}}
+`;
+const PT_HTML=`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="ptRipple" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.01" numOctaves="2" seed="4" result="n"><animate attributeName="baseFrequency" dur="16s" values="0.006 0.01;0.011 0.006;0.006 0.01" repeatCount="indefinite"/></feTurbulence><feDisplacementMap id="ptDisp" in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+<div class="ptScene"><div class="ptStage" id="ptStage" role="img" aria-label="An ancient stone gate with a swirling portal showing a distant castle">
+<div class="ptBase"></div><div class="ptHalo"></div>
+<div class="ptGate"><div class="ptWarp"></div><div class="ptSwirl"></div><div class="ptSwirl b"></div><div class="ptCore"></div></div>
+<div class="ptGlow ptFlame" style="left:22.4%;top:23%;animation-delay:-.2s"></div>
+<div class="ptGlow ptFlame" style="left:77%;top:28%;animation-delay:-.7s;animation-duration:1.7s"></div>
+<div class="ptGlow ptFlame" style="left:14.8%;top:75%;width:12%;animation-delay:-.4s;animation-duration:1.1s"></div>
+<div class="ptGlow ptFlame" style="left:91.7%;top:71%;width:7%;animation-delay:-.9s"></div>
+<div class="ptGlow ptFlame" style="left:97.5%;top:81.5%;width:7%;animation-delay:-.5s;animation-duration:1.5s"></div>
+<div class="ptGlow ptRunes" style="left:22.5%;top:39%;width:6%;height:37%"></div>
+<div class="ptGlow ptRunes" style="left:71%;top:41%;width:5%;height:33%;animation-delay:-2s"></div>
+<canvas id="ptFx"></canvas><div class="ptFlash"></div>
+<div class="ptCaption" id="ptHint"><h1>Arcane Rift</h1><p>The air shimmers and tears open. One room, one choice.</p><span class="ptTap">Tap to Enter</span></div>
+</div></div>
+<div class="ptVoid" id="ptVoid"></div>
+<button class="ptBack" id="ptBack" type="button">Step Back</button>`;
+
+function ptLater(fn,ms){PT.timers.push(setTimeout(fn,ms))}
+
+function ptBuild(){
+  if(PT.el)return;
+  try{const l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=IM+Fell+English&display=swap';document.head.appendChild(l)}catch(e){}
+  const st=document.createElement('style');st.textContent=PT_CSS;document.head.appendChild(st);
+  const el=document.createElement('div');el.id='portalOv';el.innerHTML=PT_HTML;document.body.appendChild(el);PT.el=el;
+  const stage=el.querySelector('#ptStage');
+  stage.addEventListener('click',ptEnter);
+  stage.addEventListener('pointermove',e=>{if(PT.state!=='idle')return;const r=stage.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;stage.style.transform='rotateY('+(px*5)+'deg) rotateX('+(-py*4)+'deg)'});
+  stage.addEventListener('pointerleave',()=>{if(PT.state==='idle')stage.style.transform=''});
+  el.querySelector('#ptBack').addEventListener('click',()=>{if(PT.state==='idle')ptHide(true)});
+  addEventListener('resize',ptResize);
+}
+
+/* ---- particles (same as the preview, only runs while the portal is on screen) ---- */
+const PT_G={cx:.493,cy:.527,rx:.19,ry:.31},PT_COLS=['#4fe3ff','#9a7bff','#ffffff','#ffc878'],PT_LANT=[[.224,.21],[.77,.265],[.148,.735],[.917,.70],[.975,.80]];
+let ptW=0,ptH=0,ptSparks=[],ptEmbers=[],ptFlies=[];
+function ptResize(){
+  if(!PT.el||!PT.open)return;
+  const stage=PT.el.querySelector('#ptStage'),cv=PT.el.querySelector('#ptFx'),d=Math.min(devicePixelRatio||1,2);
+  ptW=stage.offsetWidth;ptH=stage.offsetHeight;cv.width=ptW*d;cv.height=ptH*d;cv.getContext('2d').setTransform(d,0,0,d,0,0);
+  PT.el.querySelector('#ptDisp').setAttribute('scale',Math.round(ptW*.022));
+}
+function ptSpark(s,fresh){s.t=Math.random()*6.283;s.r=fresh?Math.random():1;s.v=.12+Math.random()*.25;s.c=PT_COLS[(Math.random()*4)|0];s.z=.6+Math.random()*1.4;s.px=null;return s}
+function ptEmber(e,fresh){const l=PT_LANT[(Math.random()*PT_LANT.length)|0];e.x=l[0]+(Math.random()-.5)*.02;e.y=l[1]-(fresh?Math.random()*.2:0);e.vy=.012+Math.random()*.03;e.ph=Math.random()*6.283;e.life=0;e.max=3+Math.random()*4;e.z=.6+Math.random()*1.2;return e}
+function ptStart(){
+  const low=SET.fx==='low'||SET.low;
+  ptSparks=[];ptEmbers=[];ptFlies=[];
+  for(let i=0;i<(low?40:90);i++)ptSparks.push(ptSpark({},true));
+  for(let i=0;i<(low?10:28);i++)ptEmbers.push(ptEmber({},true));
+  for(let i=0;i<(low?6:18);i++)ptFlies.push({x:Math.random(),y:.3+Math.random()*.6,ph:Math.random()*6.283,sp:.2+Math.random()*.3});
+  PT.boost=1;PT.last=0;ptResize();
+  if(SET.rm||SET.fx==='off')return;   // reduced motion / effects off: still image, no particles
+  const ctx=PT.el.querySelector('#ptFx').getContext('2d');
+  const frame=ts=>{
+    if(!PT.open)return;
+    const dt=Math.min((ts-PT.last)/1000||.016,.05);PT.last=ts;
+    ctx.clearRect(0,0,ptW,ptH);ctx.globalCompositeOperation='lighter';
+    for(const s of ptSparks){
+      s.t+=dt*(1.2+(1-s.r)*5)*PT.boost;s.r-=dt*s.v*PT.boost;if(s.r<.04)ptSpark(s);
+      const x=(PT_G.cx+Math.cos(s.t)*s.r*PT_G.rx)*ptW,y=(PT_G.cy+Math.sin(s.t)*s.r*PT_G.ry)*ptH,a=Math.min(1,s.r*4)*.9;
+      ctx.strokeStyle=s.c;ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.lineWidth=s.z*ptW/700;
+      if(s.px!==null){ctx.beginPath();ctx.moveTo(s.px,s.py);ctx.lineTo(x,y);ctx.stroke()}
+      ctx.beginPath();ctx.arc(x,y,s.z*ptW/600,0,6.283);ctx.fill();s.px=x;s.py=y;
+    }
+    for(const e of ptEmbers){
+      e.life+=dt;e.y-=e.vy*dt*3;e.x+=Math.sin(e.life*2+e.ph)*.0004;if(e.life>e.max)ptEmber(e);
+      ctx.globalAlpha=Math.sin(Math.min(1,e.life/e.max)*Math.PI)*.85;ctx.fillStyle='#ffb347';ctx.beginPath();ctx.arc(e.x*ptW,e.y*ptH,e.z*ptW/700,0,6.283);ctx.fill();
+    }
+    for(const f of ptFlies){
+      f.ph+=dt*f.sp;f.x+=Math.cos(f.ph*1.3)*.0006;f.y+=Math.sin(f.ph)*.0004;
+      ctx.globalAlpha=.35+.5*Math.sin(f.ph*4);ctx.fillStyle='#c8f4ff';ctx.shadowColor='#4fe3ff';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(f.x*ptW,f.y*ptH,1.3*ptW/700,0,6.283);ctx.fill();ctx.shadowBlur=0;
+    }
+    ctx.globalAlpha=1;PT.boost+=(1-PT.boost)*dt*1.5;
+    PT.raf=requestAnimationFrame(frame);
+  };
+  PT.raf=requestAnimationFrame(frame);
+}
+
+/* ---- open: the map marker tap lands here instead of the old pop-up box ---- */
+function portalOpen(it){
+  if(PT.open)return;
+  ptBuild();
+  PT.open=true;PT.state='idle';PT.it=it;PT.room=null;
+  const el=PT.el,stage=el.querySelector('#ptStage');
+  stage.style.transition='none';stage.style.transform='';stage.style.transformOrigin='';stage.offsetWidth;stage.style.transition='';
+  stage.classList.remove('ptSurge');
+  el.querySelector('#ptHint').classList.remove('gone');
+  el.querySelector('#ptVoid').classList.remove('on');
+  el.querySelector('#ptBack').classList.remove('hide');
+  el.style.display='block';
+  requestAnimationFrame(()=>{el.classList.add('on');ptStart()});
+  // portal music: map music dips out, Portal.mp3 loops (Sound loops every music track) until the player taps the gate
+  try{Sound.fadeOut(300).then(()=>{if(PT.open&&PT.state==='idle')Sound.fadeIn('portal',600)})}catch(e){}
+}
+
+/* ---- tap the gate: fly in, black out, portal music fades out, the room's music fades in ---- */
+function ptEnter(){
+  if(!PT.open||PT.state!=='idle')return;
+  const it=PT.it;
+  if(dist(targetLL,it.ll)>RANGE){tooFar(dist(targetLL,it.ll));ptHide(true);return}
+  if(it.used||it.busy)return;
+  PT.state='entering';it.busy=true;
+  const el=PT.el,stage=el.querySelector('#ptStage'),voidEl=el.querySelector('#ptVoid');
+  // ask the server now so the room is ready by the time the screen is black
+  PT.room=useMarker(it,()=>act('rift',{op:'enter',key:it.key,exp:it.exp,ll:targetLL})).then(r=>r&&r.result&&r.result.rift?r.result.rift.room:null,()=>null);
+  el.querySelector('#ptBack').classList.add('hide');
+  el.querySelector('#ptHint').classList.add('gone');        // 1. words fade
+  stage.classList.add('ptSurge');PT.boost=7;                // 2. portal flares, sparks race
+  ptLater(()=>{                                             // 3. fly into the gate
+    stage.style.transformOrigin=(PT_G.cx*100)+'% '+(PT_G.cy*100)+'%';
+    stage.style.transition='transform 2.4s cubic-bezier(.6,0,.3,1)';
+    stage.style.transform='scale(8)';
+  },500);
+  ptLater(()=>{voidEl.classList.add('on');try{Sound.fadeOut(1500)}catch(e){}},1000);   // 4. fade to black, portal music fades out with it
+  ptLater(async()=>{                                        // 5. black: room music fades in, room appears
+    const room=await PT.room;it.busy=false;
+    if(!PT.open)return;
+    if(!room){ptHide(true);return}                          // server said no (it already showed why): back to the map
+    PT.state='inside';stage.classList.remove('ptSurge');
+    try{Sound.fadeIn(PT_MUSIC[room.id]||'map',1400)}catch(e){}   // room track, or map music if the room has none
+    rfRoom(room);
+  },3000);
+}
+
+/* ---- close: back to the map. toMap = also bring the map music back (rfClose does that itself after a finished rift) ---- */
+function ptHide(toMap){
+  if(!PT.open)return;
+  PT.open=false;PT.state='idle';
+  PT.timers.forEach(clearTimeout);PT.timers=[];cancelAnimationFrame(PT.raf);
+  if(PT.it)PT.it.busy=false;
+  const el=PT.el;el.classList.remove('on');
+  setTimeout(()=>{if(PT.open)return;el.style.display='none';const s=el.querySelector('#ptStage');s.style.transition='none';s.style.transform='';s.offsetWidth;s.style.transition='';el.querySelector('#ptVoid').classList.remove('on')},650);
+  if(toMap){try{if(Sound.now()!=='map')Sound.fadeOut(300).then(()=>Sound.fadeIn('map',700))}catch(e){}}
+}
+
 /* ---- Arcane Rifts: one room, one choice. The server rolls everything; this only shows it. ---- */
 const rfs=document.createElement('style');rfs.textContent='#riftOv{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;padding:14px;background:#000d;font-family:Georgia,serif;color:#e6dcff}#riftOv .rfb{width:100%;max-width:380px;max-height:100%;overflow-y:auto;padding:18px 16px;border:1px solid #9b78e8;border-radius:6px;background:linear-gradient(135deg,#24123f,#0b0813);box-shadow:0 14px 50px #000c,0 0 40px #7b4dd855,inset 0 0 0 3px #170c2b;text-align:center}#riftOv .rfi{font-size:46px;line-height:1.1}#riftOv .rft{font-size:20px;font-weight:700;color:#f1e8ff;margin:4px 0 6px}#riftOv .rfw{display:inline-block;margin:2px 0 8px;padding:3px 10px;border:1px solid #b184ff;border-radius:12px;font-size:12px;color:#d8c4ff}#riftOv .rfx{font-size:14px;line-height:1.45;color:#d5c8f0;white-space:pre-line}#riftOv .rfl{margin:12px 0;font-size:14px;line-height:1.5;color:#e6dcff;white-space:pre-line;text-align:left}#riftOv button{display:block;width:100%;margin-top:9px;padding:12px 8px;border:1px solid #b184ff;border-radius:4px;background:linear-gradient(#4a2d80,#2a1650);color:#f4edff;font:700 16px Georgia,serif;cursor:pointer}#riftOv button small{display:block;margin-top:3px;font:12px Georgia,serif;color:#cdb8f5}#riftOv button.alt{background:#150d26;border-color:#6b4fa3}#riftOv button:disabled{opacity:.5}';document.head.appendChild(rfs);
 const rf=document.createElement('div');rf.id='riftOv';rf.innerHTML='<div class="rfb"><img id="rfImg" alt="" style="display:none"><div class="rfi" id="rfI"></div><div class="rft" id="rfT"></div><div class="rfw" id="rfW" style="display:none"></div><div class="rfx" id="rfX"></div><div class="rfl" id="rfL" style="display:none"></div><div id="rfC"></div></div>';document.body.appendChild(rf);
 function rfDraw(o){skinSet(rf.firstElementChild,o.skin);rf.firstElementChild.classList.toggle('slm',!!o.slm);{const im=$('rfImg');im.style.display=o.img?'block':'none';if(o.img)im.src=o.img}$('rfI').textContent=o.icon;$('rfT').textContent=o.title;const w=$('rfW');w.style.display=o.wild?'inline-block':'none';w.textContent=o.wild||'';$('rfX').textContent=o.text||'';const l=$('rfL');l.style.display=o.lines?'block':'none';l.textContent=o.lines?o.lines.join('\n'):'';
  const c=$('rfC');c.innerHTML='';(o.btns||[]).forEach(b=>{const x=document.createElement('button');x.innerHTML=b.html;if(b.alt)x.className='alt';x.onclick=()=>{c.querySelectorAll('button').forEach(y=>y.disabled=true);b.fn()};if(b.dis)x.disabled=true;c.appendChild(x)});rf.style.display='flex'}
-const rfClose=()=>{rf.style.display='none';try{Sound.music('map')}catch(e){}hud();try{if(inv.classList.contains('open'))invRender()}catch(e){}};
+const rfClose=()=>{rf.style.display='none';try{if(Sound.now()!=='map')Sound.music('map')}catch(e){}try{ptHide(false)}catch(e){}hud();try{if(inv.classList.contains('open'))invRender()}catch(e){}};
 const esc=t=>String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-function rfRoom(room){try{if(room&&room.id==='beast')Sound.music('battle_rift')}catch(e){}rfDraw({skin:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',library:'library'})[room.id],icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:room.text+(room.wild?'\n'+room.wild.text:''),
+function rfRoom(room){try{if(room&&room.id==='beast'&&!PT.open)Sound.music('battle_rift')}catch(e){}rfDraw({skin:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',library:'library'})[room.id],icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:room.text+(room.wild?'\n'+room.wild.text:''),
  btns:room.choices.map(c=>{const o=c.fight?(c.odds?'You should win this':'You would likely lose'):c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':''),sub=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' · ');return{html:esc(c.label)+(sub?'<small>'+esc(sub)+'</small>':''),dis:c.afford===false,fn:()=>riftPick(c.id)}})})}
 async function riftPick(id){const r=await act('rift',{op:'pick',pick:id});
  if(!r||!r.result||!r.result.rift)return rfDraw({icon:'✨',title:'The rift flickers',text:(act.err||'Could not reach the server.')+'\nIf the rift is still open you can try again.',btns:[{html:'Try again',fn:()=>act('rift',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.rift?rfRoom(x.result.rift.room):rfClose())},{html:'Close',alt:1,fn:rfClose}]});
