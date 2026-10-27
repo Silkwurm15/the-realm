@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.779';window.__BUILD=B;
+(function(){var B='1.781';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2041,7 +2041,11 @@ function ptEnter(){
   PT.state='entering';it.busy=true;
   const el=PT.el,stage=el.querySelector('#ptStage'),voidEl=el.querySelector('#ptVoid');
   // ask the server now so the room is ready by the time the screen is black
-  PT.room=useMarker(it,()=>act('rift',{op:'enter',key:it.key,exp:it.exp,ll:targetLL})).then(r=>r&&r.result&&r.result.rift?r.result.rift.room:null,()=>null);
+  const _rm=r=>r&&r.result&&r.result.rift?r.result.rift.room:null,
+    tryEnter=()=>useMarker(it,()=>act('rift',{op:'enter',key:it.key,exp:it.exp,ll:targetLL})).then(_rm,()=>null),
+    tryResume=()=>act('rift',{op:'resume',quiet:true}).then(_rm,()=>null);
+  // never bounce the player back out: if the call got lost, pick up the run the server already rolled, or roll once more
+  PT.room=tryEnter().then(r=>r||(it.used||!act.err?tryResume():null)).then(r=>r||(!it.used&&!act.err?tryEnter():null)).catch(()=>null);
   el.querySelector('#ptBack').classList.add('hide');
   el.querySelector('#ptHint').classList.add('gone');        // 1. words fade
   stage.classList.add('ptSurge');PT.boost=7;                // 2. portal flares, sparks race
@@ -2216,8 +2220,11 @@ function selScreen(n,view,o){selN=n;selWire();const q=SEL_T[n],ov=document.getEl
  const b=selEl('next');b.className='abs hit'+(view==='intro'?'':' nx');b.textContent=view==='intro'?'START QUEST':'CONTINUE';
  selGo=window.selGo=o.go;selX=window.selX=o.x;ov.hidden=false;selFit();selBar();requestAnimationFrame(()=>{selFit();selBar()})}
 function selIntro(it){const n=Math.min(7,(S.sel&&S.sel.n)|0);selScreen(n,'intro',{go:()=>{selHide();selAccept(it)},x:()=>{selHide();sqClose()}})}
-async function selAccept(it){if(it.used||it.busy)return;it.busy=true;let r;try{r=await useMarker(it,()=>act('quest',{op:'start',t:'selora',key:it.key,ll:targetLL,cands:gatherCands()}))}finally{it.busy=false}
- if(r&&r.result&&r.result.sq){try{Sound.queue('quest_start')}catch(e){}selShow(r.result.sq);try{syncQPoints()}catch(e){}}}
+async function selAccept(it){if(it.used||it.busy)return;it.busy=true;let r,c=[];try{c=gatherCands();r=await useMarker(it,()=>act('quest',{op:'start',t:'selora',key:it.key,ll:targetLL,cands:c}))}finally{it.busy=false}
+ if(r&&r.result&&r.result.sq){try{Sound.queue('quest_start')}catch(e){}selShow(r.result.sq);try{syncQPoints()}catch(e){}return}
+ // never fail silently: say why, and let the player retry while the marker is still there
+ const why=act.err||(c.length?'Could not reach the server. Check your connection and location, then try again.':'The map is still loading safe spots near you. Wait a few seconds and try again.');
+ selDraw({title:'The quest did not start',wild:'Selora Dawnblight',text:why,btns:[...(it.used?[]:[{html:'Try again',fn:()=>{rf.style.display='none';selAccept(it)}}]),{html:'Close',alt:1,fn:()=>{rf.style.display='none'}}]})}
 async function selChest(it){selN=1;const n0=(S.sel&&S.sel.n)|0;const r=await act('loot',{t:'chest',cq:it.qid,i:it.i,ll:targetLL});if(!r)return;const o=r.result;try{Sound.sfx('chest')}catch(e){}
  selDraw({title:o.title,wild:'Selora Dawnblight',text:o.lines.join('\n')+(o.res?'\n\nUse a Resurrect Potion? You have '+potN('res')+'.':''),btns:[{html:o.res?'Use Resurrect Potion':'Continue',fn:()=>{rf.style.display='none';if(o.res)act('usepot',{k:'res'});if(((S.sel&&S.sel.n)|0)>n0)selScreen(n0,'done',{go:()=>{selHide();sqClose()},x:()=>{selHide();sqClose()}})}}]})}
 async function selRift(it){const r=await act('rift',{op:'enter',cq:it.qid,i:it.i,ll:targetLL});if(r&&r.result&&r.result.rift)rfRoom(r.result.rift.room)}
