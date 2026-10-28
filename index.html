@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.781';window.__BUILD=B;
+(function(){var B='1.783';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2083,7 +2083,7 @@ function rfDraw(o){skinSet(rf.firstElementChild,o.skin);rf.firstElementChild.cla
  const c=$('rfC');c.innerHTML='';(o.btns||[]).forEach(b=>{const x=document.createElement('button');x.innerHTML=b.html;if(b.alt)x.className='alt';x.onclick=()=>{c.querySelectorAll('button').forEach(y=>y.disabled=true);b.fn()};if(b.dis)x.disabled=true;c.appendChild(x)});rf.style.display='flex'}
 const rfClose=()=>{rf.style.display='none';try{if(Sound.now()!=='map')Sound.music('map')}catch(e){}try{ptHide(false)}catch(e){}hud();try{if(inv.classList.contains('open'))invRender()}catch(e){}};
 const esc=t=>String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-function rfRoom(room){try{if(room&&room.id==='beast'&&!PT.open)Sound.music('battle_rift')}catch(e){}rfDraw({skin:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',library:'library'})[room.id]||'rift',icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:(room.text||'')+(room.wild?'\n'+room.wild.text:''),
+function rfRoom(room){try{if(room&&room.id==='beast'&&!PT.open)Sound.music('battle_rift')}catch(e){}rfDraw({skin:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',library:'library',wild:'rift'})[room.id]||'rift',icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:(room.text||'')+(room.wild?'\n'+room.wild.text:''),
  btns:((room.choices&&room.choices.length)?room.choices:[{id:'__leave',label:'Leave the rift'}]).map(c=>{const o=c.fight?(c.odds?'You should win this':'You would likely lose'):c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':''),sub=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' · ');return{html:esc(c.label)+(sub?'<small>'+esc(sub)+'</small>':''),dis:c.afford===false,fn:c.id==='__leave'?rfClose:()=>riftPick(c.id)}})})}
 async function riftPick(id){const r=await act('rift',{op:'pick',pick:id});
  if(!r||!r.result||!r.result.rift)return rfDraw({icon:'✨',title:'The rift flickers',text:(act.err||'Could not reach the server.')+'\nIf the rift is still open you can try again.',btns:[{html:'Try again',fn:()=>act('rift',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.rift?rfRoom(x.result.rift.room):rfClose())},{html:'Close',alt:1,fn:rfClose}]});
@@ -2223,7 +2223,7 @@ function selIntro(it){const n=Math.min(7,(S.sel&&S.sel.n)|0);selScreen(n,'intro'
 async function selAccept(it){if(it.used||it.busy)return;it.busy=true;let r,c=[];try{c=gatherCands();r=await useMarker(it,()=>act('quest',{op:'start',t:'selora',key:it.key,ll:targetLL,cands:c}))}finally{it.busy=false}
  if(r&&r.result&&r.result.sq){try{Sound.queue('quest_start')}catch(e){}selShow(r.result.sq);try{syncQPoints()}catch(e){}return}
  // never fail silently: say why, and let the player retry while the marker is still there
- const why=act.err||(c.length?'Could not reach the server. Check your connection and location, then try again.':'The map is still loading safe spots near you. Wait a few seconds and try again.');
+ const why=act.err||((typeof gotFirst!=='undefined'&&!gotFirst)?'Still waiting for your GPS location. Make sure location is allowed, then try again.':c.length?'Could not reach the server. Check your connection and location, then try again.':'The map is still loading safe spots near you. Wait a few seconds and try again.');
  selDraw({title:'The quest did not start',wild:'Selora Dawnblight',text:why,btns:[...(it.used?[]:[{html:'Try again',fn:()=>{rf.style.display='none';selAccept(it)}}]),{html:'Close',alt:1,fn:()=>{rf.style.display='none'}}]})}
 async function selChest(it){selN=1;const n0=(S.sel&&S.sel.n)|0;const r=await act('loot',{t:'chest',cq:it.qid,i:it.i,ll:targetLL});if(!r)return;const o=r.result;try{Sound.sfx('chest')}catch(e){}
  selDraw({title:o.title,wild:'Selora Dawnblight',text:o.lines.join('\n')+(o.res?'\n\nUse a Resurrect Potion? You have '+potN('res')+'.':''),btns:[{html:o.res?'Use Resurrect Potion':'Continue',fn:()=>{rf.style.display='none';if(o.res)act('usepot',{k:'res'});if(((S.sel&&S.sel.n)|0)>n0)selScreen(n0,'done',{go:()=>{selHide();sqClose()},x:()=>{selHide();sqClose()}})}}]})}
