@@ -648,7 +648,7 @@ function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(it.t==='selora'){selIntro(it);return}
  if(it.t==='rift'){portalOpen(it);return}   // Arcane Rift: portal screen replaces the pop-up box
  const c=POI[it.t];
- showModal('poi',{skin:({nature:'nature',chest:'chest',rift:'rift',quest:'quest',boss:'lair'})[it.t],icon:c.icon,title:c.title(it),color:it.t==='qpoint'?'#ff4fd8':'',text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+(it.t==='boss'?'\n\nCosts 1 🗝️ Key of the Forsaken (you have '+keysN()+').':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{hideModal('poi');if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));if(it.used||it.busy)return;it.busy=true;(it.t==='chest'||it.t==='boss'?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
+ showModal('poi',{skin:({nature:'nature',chest:'chest',rift:'rift',quest:'quest',boss:'lair'})[it.t],icon:c.icon,title:c.title(it),color:it.t==='qpoint'?'#ff4fd8':'',text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+(it.t==='boss'?'\n\nCosts 1 🗝️ Key of the Forsaken (you have '+keysN()+').':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{const keep=it.t==='chest'||it.t==='boss';if(dist(targetLL,it.ll)>RANGE){hideModal('poi');return tooFar(dist(targetLL,it.ll))}if(it.used||it.busy)return hideModal('poi');if(keep){$('mPrimary').disabled=true;$('mSecondary').disabled=true}else hideModal('poi');it.busy=true;(keep?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false;hideModal('poi')})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
 function updateCards(){items.forEach((it,i)=>{const m=markers[i];if(!m)return;const near=dist(targetLL,it.ll)<=RANGE,el=m.getElement();el.classList.toggle('near',near);el.classList.toggle('far',!near)});
  }
@@ -703,7 +703,7 @@ const MCART={start:'start',denied:'denied',lost:'lost',drive:'drive',offline:'of
 function showModal(kind,o){modalKind=kind;if(o.iconHtml)$('mIcon').innerHTML=o.iconHtml;else $('mIcon').textContent=o.icon;$('mTitle').textContent=o.title;$('mText').textContent=o.text;
  const mc=modal.firstElementChild;skinSet(mc,o.skin);const mcn=o.skin?null:MCART[kind==='shop'&&!/key/i.test(o.title||'')?'shopgen':kind];mc.classList.toggle('mcard',!!mcn);if(mcn)mc.dataset.mc=mcn;else if(!o.skin)delete mc.dataset.mc;
  mc.style.borderColor=(o.skin||mcn)?'':(o.color||'');mc.style.boxShadow=(o.skin||mcn)?'':(o.color?'0 0 22px '+o.color+'66':'');$('mTitle').style.color=mcn?'':(o.color||'');
- const b1=$('mPrimary'),b2=$('mSecondary');b1.disabled=false;b1.style.opacity='';b1.textContent=o.primary;b1.onclick=o.onPrimary;
+ const b1=$('mPrimary'),b2=$('mSecondary');b1.disabled=false;b2.disabled=false;b1.style.opacity='';b1.textContent=o.primary;b1.onclick=o.onPrimary;modal.classList.toggle('art',o.skin==='chest'||o.skin==='loot');
  if(o.secondary){b2.style.display='block';b2.textContent=o.secondary;b2.onclick=o.onSecondary}else b2.style.display='none';
  modal.classList.add('open')}
 function hideModal(kind){if(!kind||modalKind===kind){modal.classList.remove('open');modalKind=null}}
@@ -2105,11 +2105,66 @@ function ptHide(toMap){
 /* ---- Arcane Rifts: one room, one choice. The server rolls everything; this only shows it. ---- */
 const rfs=document.createElement('style');rfs.textContent='#riftOv{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;padding:14px;background:#000d;font-family:Georgia,serif;color:#e6dcff}#riftOv .rfb{width:100%;max-width:380px;max-height:100%;overflow-y:auto;padding:18px 16px;border:1px solid #9b78e8;border-radius:6px;background:linear-gradient(135deg,#24123f,#0b0813);box-shadow:0 14px 50px #000c,0 0 40px #7b4dd855,inset 0 0 0 3px #170c2b;text-align:center}#riftOv .rfi{font-size:46px;line-height:1.1}#riftOv .rft{font-size:20px;font-weight:700;color:#f1e8ff;margin:4px 0 6px}#riftOv .rfw{display:inline-block;margin:2px 0 8px;padding:3px 10px;border:1px solid #b184ff;border-radius:12px;font-size:12px;color:#d8c4ff}#riftOv .rfx{font-size:14px;line-height:1.45;color:#d5c8f0;white-space:pre-line}#riftOv .rfl{margin:12px 0;font-size:14px;line-height:1.5;color:#e6dcff;white-space:pre-line;text-align:left}#riftOv button{display:block;width:100%;margin-top:9px;padding:12px 8px;border:1px solid #b184ff;border-radius:4px;background:linear-gradient(#4a2d80,#2a1650);color:#f4edff;font:700 16px Georgia,serif;cursor:pointer}#riftOv button small{display:block;margin-top:3px;font:12px Georgia,serif;color:#cdb8f5}#riftOv button.alt{background:#150d26;border-color:#6b4fa3}#riftOv button:disabled{opacity:.5}';document.head.appendChild(rfs);
 const rf=document.createElement('div');rf.id='riftOv';rf.innerHTML='<div class="rfb"><img id="rfImg" alt="" style="display:none"><div class="rfi" id="rfI"></div><div class="rft" id="rfT"></div><div class="rfw" id="rfW" style="display:none"></div><div class="rfx" id="rfX"></div><div class="rfl" id="rfL" style="display:none"></div><div id="rfC"></div></div>';document.body.appendChild(rf);
-function rfDraw(o){skinSet(rf.firstElementChild,o.skin);rf.firstElementChild.classList.toggle('slm',!!o.slm);{const im=$('rfImg');im.style.display=o.img?'block':'none';if(o.img)im.src=o.img}$('rfI').textContent=o.icon;$('rfT').textContent=o.title;const w=$('rfW');w.style.display=o.wild?'inline-block':'none';w.textContent=o.wild||'';$('rfX').textContent=o.text||'';const l=$('rfL');l.style.display=o.lines?'block':'none';l.textContent=o.lines?o.lines.join('\n'):'';
+function rfDraw(o){skinSet(rf.firstElementChild,o.skin);{const cd=rf.firstElementChild;cd.classList.toggle('libx',!!o.lib);if(o.lib)cd.dataset.lib=o.lib;else delete cd.dataset.lib;rf.classList.toggle('liba',o.lib===6);libStage(cd,o.lib===6)}rf.firstElementChild.classList.toggle('slm',!!o.slm);{const im=$('rfImg');im.style.display=o.img?'block':'none';if(o.img)im.src=o.img}$('rfI').textContent=o.icon;$('rfT').textContent=o.title;const w=$('rfW');w.style.display=o.wild?'inline-block':'none';w.textContent=o.wild||'';$('rfX').textContent=o.text||'';const l=$('rfL');l.style.display=o.lines?'block':'none';l.textContent=o.lines?o.lines.join('\n'):'';
  const c=$('rfC');c.innerHTML='';(o.btns||[]).forEach(b=>{const x=document.createElement('button');x.innerHTML=b.html;if(b.alt)x.className='alt';x.onclick=()=>{c.querySelectorAll('button').forEach(y=>y.disabled=true);b.fn()};if(b.dis)x.disabled=true;c.appendChild(x)});rf.style.display='flex'}
 const rfClose=()=>{rf.style.display='none';try{if(Sound.now()!=='map')Sound.music('map')}catch(e){}try{ptHide(false)}catch(e){}hud();try{if(inv.classList.contains('open'))invRender()}catch(e){}};
 const esc=t=>String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-function rfRoom(room){try{if(room&&room.id==='beast'&&!PT.open)Sound.music('battle_rift')}catch(e){}rfDraw({skin:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',library:'library',wild:'rift'})[room.id]||'rift',icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:(room.text||'')+(room.wild?'\n'+room.wild.text:''),
+/* ---- Multiversal Library animated scene (art/lib_a_*): flapping books, aura, gems, sparkles. Respects Settings fx low/off + reduced motion. ---- */
+const LibFX=(function(){
+ const KEY=[6,28,58,86,96,74,58,90,62,26,6],HUES=[0,0,-35,40,150],CW=360,CH=290,K=2,TW=180,TH=210;
+ let COVER,COVERM,PAGES,ready=null,list=[],W=0,H=0,run=false,raf=0,spT=0,stage=null,last=0,books=null,sp=null;
+ const load=u=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=u});
+ function assets(){return ready||(ready=Promise.all([load('art/lib_a_cover.jpg'),load('art/lib_a_pages.jpg')]).then(([c,p])=>{if(!c||!p){ready=null;return false}COVER=c;PAGES=p;const m=document.createElement('canvas');m.width=TW;m.height=TH;const x=m.getContext('2d');x.translate(TW,0);x.scale(-1,1);x.drawImage(c,0,0,TW,TH);COVERM=m;return true}))}
+ const theta=ph=>{const x=ph*10,i=Math.min(9,Math.floor(x)),f=x-i,e=(1-Math.cos(f*Math.PI))/2;return KEY[i]+(KEY[i+1]-KEY[i])*e};
+ function Book(){const c=document.createElement('canvas');c.width=CW;c.height=CH;c.className='lb-bk';books.appendChild(c);return{c,x:c.getContext('2d')}}
+ function sheet(ctx,s,beta,len,shade){const r=beta*Math.PI/180,tx=s*Math.sin(r)*len,ty=Math.cos(r)*len;
+  const p=new Path2D();p.moveTo(0,2);p.quadraticCurveTo(tx*.3+s*5,ty*.55,tx,ty);p.quadraticCurveTo(tx+s*8,ty-9,tx*.55+s*12,ty*.25);p.lineTo(s*3,0);p.closePath();
+  ctx.save();ctx.clip(p);ctx.rotate(Math.atan2(ty,tx));ctx.drawImage(PAGES,0,-22,len*1.25,44);ctx.restore();
+  ctx.fillStyle='rgba(60,35,10,'+shade+')';ctx.fill(p);ctx.strokeStyle='rgba(120,85,40,.55)';ctx.lineWidth=.5;ctx.stroke(p)}
+ function pose(b,th){const ctx=b.x;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,CW,CH);ctx.setTransform(K,0,0,K,CW/2,160);
+  const spread=8+th*.5;
+  for(let k=0;k<14;k++){const s=k<7?-1:1,j=k%7;sheet(ctx,s,spread*(j+1)/7+(j%2?1.5:0),30+(j%3)*4+th*.06,.06+.14*(1-j/6))}
+  const a=th*Math.PI/180,L=52,D=[28,20],sn=Math.sin(a),cs=Math.cos(a);
+  for(const s of[-1,1]){const ux=s*sn*L,uy=-cs*L;ctx.save();
+   if(s<0)ctx.setTransform(K*-ux/TW,K*-uy/TW,K*D[0]/TH,K*D[1]/TH,K*ux+CW/2,K*uy+160);else ctx.setTransform(K*ux/TW,K*uy/TW,K*D[0]/TH,K*D[1]/TH,CW/2,160);
+   ctx.drawImage(s<0?COVER:COVERM,0,0,TW,TH);ctx.restore();ctx.setTransform(K,0,0,K,CW/2,160);
+   const q=new Path2D();q.moveTo(0,0);q.lineTo(ux,uy);q.lineTo(ux+D[0],uy+D[1]);q.lineTo(D[0],D[1]);q.closePath();
+   ctx.fillStyle='rgba(8,4,28,'+(.5*(1-sn)+.05)+')';ctx.fill(q);ctx.strokeStyle='rgba(225,180,90,.85)';ctx.lineWidth=.9;ctx.stroke(q)}
+  ctx.fillStyle='#b8893a';ctx.beginPath();ctx.arc(D[0]/2,D[1]/2+1,3,0,7);ctx.fill()}
+ function spawn(b,initial){const r=Math.random;b.dir=r()<.5?1:-1;b.sc=.7+r()*.8;b.speed=.05+r()*.07;b.period=.9+r()*.5;b.ph=r();
+  b.y0=H*(.04+r()*.9);b.wob=r()*6;b.x0=initial?r()*(W+200)-100:(b.dir>0?-110:W+110);b.px=b.x0;
+  b.c.style.width=(W*.26*b.sc)+'px';b.c.style.height=(W*.26*b.sc*CH/CW)+'px';b.c.style.opacity=.75+b.sc*.15;
+  b.c.style.filter='hue-rotate('+HUES[Math.floor(r()*HUES.length)]+'deg) drop-shadow(0 0 7px rgba(180,130,255,.85))'}
+ function frame(t){
+  if(!run)return;
+  if(!stage||!stage.isConnected||rf.style.display==='none'||rf.firstElementChild.dataset.lib!=='6'){stop();return}
+  const dt=Math.min(50,t-last);last=t;
+  if(!document.hidden)list.forEach(b=>{b.ph=(b.ph+dt/1000/b.period)%1;b.px+=b.dir*b.speed*W*dt/1000;
+   const lift=-Math.sin(b.ph*Math.PI*2-1.2)*H*.012,y=b.y0+Math.sin(b.px*.008+b.wob)*H*.03+lift,tilt=b.dir*(Math.cos(b.px*.008+b.wob)*6-4);
+   pose(b,theta(b.ph));const w=W*.26*b.sc,h=w*CH/CW;
+   b.c.style.transform='translate('+(b.px-w/2)+'px,'+(y-h*.58)+'px) rotate('+tilt+'deg) scaleX('+b.dir+')';
+   if(b.dir>0&&b.px>W+120||b.dir<0&&b.px<-120)spawn(b,false)});
+  raf=requestAnimationFrame(frame)}
+ function spark(){if(document.hidden||!sp||!sp.isConnected)return;const e=document.createElement('div');e.className='lb-spark';const fb=Math.random()<.6;
+  e.style.left=(fb?42+Math.random()*16:Math.random()*100)+'%';e.style.top=(fb?26+Math.random()*6:30+Math.random()*70)+'%';sp.appendChild(e);
+  e.animate([{opacity:0,transform:'translateY(0)'},{opacity:1,offset:.3},{opacity:0,transform:'translateY(-'+(80+Math.random()*160)+'px)'}],{duration:2500+Math.random()*3000}).onfinish=()=>e.remove()}
+ function stop(){run=false;cancelAnimationFrame(raf);clearInterval(spT);list=[];stage=null}
+ function start(st){
+  if(stage===st&&run)return;stop();const cl=document.documentElement.classList;
+  if(cl.contains('fx-off')||cl.contains('rm')||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
+  stage=st;const low=cl.contains('fx-low');
+  assets().then(ok=>{if(!ok||stage!==st||!st.isConnected)return;
+   books=st.querySelector('.lb-books');sp=st.querySelector('.lb-sp');W=st.clientWidth;H=st.clientHeight;if(!W||!H)return;
+   for(let i=0;i<(low?4:10);i++)list.push(Book());list.forEach(b=>spawn(b,true));
+   run=true;last=performance.now();raf=requestAnimationFrame(frame);spT=setInterval(spark,low?320:120)})}
+ return{start,stop,assets}})();
+function libStage(card,on){const old=card.querySelector('#libA');
+ if(on){let a=old;if(!a){a=document.createElement('div');a.id='libA';a.innerHTML='<img class="lb-bg" alt="" src="art/lib_a_bg.webp"><div class="lb-books"></div><img class="lb-panel" alt="" src="art/lib_a_panel.webp"><div class="lb-aura"></div><div class="lb-gem" style="left:50%;top:9%"></div><div class="lb-gem" style="left:50%;top:86.6%;animation-delay:1.6s"></div><div class="lb-sp"></div>';card.insertBefore(a,card.firstChild)}LibFX.start(a)}
+ else if(old){LibFX.stop();old.remove()}}
+const LIB_ORDER=[6,1,2,3,4,5];
+function libNext(){let i=0;try{i=(+localStorage.getItem('realm_lib')||0)%LIB_ORDER.length}catch(e){}try{localStorage.setItem('realm_lib',String((i+1)%LIB_ORDER.length))}catch(e){}return LIB_ORDER[i]}
+function rfRoom(room){if(room&&room.id==='library'){const n=libNext(),dec=u=>{const im=new Image();im.src=u;return im.decode?im.decode():Promise.resolve()};Promise.race([n===6?Promise.all([dec('art/lib_a_panel.webp'),dec('art/lib_a_bg.webp'),LibFX.assets()]):dec('art/lib_'+n+'.webp'),new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{window.__libN=n;rfRoom0(room)})}else rfRoom0(room)}
+function rfRoom0(room){try{if(room&&room.id==='beast'&&!PT.open)Sound.music('battle_rift')}catch(e){}rfDraw({skin:room.id==='library'?null:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',wild:'rift'})[room.id]||'rift',lib:room.id==='library'?(window.__libN||1):0,icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:(room.text||'')+(room.wild?'\n'+room.wild.text:''),
  btns:((room.choices&&room.choices.length)?room.choices:[{id:'__leave',label:'Leave the rift'}]).map(c=>{const o=c.fight?(c.odds?'You should win this':'You would likely lose'):c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':''),sub=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' · ');return{html:esc(c.label)+(sub?'<small>'+esc(sub)+'</small>':''),dis:c.afford===false,fn:c.id==='__leave'?rfClose:()=>riftPick(c.id)}})})}
 async function riftPick(id){const r=await act('rift',{op:'pick',pick:id});
  if(!r||!r.result||!r.result.rift)return rfDraw({icon:'✨',title:'The rift flickers',text:(act.err||'Could not reach the server.')+'\nIf the rift is still open you can try again.',btns:[{html:'Try again',fn:()=>act('rift',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.rift?rfRoom(x.result.rift.room):rfClose())},{html:'Close',alt:1,fn:rfClose}]});
@@ -2377,6 +2432,12 @@ function done(){var d=document.createElement('div');d.style.cssText='position:fi
 d.textContent='ART CHECK\nChecked '+u.length+' files. Missing: '+miss.length+'\n\n'+(miss.length?miss.join('\n'):'Nothing missing. If pictures still look broken, clear the cache (Menu > Account Management).')+'\n\n(tap to close)';d.onclick=function(){d.remove()};document.body.appendChild(d)}
 next()})}catch(e){}})();
 </script>
+<script>
+/* preload chest art so Treasure Chest -> Chest Opened flips with no blank frame */
+setTimeout(function(){[1,2,3,4,5].forEach(function(n){var i=new Image();i.src='art/lib_'+n+'.webp'})},3000);
+setTimeout(function(){['art/lib_a_panel.webp','art/lib_a_bg.webp','art/lib_a_cover.jpg','art/lib_a_pages.jpg'].forEach(function(u){var i=new Image();i.src=u})},3500);
+window.TC_PRE=['art/tc_chest.webp','art/tc_loot.webp'].map(function(u){var i=new Image();i.src=u;return i.decode?i.decode().catch(function(){}):Promise.resolve()});
+</script>
 <style id="chestArt">
 /* Treasure Chest + Chest Opened: your full illustrated art fills the whole map area. Title and buttons are part of the art; only the body text is live. */
 #modal .skc[data-skin="chest"],#modal .skc[data-skin="loot"]{--A:min(100cqw,calc(100cqh/var(--ar)));--ah:calc(var(--A)*var(--ar));--ax:calc((100cqw - var(--A))/2);--ay:calc((100cqh - var(--ah))/2);position:absolute;inset:0;z-index:1;width:auto;max-width:none;height:auto;max-height:none;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:#0a0806;overflow:hidden;container-type:size;filter:none;text-align:center}
@@ -2406,6 +2467,47 @@ next()})}catch(e){}})();
 /* a button whose label differs from the one in the art gets a live gold/dark button drawn over it */
 #modal .skc[data-skin="chest"] .m-btn.lv,#modal .skc[data-skin="loot"] .m-btn.lv{color:#fff0c6;border:1px solid #e3b65e;background:linear-gradient(#b0802d,#74491a 55%,#4f310d);text-shadow:0 2px 3px #000;box-shadow:inset 0 0 0 1px #0009,inset 0 1px 0 #ffe49a99}
 #modal .skc[data-skin="chest"] .m-btn.ghost.lv,#modal .skc[data-skin="loot"] .m-btn.ghost.lv{color:#eadfc7;border-color:#a8864a;background:linear-gradient(#1b2230,#0f141d);font-size:calc(var(--A)*.04)}
+/* chest art modal: leave the player header and footer buttons showing */
+#modal.art{top:calc(max(0px,env(safe-area-inset-top)) + var(--hudh) + 2px);bottom:calc(72px + env(safe-area-inset-bottom));padding:0;background:#0a0806}
+@media(min-width:700px){#modal.art{top:calc(var(--hudh) + 2px);left:50%;right:auto;width:min(700px,90vw);transform:translateX(-50%)}}
+/* Multiversal Library: rotating full-art popups (art/lib_1..5.webp). The art is an empty frame; live text + buttons sit inside it. */
+#riftOv .rfb.libx{--w:min(calc(100vw - 12px),460px);position:relative;box-sizing:border-box;width:var(--w);max-width:none;max-height:none;aspect-ratio:var(--ar);margin:auto;overflow:visible;border:0;border-radius:0;background:none;box-shadow:none;padding:calc(var(--w)*var(--pt)) calc(var(--w)*var(--pr)) 0 calc(var(--w)*var(--pl));text-align:center;color:var(--tx)}
+#riftOv .rfb.libx::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:var(--img) center/100% 100% no-repeat;-webkit-mask-image:linear-gradient(to right,transparent,#000 4%,#000 96%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 96%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 4%,#000 96%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 96%,transparent);mask-composite:intersect}
+#riftOv .rfb.libx>*{position:relative;z-index:1}#riftOv .rfb.libx .rfi,#riftOv .rfb.libx #rfImg,#riftOv .rfb.libx .rfw{display:none!important}
+#riftOv .rfb.libx .rft{font:700 calc(var(--w)*.052)/1.15 Georgia,serif;color:var(--tt);margin:0 0 calc(var(--w)*.01);text-shadow:0 1px 3px #0009}
+#riftOv .rfb.libx .rfx{font:400 calc(var(--w)*.031)/1.28 Georgia,serif;color:var(--tx);margin:0 0 calc(var(--w)*.016);white-space:pre-line}
+#riftOv .rfb.libx #rfC{display:flex;flex-direction:column;gap:calc(var(--w)*.013)}
+#riftOv .rfb.libx #rfC button{display:block;width:100%;box-sizing:border-box;margin:0;padding:calc(var(--w)*.013) calc(var(--w)*.03);font:700 calc(var(--w)*.036)/1.15 Georgia,serif;color:var(--bl);background:var(--bb);border:1.5px solid var(--bd);border-radius:12px;box-shadow:0 0 calc(var(--w)*.02) var(--gl),inset 0 1px 0 #ffffff40;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#riftOv .rfb.libx #rfC button small{display:block;margin-top:2px;font:400 calc(var(--w)*.026)/1.15 Georgia,serif;color:var(--sb);opacity:.95}
+#riftOv .rfb.libx #rfC button:active{filter:brightness(1.15)}#riftOv .rfb.libx #rfC button:disabled{opacity:.5}
+#riftOv .rfb.libx[data-lib="1"]{--img:url(art/lib_1.webp);--ar:0.9691;--pl:0.1519;--pr:0.1434;--pt:0.2295;--tt:#f3dc9d;--tx:#f3ead2;--bb:linear-gradient(#1d56b3,#0b2a64);--bd:#d8ab52;--gl:#3b8bff66;--bl:#fff4d8;--sb:#bcd3ff}
+#riftOv .rfb.libx[data-lib="2"]{--img:url(art/lib_2.webp);--ar:0.9691;--pl:0.1562;--pr:0.1434;--pt:0.2295;--tt:#eab0ff;--tx:#f1e6ff;--bb:linear-gradient(#7d2fc2,#3d1068);--bd:#d9b9ff;--gl:#b45cff66;--bl:#ffffff;--sb:#e2c8ff}
+#riftOv .rfb.libx[data-lib="3"]{--img:url(art/lib_3.webp);--ar:0.7933;--pl:0.1843;--pr:0.1796;--pt:0.2810;--tt:#f5e3a6;--tx:#e9f6d9;--bb:linear-gradient(#319633,#135619);--bd:#e2bb5c;--gl:#5bd35b55;--bl:#fffbe6;--sb:#c9efc0}
+#riftOv .rfb.libx[data-lib="4"]{--img:url(art/lib_4.webp);--ar:0.8566;--pl:0.2200;--pr:0.2113;--pt:0.2562;--tt:#ffe0ae;--tx:#ffe5d8;--bb:linear-gradient(#a81515,#4e0707);--bd:#e6b9ad;--gl:#ff463a55;--bl:#fff0e6;--sb:#ffc3b5}
+#riftOv .rfb.libx[data-lib="5"]{--img:url(art/lib_5.webp);--ar:0.8194;--pl:0.1882;--pr:0.1745;--pt:0.2767;--tt:#4a3416;--tx:#2f2819;--bb:linear-gradient(#fffefb,#e9e2d2);--bd:#c9a24d;--gl:#d9b45b66;--bl:#2a2010;--sb:#6d5c3a}
+@media(min-width:700px){#riftOv .rfb.libx{--w:460px}}
+/* Library scene 6 = animated (art/lib_a_*) */
+#riftOv.liba{overflow:hidden;background:#0b0618}
+#riftOv.liba::before{content:'';position:absolute;inset:-5%;z-index:0;pointer-events:none;background:url(art/lib_a_bg.webp) center/cover;filter:blur(24px) brightness(.5)}
+#riftOv.liba>.rfb{z-index:1}
+#riftOv .rfb.libx[data-lib="6"]{--w:min(100vw,calc(100dvh*2/3 - 20px),520px);--ar:.6667;--pl:.2152;--pr:.1850;--pt:.5821;--tt:#f4dca6;--tx:#f1e8d2;--bb:linear-gradient(#17356f,#0a1b48);--bd:#dcaa4c;--gl:#4aa0ff66;--bl:#fdebc8;--sb:#cfe0ff;animation:lbBreathe 14s ease-in-out infinite alternate}
+#riftOv .rfb.libx[data-lib="6"]::before{content:none}
+#riftOv .rfb.libx[data-lib="6"]{flex:none}#riftOv .rfb.libx[data-lib="6"] .rft{font-size:calc(var(--w)*.047);margin-bottom:calc(var(--w)*.006)}#riftOv .rfb.libx[data-lib="6"] .rfx{font-size:calc(var(--w)*.0285);margin-bottom:calc(var(--w)*.012)}#riftOv .rfb.libx[data-lib="6"] #rfC{gap:calc(var(--w)*.01)}#riftOv .rfb.libx[data-lib="6"] #rfC button{padding-top:calc(var(--w)*.0105);padding-bottom:calc(var(--w)*.0105);font-size:calc(var(--w)*.034)}#riftOv .rfb.libx[data-lib="6"] #rfC button small{font-size:calc(var(--w)*.0245)}
+#riftOv .rfb.libx>#libA{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#libA .lb-bg,#libA .lb-panel{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+#libA .lb-books{position:absolute;inset:0}
+#libA .lb-bk{position:absolute;left:0;top:0;will-change:transform}
+#libA .lb-gem{position:absolute;width:14%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(110,190,255,.85),rgba(80,120,255,.25) 45%,transparent 70%);mix-blend-mode:screen;animation:lbGem 3.2s ease-in-out infinite}
+#libA .lb-aura{position:absolute;left:50%;top:25%;width:60%;aspect-ratio:1;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,220,150,.55),rgba(170,110,255,.25) 40%,transparent 70%);mix-blend-mode:screen;animation:lbGem 4.5s ease-in-out infinite}
+#libA .lb-sp{position:absolute;inset:0}
+#libA .lb-spark{position:absolute;width:4px;height:4px;border-radius:50%;background:#f3e2ff;box-shadow:0 0 8px 2px #b98cff;opacity:0}
+@keyframes lbBreathe{from{transform:scale(1)}to{transform:scale(1.03)}}
+@keyframes lbGem{0%,100%{opacity:.1;transform:translate(-50%,-50%) scale(.8)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
+#riftOv .rfb.libx[data-lib="6"] #rfC button{position:relative}
+#riftOv .rfb.libx[data-lib="6"] #rfC button::before,#riftOv .rfb.libx[data-lib="6"] #rfC button::after{content:'';position:absolute;top:50%;width:calc(var(--w)*.03);aspect-ratio:1;background:radial-gradient(circle,#bfe3ff,#3c8cff 55%,#1a4fb8);transform:translateY(-50%) rotate(45deg);box-shadow:0 0 calc(var(--w)*.02) #4aa0ff;animation:lbPulse 3.2s ease-in-out infinite}
+#riftOv .rfb.libx[data-lib="6"] #rfC button::before{left:calc(var(--w)*.012)}#riftOv .rfb.libx[data-lib="6"] #rfC button::after{right:calc(var(--w)*.012);animation-delay:.6s}
+@keyframes lbPulse{0%,100%{opacity:.45}50%{opacity:1}}
+.rm #riftOv .rfb.libx[data-lib="6"],.fx-off #riftOv .rfb.libx[data-lib="6"],.rm #libA *,.fx-off #libA *,.rm #riftOv .libx #rfC button::before,.rm #riftOv .libx #rfC button::after,.fx-off #riftOv .libx #rfC button::before,.fx-off #riftOv .libx #rfC button::after{animation:none!important}
 </style>
 <script>
 /* Chest FX: coin glints over the Treasure Chest art, flickering wall torches over the Chest Opened art.
