@@ -2378,32 +2378,43 @@ d.textContent='ART CHECK\nChecked '+u.length+' files. Missing: '+miss.length+'\n
 next()})}catch(e){}})();
 </script>
 <style id="chestArt">
-/* Treasure Chest + Chest Opened dialogs: full illustrated art (top / stretchable middle / bottom), live text and buttons on top. */
-#modal .skc[data-skin="chest"],#modal .skc[data-skin="loot"]{--w:min(340px,calc(100vw - 32px));--k:calc(var(--w)/900);position:relative;z-index:1;box-sizing:border-box;width:var(--w);max-width:none;max-height:none;margin:auto;border:0;border-radius:0;box-shadow:none;background-color:transparent;background-repeat:no-repeat;background-origin:border-box;background-clip:border-box;background-size:100% auto,100% auto,100% 100%;background-position:0 0,0 100%,0 0;overflow:visible;min-height:0;filter:drop-shadow(0 10px 24px #000d)}
-#modal .skc[data-skin="chest"]{padding:calc(var(--k)*712) calc(var(--k)*135) calc(var(--k)*325);background-image:url(art/tc_chest_top.webp),url(art/tc_chest_bot.webp),url(art/tc_chest_mid.webp)}
-#modal .skc[data-skin="loot"]{padding:calc(var(--k)*764) calc(var(--k)*170) calc(var(--k)*346);background-image:url(art/tc_loot_top.webp),url(art/tc_loot_bot.webp),url(art/tc_loot_mid.webp)}
-#modal .skc[data-skin="chest"]::before,#modal .skc[data-skin="chest"]::after,#modal .skc[data-skin="loot"]::before,#modal .skc[data-skin="loot"]::after{display:none}
-#modal .skc[data-skin="chest"] #mTitle,#modal .skc[data-skin="loot"] #mTitle{position:absolute;left:calc(var(--k)*120);right:calc(var(--k)*120);margin:0;height:calc(var(--k)*70);display:flex;align-items:center;justify-content:center;text-align:center;font:700 calc(var(--k)*66)/1 Georgia,'Times New Roman',serif;color:#f8e9bd;text-shadow:0 2px 3px #000,0 0 18px rgba(255,200,90,.55);white-space:nowrap;overflow:visible}
-#modal .skc[data-skin="chest"] #mTitle{top:calc(var(--k)*568)}
-#modal .skc[data-skin="loot"] #mTitle{top:calc(var(--k)*622)}
+/* Treasure Chest + Chest Opened: your full illustrated art fills the whole map area. Title and buttons are part of the art; only the body text is live. */
+#modal .skc[data-skin="chest"],#modal .skc[data-skin="loot"]{--A:min(100cqw,calc(100cqh/var(--ar)));--ah:calc(var(--A)*var(--ar));--ax:calc((100cqw - var(--A))/2);--ay:calc((100cqh - var(--ah))/2);position:absolute;inset:0;z-index:1;width:auto;max-width:none;height:auto;max-height:none;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:#0a0806;overflow:hidden;container-type:size;filter:none;text-align:center}
+#modal .skc[data-skin="chest"]{--ar:1.47407;--img:url(art/tc_chest.webp)}
+#modal .skc[data-skin="loot"]{--ar:1.5;--img:url(art/tc_loot.webp)}
+#modal .skc[data-skin="chest"]::after,#modal .skc[data-skin="loot"]::after{content:"";display:block;position:absolute;left:-8%;right:-8%;top:-8%;bottom:-8%;width:auto;height:auto;z-index:0;background:var(--img) center/cover no-repeat;filter:blur(16px) brightness(.55);pointer-events:none;border:0;font-size:0}
+#modal .skc[data-skin="chest"]::before,#modal .skc[data-skin="loot"]::before{content:"";display:block;position:absolute;left:var(--ax);top:var(--ay);right:auto;bottom:auto;width:var(--A);height:var(--ah);z-index:1;background:var(--img) 0 0/100% 100% no-repeat;pointer-events:none;border:0;font-size:0;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(to right,transparent,#000 2.5%,#000 97.5%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(to right,transparent,#000 2.5%,#000 97.5%,transparent);mask-composite:intersect}
+#modal .skc[data-skin="chest"] #mIcon,#modal .skc[data-skin="loot"] #mIcon{display:none}
+/* title: baked into the art; shown live (over a dark patch) only if the game sends a different title */
+#modal .skc[data-skin="chest"] #mTitle,#modal .skc[data-skin="loot"] #mTitle{position:absolute;z-index:2;margin:0;padding:0;left:calc(var(--ax) + var(--A)*.17);width:calc(var(--A)*.66);display:flex;align-items:center;justify-content:center;color:transparent;text-shadow:none;background:none;font:700 calc(var(--A)*.06)/1 Georgia,serif;white-space:nowrap;pointer-events:none}
+#modal .skc[data-skin="chest"] #mTitle{top:calc(var(--ay) + var(--ah)*.433);height:calc(var(--ah)*.05)}
+#modal .skc[data-skin="loot"] #mTitle{top:calc(var(--ay) + var(--ah)*.458);height:calc(var(--ah)*.054)}
+#modal .skc[data-skin="chest"] #mTitle.lt,#modal .skc[data-skin="loot"] #mTitle.lt{color:#f8e9bd;background:#0d0b09;text-shadow:0 2px 3px #000,0 0 14px rgba(255,200,90,.5)}
 #modal .skc[data-skin="chest"] #mTitle::after,#modal .skc[data-skin="loot"] #mTitle::after{display:none}
-#modal .skc[data-skin="chest"] #mText,#modal .skc[data-skin="loot"] #mText{margin:0 0 calc(var(--k)*22);font:15px/1.4 Georgia,serif;color:#eadfc7;text-shadow:0 1px 2px #000;text-align:center;white-space:pre-line}
-#modal .skc[data-skin="chest"] .m-btn,#modal .skc[data-skin="loot"] .m-btn{position:relative;display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;min-height:46px;margin:8px 0 0;padding:6px 18px;border:1px solid #e3b65e;border-radius:3px;background:linear-gradient(#b0802d,#74491a 55%,#4f310d);color:#fff0c6;font:700 18px/1.15 Georgia,serif;text-shadow:0 2px 3px #000;box-shadow:inset 0 0 0 1px #0009,inset 0 1px 0 #ffe49a99,0 0 12px #d49a3a40;cursor:pointer}
-#modal .skc[data-skin="chest"] .m-btn.ghost,#modal .skc[data-skin="loot"] .m-btn.ghost{min-height:38px;margin-top:10px;border-color:#a8864a;background:linear-gradient(#1b2230,#0f141d);font:600 16px/1.15 Georgia,serif;color:#eadfc7;box-shadow:inset 0 0 0 1px #0009,inset 0 1px 0 #ffffff14}
-#modal .skc[data-skin="chest"] .m-btn::before,#modal .skc[data-skin="chest"] .m-btn::after,#modal .skc[data-skin="loot"] .m-btn::before,#modal .skc[data-skin="loot"] .m-btn::after{content:"";position:absolute;top:50%;width:11px;height:11px;margin-top:-6px;border:1px solid #f0c871;background:radial-gradient(circle at 35% 35%,#ff7d6e,#c4141f 60%,#6e0610);transform:rotate(45deg);box-shadow:0 0 6px #ff3b2e88;left:auto;right:auto;pointer-events:none;border-radius:1px}
-#modal .skc[data-skin="chest"] .m-btn::before,#modal .skc[data-skin="loot"] .m-btn::before{left:-7px}
-#modal .skc[data-skin="chest"] .m-btn::after,#modal .skc[data-skin="loot"] .m-btn::after{right:-7px}
-#modal .skc[data-skin="chest"] .m-btn.ghost::before,#modal .skc[data-skin="chest"] .m-btn.ghost::after,#modal .skc[data-skin="loot"] .m-btn.ghost::before,#modal .skc[data-skin="loot"] .m-btn.ghost::after{width:8px;height:8px;margin-top:-4px}
-#modal .skc[data-skin="chest"] .m-btn:active,#modal .skc[data-skin="loot"] .m-btn:active{filter:brightness(1.2)}
-#modal .skc[data-skin="chest"] .m-btn:disabled,#modal .skc[data-skin="loot"] .m-btn:disabled{opacity:.5;filter:saturate(.6)}
+/* body text */
+#modal .skc[data-skin="chest"] #mText,#modal .skc[data-skin="loot"] #mText{position:absolute;z-index:2;margin:0;padding:0 2px;display:flex;align-items:center;justify-content:safe center;overflow-y:auto;box-sizing:border-box;font:calc(var(--A)*.029)/1.36 Georgia,'Times New Roman',serif;color:#eadfc7;text-shadow:0 1px 2px #000;text-align:center;white-space:pre-line}
+#modal .skc[data-skin="chest"] #mText{left:calc(var(--ax) + var(--A)*.197);width:calc(var(--A)*.605);top:calc(var(--ay) + var(--ah)*.531);height:calc(var(--ah)*.065)}
+#modal .skc[data-skin="loot"] #mText{left:calc(var(--ax) + var(--A)*.2);width:calc(var(--A)*.6);top:calc(var(--ay) + var(--ah)*.562);height:calc(var(--ah)*.102)}
+/* buttons: invisible tap zones over the buttons in your art */
+#modal .skc[data-skin="chest"] .m-btn,#modal .skc[data-skin="loot"] .m-btn{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;box-sizing:border-box;margin:0;padding:0;min-height:0;border:0;border-radius:6px;background:none;color:transparent;text-shadow:none;box-shadow:none;font:700 calc(var(--A)*.045)/1.1 Georgia,serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#modal .skc[data-skin="chest"] .m-btn::before,#modal .skc[data-skin="chest"] .m-btn::after,#modal .skc[data-skin="loot"] .m-btn::before,#modal .skc[data-skin="loot"] .m-btn::after{display:none}
+#modal .skc[data-skin="chest"] .m-btn:active,#modal .skc[data-skin="loot"] .m-btn:active{background:rgba(255,230,150,.2);filter:none}
+#modal .skc[data-skin="chest"] #mPrimary{left:calc(var(--ax) + var(--A)*.165);width:calc(var(--A)*.67);top:calc(var(--ay) + var(--ah)*.609);height:calc(var(--ah)*.083)}
+#modal .skc[data-skin="chest"] #mSecondary{left:calc(var(--ax) + var(--A)*.192);width:calc(var(--A)*.614);top:calc(var(--ay) + var(--ah)*.71);height:calc(var(--ah)*.059)}
+#modal .skc[data-skin="loot"] #mPrimary{left:calc(var(--ax) + var(--A)*.186);width:calc(var(--A)*.63);top:calc(var(--ay) + var(--ah)*.671);height:calc(var(--ah)*.092)}
+#modal .skc[data-skin="loot"] #mSecondary{left:calc(var(--ax) + var(--A)*.186);width:calc(var(--A)*.63);top:calc(var(--ay) + var(--ah)*.775);height:calc(var(--ah)*.055)}
+/* a button whose label differs from the one in the art gets a live gold/dark button drawn over it */
+#modal .skc[data-skin="chest"] .m-btn.lv,#modal .skc[data-skin="loot"] .m-btn.lv{color:#fff0c6;border:1px solid #e3b65e;background:linear-gradient(#b0802d,#74491a 55%,#4f310d);text-shadow:0 2px 3px #000;box-shadow:inset 0 0 0 1px #0009,inset 0 1px 0 #ffe49a99}
+#modal .skc[data-skin="chest"] .m-btn.ghost.lv,#modal .skc[data-skin="loot"] .m-btn.ghost.lv{color:#eadfc7;border-color:#a8864a;background:linear-gradient(#1b2230,#0f141d);font-size:calc(var(--A)*.04)}
 </style>
 <script>
-/* Chest FX: coin glints over the Treasure Chest dialog, flickering wall torches over the Chest Opened dialog.
-   Canvas overlay mapped onto the dialog art (the stretchable middle is accounted for). Respects Reduced Motion and Effects Off; Effects Low halves the particles. */
+/* Chest FX: coin glints over the Treasure Chest art, flickering wall torches over the Chest Opened art.
+   Canvas overlay mapped onto the art box. Respects Reduced Motion and Effects Off; Effects Low halves the particles. */
 (function(){
 const modal=document.getElementById('modal');if(!modal)return;
 const R=Math.random,rt=document.documentElement.classList;
-const ART={chest:{H:1327,top:700,bot:303},loot:{H:1350,top:742,bot:326}};
+const ART={chest:{W:1042,H:1536},loot:{W:1024,H:1536}};
+const BAKED={chest:{t:'Treasure Chest',p:'Open Chest',s:'Close'},loot:{t:'Chest Opened',p:'Continue',s:null}};
 let mode=null,raf=0,last=0,cv,x,glints=[],embers=[];
 const mult=()=>rt.contains('fx-low')?.5:1;
 function mk(){const c=document.createElement('canvas');c.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2';c.setAttribute('aria-hidden','true');modal.appendChild(c);return c}
@@ -2414,15 +2425,14 @@ function flame(px,py,s,t,seed){const n=Math.sin(t*9+seed)*.5+Math.sin(t*14.3+see
  const sw=Math.sin(t*6+seed)*s*.25;
  [['rgba(255,110,20,.75)',1,1],['rgba(255,190,60,.85)',.65,.8],['rgba(255,245,190,.9)',.32,.55]].forEach(([c,sc,hh])=>{x.fillStyle=c;x.beginPath();x.ellipse(px+sw*sc,py-s*.5*k*hh,s*.55*sc*(1+.08*n),s*1.1*k*sc,0,0,6.283);x.fill()})}
 const ZONES=[[.22,.80,.32,.40,3],[0,1,.84,1,5],[0,.22,.80,.95,2],[.85,1,.55,.80,1]];
-const TORCH=[[.024,.145,1],[.256,.185,.9],[.982,.27,.9]];   // only torches in the fixed top part of the art (the middle stretches with the text)
-function geo(sk,r,mr){const A=ART[sk],w=r.width,h=r.height,k=w/900,tp=A.top*k,bp=A.bot*k,mc=Math.max(1,h-tp-bp),mi=A.H-A.top-A.bot;
- return{cx:r.left-mr.left,cy:r.top-mr.top,w,h,Y:fy=>{const yi=fy*A.H;return yi<A.top?yi*k:yi>A.H-A.bot?h-(A.H-yi)*k:tp+(yi-A.top)/mi*mc}}}
-function coins(t,G){const{cx,cy,w,Y}=G,p=.5+.5*Math.sin(t*1.6);x.globalCompositeOperation='lighter';
- const gy=cy+Y(.34);let g=x.createRadialGradient(cx+w*.5,gy,0,cx+w*.5,gy,w*.3);g.addColorStop(0,'rgba(255,190,60,'+(.12+.12*p)+')');g.addColorStop(1,'rgba(255,160,30,0)');x.globalAlpha=1;x.fillStyle=g;x.fillRect(cx,gy-w*.3,w,w*.6);
- glints.forEach(q=>star(cx+q.u*w,cy+Y(q.v),q.r*w,Math.pow(Math.max(0,Math.sin(t*q.s+q.p)),10)));
+const TORCH=[[.024,.145,1],[.256,.185,.9],[.02,.615,1],[.112,.625,.8],[.982,.27,.9],[.937,.635,.8],[.895,.645,.7]];
+function geo(sk,r,mr){const A=ART[sk],ar=A.H/A.W,W=r.width,H=r.height,aw=Math.min(W,H/ar),ah=aw*ar;return{cx:r.left-mr.left+(W-aw)/2,cy:r.top-mr.top+(H-ah)/2,w:aw,h:ah}}
+function coins(t,G){const{cx,cy,w,h}=G,p=.5+.5*Math.sin(t*1.6);x.globalCompositeOperation='lighter';
+ const gy=cy+h*.34;let g=x.createRadialGradient(cx+w*.5,gy,0,cx+w*.5,gy,w*.3);g.addColorStop(0,'rgba(255,190,60,'+(.12+.12*p)+')');g.addColorStop(1,'rgba(255,160,30,0)');x.globalAlpha=1;x.fillStyle=g;x.fillRect(cx,gy-w*.3,w,w*.6);
+ glints.forEach(q=>star(cx+q.u*w,cy+q.v*h,q.r*w,Math.pow(Math.max(0,Math.sin(t*q.s+q.p)),10)));
  x.globalCompositeOperation='source-over';x.globalAlpha=1}
-function torches(t,dt,G){const{cx,cy,w,Y}=G;x.globalCompositeOperation='lighter';x.globalAlpha=1;
- TORCH.forEach((q,i)=>{const px=cx+q[0]*w,py=cy+Y(q[1]);flame(px,py,w*.014*q[2],t,i*1.7);if(R()<dt*5*mult())embers.push({x:px,y:py-w*.01,vx:(R()-.5)*.02*w,vy:(-.04-R()*.06)*w,l:0,m:1.2+R()*1.6,r:w*(.0015+R()*.003)})});
+function torches(t,dt,G){const{cx,cy,w,h}=G;x.globalCompositeOperation='lighter';x.globalAlpha=1;
+ TORCH.forEach((q,i)=>{const px=cx+q[0]*w,py=cy+q[1]*h;flame(px,py,w*.014*q[2],t,i*1.7);if(R()<dt*5*mult())embers.push({x:px,y:py-w*.01,vx:(R()-.5)*.02*w,vy:(-.04-R()*.06)*w,l:0,m:1.2+R()*1.6,r:w*(.0015+R()*.003)})});
  for(let i=embers.length-1;i>=0;i--){const e=embers[i];e.l+=dt;e.x+=e.vx*dt+Math.sin(t*3+i)*.15;e.y+=e.vy*dt;if(e.l>e.m){embers.splice(i,1);continue}x.globalAlpha=1-e.l/e.m;x.fillStyle='#ffb347';x.beginPath();x.arc(e.x,e.y,e.r,0,6.283);x.fill()}
  x.globalCompositeOperation='source-over';x.globalAlpha=1}
 function frame(ms){const t=ms/1000,dt=Math.min(.05,t-last||.016);last=t;
@@ -2438,8 +2448,14 @@ function start(){if(!cv){cv=mk();x=cv.getContext('2d')}fit();
  last=0;raf=requestAnimationFrame(frame)}
 function sync(){const card=modal.firstElementChild,sk=card&&card.dataset.skin,open=modal.classList.contains('open'),off=rt.contains('rm')||rt.contains('fx-off')||matchMedia('(prefers-reduced-motion: reduce)').matches;
  const m=open&&!off?(sk==='chest'?'coins':sk==='loot'?'torch':null):null;if(m===mode)return;mode=m;stop();if(m)start()}
-new MutationObserver(sync).observe(modal,{attributes:true,subtree:true,attributeFilter:['class','data-skin']});
-addEventListener('resize',()=>{if(mode)fit()});sync();
+/* the title and button labels are part of the art; if the game sends different wording, draw it live over the art */
+function labels(){const card=modal.firstElementChild,sk=card&&card.dataset.skin,B=BAKED[sk];if(!B)return;
+ const T=document.getElementById('mTitle'),P=document.getElementById('mPrimary'),S=document.getElementById('mSecondary');
+ T.classList.toggle('lt',T.textContent.trim()!==B.t);
+ P.classList.toggle('lv',P.textContent.trim()!==B.p);
+ S.classList.toggle('lv',!(B.s&&S.textContent.trim()===B.s))}
+new MutationObserver(()=>{labels();sync()}).observe(modal,{attributes:true,subtree:true,childList:true,characterData:true,attributeFilter:['class','data-skin']});
+addEventListener('resize',()=>{if(mode)fit()});labels();sync();
 })();
 </script>
 </body></html>
