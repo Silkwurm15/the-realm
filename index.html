@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.785';window.__BUILD=B;
+(function(){var B='1.786';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -926,7 +926,7 @@ const QCARDS='quest_cards.webp',QBGI='quest_bg.webp',QORD=['walk1','nature','cha
 +'#qpanel .qk.done .b span b{color:#24150a}';document.head.appendChild(e)})();
 
 /* ---- Quest pop-up: one ornate frame per quest type (red Daily, blue Weekly, purple Monthly, teal Explorable). The art holds only the frame; every word is live text. ---- */
-const QPG={"daily":{"ar":0.7453,"w":553,"h":742,"xc":[0.9308,0.0758,0.131],"coin":[0.3042,0.7318,0.0961],"title":0.465,"desc":0.498,"div":0.6482,"btn":[0.2343,0.8108,0.7802,0.9214],"inner":[0.326,0.8271,0.6863,0.9084]},"weekly":{"ar":0.7534,"w":553,"h":734,"xc":[0.9259,0.1063,0.1432],"coin":[0.3092,0.7343,0.1085],"title":0.4959,"desc":0.5436,"div":0.6662,"btn":[0.2514,0.7861,0.7939,0.9659],"inner":[0.3146,0.8229,0.7306,0.9142]},"monthly":{"ar":0.7476,"w":545,"h":729,"xc":[0.9266,0.107,0.1365],"coin":[0.3046,0.7366,0.1101],"title":0.4966,"desc":0.5446,"div":0.668,"btn":[0.2459,0.7888,0.7963,0.9698],"inner":[0.3101,0.8258,0.7321,0.9177]},"expl":{"ar":0.7449,"w":546,"h":733,"xc":[0.9359,0.1132,0.1363],"coin":[0.304,0.734,0.1099],"title":0.4952,"desc":0.543,"div":0.6658,"btn":[0.2454,0.7858,0.7949,0.9659],"inner":[0.3095,0.8226,0.7308,0.9141]}};
+const QPG={"daily":{"ar":0.7453,"w":553,"h":742,"xc":[0.9308,0.0758,0.131],"coin":[0.3042,0.7318,0.0961],"title":0.465,"desc":0.498,"div":0.6482,"btn":[0.2343,0.8108,0.7802,0.9214],"inner":[0.326,0.8271,0.6863,0.9084]},"weekly":{"ar":0.7534,"w":553,"h":734,"xc":[0.9259,0.1063,0.1432],"coin":[0.3092,0.7275,0.1085],"title":0.4959,"desc":0.534,"div":0.639,"btn":[0.2514,0.7861,0.7939,0.9659],"inner":[0.3146,0.8229,0.7306,0.9142]},"monthly":{"ar":0.7476,"w":545,"h":729,"xc":[0.9266,0.107,0.1365],"coin":[0.3046,0.727,0.1101],"title":0.4966,"desc":0.536,"div":0.6406,"btn":[0.2459,0.7888,0.7963,0.9698],"inner":[0.3101,0.8258,0.7321,0.9177]},"expl":{"ar":0.7449,"w":546,"h":733,"xc":[0.9359,0.1132,0.1363],"coin":[0.304,0.734,0.1099],"title":0.4952,"desc":0.543,"div":0.6658,"btn":[0.2454,0.7858,0.7949,0.9659],"inner":[0.3095,0.8226,0.7308,0.9141]}};
 const QP_IMG=k=>'art/qp_'+k+'.webp?v='+window.__BUILD;
 (()=>{const e=document.createElement('style');e.textContent='#qpop{position:absolute;inset:0;z-index:1095;background:rgba(5,8,6,.78);display:none;align-items:center;justify-content:center;padding:20px}#qpop.open{display:flex}'
 +'#qpop .qpc{position:relative;container-type:inline-size;width:min(92vw,400px,calc(86vh * var(--ar)));aspect-ratio:var(--ar);background:center/100% 100% no-repeat;filter:drop-shadow(0 8px 18px #000d);font-family:Georgia,serif}'
@@ -978,7 +978,7 @@ function qpFill(){const m=qpModel();if(!m)return qpClose();
   const bt=$q('.qpbtn');bt.style.left=pct(g.inner[0]);bt.style.top=pct(g.inner[1]);bt.style.width=pct(g.inner[2]-g.inner[0]);bt.style.height=pct(g.inner[3]-g.inner[1])}
  if(m.pill){$q('.qpb i').style.width=m.pill.pct+'%';$q('.qpb span').textContent=m.pill.txt}
  const r=$q('.qpr');if(m.kind==='expl')r.innerHTML=String(m.note).split('\n').map(s=>s.replace(/</g,'&lt;')).join('<br>');
- else r.innerHTML='Reward: +'+m.xp.toLocaleString()+' XP'+(m.pots?'<small>'+(m.kind==='daily'?m.pots.split(', ').map(t=>'<span style="display:block;white-space:nowrap">'+t+'</span>').join(''):m.pots)+'</small>':'');
+ else r.innerHTML='Reward: +'+m.xp.toLocaleString()+' XP'+(m.pots?'<small>'+(m.kind==='daily'?m.pots.split(', ').map(t=>'<span style="display:block;white-space:nowrap">'+t+'</span>').join(''):m.pots.split(', ').map((t,i,a)=>'<span style=\"white-space:nowrap\">'+(i<a.length-1?t.replace(/ Potions?$/,'')+',':t)+'</span>').join(' '))+'</small>':'');
  const bt=$q('.qpbtn');bt.textContent=m.btn;bt.disabled=!m.enabled;bt.dataset.mode=m.mode;bt.classList.toggle('done',!!m.done);bt.classList.toggle('long',m.btn.length>9&&m.btn.length<=13);bt.classList.toggle('xl',m.btn.length>13)}
 function qpShow(el,tr,i){const d=qpData(tr,i);if(!d)return;qpS={tr,i};qpKey='';QPOP.classList.add('open');qpFill()}
 function qpGeneric(o){qpS={gen:o};qpKey='';QPOP.classList.add('open');qpFill()}   // {title,desc,note,btn,on}  ·  teal Explorable frame
