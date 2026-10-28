@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.783';window.__BUILD=B;
+(function(){var B='1.784';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -925,41 +925,67 @@ const QCARDS='quest_cards.webp',QBGI='quest_bg.webp',QORD=['walk1','nature','cha
 +'#qpanel .qk .b span{justify-content:center;font:700 6.4cqw Georgia,serif;padding:0 4.2cqw;color:#24150a;text-shadow:0 1px 0 #f8e6b4,0 0 3px #f1d48f}'
 +'#qpanel .qk.done .b span b{color:#24150a}';document.head.appendChild(e)})();
 
-/* ---- Quest pop-up: same ornate card frame as the quest slips, red X, Turn In button ---- */
+/* ---- Quest pop-up: one ornate frame per quest type (red Daily, blue Weekly, purple Monthly, teal Explorable). The art holds only the frame; every word is live text. ---- */
+const QPG={"daily":{"ar":0.7453,"w":553,"h":742,"xc":[0.9308,0.0758,0.131],"coin":[0.3042,0.7587,0.0961],"title":0.465,"desc":0.498,"div":0.6969,"btn":[0.2343,0.8108,0.7802,0.9214],"inner":[0.326,0.8271,0.6863,0.9084]},"weekly":{"ar":0.7534,"w":553,"h":734,"xc":[0.9259,0.1063,0.1432],"coin":[0.3092,0.7343,0.1085],"title":0.4959,"desc":0.5436,"div":0.6662,"btn":[0.2514,0.7861,0.7939,0.9659],"inner":[0.3146,0.8229,0.7306,0.9142]},"monthly":{"ar":0.7476,"w":545,"h":729,"xc":[0.9266,0.107,0.1365],"coin":[0.3046,0.7366,0.1101],"title":0.4966,"desc":0.5446,"div":0.668,"btn":[0.2459,0.7888,0.7963,0.9698],"inner":[0.3101,0.8258,0.7321,0.9177]},"expl":{"ar":0.7449,"w":546,"h":733,"xc":[0.9359,0.1132,0.1363],"coin":[0.304,0.734,0.1099],"title":0.4952,"desc":0.543,"div":0.6658,"btn":[0.2454,0.7858,0.7949,0.9659],"inner":[0.3095,0.8226,0.7308,0.9141]}};
+const QP_IMG=k=>'art/qp_'+k+'.webp?v='+window.__BUILD;
 (()=>{const e=document.createElement('style');e.textContent='#qpop{position:absolute;inset:0;z-index:1095;background:rgba(5,8,6,.78);display:none;align-items:center;justify-content:center;padding:20px}#qpop.open{display:flex}'
-+'#qpop .qpc{position:relative;container-type:inline-size;width:min(92vw,400px,calc(86vh * 300 / 344));aspect-ratio:300/344;background-repeat:no-repeat;background-size:400% 200%;filter:drop-shadow(0 8px 18px #000d)}'
-+'#qpop .qpx{position:absolute;top:-2.2%;right:-2.2%;width:9.5cqw;height:9.5cqw;min-width:34px;min-height:34px;border-radius:50%;border:2px solid #f3d27a;background:radial-gradient(circle at 35% 30%,#ff7b6e,#d02a20 55%,#7d130d);color:#fff;font:700 5.4cqw/1 Arial,sans-serif;display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 2px 6px #000c,inset 0 1px 2px #ffffff66;text-shadow:0 1px 2px #000;z-index:3;-webkit-tap-highlight-color:transparent}#qpop .qpx:active{filter:brightness(1.2)}'
-+'#qpop .qpp{position:absolute;left:8.5%;right:8.5%;top:49%;bottom:6.5%;border-radius:10px;background:none;border:0;box-shadow:none;padding:2.2cqw 3.4cqw 3cqw;display:flex;flex-direction:column;align-items:stretch;gap:1.5cqw;text-align:center;color:#fff1cf;font-family:Georgia,serif}'
-+'#qpop .qpt{font:700 5.5cqw/1.1 Georgia,serif;color:#2a1706;text-shadow:0 1px 0 #ffe9b866;flex:none}'
-+'#qpop .qpd{font:italic 3.5cqw/1.22 Georgia,serif;color:#4a3216;text-shadow:0 1px 0 #ffe9b855;flex:none}'
-+'#qpop .qpb{position:relative;height:6.2cqw;border:1.5px solid #e0b655;border-radius:999px;background:#0b0805;overflow:hidden;box-shadow:inset 0 0 6px #000;flex:none}#qpop .qpb i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#63e05b,#1d8a2a)}#qpop .qpb span{position:absolute;inset:0;display:grid;place-items:center;font:700 3.9cqw Georgia,serif;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 3px #000}'
-+'#qpop .qpr{font:700 4cqw/1.25 Georgia,serif;color:#5a3a0a;text-shadow:0 1px 0 #ffe9b855;flex:none}#qpop .qpr small{display:block;font:600 3.3cqw/1.2 Georgia,serif;color:#4a3216}'
-+'#qpop .qpbt{margin-top:auto;display:flex;justify-content:center;align-items:center;gap:2cqw;flex:none}'
-+'#qpop .qpbtn{flex:none;display:inline-flex;align-items:center;justify-content:center;padding:0 4cqw;line-height:1;white-space:nowrap;min-height:11cqw;border-radius:9px;border:2px solid #f3d27a;background:linear-gradient(180deg,#f5d77f,#c8922f 55%,#8a5e1a);color:#2a1706;font:700 5cqw Georgia,serif;text-shadow:0 1px 0 #ffe9a8;box-shadow:0 0 12px #e0b04e88,inset 0 1px 2px #fff8;cursor:pointer;-webkit-tap-highlight-color:transparent}#qpop .qpbtn:active:not(:disabled){filter:brightness(1.15)}'
-+'#qpop .qpbtn:disabled{background:linear-gradient(180deg,#5a5750,#3b3934);border-color:#6d6a62;color:#98938a;text-shadow:none;box-shadow:inset 0 1px 2px #0008;cursor:not-allowed}'
-+'#qpop .qpbtn.alt{background:linear-gradient(180deg,#3a4a2c,#1e2a15);border-color:#8fb66a;color:#e9f6d4;text-shadow:0 1px 2px #000;box-shadow:none;font-size:4.2cqw}';document.head.appendChild(e)})();
++'#qpop .qpc{position:relative;container-type:inline-size;width:min(92vw,400px,calc(86vh * var(--ar)));aspect-ratio:var(--ar);background:center/100% 100% no-repeat;filter:drop-shadow(0 8px 18px #000d);font-family:Georgia,serif}'
++'#qpop .qpc>*{position:absolute}'
++'#qpop .qpx{width:var(--xd);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:0;background:transparent;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;z-index:3}#qpop .qpx:active{background:#fff3}'
++'#qpop .qpt{left:7%;width:86%;transform:translateY(-50%);text-align:center;white-space:nowrap;overflow:hidden;font:700 6.2cqw/1.15 Georgia,serif;color:#2a1706;text-shadow:0 1px 0 #ffe9b866}'
++'#qpop .qpd{left:10%;width:80%;text-align:center;overflow:hidden;font:italic 3.8cqw/1.22 Georgia,serif;color:#3d2a12;text-shadow:0 1px 0 #ffe9b855}'
++'#qpop .qpb{left:21%;width:58%;height:4.8cqw;border:1.5px solid #8a6420;border-radius:999px;background:#2a1b0c;overflow:hidden;box-shadow:inset 0 0 5px #000,0 1px 0 #ffe9b866}#qpop .qpb i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#63e05b,#1d8a2a)}#qpop .qpb span{position:absolute;inset:0;display:grid;place-items:center;font:700 3.2cqw Georgia,serif;color:#fff1cf;text-shadow:0 1px 2px #000,0 0 3px #000}'
++'#qpop .qpr{transform:translateY(-50%);font:700 4.8cqw/1.2 Georgia,serif;color:#2a1706;text-shadow:0 1px 0 #ffe9b855;white-space:nowrap}#qpop .qpr small{display:block;font:600 3.3cqw/1.25 Georgia,serif;color:#4a3216;white-space:normal}'
++'#qpop .qpr.note{left:12%;width:76%;text-align:center;font:italic 600 3.6cqw/1.3 Georgia,serif;white-space:normal;color:#3d2a12}'
++'#qpop .qpbtn{transform:translate(0,0);display:grid;place-items:center;padding:0;border:0;border-radius:12px;background:transparent;color:#f6e7b4;font:700 6.4cqw/1 Georgia,serif;text-shadow:0 2px 2px #000,0 0 6px #000a;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;z-index:2}'
++'#qpop .qpbtn::after{content:"";position:absolute;inset:-14% -12%}'
++'#qpop .qpbtn.long{font-size:5cqw}#qpop .qpbtn.xl{font-size:4.2cqw}'
++'#qpop .qpbtn:not(:disabled){animation:qpg 1.7s ease-in-out infinite}#qpop .qpbtn:active:not(:disabled){filter:brightness(1.25)}'
++'@keyframes qpg{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 16px 2px var(--gl,#f3d27a)}}'
++'#qpop .qpbtn:disabled{cursor:default;color:#b9b2a0;text-shadow:0 1px 2px #000}#qpop .qpbtn:disabled::before{content:"";position:absolute;inset:-3% -2%;border-radius:12px;background:rgba(30,26,22,.52);-webkit-backdrop-filter:grayscale(1) brightness(.8);backdrop-filter:grayscale(1) brightness(.8);z-index:-1}'
++'#qpop .qpbtn.done:disabled::before{background:rgba(30,26,22,.35)}#qpop .qpbtn.done:disabled{color:#e9dcae}';document.head.appendChild(e)})();
+const QPGL={daily:'#ff5a3c',weekly:'#4aa8ff',monthly:'#c46cff',expl:'#35e0b0'};
 const QPOP=document.createElement('div');QPOP.id='qpop';QPOP.setAttribute('role','dialog');QPOP.setAttribute('aria-modal','true');
-QPOP.innerHTML='<div class="qpc"><button class="qpx" type="button" aria-label="Close">✕</button><div class="qpp"><div class="qpt"></div><div class="qpd"></div><div class="qpb"><i></i><span></span></div><div class="qpr"></div><div class="qpbt"><button class="qpbtn alt" type="button" style="display:none">📷 Enter Photo</button><button class="qpbtn qpturn" type="button">Turn In</button></div></div></div>';
+QPOP.innerHTML='<div class="qpc"><button class="qpx" type="button" aria-label="Close"></button><div class="qpt"></div><div class="qpd"></div><div class="qpb"><i></i><span></span></div><div class="qpr"></div><button class="qpbtn" type="button"></button></div>';
 (modal.parentElement||document.body).insertBefore(QPOP,modal);
-let qpS=null;
-function qpClose(){QPOP.classList.remove('open');qpS=null}
+setTimeout(()=>{try{Object.keys(QPG).forEach(k=>{new Image().src=QP_IMG(k)})}catch(e){}},4000);
+let qpS=null,qpKey='';
+function qpClose(){QPOP.classList.remove('open');qpS=null;qpKey=''}
 function qpData(tr,i){const T=S[tr],M=MULT[tr];
  if(i==='ms'){const m=T.ms,pots=Object.keys(MSPOT[tr]).filter(k=>MSPOT[tr][k]).map(k=>{const n=MSPOT[tr][k];return '+'+n+' '+PN[k]+' Potion'+(n>1?'s':'')}).join(', ');
-  return{title:MS[tr],hint:'Finish all 5 quests on this tab.',prog:m.p+' / 5',pct:100*m.p/5,xp:Math.round(m.xp*M*lvlScale()),pots,done:!!m.done,ready:!!m.ready&&!m.done}}
+  return{kind:tr,title:MS[tr],hint:'Finish all 5 quests on this tab.',prog:m.p+' / 5',pct:100*m.p/5,xp:Math.round(m.xp*M*lvlScale()),pots,done:!!m.done,ready:!!m.ready&&!m.done}}
  const q=T.q[i];if(!q)return null;
- return{title:q.title,hint:HINT[q.kind]||'',prog:q.kind==='walk'?`${(q.p/1609.344).toFixed(2)} / ${mi(q.goal)}`:`${Math.floor(q.p)} / ${q.goal}`,pct:Math.min(100,100*q.p/q.goal),xp:Math.round(q.xp*M*lvlScale()),pots:'',done:!!q.done,ready:!!q.ready&&!q.done,photo:q.kind==='photo'&&!q.done&&!q.ready}}
-function qpFill(){if(!qpS)return;const d=qpData(qpS.tr,qpS.i);if(!d)return qpClose();
- const $q=x=>QPOP.querySelector(x);$q('.qpt').textContent=d.title;$q('.qpd').textContent=d.done?'This quest has been turned in.':d.ready?'Quest complete! Turn it in to claim your reward.':d.hint;
- $q('.qpb i').style.width=(d.done?100:d.pct)+'%';$q('.qpb span').textContent=d.ready?'Ready to Claim':d.prog;
- $q('.qpr').innerHTML='Reward: +'+d.xp.toLocaleString()+' XP'+(d.pots?'<small>'+d.pots+'</small>':'');
- const t=$q('.qpturn');t.disabled=!d.ready;t.textContent=d.done?'Turned In ✔':'Turn In';
- const ph=$q('.alt');ph.style.display=d.photo?'':'none'}
-function qpShow(el,tr,i){const d=qpData(tr,i);if(!d)return;qpS={tr,i};
- const c=QPOP.firstElementChild;c.style.backgroundImage=el.style.backgroundImage;c.style.backgroundPosition=el.style.backgroundPosition;
- qpFill();QPOP.classList.add('open')}
+ return{kind:tr,title:q.title,hint:HINT[q.kind]||'',prog:q.kind==='walk'?`${(q.p/1609.344).toFixed(2)} / ${mi(q.goal)}`:`${Math.floor(q.p)} / ${q.goal}`,pct:Math.min(100,100*q.p/q.goal),xp:Math.round(q.xp*M*lvlScale()),pots:'',done:!!q.done,ready:!!q.ready&&!q.done,photo:q.kind==='photo'&&!q.done&&!q.ready}}
+/* what the pop-up shows: quest slips (daily / weekly / monthly) or a plain action (explorable quests: Abandon) */
+function qpModel(){if(!qpS)return null;
+ if(qpS.gen){const o=qpS.gen;return{kind:'expl',title:o.title,desc:o.desc,note:typeof o.note==='function'?o.note():o.note||'',btn:o.btn,mode:'gen',enabled:!!o.on}}
+ const d=qpData(qpS.tr,qpS.i);if(!d)return null;
+ const prog=!d.done&&!d.ready&&!d.photo;
+ return{kind:d.kind,title:d.title,desc:d.done?'This quest has been turned in.':d.ready?'Quest complete! Turn it in to claim your reward.':d.hint,pill:(!d.done&&!d.ready)?{pct:d.pct,txt:d.prog}:null,xp:d.xp,pots:d.pots,
+  btn:d.done?'Turned In ✔':d.photo?'📷 Enter Photo':'Turn In',mode:d.photo?'photo':'turn',enabled:d.photo||d.ready,done:d.done}}
+function qpFit(el,min,max,byH){let s=max;el.style.fontSize=s+'cqw';while(s>min&&(byH?el.scrollHeight>el.clientHeight+1:el.scrollWidth>el.clientWidth+1)){s=Math.round((s-.2)*10)/10;el.style.fontSize=s+'cqw'}}
+function qpFill(){const m=qpModel();if(!m)return qpClose();
+ const g=QPG[m.kind],c=QPOP.firstElementChild,$q=x=>c.querySelector(x),pct=v=>(v*100)+'%';
+ const key=m.kind+'|'+m.title+'|'+m.desc+'|'+(m.note||'')+'|'+!!m.pill;
+ if(key!==qpKey){qpKey=key;
+  c.style.setProperty('--ar',g.ar);c.style.setProperty('--gl',QPGL[m.kind]);c.style.backgroundImage='url('+QP_IMG(m.kind)+')';
+  const x=$q('.qpx');x.style.left=pct(g.xc[0]);x.style.top=pct(g.xc[1]);x.style.setProperty('--xd',pct(g.xc[2]));
+  const t=$q('.qpt');t.textContent=m.title;t.style.top=pct(g.title);qpFit(t,3.4,6.2,false);
+  const d=$q('.qpd');d.textContent=m.desc;d.style.top='calc('+pct(g.desc-.006)+')';d.style.height='calc('+pct(g.div-g.desc-.02)+' - '+(m.pill?'5.8':'0')+'cqw)';qpFit(d,2.6,3.8,true);
+  const b=$q('.qpb');b.style.display=m.pill?'':'none';b.style.top='calc('+pct(g.desc)+' + 5.2cqw)';
+  const r=$q('.qpr');r.classList.toggle('note',m.kind==='expl');
+  if(m.kind==='expl'){r.style.left='';r.style.top=pct(g.coin[1])}else{r.style.left='calc('+pct(g.coin[0])+' + '+(g.coin[2]*50)+'cqw + 2.6cqw)';r.style.top=pct(g.coin[1])}
+  const bt=$q('.qpbtn');bt.style.left=pct(g.inner[0]);bt.style.top=pct(g.inner[1]);bt.style.width=pct(g.inner[2]-g.inner[0]);bt.style.height=pct(g.inner[3]-g.inner[1])}
+ if(m.pill){$q('.qpb i').style.width=m.pill.pct+'%';$q('.qpb span').textContent=m.pill.txt}
+ const r=$q('.qpr');if(m.kind==='expl')r.innerHTML=String(m.note).split('\n').map(s=>s.replace(/</g,'&lt;')).join('<br>');
+ else r.innerHTML='Reward: +'+m.xp.toLocaleString()+' XP'+(m.pots?'<small>'+m.pots+'</small>':'');
+ const bt=$q('.qpbtn');bt.textContent=m.btn;bt.disabled=!m.enabled;bt.dataset.mode=m.mode;bt.classList.toggle('done',!!m.done);bt.classList.toggle('long',m.btn.length>9&&m.btn.length<=13);bt.classList.toggle('xl',m.btn.length>13)}
+function qpShow(el,tr,i){const d=qpData(tr,i);if(!d)return;qpS={tr,i};qpKey='';QPOP.classList.add('open');qpFill()}
+function qpGeneric(o){qpS={gen:o};qpKey='';QPOP.classList.add('open');qpFill()}   // {title,desc,note,btn,on}  ·  teal Explorable frame
 QPOP.addEventListener('click',e=>{if(e.target===QPOP||e.target.closest('.qpx')){qpClose();return}
- if(e.target.closest('.alt')){qpClose();askPhoto({done:()=>act('photo',{path:lastPhoto,ll:targetLL})});return}
- const b=e.target.closest('.qpturn');if(!b||b.disabled||!qpS)return;
+ const b=e.target.closest('.qpbtn');if(!b||b.disabled||!qpS)return;
+ if(qpS.gen){const on=qpS.gen.on;qpClose();if(on)on();return}
+ if(b.dataset.mode==='photo'){qpClose();askPhoto({done:()=>act('photo',{path:lastPhoto,ll:targetLL})});return}
  const {tr,i}=qpS,d=qpData(tr,i);if(!d||!d.ready)return;
  qpClose();   // window closes first, then the slip grays out once the server confirms the claim
  const p=i==='ms'?claimMs(tr):claim(tr,S[tr].q[i]);
@@ -2101,7 +2127,7 @@ function sqCard(id){return sqList().filter(q=>id?q.id===id:!QLINES[q.id]).map(q=
 function sqAbandon(id){if(confirm('Abandon this quest? You will not get the reward.'))act('quest',{op:'abandon',qid:id}).then(()=>{rf.style.display='none';render();try{syncQPoints()}catch(e){}})}
 function sqPanel(id){const q=sqGet(id);if(!q){render();return}const i=sqInfo(q);
  if(q.id==='door'){showModal('quest',{icon:'🚪',title:i.name,text:'The riddle is still waiting.\n'+i.left+' min left',primary:'Open Riddle',onPrimary:()=>{hideModal('quest');act('quest',{op:'resume',qid:q.qid}).then(r=>{if(r&&r.result&&r.result.sq)sqShow(r.result.sq)})},secondary:'Abandon Quest',onSecondary:()=>{hideModal('quest');sqAbandon(q.qid)}});return}
- popup({icon:SQ_ICON[q.id],title:i.name,text:i.sub+'\n'+(q.id==='slumber'||q.id==='calaun'||q.id==='selora'?'No time limit':i.left+' min left')+'\n\nAbandoning forfeits the reward'+(q.id==='slumber'||q.id==='calaun'||q.id==='selora'?' and the quest returns tomorrow.':'.'),btn:'Abandon Quest',on:()=>sqAbandon(q.qid)})}
+ const nl=q.id==='slumber'||q.id==='calaun'||q.id==='selora';qpGeneric({title:i.name,desc:i.sub,note:()=>{const l=nl?'No time limit':sqInfo(q).left+' min left';return l+'\nAbandoning forfeits the reward'+(nl?' and the quest returns tomorrow.':'.')},btn:'Abandon Quest',on:()=>sqAbandon(q.qid)})}
 function sqClose(){rf.style.display='none';hud();try{render()}catch(e){}try{syncQPoints()}catch(e){}try{if(inv.classList.contains('open'))invRender()}catch(e){}}
 
 /* ---- LOST IN SLUMBER: a daily marker the server places near you (S.slm), then pop-up screens with art banners and pill buttons. The server decides every step; this only draws it. ---- */
