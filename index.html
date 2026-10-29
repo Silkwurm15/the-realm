@@ -252,12 +252,13 @@ html.hc .mk .badge svg{width:24px;height:24px}
 .skc[data-skin]:not([data-skin="door"])::before,.skc[data-skin]:not([data-skin="door"])::after{content:"";position:absolute;top:0;bottom:0;left:auto;right:auto;border:0;border-radius:0;font-size:0;color:transparent;pointer-events:none;background-repeat:repeat-y;background-position:0 0;background-size:100% auto}
 .skc[data-skin]:not([data-skin="door"])::before{left:calc(var(--w)*var(--bl)*-1);width:calc(var(--w)*var(--lsw));background-image:var(--ls)}
 .skc[data-skin]:not([data-skin="door"])::after{right:calc(var(--w)*var(--br)*-1);width:calc(var(--w)*var(--rsw));background-image:var(--rs)}
-.skc[data-skin="door"],#riftOv .rfb.skc[data-skin="door"]{--w:min(380px,calc(100vw - 28px));box-sizing:border-box;width:var(--w);max-width:none;max-height:none;margin:auto;border:0;border-radius:0;padding:calc(var(--w)*var(--banh)*.93) calc(var(--w)*.06) 18px;background:var(--banner) 50% 0/100% auto no-repeat,linear-gradient(#150c26,#0b0713 45%);box-shadow:none;overflow:visible}
+.skc[data-skin="door"],#riftOv .rfb.skc[data-skin="door"]{--w:min(380px,calc(100vw - 28px));box-sizing:border-box;width:var(--w);max-width:none;max-height:none;margin:auto;border-style:solid;border-color:transparent;border-radius:0;border-width:calc(var(--w)*.2886) calc(var(--w)*.0606) calc(var(--w)*.075) calc(var(--w)*.0606);border-image:url(art/wd_frame.webp) 200 42 52 42/calc(var(--w)*.2886) calc(var(--w)*.0606) calc(var(--w)*.075) calc(var(--w)*.0606) round;padding:2px calc(var(--w)*.015) calc(var(--w)*.02);background:url(art/wd_tex.webp) 0 0/calc(var(--w)*.46) auto repeat;background-clip:padding-box;background-origin:padding-box;box-shadow:none;overflow:visible;filter:drop-shadow(0 10px 22px rgba(0,0,0,.65))}
 .skc[data-skin] .m-icon,.skc[data-skin] .rfi,.skc[data-skin] .rfw,#riftOv .skc[data-skin] .rfi,#riftOv .skc[data-skin] .rfw{display:none}
 .skc[data-skin] #mTitle,.skc[data-skin] .rft,#riftOv .skc[data-skin] .rft{margin:0;font:700 24px/1.15 Georgia,serif;color:#f6e8c1;text-shadow:0 2px 3px #000,0 0 14px rgba(255,214,120,.4);text-align:center}
-.skc[data-skin="door"] .rft,#riftOv .skc[data-skin="door"] .rft{font-size:17px;font-weight:400;color:#cdb8f5}
+.skc[data-skin="door"] .rft,#riftOv .skc[data-skin="door"] .rft{font-size:26px;font-weight:700;color:#f6e3b0;margin-top:2px}
+.skc[data-skin="door"] .rfx,#riftOv .skc[data-skin="door"] .rfx{font-size:16px;line-height:1.4;margin:6px 0 14px}
 .skc[data-skin] #mTitle::after,.skc[data-skin] .rft::after,#riftOv .skc[data-skin] .rft::after{content:"";display:block;margin:8px auto 2px;width:calc(var(--w)*var(--dw));max-width:100%;height:calc(var(--w)*var(--dh));background:var(--div) center/100% 100% no-repeat}
-.skc[data-skin="door"] .rft::after,#riftOv .skc[data-skin="door"] .rft::after{display:none}
+
 .skc[data-skin] #mText,.skc[data-skin] .rfx,.skc[data-skin] .rfl,#riftOv .skc[data-skin] .rfx,#riftOv .skc[data-skin] .rfl{font:15px/1.45 Georgia,serif;color:#eadfc7;text-shadow:0 1px 2px #000;margin:8px 0 14px;text-align:center;white-space:pre-line}
 .skc[data-skin] .m-btn,.skc[data-skin] #rfC button{display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;width:100%;min-height:calc(var(--w)*var(--bh));margin:6px 0 0;padding:4px 4px;border-style:solid;border-color:transparent;border-width:0 calc(var(--w)*var(--c1r)) 0 calc(var(--w)*var(--c1l));border-radius:0;background:var(--b1l) 0 50%/auto 100% no-repeat,var(--b1r) 100% 50%/auto 100% no-repeat,var(--b1m) 0 50%/auto 100% repeat-x;background-origin:border-box,border-box,padding-box;background-clip:border-box,border-box,padding-box;color:#f6e8c1;font:700 19px/1.15 Georgia,serif;text-shadow:0 2px 3px #000;cursor:pointer}
 .skc[data-skin] #rfC button small{display:block;margin-top:2px;font:13px/1.2 Georgia,serif;color:#dccfae;text-shadow:0 1px 2px #000}
@@ -293,7 +294,13 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #riftOv .skc[data-skin="sat"] .rft{margin-top:calc(var(--w)*-0.0705);font-size:27px;color:#f3dfa0;text-shadow:0 2px 3px #000,0 0 16px rgba(255,200,90,.45)}#riftOv .skc[data-skin="sat"] .rfl{margin:10px 0 6px;text-align:center}#riftOv .skc[data-skin="sat"] #rfC button{width:calc(100% + var(--w)*.1);margin:2px calc(var(--w)*-.05) 0;font-size:22px;color:#f6e3a8}
 #riftOv .skc[data-skin="qc"] .rft{margin-top:calc(var(--w)*-0.0717);font-size:27px;color:#f3dfa0;text-shadow:0 2px 3px #000,0 0 16px rgba(255,200,90,.45)}#riftOv .skc[data-skin="qc"] .rfl{margin:10px 0 6px;text-align:center}#riftOv .skc[data-skin="qc"] #rfC button{width:calc(100% + var(--w)*.1);margin:2px calc(var(--w)*-.05) 0;font-size:22px;color:#f6e3a8}#riftOv .skc[data-skin="qc"] .rfx{font:700 19px/1.2 Georgia,serif;color:#f0d78c;margin:2px 0 10px}#riftOv .skc[data-skin="qc"] .rfx::after{content:"";display:block;margin:6px auto 0;width:calc(var(--w)*.62);height:calc(var(--w)*.075);background:var(--div) center/100% 100% no-repeat}
 /* /SKIN-SAT-QC */
-.skc[data-skin="door"]{--b1l:url(art/rfx_b1l.webp);--b1m:url(art/rfx_b1m.webp);--b1r:url(art/css_b1r_17.webp);--bh:0.1237;--banner:url(art/css_banner.webp);--banh:0.9000;--bh2:.07;--c1l:0.0991;--c1r:0.1016}
+.skc[data-skin="door"]{--bh:0.135;--bh2:.07;--dw:0.62;--dh:0.0492;--div:url(art/wd_div.webp)}
+/* Whispering Door riddle: painted buttons (3-slice border-image) in different colours */
+#riftOv .skc[data-skin="door"] #rfC button{--bi:url(art/wd_btn_teal.webp);--sl:102;--sr:100;--cl:.1721;--cr:.1688;min-height:calc(var(--w)*.135);margin:7px 0 0;padding:2px 0;border-style:solid;border-color:transparent;border-width:0 calc(var(--w)*var(--cr)) 0 calc(var(--w)*var(--cl));border-image:var(--bi) 0 var(--sr) 0 var(--sl) fill/0 calc(var(--w)*var(--cr)) 0 calc(var(--w)*var(--cl)) round;background:none;font-size:19px}
+#riftOv .skc[data-skin="door"] #rfC button:nth-child(4n+1){--bi:url(art/wd_btn_red.webp);--sl:89;--sr:83;--cl:.1502;--cr:.1401}
+#riftOv .skc[data-skin="door"] #rfC button:nth-child(4n+3){--bi:url(art/wd_btn_purple.webp)}
+#riftOv .skc[data-skin="door"] #rfC button.alt{--bi:url(art/wd_btn_green.webp)}
+#riftOv .skc[data-skin="door"] #rfC button.alt:last-child{--bi:url(art/wd_btn_grey.webp)}
 
 /* title cards are tappable; the equipped title shows in the top bar under the name */
 .tap{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}.tap:active{filter:brightness(1.18)}.tap:focus-visible{outline:2px solid #e5c77b;outline-offset:2px}
@@ -706,8 +713,8 @@ function showModal(kind,o){modalKind=kind;if(o.iconHtml)$('mIcon').innerHTML=o.i
  mc.style.borderColor=(o.skin||mcn)?'':(o.color||'');mc.style.boxShadow=(o.skin||mcn)?'':(o.color?'0 0 22px '+o.color+'66':'');$('mTitle').style.color=mcn?'':(o.color||'');
  const b1=$('mPrimary'),b2=$('mSecondary');b1.disabled=false;b2.disabled=false;b1.style.opacity='';b1.textContent=o.primary;b1.onclick=o.onPrimary;modal.classList.toggle('art',o.skin==='chest'||o.skin==='loot');
  if(o.secondary){b2.style.display='block';b2.textContent=o.secondary;b2.onclick=o.onSecondary}else b2.style.display='none';
- modal.classList.add('open')}
-function hideModal(kind){if(!kind||modalKind===kind){modal.classList.remove('open');modalKind=null}}
+ modal.classList.add('open');if(kind==='poi'&&o.skin==='quest'&&o.title==='The Whispering Door'){try{wdOpen()}catch(e){}}else{try{wdClose()}catch(e){}}}
+function hideModal(kind){if(!kind||modalKind===kind){modal.classList.remove('open');modalKind=null;try{wdClose()}catch(e){}}}
 
 /* ---------- GPS ---------- */
 function gpsState(){} // status pill removed; errors are shown as pop-ups
@@ -1349,7 +1356,7 @@ function cbDraw(title,btns,bars){$('cbT').textContent=title;$('cbA').innerHTML=(
  $('cbB').innerHTML=bars?'<div class="cbh"><span>'+C.e.n+'</span><span>'+Math.max(0,C.eh)+' / '+C.e.hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*C.eh/C.e.hp)+'%;background:#d6304a"></i></div><div class="cbh"><span>You</span><span>'+Math.floor(H().hp)+' / '+stats().hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*H().hp/stats().hp)+'%;background:#4caf50"></i></div>':'';
  $('cbL').textContent=C.log.slice(-4).join('\n');$('cbR').innerHTML='';btns.forEach(b=>{const x=document.createElement('button');x.textContent=b[0];if(b[2])x.className='alt';x.onclick=b[1];$('cbR').appendChild(x)});cb.style.display='flex'}
 function cbShow(f){fighting=true;try{if(f.phase==='intro')Sound.music(f.strong?'battle_strongmimic':'battle_mimic');else if(f.phase==='fallen')Sound.sfx('lose');else if(f.phase==='end'||!['intro','choice','fallen'].includes(f.phase)){Sound.music('map');if(/victory/i.test(f.title||''))Sound.sfx('win');else if(/defeat/i.test(f.title||''))Sound.sfx('lose')}}catch(e){}C={k:f.strong?'smimic':'mimic',m:{name:f.m.name},e:{n:f.e.n,hp:f.e.hp},eh:f.eh,log:f.log};
- if(f.phase==='intro')cbDraw(f.title,[['Defend Yourself!',()=>cbOp('start')]],false);
+ if(f.phase==='intro'){cbDraw(f.title,[['Defend Yourself!',()=>cbOp('start')]],false);if(f.strong){try{lmOpen(()=>cbOp('start'))}catch(e){}}}
  else if(f.phase==='choice')cbDraw('Your move!',[['Attack',()=>cbOp('attack')],['Flee',()=>cbOp('flee'),1]],true);
  else if(f.phase==='fallen')cbDraw('You have fallen!',[['Use Resurrect Potion ('+f.res+')',()=>cbOp('res')],['Give Up',()=>cbOp('giveup'),1]],true);
  else cbDraw(f.title,[['Continue',()=>{cb.style.display='none';C=null;fighting=false;hud();if(inv.classList.contains('open'))invRender()}]],true)}
@@ -2260,7 +2267,7 @@ function ptHide(toMap){
 /* ---- Arcane Rifts: one room, one choice. The server rolls everything; this only shows it. ---- */
 const rfs=document.createElement('style');rfs.textContent='#riftOv{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;padding:14px;background:#000d;font-family:Georgia,serif;color:#e6dcff}#riftOv .rfb{width:100%;max-width:380px;max-height:100%;overflow-y:auto;padding:18px 16px;border:1px solid #9b78e8;border-radius:6px;background:linear-gradient(135deg,#24123f,#0b0813);box-shadow:0 14px 50px #000c,0 0 40px #7b4dd855,inset 0 0 0 3px #170c2b;text-align:center}#riftOv .rfi{font-size:46px;line-height:1.1}#riftOv .rft{font-size:20px;font-weight:700;color:#f1e8ff;margin:4px 0 6px}#riftOv .rfw{display:inline-block;margin:2px 0 8px;padding:3px 10px;border:1px solid #b184ff;border-radius:12px;font-size:12px;color:#d8c4ff}#riftOv .rfx{font-size:14px;line-height:1.45;color:#d5c8f0;white-space:pre-line}#riftOv .rfl{margin:12px 0;font-size:14px;line-height:1.5;color:#e6dcff;white-space:pre-line;text-align:left}#riftOv button{display:block;width:100%;margin-top:9px;padding:12px 8px;border:1px solid #b184ff;border-radius:4px;background:linear-gradient(#4a2d80,#2a1650);color:#f4edff;font:700 16px Georgia,serif;cursor:pointer}#riftOv button small{display:block;margin-top:3px;font:12px Georgia,serif;color:#cdb8f5}#riftOv button.alt{background:#150d26;border-color:#6b4fa3}#riftOv button:disabled{opacity:.5}';document.head.appendChild(rfs);
 const rf=document.createElement('div');rf.id='riftOv';rf.innerHTML='<div class="rfb"><img id="rfImg" alt="" style="display:none"><div class="rfi" id="rfI"></div><div class="rft" id="rfT"></div><div class="rfw" id="rfW" style="display:none"></div><div class="rfx" id="rfX"></div><div class="rfl" id="rfL" style="display:none"></div><div id="rfC"></div></div>';document.body.appendChild(rf);
-function rfDraw(o){skinSet(rf.firstElementChild,o.skin);{const cd=rf.firstElementChild;cd.classList.toggle('libx',!!o.lib);if(o.lib)cd.dataset.lib=o.lib;else delete cd.dataset.lib;rf.classList.toggle('liba',o.lib===6);libStage(cd,o.lib===6)}rf.firstElementChild.classList.toggle('slm',!!o.slm);{const im=$('rfImg');im.style.display=o.img?'block':'none';if(o.img)im.src=o.img}$('rfI').textContent=o.icon;$('rfT').textContent=o.title;const w=$('rfW');w.style.display=o.wild?'inline-block':'none';w.textContent=o.wild||'';$('rfX').textContent=o.text||'';const l=$('rfL');l.style.display=o.lines?'block':'none';l.textContent=o.lines?o.lines.join('\n'):'';
+function rfDraw(o){try{wdBg(!!window.wdBgNext||o.skin==='door')}catch(e){}window.wdBgNext=0;skinSet(rf.firstElementChild,o.skin);{const cd=rf.firstElementChild;cd.classList.toggle('libx',!!o.lib);if(o.lib)cd.dataset.lib=o.lib;else delete cd.dataset.lib;rf.classList.toggle('liba',o.lib===6);libStage(cd,o.lib===6)}rf.firstElementChild.classList.toggle('slm',!!o.slm);{const im=$('rfImg');im.style.display=o.img?'block':'none';if(o.img)im.src=o.img}$('rfI').textContent=o.icon;$('rfT').textContent=o.title;const w=$('rfW');w.style.display=o.wild?'inline-block':'none';w.textContent=o.wild||'';$('rfX').textContent=o.text||'';const l=$('rfL');l.style.display=o.lines?'block':'none';l.textContent=o.lines?o.lines.join('\n'):'';
  const c=$('rfC');c.innerHTML='';(o.btns||[]).forEach(b=>{const x=document.createElement('button');x.innerHTML=b.html;if(b.alt)x.className='alt';x.onclick=()=>{c.querySelectorAll('button').forEach(y=>y.disabled=true);b.fn()};if(b.dis)x.disabled=true;c.appendChild(x)});rf.style.display='flex'}
 const rfClose=()=>{rf.style.display='none';try{if(Sound.now()!=='map')Sound.music('map')}catch(e){}try{ptHide(false)}catch(e){}hud();try{if(inv.classList.contains('open'))invRender()}catch(e){}};
 const esc=t=>String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
@@ -2475,13 +2482,14 @@ function selShow(sq){const n=sq.step|0;selN=n;const T=SEL_T[n]||SEL_T[0],tag='Se
  sqClose()}
 
 function sqShow(sq){
+ if(sq.id==='door')window.wdBgNext=1;
  if(sq.id==='slumber')return slmShow(sq);
  if(sq.id==='calaun')return calShow(sq);
  if(sq.id==='selora')return selShow(sq);
- if(sq.phase==='riddle')return rfDraw({skin:'door',icon:'🚪',title:sq.name,text:'A carved face in the door whispers:\n\n'+sq.riddle.q,btns:[...sq.riddle.opts.map((o,i)=>({html:esc(o),fn:()=>sqAnswer(sq.qid,i)})),{html:'Not now',alt:1,fn:sqClose},{html:'Abandon quest',alt:1,fn:()=>sqAbandon(sq.qid)}]});
+ if(sq.phase==='riddle')return rfDraw({skin:'door',icon:'🚪',title:sq.name,text:'A carved face in the door whispers:\n\u201C'+sq.riddle.q+'\u201D',btns:[...sq.riddle.opts.map((o,i)=>({html:esc(o),fn:()=>sqAnswer(sq.qid,i)})),{html:'Not now',alt:1,fn:sqClose},{html:'Abandon quest',alt:1,fn:()=>sqAbandon(sq.qid)}]});
  rfDraw({skin:sq.phase==='done'&&sq.ok?'qc':sq.id==='traveler'?'trav':sq.id==='satchel'&&sq.phase!=='done'&&sq.phase!=='progress'?'sat':undefined,icon:sq.phase==='done'?(sq.ok?'🏆':'🚪'):sq.phase==='progress'?'✨':(SQ_ICON[sq.id]||'📜'),title:sq.phase==='done'?(sq.ok?'Quest Complete':'A Meager Prize'):sq.name,text:sq.phase==='done'?sq.name:'',lines:sq.lines,btns:[{html:'Continue',fn:sqClose}]})}
 async function sqAnswer(qid,i){const r=await act('quest',{op:'answer',qid,pick:i});
- if(!r||!r.result||!r.result.sq)return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',qid,quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});
+ if(!r||!r.result||!r.result.sq){window.wdBgNext=1;return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',qid,quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});}
  sqSnd(r.result.sq);sqShow(r.result.sq)}
 function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,90+Math.random()*110);if(safeAt(p,c))out.push(p)}return out}   // safe spots 90-200 m away; the server picks from them and checks the distances
 async function questStart(it){const r=await useMarker(it,()=>act('quest',{op:'start',key:it.key,exp:it.exp,ll:targetLL,cands:gatherCands()}));if(r&&r.result&&r.result.sq){try{Sound.queue('quest_start')}catch(e){}sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
@@ -2713,6 +2721,124 @@ function labels(){const card=modal.firstElementChild,sk=card&&card.dataset.skin,
  S.classList.toggle('lv',!(B.s&&S.textContent.trim()===B.s))}
 new MutationObserver(()=>{labels();sync()}).observe(modal,{attributes:true,subtree:true,childList:true,characterData:true,attributeFilter:['class','data-skin']});
 addEventListener('resize',()=>{if(mode)fit()});labels();sync();
+})();
+</script>
+
+<!-- Whispering Door quest prompt + Living Mimic (Strong Mimic intro): animated full-screen scenes -->
+<style>
+.scn{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:#05060b}
+.scn.open{display:flex}
+.scn .stg{position:relative;width:min(100vw,calc(100dvh*2/3));aspect-ratio:2/3;overflow:hidden}
+.scn .stg img,.scn .stg canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.scn .hot{position:absolute;background:transparent;border:0;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:0}
+#wdDlg{clip-path:polygon(33.2% 34.6%,67.4% 34.6%,78.1% 38.4%,87.4% 40%,87.9% 81.7%,11.7% 81.7%,12.2% 40%,22% 38.4%)}
+#lmOv{background:#07040a}
+#wdOv.bg{z-index:1499;pointer-events:none}
+#wdOv.bg #wdDlg,#wdOv.bg .hot{display:none}
+#wdOv.bg .stg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100vw,calc(100dvh*2/3))}
+</style>
+<div class="scn" id="wdOv" role="dialog" aria-modal="true" aria-label="The Whispering Door"><div class="stg">
+<img alt="" src="art/whispering_door.webp"><canvas id="wdC"></canvas><img id="wdDlg" alt="" src="art/whispering_door.webp">
+<button class="hot" id="wdGo" aria-label="Begin Quest" style="left:17%;top:64.5%;width:66%;height:7%"></button>
+<button class="hot" id="wdNo" aria-label="Close" style="left:18%;top:72.3%;width:64%;height:6.2%"></button>
+</div></div>
+<div class="scn" id="lmOv" role="dialog" aria-modal="true" aria-label="Strong Mimic"><div class="stg">
+<canvas id="lmC" width="1024" height="1536"></canvas>
+<button class="hot" id="lmGo" aria-label="Defend Yourself!" style="left:12%;top:77%;width:76%;height:9%"></button>
+</div></div>
+<script>
+(function(){
+const $$=id=>document.getElementById(id);
+/* ================= THE WHISPERING DOOR ================= */
+const wdOv=$$('wdOv'),wc=$$('wdC'),wx=wc.getContext('2d');let wW,wH,wS,wRaf=0;
+function wrs(){const d=devicePixelRatio||1;wW=wc.clientWidth;wH=wc.clientHeight;wc.width=wW*d;wc.height=wH*d;wx.setTransform(d,0,0,d,0,0);wS=wW/1024}
+function wglow(px,py,r,rgb,a){if(a<=0.003)return;const X=px*wS,Y=py*wS,R=r*wS;const g=wx.createRadialGradient(X,Y,0,X,Y,R);
+g.addColorStop(0,`rgba(${rgb},${a})`);g.addColorStop(.4,`rgba(${rgb},${a*.35})`);g.addColorStop(1,`rgba(${rgb},0)`);wx.fillStyle=g;wx.fillRect(X-R,Y-R,R*2,R*2)}
+const BL='110,185,255',WM='255,165,60',CY='170,215,255';
+const fl=(t,p)=>.72+.28*(Math.sin(t*5.3+p)*.5+Math.sin(t*8.9+p*2.1)*.3+Math.sin(t*13.7+p*.7)*.2);
+const wflames=[[92,505,1,0],[912,515,1,2],[62,1035,.55,4],[103,1058,.5,1],[62,1095,.5,3],[1015,1105,.55,5],[940,1165,.5,2.5]];
+const wcols=[[358,290],[358,350],[358,410],[358,455],[358,530],[664,290],[664,345],[664,405],[664,455],[664,530]];
+const warch=[];for(let i=0;i<22;i++){const th=Math.PI+(i+.5)/22*Math.PI;warch.push([512+290*Math.cos(th),300+235*Math.sin(th),i/22])}
+let WP=[];function wmk(init){const blue=Math.random()<.35;return{x:Math.random()*1024,y:init?Math.random()*1536:1546,r:Math.random()*1.6+.6,vy:Math.random()*.5+.2,ph:Math.random()*6,a:Math.random()*.5+.25,blue}}
+function wframe(ms){if(!wdOv.classList.contains('open')){wRaf=0;return}
+const t=ms/1000;wx.clearRect(0,0,wW,wH);wx.globalCompositeOperation='lighter';
+const br=.5+.5*Math.sin(t*1.1);
+wglow(512,330,330,'60,110,255',.10+.07*br);
+wglow(512,480,120,BL,.35+.3*br);wglow(512,480,45,CY,.35+.3*br);
+for(let y=140;y<=560;y+=28){const k=Math.max(0,Math.sin(t*2.2-y*.03));wglow(512,y,34,CY,.08+.22*k)}
+wcols.forEach(([px,py])=>{const k=.5+.5*Math.sin(t*1.6-py*.012+(px>500?1.2:0));wglow(px,py,34,BL,.1+.4*k)});
+warch.forEach(([px,py,u])=>{const k=.5+.5*Math.sin(t*1.4-u*9);wglow(px,py,26,BL,.08+.4*k)});
+wglow(512,1400,260,'70,130,255',.10+.08*br);
+for(const [px,py,sc,p] of wflames){const f=fl(t,p);wglow(px,py,150*sc,WM,.12*f);wglow(px,py,55*sc,'255,190,90',.45*f);wglow(px,py,20*sc,'255,230,170',.5*f)}
+for(const q of WP){q.y-=q.vy;q.x+=Math.sin(t*1.1+q.ph)*.35;if(q.y<-10)Object.assign(q,wmk(false));
+const fade=Math.min(1,q.y/350);wglow(q.x,q.y,q.r*6,q.blue?BL:WM,q.a*fade)}
+wRaf=requestAnimationFrame(wframe)}
+let wdMode='';
+function wgo(){if(!WP.length)for(let i=0;i<70;i++)WP.push(wmk(true));wdOv.classList.add('open');wrs();if(!wRaf)wRaf=requestAnimationFrame(wframe)}
+window.wdOpen=function(){wdMode='prompt';wdOv.classList.remove('bg');wgo()};
+window.wdClose=function(){if(wdMode==='bg')return;wdMode='';wdOv.classList.remove('open')};
+/* riddle-quest popup: same animated door scene fills the whole screen behind the normal popup */
+window.wdBg=function(on){const r=window.rf||document.getElementById('riftOv');
+ if(on){wdMode='bg';wdOv.classList.add('bg');wgo();if(r)r.style.background='#0005'}
+ else if(wdMode==='bg'){wdMode='';wdOv.classList.remove('bg','open');if(r)r.style.background=''}};
+try{new MutationObserver(()=>{const r=document.getElementById('riftOv');if(r&&r.style.display==='none')wdBg(0)}).observe(document.getElementById('riftOv'),{attributes:true,attributeFilter:['style']})}catch(e){}
+addEventListener('resize',()=>{if(wdOv.classList.contains('open'))wrs()});
+/* Buttons: forward to the normal quest prompt's own buttons so all game logic (range check, quest start) stays the same */
+$$('wdGo').onclick=()=>{const b=$$('mPrimary');wdClose();if(b)b.click()};
+$$('wdNo').onclick=()=>{const b=$$('mSecondary');wdClose();if(b&&b.onclick)b.click();else if(window.hideModal)hideModal('poi')};
+
+/* ================= LIVING MIMIC (Strong Mimic intro) ================= */
+const lmOv=$$('lmOv'),cv=$$('lmC'),ctx=cv.getContext('2d');
+const lim=new Image();let limOk=false,lRaf=0;lim.onload=()=>{limOk=true};lim.src='art/living_mimic.webp';
+const ss=(a,b,x)=>{x=Math.min(1,Math.max(0,(x-a)/(b-a)));return x*x*(3-2*x)};
+const R=Math.random;
+const lflames=[[52,330,130],[922,540,100],[975,438,60]];
+const fangs=[[455,350],[535,300],[600,300],[690,320],[420,330]];
+const coins=[[300,812],[700,792],[880,805],[150,748],[620,800],[200,770],[960,985],[420,1500]];
+let parts=[],drops=[],sparks=[];
+function lglow(x,y,r,col,a){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${col},${a})`);g.addColorStop(1,`rgba(${col},0)`);ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2)}
+function lframe(ms){if(!lmOv.classList.contains('open')){lRaf=0;return}
+ if(!limOk){lRaf=requestAnimationFrame(lframe);return}
+ const t=ms/1000;
+ ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
+ ctx.drawImage(lim,0,0,1024,1536);
+ ctx.globalCompositeOperation='lighter';
+ lglow(820,110,300,'110,170,255',0.16+0.08*Math.sin(t*0.8));
+ lflames.forEach(([x,y,r],i)=>{
+  const f=0.5+0.25*Math.sin(t*9+i*2)+0.15*Math.sin(t*17+i*5)+0.1*Math.sin(t*31+i);
+  lglow(x,y,r*(1+0.2*f),'255,140,40',0.28*f+0.12);
+  lglow(x+Math.sin(t*7+i)*4,y-20,r*0.45,'255,210,120',0.22*f);
+  if(R()<0.35)parts.push({x:x+(R()-.5)*30,y:y-10,vx:(R()-.5)*20,vy:-30-R()*50,l:0,m:2+R()*2,s:1+R()*2});
+ });
+ const wf=0.5+0.2*Math.sin(t*9)+0.1*Math.sin(t*23);
+ lglow(250,500,420,'255,150,60',0.10*wf+0.04);
+ const breath=0.5+0.5*Math.sin(t*1.6);
+ lglow(560,430,230,'255,40,30',0.10+0.08*breath);
+ const bp=0.5+0.5*Math.sin(t*2.2);
+ lglow(512,1250,330,'255,30,30',0.04+0.06*bp);
+ parts=parts.filter(p=>(p.l+=1/60)<p.m);
+ parts.forEach(p=>{p.x+=(p.vx+Math.sin(t*3+p.m*9)*12)/60;p.y+=p.vy/60;
+  ctx.globalAlpha=Math.max(0,1-p.l/p.m);ctx.fillStyle='#ffb050';
+  ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,7);ctx.fill()});
+ ctx.globalAlpha=1;
+ if(R()<0.08){const c=coins[(R()*coins.length)|0];sparks.push({x:c[0]+(R()-.5)*60,y:c[1]+(R()-.5)*20,l:0,m:0.7+R()*0.5})}
+ sparks=sparks.filter(s=>(s.l+=1/60)<s.m);
+ sparks.forEach(s=>{const a=Math.sin(s.l/s.m*Math.PI),r=14*a;
+  ctx.fillStyle=`rgba(255,235,170,${a})`;
+  ctx.fillRect(s.x-r,s.y-0.8,r*2,1.6);ctx.fillRect(s.x-0.8,s.y-r,1.6,r*2)});
+ ctx.globalCompositeOperation='source-over';
+ if(R()<0.03){const f=fangs[(R()*fangs.length)|0];drops.push({x:f[0]+(R()-.5)*6,y:f[1]+30,v:10,l:0})}
+ drops=drops.filter(d=>d.y<780&&d.l<2);
+ drops.forEach(d=>{d.v+=500/60;d.y+=d.v/60;d.l+=1/60;
+  ctx.fillStyle='rgba(235,215,215,0.55)';ctx.beginPath();ctx.ellipse(d.x,d.y,1.8,4+d.v/60,0,0,7);ctx.fill()});
+ const v=ctx.createRadialGradient(512,700,350,512,700,1000);
+ v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,`rgba(0,0,0,${0.22+0.04*Math.sin(t*9)})`);
+ ctx.fillStyle=v;ctx.fillRect(0,0,1024,1536);
+ lRaf=requestAnimationFrame(lframe)}
+window.lmOpen=function(cb){lmCb=cb||null;parts=[];drops=[];sparks=[];lmOv.classList.add('open');if(!lRaf)lRaf=requestAnimationFrame(lframe)};
+window.lmClose=function(){lmOv.classList.remove('open')};
+let lmCb=null;
+$$('lmGo').onclick=()=>{const f=lmCb;lmCb=null;lmClose();if(f)f()};
 })();
 </script>
 </body></html>
