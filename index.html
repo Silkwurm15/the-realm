@@ -2092,9 +2092,10 @@ const PT_CSS=`
 #portalOv{--void:#05040a;--cyan:#4fe3ff;--violet:#8a5cff;--img:url("art/rift_portal.jpg");position:fixed;inset:0;z-index:1490;display:none;opacity:0;transition:opacity .55s ease;background:var(--void);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden;font-family:Cinzel,Georgia,serif;color-scheme:dark}
 #portalOv.on{opacity:1}
 #portalOv *,#portalOv *::before,#portalOv *::after{box-sizing:border-box}
-#portalOv .ptScene{position:absolute;inset:0;perspective:1200px;display:grid;place-items:center}
+#portalOv .ptScene{position:absolute;inset:0;perspective:1200px;display:grid;grid-template:minmax(0,1fr)/minmax(0,1fr);place-items:center}
 #portalOv .ptStage{position:relative;width:min(100%,calc(100dvh * .94));aspect-ratio:1080/1149;transform-style:preserve-3d;transition:transform .25s ease-out;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
 #portalOv .ptStage>*{position:absolute;pointer-events:none}
+@media (max-aspect-ratio:94/100){#portalOv .ptStage{width:max(100%,calc(100dvh * .94));width:max(100%,calc(100vh * .94));width:max(100%,calc(100dvh * .94))}}   /* tall phone screens: fill the whole screen (cover) instead of letterboxing */
 #portalOv .ptBase{inset:0;background:var(--img) center/100% 100% no-repeat}
 #portalOv .ptGate{left:31%;top:21.3%;width:36.6%;height:62.7%;border-radius:50% 50% 46% 46% / 40% 40% 50% 50%;overflow:hidden;animation:ptBreathe 4.5s ease-in-out infinite}
 #portalOv .ptWarp{position:absolute;inset:0;background:var(--img) 48.9% 57.1%/273% auto no-repeat;filter:url(#ptRipple)}
@@ -2326,7 +2327,7 @@ function libStage(card,on){const old=card.querySelector('#libA');
 const LIB_ORDER=[6,1,2,3,4,5];
 function libNext(){let i=0;try{i=(+localStorage.getItem('realm_lib')||0)%LIB_ORDER.length}catch(e){}try{localStorage.setItem('realm_lib',String((i+1)%LIB_ORDER.length))}catch(e){}return LIB_ORDER[i]}
 function rfRoom(room){if(room&&room.id==='library'){const n=libNext(),dec=u=>{const im=new Image();im.src=u;return im.decode?im.decode():Promise.resolve()};Promise.race([n===6?Promise.all([dec('art/lib_a_panel.webp'),dec('art/lib_a_bg.webp'),LibFX.assets()]):dec('art/lib_'+n+'.webp'),new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{window.__libN=n;rfRoom0(room)})}else rfRoom0(room)}
-function rfRoom0(room){try{if(room&&room.id==='beast'&&!PT.open)Sound.music('battle_rift')}catch(e){}rfDraw({skin:room.id==='library'?null:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',wild:'rift'})[room.id]||'rift',lib:room.id==='library'?(window.__libN||1):0,icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:(room.text||'')+(room.wild?'\n'+room.wild.text:''),
+function rfRoom0(room){if(room&&room.id==='wild'&&room.choices&&room.choices.length&&window.wrOpen){try{rf.style.display='none';wrOpen(room,id=>riftPick(id));return}catch(e){}}try{if(room&&room.id==='beast'&&!PT.open)Sound.music('battle_rift')}catch(e){}rfDraw({skin:room.id==='library'?null:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',wild:'rift'})[room.id]||'rift',lib:room.id==='library'?(window.__libN||1):0,icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:(room.text||'')+(room.wild?'\n'+room.wild.text:''),
  btns:((room.choices&&room.choices.length)?room.choices:[{id:'__leave',label:'Leave the rift'}]).map(c=>{const o=c.fight?(c.odds?'You should win this':'You would likely lose'):c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':''),sub=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' · ');return{html:esc(c.label)+(sub?'<small>'+esc(sub)+'</small>':''),dis:c.afford===false,fn:c.id==='__leave'?rfClose:()=>riftPick(c.id)}})})}
 async function riftPick(id){const r=await act('rift',{op:'pick',pick:id});
  if(!r||!r.result||!r.result.rift)return rfDraw({icon:'✨',title:'The rift flickers',text:(act.err||'Could not reach the server.')+'\nIf the rift is still open you can try again.',btns:[{html:'Try again',fn:()=>act('rift',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.rift?rfRoom(x.result.rift.room):rfClose())},{html:'Close',alt:1,fn:rfClose}]});
@@ -2839,6 +2840,78 @@ window.lmOpen=function(cb){lmCb=cb||null;parts=[];drops=[];sparks=[];lmOv.classL
 window.lmClose=function(){lmOv.classList.remove('open')};
 let lmCb=null;
 $$('lmGo').onclick=()=>{const f=lmCb;lmCb=null;lmClose();if(f)f()};
+})();
+</script>
+
+<!-- Wild Room (Arcane Rift room): animated full-screen scene with live odds -->
+<style>
+#wrOv{position:fixed;inset:0;z-index:1600;display:none;align-items:center;justify-content:center;background:#07041a;overflow:hidden}
+#wrOv.open{display:flex}
+#wrOv #wrS{position:relative;flex:none;width:min(100vw,calc(100dvh*941/1672));aspect-ratio:941/1672;container-type:inline-size;overflow:hidden;--img:url(art/wild_room.webp)}
+@media (max-aspect-ratio:941/1672){#wrOv #wrS{width:calc(100dvh*941/1672)}}  /* tall phones: fill the whole screen */
+#wrOv .wl{position:absolute;inset:0;background:var(--img) center/100% 100%}
+#wrOv #wrBase{animation:wrHue 14s ease-in-out infinite alternate}   /* no drift/zoom: the live text must stay lined up with the painted buttons */
+@keyframes wrDrift{from{transform:scale(1.02)}to{transform:scale(1.06) translate(-.6%,-.8%)}}
+@keyframes wrHue{from{filter:hue-rotate(-8deg) saturate(1.05)}to{filter:hue-rotate(10deg) saturate(1.25) brightness(1.06)}}
+#wrOv #wrPw{position:absolute;inset:0;-webkit-mask-image:radial-gradient(ellipse 38cqw 15cqw at 41.5cqw 13cqw,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 38cqw 15cqw at 41.5cqw 13cqw,#000 60%,transparent 100%);animation:wrHue 14s ease-in-out infinite alternate;pointer-events:none}
+#wrOv #wrPt{position:absolute;width:68cqw;height:68cqw;left:10.28cqw;top:-22.5cqw;transform-origin:45.9% 52.2%;animation:wrSpin 70s linear infinite}
+@keyframes wrSpin{to{transform:rotate(360deg)}}
+#wrOv .wg{position:absolute;left:50%;transform:translate(-50%,-50%);border-radius:50%;mix-blend-mode:screen;pointer-events:none;animation:wrPulse 3.2s ease-in-out infinite}
+@keyframes wrPulse{0%,100%{opacity:.15;scale:.94}50%{opacity:.85;scale:1.06}}
+#wrOv #wrG0{top:45%;width:70%;height:9%;background:radial-gradient(ellipse,rgba(255,200,110,.55),transparent 65%)}
+#wrOv #wrG1{top:60.5%;width:62%;height:7%;background:radial-gradient(ellipse,rgba(190,110,255,.8),transparent 65%)}
+#wrOv #wrG2{top:72.8%;width:62%;height:7%;background:radial-gradient(ellipse,rgba(90,150,255,.8),transparent 65%);animation-delay:.8s}
+#wrOv #wrG3{top:84%;width:62%;height:7%;background:radial-gradient(ellipse,rgba(60,255,210,.75),transparent 65%);animation-delay:1.6s}
+#wrOv #wrC{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;pointer-events:none}
+#wrOv .wv{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 60%,rgba(0,0,10,.45));pointer-events:none}
+#wrOv .wb{position:absolute;left:19%;width:62%;height:11.4%;background:transparent;border:0;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:0;border-radius:50%}
+#wrOv .wb:active{background:radial-gradient(ellipse,rgba(255,255,255,.18),transparent 70%)}
+#wrOv .wb[disabled]{cursor:default}
+#wrOv .wt{position:absolute;left:50%;transform:translate(-50%,-50%);width:60%;text-align:center;font:400 2.55cqw/1.15 "IM Fell English",Georgia,serif;color:#f3e8f2;text-shadow:0 1px 3px #000,0 0 8px rgba(10,5,30,.9);pointer-events:none;white-space:nowrap}
+#wrOv .wd{opacity:.4;filter:grayscale(.6)}
+#wrOv #wrWeave{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 2.2cqw);max-width:84%;padding:1.1cqw 3cqw;border:1px solid rgba(190,150,255,.65);border-radius:4cqw;background:rgba(10,5,30,.62);color:#efe6ff;font:400 2.5cqw/1.25 "IM Fell English",Georgia,serif;text-align:center;pointer-events:none;display:none;backdrop-filter:blur(2px)}
+#wrOv #wrWeave b{color:#ffd98a;font-weight:600}
+@media (prefers-reduced-motion:reduce){#wrOv *{animation:none!important}}
+</style>
+<div id="wrOv" role="dialog" aria-modal="true" aria-label="Wild Room"><div id="wrS">
+<div class="wl" id="wrBase"></div><div id="wrPw"><img id="wrPt" alt="" src="art/wild_swirl.webp"></div>
+<div class="wg" id="wrG0"></div><div class="wg" id="wrG1"></div><div class="wg" id="wrG2"></div><div class="wg" id="wrG3"></div>
+<canvas id="wrC"></canvas><div class="wv"></div>
+<div id="wrWeave"></div>
+<div class="wt" id="wrT0" style="top:62.5%"></div><div class="wt" id="wrT1" style="top:74.6%"></div><div class="wt" id="wrT2" style="top:86.2%"></div>
+<button class="wb" id="wrB0" type="button" style="top:54.7%" aria-label="Step in boldly"></button>
+<button class="wb" id="wrB1" type="button" style="top:67.6%" aria-label="Slip through"></button>
+<button class="wb" id="wrB2" type="button" style="top:79.5%" aria-label="Weave the magic"></button>
+</div></div>
+<script>
+(function(){
+const $$=id=>document.getElementById(id);
+const ov=$$('wrOv'),cv=$$('wrC'),x=cv.getContext('2d');let W=0,H=0,P=[],raf=0,tt=0;
+const cols=['255,190,100','170,120,255','110,190,255','120,255,220'];
+function rs(){const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);W=cv.width=Math.max(1,r.width*d);H=cv.height=Math.max(1,r.height*d)}
+function mk(i){return{x:Math.random(),y:i?Math.random():1.02,r:Math.random()*2.2+.6,v:Math.random()*.0007+.0002,s:Math.random()*6,k:cols[Math.random()*4|0]}}
+function frame(){if(!ov.classList.contains('open')){raf=0;return}
+ tt+=.02;x.clearRect(0,0,W,H);
+ for(const p of P){p.y-=p.v;p.x+=Math.sin(tt+p.s)*.0004;if(p.y<-.02)Object.assign(p,mk(false));
+  const a=(.5+.5*Math.sin(tt*3+p.s))*Math.min(1,p.y*2.5),px=p.x*W,py=p.y*H,r=p.r*W/500;
+  const g=x.createRadialGradient(px,py,0,px,py,r*4);g.addColorStop(0,'rgba('+p.k+','+a+')');g.addColorStop(1,'rgba('+p.k+',0)');
+  x.fillStyle=g;x.beginPath();x.arc(px,py,r*4,0,7);x.fill()}
+ raf=requestAnimationFrame(frame)}
+const SLOT=['bold','slip','weave'];let cur=null;
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+window.wrOpen=function(room,pick){
+ const ch=room.choices||[];
+ SLOT.forEach((id,i)=>{const c=ch.find(q=>q.id===id),b=$$('wrB'+i),t=$$('wrT'+i);
+  if(!c){b.style.display='none';t.textContent='';return}
+  b.style.display='';b.disabled=c.afford===false;t.classList.toggle('wd',c.afford===false);b.setAttribute('aria-label',c.label||id);
+  const o=c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':'');
+  t.textContent=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' \u00B7 ');
+  b.onclick=()=>{if(b.disabled)return;wrClose();pick(id)}});
+ const w=$$('wrWeave');if(room.wild&&room.wild.name){w.innerHTML='<b>'+esc(room.wild.name)+'</b> \u2014 '+esc(room.wild.text||'');w.style.display='block'}else w.style.display='none';
+ if(!P.length)for(let i=0;i<110;i++)P.push(mk(true));
+ ov.classList.add('open');rs();if(!raf)raf=requestAnimationFrame(frame)};
+window.wrClose=function(){ov.classList.remove('open')};
+addEventListener('resize',()=>{if(ov.classList.contains('open'))rs()});
 })();
 </script>
 </body></html>
