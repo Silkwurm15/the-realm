@@ -168,6 +168,7 @@ html,body{position:fixed!important;left:0;top:0;right:0;bottom:0;width:100%!impo
 #selOv .sp .txt{top:calc(var(--p)*84);bottom:calc(var(--p)*14);font-size:calc(var(--p)*24)}
 #selOv .sp .div{top:calc(var(--p)*76)}
 #selOv .scroll,#selOv .qn,#selOv .ttl,#selOv .spk,#selOv .say,#selOv .sb,#selOv .rwh,#selOv .rwt,#selOv .hit{transform:translate(calc(var(--p)*-752),calc(var(--off) - var(--p)*30))}
+#selOv .hit:active{transform:translate(calc(var(--p)*-752),calc(var(--off) - var(--p)*28))}   /* keep the portrait offset while pressed: the plain :active rule dropped it and the button jumped away mid-tap */
 }
 #selOv .stg{width:min(100cqw,150cqh)}
 
@@ -1722,15 +1723,16 @@ const HIT_GROUP={warrior:'melee',barbarian:'melee',paladin:'melee',antipaladin:'
 const Sound=(()=>{let ctx=null,unlocked=false,want='map',el=null,seq=Promise.resolve();const bufs={},bad=new Set();
  const vol=k=>SET.mute?0:Math.max(0,Math.min(1,(SET.master/100)*(SET[k]/100)));
  function unlock(){if(unlocked)return;unlocked=true;try{const AC=window.AudioContext||window.webkitAudioContext;if(AC)ctx=new AC();if(ctx&&ctx.state==='suspended')ctx.resume()}catch(e){}if(want)music(want)}
- async function load(n){if(bufs[n])return bufs[n];if(bad.has(n)||!ctx)return null;try{const r=await fetch(SND_BASE+'sfx/'+n+'.mp3');if(!r.ok)throw 0;const b=await ctx.decodeAudioData(await r.arrayBuffer());return bufs[n]=b}catch(e){bad.add(n);return null}}
+ async function load(n){if(bufs[n])return bufs[n];if(bad.has(n)||!ctx)return null;try{let r=await fetch(SND_BASE+'sfx/'+n+'.mp3');if(!r.ok)r=await fetch(SND_BASE+'sfx/'+n+'.wav');if(!r.ok)throw 0;const b=await ctx.decodeAudioData(await r.arrayBuffer());return bufs[n]=b}catch(e){bad.add(n);return null}}
  function play(n){return new Promise(async res=>{if(!unlocked||vol('sfx')<=0)return res(false);const b=await load(n);if(!b||!ctx)return res(false);try{if(ctx.state==='suspended')ctx.resume();const s=ctx.createBufferSource(),g=ctx.createGain();s.buffer=b;g.gain.value=vol('sfx');s.connect(g);g.connect(ctx.destination);let done=false;const fin=()=>{if(!done){done=true;res(true)}};s.onended=fin;setTimeout(fin,(b.duration||3)*1000+400);s.start(0)}catch(e){res(false)}})}
  const sfx=n=>play(n);                                                  // plays right away
  const queue=(...names)=>(seq=seq.then(()=>names.reduce((p,n)=>p.then(()=>play(n)),Promise.resolve())));   // plays one after another, each waits for the one before
  async function first(names){for(const n of names){if(!unlocked)return false;if(await load(n))return play(n)}return false}   // plays the first name that has a file
- function hit(cls){const g=HIT_GROUP[cls]||'melee',l=['hit_'+cls];if(cls==='archer'||cls==='scout')l.push('hit_ranged');l.push('hit_'+g);if(g!=='melee')l.push('hit_melee');return first(l)}
+ function hit(cls){const g=HIT_GROUP[cls]||'melee',l=['hit_'+cls];if(cls==='archer'||cls==='scout'){if(cls==='scout')l.push('hit_archer');l.push('hit_ranged')}l.push('hit_'+g);if(g!=='melee')l.push('hit_melee');return first(l)}
  function levelUp(){setTimeout(()=>queue('levelup'),300)}   // always lands after the sound that caused it
  function fromMsg(m){m=String(m||'');if(/Traveler's Request complete/i.test(m))queue('quest_complete');else if(/Traveler's Request: \d+ \/ \d+/i.test(m))queue('quest_progress');else if(/quest ran out of time/i.test(m))queue('quest_fail')}
- function music(n){want=n||null;if(!unlocked)return;if(el){el.pause();el=null}if(!n)return;const list=[n];if(n.indexOf('_')>0)list.push(n.split('_')[0]);   // battle_mimic falls back to battle
+ function music(n){if(unlocked&&n&&el&&want===n&&!el.ended){if(el.paused&&!document.hidden)el.play().catch(()=>{});return}   // same track already playing (e.g. every arena round): keep it going, never restart
+ want=n||null;if(!unlocked)return;if(el){el.pause();el=null}if(!n)return;const list=[n];if(n.indexOf('_')>0)list.push(n.split('_')[0]);   // battle_mimic falls back to battle
   const go=i=>{if(i>=list.length||bad.has('m:'+list[i])){if(i<list.length)go(i+1);return}const a=new Audio(SND_BASE+'music/'+list[i]+'.mp3');a.loop=true;a.volume=vol('music');a.onerror=()=>{bad.add('m:'+list[i]);if(el===a){el=null;go(i+1)}};el=a;if(!document.hidden)a.play().catch(()=>{})};go(0)}
  function refresh(){if(el)el.volume=vol('music')}
  let fT=0;   // music fades: fadeOut ramps the current track to silence, fadeIn starts a track at 0 and ramps it up
