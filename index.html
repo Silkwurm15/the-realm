@@ -656,7 +656,8 @@ function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(it.t==='selora'){selIntro(it);return}
  if(it.t==='rift'){portalOpen(it);return}
  if(it.t==='nature'){natOpen(it);return}
- if(it.t==='qpoint'&&it.q==='lights'){slOpen(it);return}   // Strange Lights: animated art card per light   // Nature Discovery: animated art screen replaces the pop-up box   // Arcane Rift: portal screen replaces the pop-up box
+ if(it.t==='qpoint'&&it.q==='lights'){slOpen(it);return}
+ if(it.t==='quest'&&it.name===QN[0]){slqOpen(it);return}   // Investigate the Strange Lights: animated quest page replaces the pop-up box   // Strange Lights: animated art card per light   // Nature Discovery: animated art screen replaces the pop-up box   // Arcane Rift: portal screen replaces the pop-up box
  const c=POI[it.t];
  showModal('poi',{skin:({nature:'nature',chest:'chest',rift:'rift',quest:'quest',boss:'lair'})[it.t],icon:c.icon,title:c.title(it),color:it.t==='qpoint'?'#ff4fd8':'',text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+(it.t==='boss'?'\n\nCosts 1 🗝️ Key of the Forsaken (you have '+keysN()+').':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{const keep=it.t==='chest'||it.t==='boss';if(dist(targetLL,it.ll)>RANGE){hideModal('poi');return tooFar(dist(targetLL,it.ll))}if(it.used||it.busy)return hideModal('poi');if(keep){$('mPrimary').disabled=true;$('mSecondary').disabled=true}else hideModal('poi');it.busy=true;(keep?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false;hideModal('poi')})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
@@ -1426,6 +1427,29 @@ function slGo(){
  const fl=SL.el.querySelector('.slf');fl.classList.remove('go');void fl.offsetWidth;fl.classList.add('go');
  setTimeout(()=>slClose(),420);
  questVisit(it).catch(e=>console.warn('strange light visit',e)).finally(()=>{it.busy=false})}
+
+/* ---------- Strange Lights quest page (strange_lights.html) ----------
+   Shown full screen in a frame when the "Investigate the Strange Lights" marker is tapped. Its Continue button begins the quest. */
+const SLQ={el:null,fr:null,it:null,open:false};
+function slqBuild(){
+ if(SLQ.el)return;
+ const ov=document.createElement('div');ov.id='slqOv';ov.style.cssText='position:fixed;inset:0;z-index:1200;display:none;background:#07050f';
+ ov.innerHTML='<iframe title="Investigate the Strange Lights" style="position:absolute;inset:0;width:100%;height:100%;border:0;background:#07050f"></iframe>';
+ document.body.appendChild(ov);SLQ.el=ov;SLQ.fr=ov.querySelector('iframe');
+ addEventListener('message',e=>{if(!SLQ.open||e.source!==SLQ.fr.contentWindow||!e.data||e.data.realm!=='sl-quest')return;if(e.data.act==='go')slqGo();else if(e.data.act==='close')slqClose()});
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&SLQ.open)slqClose()})}
+function slqOpen(it){
+ if(SLQ.open)return;slqBuild();SLQ.open=true;SLQ.it=it;
+ SLQ.fr.src='strange_lights.html?v='+window.__BUILD;SLQ.el.style.display='block'}
+function slqClose(){
+ if(!SLQ.open)return;SLQ.open=false;SLQ.el.style.display='none';SLQ.fr.src='about:blank'}
+function slqGo(){
+ const it=SLQ.it;if(!it)return;
+ setTimeout(()=>{
+  slqClose();
+  if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));
+  if(it.used||it.busy)return;
+  it.busy=true;questStart(it).finally(()=>{it.busy=false})},450)}
 
 /* ---- interactive mimic combat (chest ambush) ---- */
 const mimicArt=strong=>{const B=strong?'#3d2a52':'#7a4a1f',D=strong?'#24162f':'#4a2b10',G=strong?'#b8a0d8':'#d6b050',E=strong?'#ff3b30':'#ffd83a',T='#f6f1e3',sp=strong?'<path d="M45 22l8-24 8 24zM85 14l10-30 10 30zM125 22l8-24 8 24z" fill="'+G+'"/>':'',tt=(a,y,d,n)=>Array.from({length:n},(_,i)=>'<path d="M'+(a+i*22)+' '+y+'l7 '+d+' 7 '+(-d)+'z" fill="'+T+'"/>').join('');

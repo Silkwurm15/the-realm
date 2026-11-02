@@ -1,0 +1,482 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Strange Lights</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&display=swap">
+<style>
+/* Layout: the quest card art fills a phone-shaped stage; every effect is a layer positioned in the artwork's own 941x1672 coordinates. */
+:root {
+  --bg: #07050f;
+  --ink: #f3e9c9;
+  --gold: #c9a24b;
+  --veil: rgba(10, 7, 22, 0.72);
+  --font-label: "Cinzel", Georgia, "Times New Roman", serif;
+  --img: url(art/strange_lights_card.jpg);
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  padding-block: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.stage {
+  position: relative;
+  width: min(100%, calc(100dvh * 941 / 1672));
+  aspect-ratio: 941 / 1672;
+  max-height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  border-radius: 6px;
+  isolation: isolate;
+}
+.world {
+  position: absolute; inset: 0;
+  transform-origin: 50% 45%;
+  animation: drift 38s ease-in-out infinite alternate;
+}
+.base { position: absolute; inset: 0; background-image: var(--img); background-size: 100% 100%; }
+.rg {
+  position: absolute;
+  background-image: var(--img);
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+.rg.soft {
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 52%, transparent 74%);
+  mask-image: radial-gradient(ellipse at center, #000 52%, transparent 74%);
+}
+.glow-layer { mix-blend-mode: screen; }
+
+/* Aurora: a displaced copy of the sky so the ribbons ripple, then a colour-shifting copy on top. */
+.aurora-ripple {
+  -webkit-mask-image: radial-gradient(ellipse 72% 70% at 52% 45%, #000 50%, transparent 100%);
+  mask-image: radial-gradient(ellipse 72% 70% at 52% 45%, #000 50%, transparent 100%);
+  filter: url(#ripple);
+}
+.aurora-hue {
+  mix-blend-mode: screen;
+  opacity: .45;
+  -webkit-mask-image: radial-gradient(ellipse 70% 68% at 52% 45%, #000 45%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 68% at 52% 45%, #000 45%, transparent 100%);
+  animation: hueflow 14s linear infinite, breathe 7s ease-in-out infinite;
+}
+.wisps { mix-blend-mode: screen; opacity: .5; animation: hueflow 18s linear infinite reverse, breathe 5s ease-in-out infinite; }
+.wisps.soft { -webkit-mask-image: radial-gradient(ellipse at center, #000 40%, transparent 78%); mask-image: radial-gradient(ellipse at center, #000 40%, transparent 78%); }
+
+.rune { mix-blend-mode: screen; opacity: 0; animation: runepulse 4.2s ease-in-out infinite; }
+.gem { mix-blend-mode: screen; opacity: 0; animation: gempulse 3.6s ease-in-out infinite; }
+.btn-glow { mix-blend-mode: screen; opacity: 0; animation: btnpulse 3.2s ease-in-out infinite; }
+
+.lamp, .flame {
+  position: absolute; border-radius: 50%; pointer-events: none; mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+}
+.lamp { background: radial-gradient(circle, rgba(255,190,90,.75) 0%, rgba(255,140,50,.35) 35%, transparent 70%); }
+.flame.g { background: radial-gradient(circle, rgba(120,255,200,.55), transparent 68%); animation: breathe 4.4s ease-in-out infinite; }
+.flame.p { background: radial-gradient(circle, rgba(255,110,190,.55), transparent 68%); animation: breathe 5.1s ease-in-out -1.6s infinite; }
+
+.glint {
+  position: absolute; width: calc(var(--s) / 941 * 100%); aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(0); opacity: 0; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(circle, #fff 0 5%, rgba(255,255,255,.4) 12%, transparent 42%);
+  animation: twinkle var(--d, 4s) ease-in-out var(--delay, 0s) infinite;
+}
+.glint::before, .glint::after { content: ""; position: absolute; }
+.glint::before { left: 0; right: 0; top: 48.6%; height: 2.8%; background: linear-gradient(90deg, transparent, #fff 50%, transparent); }
+.glint::after { top: 0; bottom: 0; left: 48.6%; width: 2.8%; background: linear-gradient(180deg, transparent, #fff 50%, transparent); }
+
+.shine-box { position: absolute; overflow: hidden; border-radius: 999px; pointer-events: none; }
+.shine-box::after {
+  content: ""; position: absolute; top: -20%; bottom: -20%; left: 0; width: 30%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,.0) 20%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 80%, transparent 100%);
+  transform: translateX(-130%) skewX(-18deg);
+  mix-blend-mode: screen;
+  animation: sweep 4.8s ease-in-out 1.2s infinite;
+}
+.shine-box.flash::after { animation: sweep .7s ease-out 1; }
+
+.fall { position: absolute; overflow: hidden; pointer-events: none; mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 45%, #000 40%, transparent 78%);
+  mask-image: radial-gradient(ellipse at 50% 45%, #000 40%, transparent 78%); }
+.stream { position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 5px, rgba(200,230,255,.34) 6px 7px, transparent 9px 14px);
+  -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 10px, transparent 34px 46px);
+  mask-image: repeating-linear-gradient(180deg, #000 0 10px, transparent 34px 46px);
+  -webkit-mask-size: 100% 92px; mask-size: 100% 92px;
+  animation: flow .85s linear infinite;
+}
+.stream.b { background: repeating-linear-gradient(90deg, transparent 0 9px, rgba(255,255,255,.32) 10px 11px, transparent 13px 19px); animation-duration: 1.35s; opacity: .85; }
+.stream.c { --p: 60px; background: repeating-linear-gradient(90deg, transparent 0 3px, rgba(235,248,255,.5) 4px 5px, transparent 6px 11px); -webkit-mask-size: 100% 60px; mask-size: 100% 60px; animation-duration: .55s; opacity: .7; }
+.mist-glow { position: absolute; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 60%, rgba(200,230,255,.55), rgba(120,170,255,.22) 45%, transparent 72%); animation: mistpulse 3.4s ease-in-out infinite; }
+
+canvas#fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; }
+
+.hit {
+  position: absolute; background: transparent; border: 0; padding: 0; cursor: pointer; border-radius: 999px;
+  -webkit-tap-highlight-color: transparent;
+}
+.hit:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+.ctl {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  right: max(12px, env(safe-area-inset-right, 0px));
+  z-index: 20;
+  font: 600 12px/1 var(--font-label);
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink); background: var(--veil);
+  border: 1px solid rgba(201,162,75,.55); border-radius: 999px;
+  padding: 9px 14px; cursor: pointer;
+}
+.ctl:hover { border-color: var(--gold); }
+.ctl:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.paused *, .paused *::after, .paused *::before { animation-play-state: paused !important; }
+
+@keyframes drift { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.035) translate(-.5%, -.35%); } }
+@keyframes hueflow { from { filter: hue-rotate(0deg) brightness(1.25) saturate(1.2); } to { filter: hue-rotate(360deg) brightness(1.25) saturate(1.2); } }
+@keyframes breathe { 0%, 100% { opacity: .25; } 50% { opacity: .7; } }
+@keyframes runepulse { 0%, 100% { opacity: 0; filter: brightness(1.2) saturate(1.2); } 50% { opacity: .95; filter: brightness(2.1) saturate(1.7); } }
+@keyframes gempulse { 0%, 100% { opacity: 0; filter: brightness(1.2); } 50% { opacity: .9; filter: brightness(2) saturate(1.5); } }
+@keyframes btnpulse { 0%, 100% { opacity: 0; filter: brightness(1.2); } 50% { opacity: .55; filter: brightness(1.7) saturate(1.3); } }
+@keyframes twinkle {
+  0%, 62%, 100% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+  78% { transform: translate(-50%, -50%) scale(1) rotate(45deg); opacity: 1; }
+  90% { transform: translate(-50%, -50%) scale(.35) rotate(90deg); opacity: .5; }
+}
+@keyframes sweep { 0% { transform: translateX(-130%) skewX(-18deg); } 55%, 100% { transform: translateX(480%) skewX(-18deg); } }
+@keyframes flow { from { -webkit-mask-position: 0 0; mask-position: 0 0; } to { -webkit-mask-position: 0 var(--p, 92px); mask-position: 0 var(--p, 92px); } }
+@keyframes mistpulse { 0%, 100% { opacity: .35; transform: scale(1); } 50% { opacity: .8; transform: scale(1.08); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .world, .rg, .glint, .shine-box::after, .stream, .flame { animation: none !important; }
+  .rune, .gem, .btn-glow { opacity: .25; }
+  .aurora-ripple { filter: none; }
+  canvas#fx, .ctl { display: none; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="ripple" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence id="turb" type="fractalNoise" baseFrequency="0.004 0.009" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="34" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<button class="ctl" id="ctl" type="button" aria-pressed="false">Pause</button>
+<button class="ctl" id="xcl" type="button" aria-label="Close" style="right:auto;left:max(12px, env(safe-area-inset-left, 0px))">Close</button>
+
+<div class="stage" id="stage" role="img" aria-label="Animated quest card: Investigate the Strange Lights. Visit all 5 lights before they fade. You have 60 minutes. A rainbow aurora ripples over ruins, runes glow, lanterns flicker and a waterfall runs below.">
+  <div class="world" id="world">
+    <div class="base"></div>
+    <canvas id="fx"></canvas>
+  </div>
+</div>
+
+<script>
+(function () {
+  var W0 = 941, H0 = 1672;
+  var world = document.getElementById('world');
+  var stage = document.getElementById('stage');
+  var fx = document.getElementById('fx');
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function region(cls, x, y, w, h, extra) {
+    var e = document.createElement('div');
+    e.className = 'rg ' + cls;
+    e.style.cssText =
+      'left:' + (x / W0 * 100) + '%;top:' + (y / H0 * 100) + '%;' +
+      'width:' + (w / W0 * 100) + '%;height:' + (h / H0 * 100) + '%;' +
+      'background-size:' + (W0 / w * 100) + '% ' + (H0 / h * 100) + '%;' +
+      'background-position:' + (x / (W0 - w) * 100) + '% ' + (y / (H0 - h) * 100) + '%;' + (extra || '');
+    world.insertBefore(e, fx);
+    return e;
+  }
+  function spot(cls, x, y, size, extra) {
+    var e = document.createElement('div');
+    e.className = cls;
+    e.style.cssText = 'left:' + (x / W0 * 100) + '%;top:' + (y / H0 * 100) + '%;width:' + (size / W0 * 100) + '%;aspect-ratio:1;' + (extra || '');
+    world.insertBefore(e, fx);
+    return e;
+  }
+  function box(cls, x, y, w, h, extra) {
+    var e = document.createElement('div');
+    e.className = cls;
+    e.style.cssText = 'left:' + (x / W0 * 100) + '%;top:' + (y / H0 * 100) + '%;width:' + (w / W0 * 100) + '%;height:' + (h / H0 * 100) + '%;' + (extra || '');
+    world.insertBefore(e, fx);
+    return e;
+  }
+
+  /* Aurora */
+  region('aurora-ripple', 380, 0, 540, 340);
+  region('aurora-hue', 380, 0, 540, 340);
+  region('aurora-hue', 430, 300, 230, 190, 'animation-delay:-5s');
+
+  /* Rainbow wisps hugging the frame */
+  region('wisps soft', 0, 560, 130, 660);
+  region('wisps soft', 815, 560, 126, 660, 'animation-delay:-7s');
+
+  /* Runes */
+  region('rune soft', 840, 345, 85, 160, 'animation-delay:0s');
+  region('rune soft', 845, 478, 70, 75, 'animation-delay:-1.4s');
+  region('rune soft', 95, 1255, 140, 245, 'animation-delay:-2.1s');
+  region('rune soft', 255, 1265, 100, 150, 'animation-delay:-3.2s');
+
+  /* Gems */
+  var gems = [[472, 572], [87, 622], [855, 622], [90, 1147], [855, 1147], [472, 1172], [471, 843]];
+  gems.forEach(function (g, i) {
+    var s = i === 0 ? 120 : 84;
+    region('gem soft', g[0] - s / 2, g[1] - s / 2, s, s, 'animation-delay:' + (-i * 0.55).toFixed(2) + 's');
+    spot('glint', g[0], g[1], i === 0 ? 120 : 82, '--s:' + (i === 0 ? 120 : 82) + ';--d:' + (3.6 + (i % 3) * 0.8) + 's;--delay:' + (-i * 0.9).toFixed(2) + 's;');
+  });
+  spot('glint', 460, 692, 100, '--s:100;--d:4.4s;--delay:-1.2s;');
+  spot('glint', 428, 716, 46, '--s:46;--d:3.4s;--delay:-2.4s;');
+  spot('glint', 444, 668, 38, '--s:38;--d:3.9s;--delay:-0.4s;');
+
+  /* Continue button */
+  region('btn-glow soft', 125, 1032, 700, 98);
+  var shine = box('shine-box', 150, 1042, 645, 80);
+  var hit = document.createElement('button');
+  hit.type = 'button'; hit.className = 'hit'; hit.setAttribute('aria-label', 'Continue');
+  hit.style.cssText = 'left:' + (130 / W0 * 100) + '%;top:' + (1036 / H0 * 100) + '%;width:' + (690 / W0 * 100) + '%;height:' + (92 / H0 * 100) + '%;';
+  world.appendChild(hit);
+
+  /* Lanterns and ghost flames */
+  var lamps = [spot('lamp', 283, 550, 190), spot('lamp', 668, 550, 190)];
+  spot('flame g', 283, 468, 120);
+  spot('flame p', 668, 488, 120);
+
+  /* Waterfall */
+  var fall = box('fall', 438, 1302, 175, 128);
+  var s1 = document.createElement('div'); s1.className = 'stream';
+  var s2 = document.createElement('div'); s2.className = 'stream b';
+  var s3 = document.createElement('div'); s3.className = 'stream c';
+  fall.appendChild(s1); fall.appendChild(s2); fall.appendChild(s3);
+  box('mist-glow', 440, 1395, 175, 75);
+  box('fall', 728, 1370, 50, 105).appendChild(s1.cloneNode());
+
+  /* Aurora ripple: slowly slide the noise so ribbons wave */
+  var turb = document.getElementById('turb');
+  var paused = false;
+
+  /* Particles */
+  var ctx = fx.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var S = 1;
+  function resize() {
+    var w = stage.clientWidth, h = stage.clientHeight;
+    fx.width = Math.round(w * dpr); fx.height = Math.round(h * dpr);
+    S = fx.width / W0;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var sprites = [];
+  (function () {
+    for (var i = 0; i < 12; i++) {
+      var c = document.createElement('canvas'); c.width = c.height = 48;
+      var g = c.getContext('2d');
+      var gr = g.createRadialGradient(24, 24, 0, 24, 24, 24);
+      var hue = i * 30;
+      gr.addColorStop(0, 'hsla(' + hue + ',100%,92%,1)');
+      gr.addColorStop(0.2, 'hsla(' + hue + ',100%,70%,.85)');
+      gr.addColorStop(0.55, 'hsla(' + hue + ',100%,55%,.22)');
+      gr.addColorStop(1, 'hsla(' + hue + ',100%,50%,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, 48, 48);
+      sprites.push(c);
+    }
+  })();
+
+  var P = [];
+  var MAX = 170;
+  function sp(hue) { return sprites[((Math.round(hue / 30) % 12) + 12) % 12]; }
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+
+  function spawnMote() {
+    P.push({ k: 'mote', x: rnd(0, W0), y: rnd(900, H0), vx: rnd(-6, 6), vy: rnd(-22, -8), r: rnd(5, 13), hue: rnd(0, 360),
+      life: 0, max: rnd(7, 13), ph: rnd(0, 6.28), sw: rnd(8, 22) });
+  }
+  function spawnAurora() {
+    var t = Math.random();
+    P.push({ k: 'aur', x: 540 + t * 40 + rnd(-20, 20), y: rnd(430, 480), vx: rnd(10, 28), vy: rnd(-46, -24), r: rnd(6, 14),
+      hue: [10, 50, 120, 170, 210, 280][Math.floor(Math.random() * 6)], life: 0, max: rnd(5, 9), ph: rnd(0, 6.28), sw: rnd(14, 30) });
+  }
+  function spawnEmber() {
+    var lx = Math.random() < 0.5 ? 283 : 668;
+    P.push({ k: 'emb', x: lx + rnd(-10, 10), y: 535 + rnd(-8, 4), vx: rnd(-8, 8), vy: rnd(-40, -18), r: rnd(3, 6.5), hue: rnd(20, 45),
+      life: 0, max: rnd(2, 4), ph: rnd(0, 6.28), sw: rnd(6, 14) });
+  }
+  function spawnRiver() {
+    P.push({ k: 'twk', x: rnd(540, 840), y: rnd(1455, 1550), vx: rnd(25, 60), vy: rnd(3, 12), r: rnd(3, 7), hue: rnd(180, 220),
+      life: 0, max: rnd(1.2, 2.4), ph: 0, sw: 0 });
+  }
+  function burst(cx, cy) {
+    for (var i = 0; i < 70; i++) {
+      var a = rnd(0, 6.283), v = rnd(70, 300);
+      P.push({ k: 'brst', x: cx + rnd(-200, 200) * Math.random(), y: cy + rnd(-10, 10), vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60,
+        r: rnd(4, 10), hue: (i / 70) * 360, life: 0, max: rnd(0.9, 1.7), ph: 0, sw: 0 });
+    }
+  }
+
+
+  /* Waterfall particles: streaks, spray, mist and pool ripples */
+  var W = [];
+  var wa = { f: 0, r: 0, m: 0, s: 0, p: 0 };
+  function spawnStreak(pre) {
+    var y0 = 1308;
+    var p = { k: 'st', x: rnd(452, 598), y0: y0, yEnd: 1424 + rnd(-4, 4), v: rnd(170, 300), len: rnd(14, 42), w: rnd(0.7, 1.8), a: rnd(0.35, 0.85) };
+    p.y = pre ? y0 + rnd(0, 116) : y0 + rnd(0, 6);
+    W.push(p);
+  }
+  function spawnStreakR() {
+    W.push({ k: 'st', x: rnd(735, 769), y0: 1372, y: 1372 + rnd(0, 5), yEnd: 1470 + rnd(-4, 4), v: rnd(120, 200), len: rnd(10, 26), w: rnd(0.6, 1.3), a: rnd(0.3, 0.7) });
+  }
+  function spawnMist() { W.push({ k: 'ms', x: rnd(455, 600), y: rnd(1405, 1432), vx: rnd(-8, 10), vy: rnd(-14, -5), r: rnd(18, 34), life: 0, max: rnd(2.5, 4.5) }); }
+  function spawnSplash() { W.push({ k: 'sp', x: rnd(455, 600), y: 1424, vx: rnd(-30, 30), vy: rnd(-110, -40), r: rnd(1.5, 3.2), life: 0, max: rnd(0.5, 0.9) }); }
+  function spawnRip() { W.push({ k: 'rp', x: rnd(470, 600), y: rnd(1432, 1448), life: 0, max: rnd(1.4, 2.2), R: rnd(22, 44) }); }
+
+  function stepWater(dt) {
+    wa.f += dt * 60; wa.r += dt * 18; wa.m += dt * 6; wa.s += dt * 14; wa.p += dt * 2.5;
+    if (W.length < 320) {
+      while (wa.f > 1) { wa.f--; spawnStreak(false); }
+      while (wa.r > 1) { wa.r--; spawnStreakR(); }
+      while (wa.m > 1) { wa.m--; spawnMist(); }
+      while (wa.s > 1) { wa.s--; spawnSplash(); }
+      while (wa.p > 1) { wa.p--; spawnRip(); }
+    } else { wa.f = wa.r = wa.m = wa.s = wa.p = 0; }
+    ctx.lineCap = 'round';
+    for (var i = W.length - 1; i >= 0; i--) {
+      var p = W[i], a;
+      if (p.k === 'st') {
+        p.y += p.v * dt;
+        if (p.y - p.len > p.yEnd) { W.splice(i, 1); continue; }
+        var top = Math.max(p.y0, p.y - p.len), bot = Math.min(p.y, p.yEnd);
+        a = p.a * Math.min(1, (p.y - p.y0) / 16) * Math.min(1, (p.yEnd - top) / 14);
+        if (a <= 0 || bot <= top) continue;
+        ctx.globalAlpha = Math.min(1, a);
+        ctx.strokeStyle = 'rgb(215,236,255)';
+        ctx.lineWidth = Math.max(1, p.w * S);
+        ctx.beginPath(); ctx.moveTo(p.x * S, top * S); ctx.lineTo(p.x * S, bot * S); ctx.stroke();
+        continue;
+      }
+      p.life += dt;
+      if (p.life >= p.max) { W.splice(i, 1); continue; }
+      var u = p.life / p.max;
+      if (p.k === 'ms') {
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        ctx.globalAlpha = Math.sin(Math.PI * u) * 0.17;
+        var dm = p.r * 2 * S * (1 + u * 0.6);
+        ctx.drawImage(sp(210), p.x * S - dm / 2, p.y * S - dm / 2, dm, dm);
+      } else if (p.k === 'sp') {
+        p.vy += 300 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        ctx.globalAlpha = Math.sin(Math.PI * u) * 0.9;
+        var ds = p.r * 2 * S;
+        ctx.drawImage(sp(200), p.x * S - ds / 2, p.y * S - ds / 2, ds, ds);
+      } else if (p.k === 'rp') {
+        var rx = p.R * u;
+        ctx.globalAlpha = (1 - u) * 0.5;
+        ctx.strokeStyle = 'rgb(200,230,255)';
+        ctx.lineWidth = Math.max(1, 1.2 * S);
+        ctx.beginPath(); ctx.ellipse(p.x * S, p.y * S, Math.max(0.5, rx * S), Math.max(0.3, rx * S * 0.28), 0, 0, 6.283); ctx.stroke();
+      }
+    }
+  }
+
+  var acc = { m: 0, a: 0, e: 0, r: 0 };
+  function step(dt) {
+    acc.m += dt * 7; acc.a += dt * 9; acc.e += dt * 5; acc.r += dt * 7;
+    while (acc.m > 1) { acc.m--; if (P.length < MAX) spawnMote(); }
+    while (acc.a > 1) { acc.a--; if (P.length < MAX) spawnAurora(); }
+    while (acc.e > 1) { acc.e--; if (P.length < MAX) spawnEmber(); }
+    while (acc.r > 1) { acc.r--; if (P.length < MAX) spawnRiver(); }
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, fx.width, fx.height);
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = P.length - 1; i >= 0; i--) {
+      var p = P[i];
+      p.life += dt;
+      if (p.life >= p.max) { P.splice(i, 1); continue; }
+      var u = p.life / p.max;
+      if (p.k === 'brst') { p.vy += 260 * dt; p.vx *= (1 - 1.4 * dt); }
+      p.x += (p.vx + Math.sin(p.life * 1.6 + p.ph) * p.sw * 0.5) * dt;
+      p.y += p.vy * dt;
+      var a = Math.sin(Math.PI * u);
+      if (p.k === 'emb') a *= 0.9;
+      if (p.k === 'twk') a = Math.pow(Math.sin(Math.PI * u), 2);
+      ctx.globalAlpha = Math.max(0, Math.min(1, a)) * (p.k === 'mote' ? 0.75 : 1);
+      var hue = p.k === 'brst' ? p.hue + p.life * 120 : p.hue;
+      var d = p.r * 2 * S;
+      ctx.drawImage(sp(hue), p.x * S - d / 2, p.y * S - d / 2, d, d);
+    }
+    stepWater(dt);
+    ctx.globalAlpha = 1;
+  }
+
+  /* Lantern flicker + aurora ripple drift */
+  var t0 = performance.now(), last = t0, frame = 0;
+  function loop(now) {
+    requestAnimationFrame(loop);
+    if (paused) { last = now; return; }
+    var dt = Math.min(0.05, (now - last) / 1000); last = now;
+    var t = (now - t0) / 1000;
+    frame++;
+    for (var i = 0; i < lamps.length; i++) {
+      var f = 0.62 + 0.22 * Math.sin(t * (7.3 + i * 1.9) + i) + 0.14 * Math.sin(t * (13.1 + i) + i * 2.2) + (Math.random() - 0.5) * 0.16;
+      lamps[i].style.opacity = Math.max(0.25, Math.min(1, f)).toFixed(3);
+      var sc = 0.94 + f * 0.1;
+      lamps[i].style.transform = 'translate(-50%,-50%) scale(' + sc.toFixed(3) + ')';
+    }
+    if (frame % 2 === 0 && turb) {
+      var bx = 0.0042 + 0.0011 * Math.sin(t * 0.32);
+      var by = 0.0095 + 0.0022 * Math.sin(t * 0.21 + 1.3);
+      turb.setAttribute('baseFrequency', bx.toFixed(5) + ' ' + by.toFixed(5));
+    }
+    step(dt);
+  }
+  if (!reduce) {
+    for (var k = 0; k < 40; k++) { spawnMote(); }
+    for (var k3 = 0; k3 < 36; k3++) { spawnStreak(true); }
+    for (var k2 = 0; k2 < 20; k2++) { spawnAurora(); P[P.length - 1].life = rnd(0, 4); }
+    requestAnimationFrame(loop);
+  }
+
+  /* Interactions */
+  hit.addEventListener('click', function () {
+    try { parent.postMessage({ realm: 'sl-quest', act: 'go' }, '*'); } catch (e) {}
+    if (reduce) return;
+    burst(472, 1080);
+    shine.classList.remove('flash'); void shine.offsetWidth; shine.classList.add('flash');
+    setTimeout(function () { shine.classList.remove('flash'); }, 900);
+  });
+  stage.addEventListener('pointerdown', function (e) {
+    if (reduce || e.target === hit) return;
+    var r = stage.getBoundingClientRect();
+    var x = (e.clientX - r.left) / r.width * W0, y = (e.clientY - r.top) / r.height * H0;
+    for (var i = 0; i < 14; i++) {
+      var a = rnd(0, 6.283), v = rnd(30, 130);
+      P.push({ k: 'brst', x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 30, r: rnd(3, 7), hue: rnd(0, 360), life: 0, max: rnd(0.6, 1.1), ph: 0, sw: 0 });
+    }
+  });
+
+  document.getElementById('xcl').addEventListener('click', function () { try { parent.postMessage({ realm: 'sl-quest', act: 'close' }, '*'); } catch (e) {} });
+  var ctl = document.getElementById('ctl');
+  ctl.addEventListener('click', function () {
+    paused = !paused;
+    document.documentElement.classList.toggle('paused', paused);
+    ctl.textContent = paused ? 'Play' : 'Pause';
+    ctl.setAttribute('aria-pressed', paused ? 'true' : 'false');
+  });
+})();
+</script>
+
+</body></html>
