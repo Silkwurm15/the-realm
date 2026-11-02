@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.786-dev2';window.__BUILD=B;
+(function(){var B='1.786';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -548,7 +548,6 @@ window.LOOK_IMG={"red": "art/look_img_red.webp", "green": "art/look_img_green.we
 </script>
 <script>
 window.startRealm=()=>{'use strict';
-window.DEV_UNLOCK=true;   // TEMPORARY TEST SWITCH (free camera, no range limit, no GPS wait, no safe-spot check). Set false, or remove every DEV_UNLOCK use, before release.
 const $=id=>document.getElementById(id);
 const FALLBACK=[-89.0940,42.2711]; // [lng,lat]
 const START={zoom:16,pitch:62,bearing:-18};
@@ -603,10 +602,10 @@ layers:[
 ]};
 
 const map=new maplibregl.Map({container:'map',style,center:FALLBACK,zoom:START.zoom,pitch:START.pitch,bearing:START.bearing,maxPitch:75,minZoom:14,maxZoom:19,attributionControl:{compact:true},dragRotate:true,touchPitch:false});
-if(window.DEV_UNLOCK)map.dragPan.enable();else map.dragPan.disable();map.doubleClickZoom.disable();map.scrollZoom.enable({around:'center'});map.touchZoomRotate.enable({around:'center'});
+map.dragPan.disable();map.doubleClickZoom.disable();map.scrollZoom.enable({around:'center'});map.touchZoomRotate.enable({around:'center'});
 /* One finger drag spins the camera around the player (left/right) and tilts it (up/down). The camera stays locked on the player; two fingers pinch to zoom. */
 (function(){const el=map.getCanvasContainer();let x0=0,y0=0,xl=0,yl=0,on=false,spin=false;
- el.addEventListener('touchstart',e=>{if(window.DEV_UNLOCK){on=false;return}if(e.touches.length===1){x0=xl=e.touches[0].clientX;y0=yl=e.touches[0].clientY;on=true;spin=false}else on=false},{passive:true});
+ el.addEventListener('touchstart',e=>{if(e.touches.length===1){x0=xl=e.touches[0].clientX;y0=yl=e.touches[0].clientY;on=true;spin=false}else on=false},{passive:true});
  el.addEventListener('touchmove',e=>{if(!on||e.touches.length!==1)return;const x=e.touches[0].clientX,y=e.touches[0].clientY;if(!spin&&Math.hypot(x-x0,y-y0)<6)return;spin=true;
   map.jumpTo({bearing:map.getBearing()-(x-xl)*0.4,pitch:Math.max(0,Math.min(map.getMaxPitch(),map.getPitch()-(y-yl)*0.25))});xl=x;yl=y},{passive:true});
  ['touchend','touchcancel'].forEach(ev=>el.addEventListener(ev,()=>{on=false},{passive:true}))})();
@@ -648,8 +647,7 @@ const POI={
  qpoint:{icon:'📍',title:it=>it.name,text:it=>it.q==='calaun'?calPoi(it)[0]:it.q==='selora'?selPoi(it)[0]:it.q==='satchel'?'The owner of the satchel is waiting here.':it.q==='slumber'?(it.i===3?'Titan Ulfur is here, fast asleep.':'Something about this spot is worth a closer look.'):'A strange glow gathers here. Step closer and investigate.',go:it=>it.q==='calaun'?calPoi(it)[1]:it.q==='selora'?selPoi(it)[1]:it.q==='satchel'?'Return the Satchel':it.q==='slumber'?(it.i===3?'Wake Him':'Search Here'):'Investigate'},
  boss:{icon:'💀',title:()=>'Dark Lair',text:'A powerful foe lurks within. Prepare yourself before you strike.',go:'Challenge'}};
 function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
- if(d>RANGE&&!window.DEV_UNLOCK){tooFar(d);return}
- window.DEV_LL=it.ll;
+ if(d>RANGE){tooFar(d);return}
  if((it.t==='chest'||it.t==='boss'||it.t==='rift')&&S.hero.downed){toast('You are downed. Recover to 25% HP first ('+Math.floor(100*S.hero.hp/stats().hp)+'% now).');return}
  if((it.t==='chest'||it.t==='boss'||it.t==='rift')&&H().inv.length>=bagCap()){toast('Your backpack is full ('+H().inv.length+' / '+bagCap()+'). Sell items or buy a Backpack Expansion in the Shop.');return}
  if(it.t==='boss'&&keysN()<1){toast('You need a 🗝️ Key of the Forsaken to challenge a Dark Lair. You earn one for completing your dailies, or get more in the Shop.');return}
@@ -659,9 +657,9 @@ function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(it.t==='rift'){portalOpen(it);return}
  if(it.t==='nature'){natOpen(it);return}   // Nature Discovery: animated art screen replaces the pop-up box   // Arcane Rift: portal screen replaces the pop-up box
  const c=POI[it.t];
- showModal('poi',{skin:({nature:'nature',chest:'chest',rift:'rift',quest:'quest',boss:'lair'})[it.t],icon:c.icon,title:c.title(it),color:it.t==='qpoint'?'#ff4fd8':'',text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+(it.t==='boss'?'\n\nCosts 1 🗝️ Key of the Forsaken (you have '+keysN()+').':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{const keep=it.t==='chest'||it.t==='boss';if(dist(targetLL,it.ll)>RANGE&&!window.DEV_UNLOCK){hideModal('poi');return tooFar(dist(targetLL,it.ll))}if(it.used||it.busy)return hideModal('poi');if(keep){$('mPrimary').disabled=true;$('mSecondary').disabled=true}else hideModal('poi');it.busy=true;(keep?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false;hideModal('poi')})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
+ showModal('poi',{skin:({nature:'nature',chest:'chest',rift:'rift',quest:'quest',boss:'lair'})[it.t],icon:c.icon,title:c.title(it),color:it.t==='qpoint'?'#ff4fd8':'',text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+(it.t==='boss'?'\n\nCosts 1 🗝️ Key of the Forsaken (you have '+keysN()+').':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{const keep=it.t==='chest'||it.t==='boss';if(dist(targetLL,it.ll)>RANGE){hideModal('poi');return tooFar(dist(targetLL,it.ll))}if(it.used||it.busy)return hideModal('poi');if(keep){$('mPrimary').disabled=true;$('mSecondary').disabled=true}else hideModal('poi');it.busy=true;(keep?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false;hideModal('poi')})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
-function updateCards(){items.forEach((it,i)=>{const m=markers[i];if(!m)return;const near=dist(targetLL,it.ll)<=RANGE||!!window.DEV_UNLOCK,el=m.getElement();el.classList.toggle('near',near);el.classList.toggle('far',!near)});
+function updateCards(){items.forEach((it,i)=>{const m=markers[i];if(!m)return;const near=dist(targetLL,it.ll)<=RANGE,el=m.getElement();el.classList.toggle('near',near);el.classList.toggle('far',!near)});
  }
 
 function lookSrc(){return(window.LOOK_IMG&&window.LOOK_IMG[S.look||'black'])||''}
@@ -692,7 +690,7 @@ function frame(now){track();
   if(dist(player,rangeAt)>.5){rangeAt=player.slice();map.getSource('range').setData(ringPoly(player,RANGE))}}
  const p=(now%2600)/2600;
  if(!gesturing&&(frameN++%3===0))map.getSource('pulse').setData(ringPoly(player,RANGE*(.17+.83*p),72,{o:+(0.9*(1-p)).toFixed(2)}));
- if(moved&&following&&!window.DEV_UNLOCK&&!intro&&gotFirst&&!gesturing&&!map.isEasing())map.jumpTo({center:player}); // map stays anchored on the player
+ if(moved&&following&&!intro&&gotFirst&&!gesturing&&!map.isEasing())map.jumpTo({center:player}); // map stays anchored on the player
  requestAnimationFrame(frame)}
 
 map.on('load',()=>{
@@ -831,8 +829,8 @@ const CORE_KEYS=['xpv','xp','need','lvl','cls','hero','loot','chaos','enc','k','
 let fighting=false,actChain=Promise.resolve();
 function applyCore(c){if(!c)return;setTimeout(refreshLook,0);const pLvl=S.lvl,pCls=S.cls;CORE_KEYS.forEach(k=>{if(c[k]===undefined)return;if(!c[k]&&S[k]&&(k==='name'||k==='look'||k==='onboarded'))return;S[k]=c[k]});if(pLvl&&pCls&&S.cls===pCls&&S.lvl>pLvl){try{Sound.levelUp()}catch(e){}}try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}hud();render();try{if(inv.classList.contains('open'))invRender()}catch(e){}}
 function act(action,args){return actChain=actChain.then(async()=>{let fixed=false;try{fixed=gotFirst}catch(e){}
- if(!fixed&&!window.DEV_UNLOCK&&args&&args.ll){act.err=null;return null}   // DEV_UNLOCK: TEMPORARY, remove   // never send the default start position (Rockford) to the server before a real GPS fix exists
- if(window.DEV_UNLOCK&&window.DEV_LL&&args&&args.ll)args={...args,ll:window.DEV_LL};const r=await window.realmCloud.api(action,args||{});if(r.error){act.err=r.error;if(!(args&&args.quiet))toast(r.error);return null}act.err=null;try{setTitles(r.titles)}catch(e){}applyCore(r.core);try{syncQPoints()}catch(e){}try{drawSlm()}catch(e){}try{drawCal()}catch(e){}(r.msgs||[]).forEach(m=>{toast(m);try{Sound.fromMsg(m)}catch(e){}});return r}).catch(e=>{console.error('act failed',action,e);act.err='Something went wrong. Try again.';return null})}
+ if(!fixed&&args&&args.ll){act.err=null;return null}   // never send the default start position (Rockford) to the server before a real GPS fix exists
+ const r=await window.realmCloud.api(action,args||{});if(r.error){act.err=r.error;if(!(args&&args.quiet))toast(r.error);return null}act.err=null;try{setTitles(r.titles)}catch(e){}applyCore(r.core);try{syncQPoints()}catch(e){}try{drawSlm()}catch(e){}try{drawCal()}catch(e){}(r.msgs||[]).forEach(m=>{toast(m);try{Sound.fromMsg(m)}catch(e){}});return r}).catch(e=>{console.error('act failed',action,e);act.err='Something went wrong. Try again.';return null})}
 let QV='home',tab='daily',rndOffers=[],expl=[],lastWalk=null,acc=0;
 function save(){try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}if(window.realmCloud)window.realmCloud.queue(S)}
 function hud(){const x=document.querySelector('.xptext'),b=document.querySelector('.xpfill'),l=document.querySelector('.level');if(x)x.textContent=S.lvl>=100?'MAX LEVEL':`${Math.floor(S.xp).toLocaleString()} / ${S.need.toLocaleString()} XP`;if(b)b.style.width=(S.lvl>=100?100:Math.min(100,100*S.xp/S.need))+'%';if(l)l.textContent=S.lvl;const d=document.querySelector('.nav-dot');if(d){let n=false;try{n=['daily','weekly','monthly'].some(t=>{const T=S[t];return T&&((T.ms&&T.ms.ready&&!T.ms.done)||(T.q||[]).some(q=>q.ready&&!q.done))})||qNewSq('lines')||qNewSq('expl')}catch(e){}d.style.display=n?'block':'none'}try{qHubDots()}catch(e){}try{hudPlus()}catch(e){}}
@@ -896,7 +894,7 @@ async function verifyEvidence(e){const cl=window.realmCloud,uid=cl&&cl.uid();if(
 pf.onchange=async()=>{const f=pf.files[0],c=pctx;pctx=null;if(!f||!c)return;
  if(!/^image\//.test(f.type))return toast('Please submit a photo.');
  if((Date.nativeNow?Date.nativeNow():Date.now())-f.lastModified>6e5)return toast('Take the photo now. Older photos are not accepted.');
- if(!window.DEV_UNLOCK&&!(c.o?dist(targetLL,c.o.ll)<=RANGE:items.some(i=>dist(targetLL,i.ll)<=RANGE)))return toast('Take the photo inside the quest area, from a public spot.');
+ if(!(c.o?dist(targetLL,c.o.ll)<=RANGE:items.some(i=>dist(targetLL,i.ll)<=RANGE)))return toast('Take the photo inside the quest area, from a public spot.');
  const th=await thumb(f);if(!th)return toast('Could not read that photo.');
  const h=hash(th);if(S.hashes.includes(h))return toast('That photo was already used.');
  if(!(await verifyEvidence({f,th,h,ll:targetLL,t:Date.now()})))return toast('Photo could not be verified.');
@@ -1035,8 +1033,8 @@ panel.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b|
   return popup({...base,btn:'In Progress'})}
  const o=(a==='rgo'?rndOffers:expl)[i];if(!o)return;
  const dd=dist(targetLL,o.ll),base={icon:o.photo?'📷':'🧭',title:a==='rgo'?o.title:(LABEL[o.t]||'Discovery'),text:`${ft(dd)} away\nReward: +${a==='rgo'?o.xp:100} XP`};
- if(dd>RANGE&&!window.DEV_UNLOCK)return tooFar(dd);
- popup({...base,btn:o.photo?'📷 Enter Photo':'Enter',on:()=>{if(dist(targetLL,o.ll)>RANGE&&!window.DEV_UNLOCK)return tooFar(dist(targetLL,o.ll));o.photo?askPhoto({o,done:()=>completeLoc(a,o)}):completeLoc(a,o)}})});
+ if(dd>RANGE)return tooFar(dd);
+ popup({...base,btn:o.photo?'📷 Enter Photo':'Enter',on:()=>{if(dist(targetLL,o.ll)>RANGE)return tooFar(dist(targetLL,o.ll));o.photo?askPhoto({o,done:()=>completeLoc(a,o)}):completeLoc(a,o)}})});
 rollover();save();hud();setInterval(()=>{flushWalk();rollover();offerRandom()},20000);setInterval(lairTick,15000);setInterval(()=>{if(!lastSync||dist(lastSync,targetLL)>80||Date.now()-lastSyncT>6e4)syncWorld()},10000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)rollover()});
 
 /* ---- Dark lairs: appear on even hours (12, 2, 4 ... local time), vanish 20 min later, >=500 ft apart ---- */
@@ -1329,7 +1327,7 @@ function natClose(){
  setTimeout(()=>{if(NAT.open)return;NAT.el.style.display='none';cancelAnimationFrame(NAT.raf);NAT.v.forEach(v=>v.live=false)},380)}
 async function natGather(){
  const it=NAT.it;if(!it||NAT.state!=='ask')return;
- if(dist(targetLL,it.ll)>RANGE&&!window.DEV_UNLOCK){natClose();return tooFar(dist(targetLL,it.ll))}
+ if(dist(targetLL,it.ll)>RANGE){natClose();return tooFar(dist(targetLL,it.ll))}
  if(it.used||it.busy)return natClose();
  NAT.state='busy';it.busy=true;
  const a=NAT.v[0].el;a.querySelectorAll('.nz').forEach(z=>z.disabled=true);a.querySelector('[data-z=go]').classList.add('busy');
@@ -2229,7 +2227,7 @@ function portalOpen(it){
 function ptEnter(){
   if(!PT.open||PT.state!=='idle')return;
   const it=PT.it;
-  if(dist(targetLL,it.ll)>RANGE&&!window.DEV_UNLOCK){tooFar(dist(targetLL,it.ll));ptHide(true);return}
+  if(dist(targetLL,it.ll)>RANGE){tooFar(dist(targetLL,it.ll));ptHide(true);return}
   if(it.used||it.busy)return;
   PT.state='entering';it.busy=true;
   const el=PT.el,stage=el.querySelector('#ptStage'),voidEl=el.querySelector('#ptVoid');
@@ -2496,7 +2494,7 @@ function sqShow(sq){
 async function sqAnswer(qid,i){const r=await act('quest',{op:'answer',qid,pick:i});
  if(!r||!r.result||!r.result.sq){window.wdBgNext=1;return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',qid,quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});}
  sqSnd(r.result.sq);sqShow(r.result.sq)}
-function gatherCands(){if(window.DEV_UNLOCK){const o=[],c0=window.DEV_LL||targetLL;for(let i=0;i<16;i++)o.push(dest(c0,Math.random()*360,95+Math.random()*100));return o}const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,90+Math.random()*110);if(safeAt(p,c))out.push(p)}return out}   // safe spots 90-200 m away; the server picks from them and checks the distances
+function gatherCands(){const c=safeCtx();if(!c.ready)return[];const out=[];for(let i=0;i<70&&out.length<16;i++){const p=dest(targetLL,Math.random()*360,90+Math.random()*110);if(safeAt(p,c))out.push(p)}return out}   // safe spots 90-200 m away; the server picks from them and checks the distances
 async function questStart(it){const r=await useMarker(it,()=>act('quest',{op:'start',key:it.key,exp:it.exp,ll:targetLL,cands:gatherCands()}));if(r&&r.result&&r.result.sq){try{Sound.queue('quest_start')}catch(e){}sqShow(r.result.sq);try{syncQPoints()}catch(e){}}}
 const sqSnd=sq=>{try{if(sq.phase==='progress')Sound.queue('quest_progress');else if(sq.phase==='done')Sound.queue(sq.ok?'quest_complete':'quest_fail')}catch(e){}};
 async function questVisit(it){if(it.q==='calaun'&&it.k==='chest')return calChest(it);if(it.q==='calaun'&&it.k==='rift')return calRift(it);if(it.q==='selora'&&it.k==='chest')return selChest(it);if(it.q==='selora'&&it.k==='rift')return selRift(it);const r=await act('quest',{op:'visit',qid:it.qid,i:it.i,ll:targetLL});if(r&&r.result&&r.result.sq){sqSnd(r.result.sq);sqShow(r.result.sq)}}
