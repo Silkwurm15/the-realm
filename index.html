@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.787';window.__BUILD=B;
+(function(){var B='1.788';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -656,8 +656,8 @@ function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(it.t==='selora'){selIntro(it);return}
  if(it.t==='rift'){portalOpen(it);return}
  if(it.t==='nature'){natOpen(it);return}
- if(it.t==='qpoint'&&it.q==='lights'){slOpen(it);return}
- if(it.t==='quest'&&it.name===QN[0]){slqOpen(it);return}   // Investigate the Strange Lights: animated quest page replaces the pop-up box   // Strange Lights: animated art card per light   // Nature Discovery: animated art screen replaces the pop-up box   // Arcane Rift: portal screen replaces the pop-up box
+ if(it.t==='qpoint'&&it.q==='lights'){slOpen(it);return}   // Strange Lights: animated art card per light   // Nature Discovery: animated art screen replaces the pop-up box   // Arcane Rift: portal screen replaces the pop-up box
+ if(it.t==='quest'&&/strange lights/i.test(it.name||'')){sqcOpen({title:it.name,text:'Something strange stirs nearby.\nInvestigate to begin the quest.',go:'Begin Quest',close:1,onGo:()=>{if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));if(it.used||it.busy)return;it.busy=true;questStart(it).catch(e=>console.warn('strange lights start',e)).finally(()=>{it.busy=false})}});return}   // Strange Lights quest: themed art card replaces the pop-up box
  const c=POI[it.t];
  showModal('poi',{skin:({nature:'nature',chest:'chest',rift:'rift',quest:'quest',boss:'lair'})[it.t],icon:c.icon,title:c.title(it),color:it.t==='qpoint'?'#ff4fd8':'',text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+(it.t==='boss'?'\n\nCosts 1 🗝️ Key of the Forsaken (you have '+keysN()+').':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{const keep=it.t==='chest'||it.t==='boss';if(dist(targetLL,it.ll)>RANGE){hideModal('poi');return tooFar(dist(targetLL,it.ll))}if(it.used||it.busy)return hideModal('poi');if(keep){$('mPrimary').disabled=true;$('mSecondary').disabled=true}else hideModal('poi');it.busy=true;(keep?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false;hideModal('poi')})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
@@ -1428,28 +1428,41 @@ function slGo(){
  setTimeout(()=>slClose(),420);
  questVisit(it).catch(e=>console.warn('strange light visit',e)).finally(()=>{it.busy=false})}
 
-/* ---------- Strange Lights quest page (strange_lights.html) ----------
-   Shown full screen in a frame when the "Investigate the Strange Lights" marker is tapped. Its Continue button begins the quest. */
-const SLQ={el:null,fr:null,it:null,open:false};
-function slqBuild(){
- if(SLQ.el)return;
- const ov=document.createElement('div');ov.id='slqOv';ov.style.cssText='position:fixed;inset:0;z-index:1200;display:none;background:#07050f';
- ov.innerHTML='<iframe title="Investigate the Strange Lights" style="position:absolute;inset:0;width:100%;height:100%;border:0;background:#07050f"></iframe>';
- document.body.appendChild(ov);SLQ.el=ov;SLQ.fr=ov.querySelector('iframe');
- addEventListener('message',e=>{if(!SLQ.open||e.source!==SLQ.fr.contentWindow||!e.data||e.data.realm!=='sl-quest')return;if(e.data.act==='go')slqGo();else if(e.data.act==='close')slqClose()});
- addEventListener('keydown',e=>{if(e.key==='Escape'&&SLQ.open)slqClose()})}
-function slqOpen(it){
- if(SLQ.open)return;slqBuild();SLQ.open=true;SLQ.it=it;
- SLQ.fr.src='strange_lights.html?v='+window.__BUILD;SLQ.el.style.display='block'}
-function slqClose(){
- if(!SLQ.open)return;SLQ.open=false;SLQ.el.style.display='none';SLQ.fr.src='about:blank'}
-function slqGo(){
- const it=SLQ.it;if(!it)return;
- setTimeout(()=>{
-  slqClose();
-  if(dist(targetLL,it.ll)>RANGE)return tooFar(dist(targetLL,it.ll));
-  if(it.used||it.busy)return;
-  it.busy=true;questStart(it).finally(()=>{it.busy=false})},450)}
+
+/* ---------- Strange Lights quest cards: the rainbow-aurora art (art/sq_lights_card.webp) holds only the frame, button and sparkles.
+   Every word is live text, so the same card serves page 1 (Begin Quest) and page 2 (Continue / progress). ---------- */
+const SQC={};
+function sqcBuild(){
+ if(SQC.el)return;
+ const st=document.createElement('style');st.textContent='#sqcOv{position:absolute;inset:0;z-index:1100;display:none;align-items:center;justify-content:center;background:rgba(5,4,12,.92);opacity:0;transition:opacity .3s;touch-action:manipulation;-webkit-user-select:none;user-select:none}#sqcOv.on{opacity:1}'
+ +'#sqcOv .sqc{--w:min(100vw,calc(100vh*941/1672));position:relative;width:var(--w);aspect-ratio:941/1672;overflow:hidden;transform:scale(.97);transition:transform .3s}#sqcOv.on .sqc{transform:none}'
+ +'#sqcOv .sqc img{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;animation:sqcBr 7s ease-in-out infinite}@keyframes sqcBr{50%{transform:scale(1.012)}}'
+ +'#sqcOv .sqt{position:absolute;left:8%;width:84%;top:44.6%;height:4.7%;display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;font:700 calc(var(--w)*.056)/1 Georgia,"Times New Roman",serif;color:#f7ead0;text-shadow:0 2px 3px #000,0 0 calc(var(--w)*.03) rgba(255,210,120,.45);pointer-events:none}'
+ +'#sqcOv .sqx{position:absolute;left:9%;width:82%;top:51.7%;height:9.6%;display:flex;align-items:center;justify-content:center;text-align:center;white-space:pre-line;font:400 calc(var(--w)*.04)/1.28 Georgia,"Times New Roman",serif;color:#f1ead8;text-shadow:0 1px 2px #000;pointer-events:none}'
+ +'#sqcOv .sqb{position:absolute;box-sizing:border-box;left:13.8%;top:61.96%;width:73.3%;height:5.5%;margin:0;padding:0;border:0;border-radius:999px;overflow:hidden;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:0;font:700 calc(var(--w)*.052)/1 Georgia,"Times New Roman",serif;color:#fff4d2;text-shadow:0 0 3px #1a0d04,0 0 3px #1a0d04,0 2px 2px #000,0 0 calc(var(--w)*.02) rgba(0,0,0,.8)}'
+ +'#sqcOv .sqb:active{background:rgba(255,255,255,.16)}#sqcOv .sqb:focus-visible{box-shadow:0 0 0 2px #fff8}'
+ +'#sqcOv .sqb::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5) 50%,transparent);transform:translateX(-140%) skewX(-18deg);mix-blend-mode:screen;animation:sqcSh 4.8s ease-in-out 1.2s infinite}@keyframes sqcSh{0%{transform:translateX(-140%) skewX(-18deg)}55%,100%{transform:translateX(520%) skewX(-18deg)}}'
+ +'#sqcOv .sqz{position:absolute;top:max(10px,env(safe-area-inset-top));right:10px;width:38px;height:38px;border-radius:50%;border:1.5px solid #c9a24b;background:rgba(10,7,22,.72);color:#f3e9c9;font:700 18px/1 Georgia,serif;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;-webkit-tap-highlight-color:transparent}#sqcOv.cl .sqz{display:flex}'
+ +'@media(prefers-reduced-motion:reduce){#sqcOv .sqc img,#sqcOv .sqb::after{animation:none}}'
+ +'html.rm #sqcOv .sqc img,html.fx-off #sqcOv .sqc img,html.rm #sqcOv .sqb::after,html.fx-off #sqcOv .sqb::after{animation:none}';document.head.appendChild(st);
+ const ov=document.createElement('div');ov.id='sqcOv';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','Strange Lights quest');
+ ov.innerHTML='<div class="sqc"><img alt="" draggable="false"><div class="sqt"></div><div class="sqx"></div><button type="button" class="sqb"></button><button type="button" class="sqz" aria-label="Close">\u2715</button></div>';
+ (modal.parentElement||document.body).appendChild(ov);
+ SQC.el=ov;SQC.img=ov.querySelector('img');
+ ov.addEventListener('click',e=>{if(!SQC.o||SQC.busy)return;if(e.target.closest('.sqb'))return sqcGo();if(e.target.closest('.sqz')||(e.target===ov&&SQC.o.close))sqcClose()});
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&SQC.o&&SQC.o.close&&!SQC.busy)sqcClose()})}
+async function sqcOpen(o){
+ sqcBuild();SQC.o=o;SQC.busy=false;
+ SQC.img.src='art/sq_lights_card.webp?v='+window.__BUILD;
+ const q=s=>SQC.el.querySelector(s);
+ q('.sqt').textContent=o.title||'';q('.sqx').textContent=o.text||'';q('.sqb').textContent=o.go||'Continue';
+ SQC.el.classList.toggle('cl',!!o.close);SQC.el.style.display='flex';
+ await Promise.race([SQC.img.decode?SQC.img.decode().catch(()=>{}):0,new Promise(r=>setTimeout(r,1500))]);
+ if(SQC.o!==o)return;
+ requestAnimationFrame(()=>SQC.el.classList.add('on'))}
+function sqcHide(){SQC.el.classList.remove('on');setTimeout(()=>{if(!SQC.o)SQC.el.style.display='none'},320)}
+function sqcClose(){const o=SQC.o;if(!o)return;SQC.o=null;sqcHide();if(o.onClose)o.onClose()}
+function sqcGo(){const o=SQC.o;if(!o)return;SQC.o=null;sqcHide();if(o.onGo)o.onGo()}
 
 /* ---- interactive mimic combat (chest ambush) ---- */
 const mimicArt=strong=>{const B=strong?'#3d2a52':'#7a4a1f',D=strong?'#24162f':'#4a2b10',G=strong?'#b8a0d8':'#d6b050',E=strong?'#ff3b30':'#ffd83a',T='#f6f1e3',sp=strong?'<path d="M45 22l8-24 8 24zM85 14l10-30 10 30zM125 22l8-24 8 24z" fill="'+G+'"/>':'',tt=(a,y,d,n)=>Array.from({length:n},(_,i)=>'<path d="M'+(a+i*22)+' '+y+'l7 '+d+' 7 '+(-d)+'z" fill="'+T+'"/>').join('');
@@ -2596,6 +2609,7 @@ function sqShow(sq){
  if(sq.id==='calaun')return calShow(sq);
  if(sq.id==='selora')return selShow(sq);
  if(sq.phase==='riddle')return rfDraw({skin:'door',icon:'🚪',title:sq.name,text:'A carved face in the door whispers:\n\u201C'+sq.riddle.q+'\u201D',btns:[...sq.riddle.opts.map((o,i)=>({html:esc(o),fn:()=>sqAnswer(sq.qid,i)})),{html:'Not now',alt:1,fn:sqClose},{html:'Abandon quest',alt:1,fn:()=>sqAbandon(sq.qid)}]});
+ if(sq.id==='lights'&&sq.phase!=='done')return sqcOpen({title:sq.name,text:(sq.lines||[]).join('\n'),go:'Continue',onGo:sqClose});   // Strange Lights: same themed card for the start + progress pages
  rfDraw({skin:sq.phase==='done'&&sq.ok?'qc':sq.id==='traveler'?'trav':sq.id==='satchel'&&sq.phase!=='done'&&sq.phase!=='progress'?'sat':undefined,icon:sq.phase==='done'?(sq.ok?'🏆':'🚪'):sq.phase==='progress'?'✨':(SQ_ICON[sq.id]||'📜'),title:sq.phase==='done'?(sq.ok?'Quest Complete':'A Meager Prize'):sq.name,text:sq.phase==='done'?sq.name:'',lines:sq.lines,btns:[{html:'Continue',fn:sqClose}]})}
 async function sqAnswer(qid,i){const r=await act('quest',{op:'answer',qid,pick:i});
  if(!r||!r.result||!r.result.sq){window.wdBgNext=1;return rfDraw({icon:'🚪',title:'The door is silent',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'resume',qid,quiet:true}).then(x=>x&&x.result&&x.result.sq?sqShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});}
