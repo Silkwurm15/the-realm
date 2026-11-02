@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.786';window.__BUILD=B;
+(function(){var B='1.787';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -655,7 +655,8 @@ function openPoi(it){if(it.gone)return;const d=dist(targetLL,it.ll);
  if(it.t==='calaun'){calIntro(it);return}
  if(it.t==='selora'){selIntro(it);return}
  if(it.t==='rift'){portalOpen(it);return}
- if(it.t==='nature'){natOpen(it);return}   // Nature Discovery: animated art screen replaces the pop-up box   // Arcane Rift: portal screen replaces the pop-up box
+ if(it.t==='nature'){natOpen(it);return}
+ if(it.t==='qpoint'&&it.q==='lights'){slOpen(it);return}   // Strange Lights: animated art card per light   // Nature Discovery: animated art screen replaces the pop-up box   // Arcane Rift: portal screen replaces the pop-up box
  const c=POI[it.t];
  showModal('poi',{skin:({nature:'nature',chest:'chest',rift:'rift',quest:'quest',boss:'lair'})[it.t],icon:c.icon,title:c.title(it),color:it.t==='qpoint'?'#ff4fd8':'',text:(typeof c.text==='function'?c.text(it):c.text)+(it.exp&&!['nature','quest','qpoint'].includes(it.t)?' Vanishes in '+Math.max(1,Math.ceil((it.exp-Date.now())/6e4))+' min.':'')+(it.t==='boss'?'\n\nCosts 1 🗝️ Key of the Forsaken (you have '+keysN()+').':''),primary:typeof c.go==='function'?c.go(it):c.go,onPrimary:()=>{const keep=it.t==='chest'||it.t==='boss';if(dist(targetLL,it.ll)>RANGE){hideModal('poi');return tooFar(dist(targetLL,it.ll))}if(it.used||it.busy)return hideModal('poi');if(keep){$('mPrimary').disabled=true;$('mSecondary').disabled=true}else hideModal('poi');it.busy=true;(keep?lootFrom(it):it.t==='nature'?gatherNature(it):it.t==='rift'?riftEnter(it):it.t==='qpoint'?questVisit(it):it.t==='quest'?questStart(it):markerUse(it)).finally(()=>{it.busy=false;hideModal('poi')})},secondary:'Close',onSecondary:()=>hideModal('poi')})}
 function spawn(){const c=safeCtx();if(!c.ready){if((spawn.r=(spawn.r||0)+1)<8)map.once('idle',()=>setTimeout(spawn,400));return}spawn.r=0;syncWorld()}
@@ -1344,6 +1345,87 @@ function natFound(lines){
  const fl=a.el.querySelector('.nflash');fl.classList.remove('go');void fl.offsetWidth;fl.classList.add('go');
  b.el.classList.add('show');a.el.classList.remove('show');NAT.state='found';
  setTimeout(()=>{if(NAT.state==='found')a.live=false},800)}
+
+/* ---------- Strange Lights card: one animated art card per light (art/strange_light_1..5.webp) ----------
+   Light 1 blue (lightning) · 2 green (spiral motes) · 3 gold (turning rings) · 4 red (heat + sparks) · 5 purple (vortex).
+   The art has no title baked in: the live title ("Strange Light N") is drawn over it; Investigate / Close are invisible buttons over the painted ones. */
+const SL={el:null,card:null,img:null,cv:null,g:null,raf:0,it:null,open:false,go:false,rm:!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)};
+const SL_F=[{x:.51,y:.145,c:[80,170,255],t:'#a8f0ff'},{x:.50,y:.145,c:[110,255,90],t:'#d4ffa0'},{x:.50,y:.165,c:[255,190,60],t:'#ffe879'},{x:.46,y:.16,c:[255,90,40],t:'#ffb08a'},{x:.50,y:.175,c:[190,90,255],t:'#ecaaff'}];
+const SL_CSS='#slOv{position:absolute;inset:0;z-index:1100;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(5,8,6,.78);opacity:0;transition:opacity .3s;touch-action:manipulation;-webkit-user-select:none;user-select:none}#slOv.on{opacity:1}'
++'#slOv .slc{--w:min(420px,calc(100vw - 24px),calc((100vh - 40px)*508/504));position:relative;width:var(--w);aspect-ratio:508/504;border-radius:calc(var(--w)*.03);overflow:hidden;filter:drop-shadow(0 10px 26px #000c);transform:scale(.94);transition:transform .3s}#slOv.on .slc{transform:none}'
++'#slOv .slc img,#slOv .slc canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}'
++'#slOv .slc img{animation:slBr 6s ease-in-out infinite}@keyframes slBr{50%{transform:scale(1.014)}}'
++'#slOv .slt{position:absolute;left:23%;width:54%;top:34.2%;height:10%;display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;font:700 calc(var(--w)*.064)/1 Georgia,"Times New Roman",serif;color:var(--tc,#ffe879);text-shadow:0 2px 3px #000,0 0 calc(var(--w)*.03) var(--tg,rgba(255,200,80,.6));pointer-events:none}'
++'#slOv .slz{position:absolute;box-sizing:border-box;margin:0;padding:0;border:0;background:none;border-radius:calc(var(--w)*.05);color:transparent;font-size:0;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:0}'
++'#slOv .slz:active{background:rgba(255,255,255,.14)}#slOv .slz:focus-visible{box-shadow:0 0 0 2px #fff8}#slOv .slz:disabled{cursor:default}'
++'#slOv .slz.go{left:18.7%;top:60.5%;width:64%;height:13.9%}#slOv .slz.cl{left:19.7%;top:78.4%;width:62%;height:11.9%}'
++'#slOv .slf{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(circle at 50% 30%,var(--tf,rgba(255,255,255,.9)),rgba(0,0,0,0) 70%)}#slOv .slf.go{animation:slFl .5s ease-out}@keyframes slFl{0%{opacity:0}25%{opacity:1}100%{opacity:0}}'
++'@media(prefers-reduced-motion:reduce){#slOv .slc img{animation:none}}'
++'html.rm #slOv .slc img,html.fx-off #slOv .slc img{animation:none}';
+/* one gem animation each: blue = lightning, green = spiralling motes, gold = turning rings, red = heat ripples + sparks, purple = counter-turning vortex */
+const SL_FX=[
+ h=>{const{g,W,fx,fy,col,glow}=h,R=Math.random;let bl=[],nx=0;return t=>{if(t>nx){nx=t+.2+R()*.45;const a=R()*6.28,L=W*(.12+R()*.1),p=[[fx,fy]];for(let s=1;s<=7;s++){const r=L*s/7,j=(R()-.5)*W*.035;p.push([fx+Math.cos(a)*r-Math.sin(a)*j,fy+Math.sin(a)*r*.7+Math.cos(a)*j])}bl.push({p,t0:t})}
+  bl=bl.filter(b=>t-b.t0<.28);g.lineJoin='round';bl.forEach(b=>{const al=1-(t-b.t0)/.28;[[7,.35,0],[2.5,1,1]].forEach(([w,m,wh])=>{g.strokeStyle=wh?`rgba(220,240,255,${al})`:col(al*m*.8);g.lineWidth=w;g.beginPath();b.p.forEach((q,i)=>i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]));g.stroke()})});glow(fx,fy,W*.1,.2+.25*R()*(bl.length?1:.3))}},
+ h=>{const{W,fx,fy,glow}=h;return t=>{glow(fx,fy,W*.09,.35+.2*Math.sin(t*2.4));for(let j=0;j<16;j++){const u=(t*.22+j/16)%1,a=t*2.2+j*.9,r=W*(.03+u*.17);glow(fx+Math.cos(a)*r,fy+Math.sin(a)*r*.6,W*.012,(1-u)*.9)}}},
+ h=>{const{g,W,fx,fy,col,glow}=h;return t=>{glow(fx,fy,W*.1,.3+.2*Math.sin(t*2));for(let j=0;j<3;j++){g.save();g.translate(fx,fy);g.rotate(t*(.5+j*.25)*(j%2?-1:1)+j*1.05);g.scale(1,.3+.28*Math.abs(Math.sin(t*.6+j)));g.strokeStyle=col(.6);g.lineWidth=4;g.beginPath();g.arc(0,0,W*(.12+j*.015),0,6.28);g.stroke();g.restore()}}},
+ h=>{const{g,W,H,fx,fy,col,glow}=h,R=Math.random;return t=>{glow(fx,fy,W*.09,.3+.3*R());for(let j=0;j<2;j++){const u=(t*.5+j*.5)%1;g.strokeStyle=col((1-u)*.6);g.lineWidth=4;g.beginPath();g.ellipse(fx,fy,W*(.05+u*.2),H*(.03+u*.1),0,0,6.28);g.stroke()}
+  for(let j=0;j<12;j++){const u=(t*.55+j*.083)%1,a=j*2.4;glow(fx+Math.cos(a)*u*W*.14,fy+Math.sin(a)*u*H*.08-u*H*.1,W*.01,(1-u)*.95)}}},
+ h=>{const{g,W,fx,fy,col,glow}=h;return t=>{glow(fx,fy,W*.1,.25+.2*Math.sin(t*3));g.save();g.translate(fx,fy);g.scale(1,.4);g.lineWidth=5;[[.1,1,[40,26]],[.15,-1.4,[18,34]]].forEach(([r,w,d])=>{g.save();g.rotate(t*w);g.setLineDash(d);g.strokeStyle=col(.75);g.beginPath();g.arc(0,0,W*r,0,6.28);g.stroke();g.restore()});g.restore()}}
+];
+function slBuild(){
+ if(SL.el)return;
+ const st=document.createElement('style');st.textContent=SL_CSS;document.head.appendChild(st);
+ const ov=document.createElement('div');ov.id='slOv';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','Strange Light');
+ ov.innerHTML='<div class="slc"><img alt="" draggable="false"><canvas width="1016" height="1008"></canvas><div class="slt"></div><div class="slf"></div><button type="button" class="slz go" data-z="go" aria-label="Investigate">Investigate</button><button type="button" class="slz cl" data-z="close" aria-label="Close">Close</button></div>';
+ (modal.parentElement||document.body).appendChild(ov);
+ SL.el=ov;SL.card=ov.querySelector('.slc');SL.img=ov.querySelector('img');SL.cv=ov.querySelector('canvas');SL.g=SL.cv.getContext('2d');
+ ov.addEventListener('click',e=>{const b=e.target.closest('.slz');if(b&&!b.disabled){if(b.dataset.z==='go')slGo();else slClose();return}if(e.target===ov&&!SL.go)slClose()});
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&SL.open&&!SL.go)slClose()})}
+function slStart(n){   // n = 0..4, which light's animation to run
+ const i=n%5,f=SL_F[i],W=1016,H=1008,g=SL.g,im=SL.img,R=Math.random,[r,gr,b]=f.c,fx=f.x*W,fy=f.y*H,col=a=>`rgba(${r},${gr},${b},${a})`;
+ const glow=(x,y,Rr,a)=>{const d=g.createRadialGradient(x,y,0,x,y,Rr);d.addColorStop(0,col(a));d.addColorStop(1,col(0));g.fillStyle=d;g.fillRect(x-Rr,y-Rr,2*Rr,2*Rr)};
+ const low=document.documentElement.classList.contains('fx-low'),calm=SL.rm||document.documentElement.classList.contains('rm')||document.documentElement.classList.contains('fx-off');
+ const fxf=SL_FX[i]({g,W,H,fx,fy,col,glow}),P=Array.from({length:low?10:22},()=>({x:R(),y:R(),s:.6+R()*1.4,v:.025+R()*.05,ph:R()*6.28,dx:(R()-.5)*.02}));
+ const oc=document.createElement('canvas'),o=oc.getContext('2d'),gw=.4*W,gh=.34*H;oc.width=gw;oc.height=gh;
+ let last=0;
+ const frame=ts=>{const t=ts/1000,dt=Math.min(.05,t-last||.016);last=t;
+  g.clearRect(0,0,W,H);g.globalCompositeOperation='source-over';
+  if(im.complete&&im.naturalWidth){const s=1+.045*Math.sin(t*2.2),sw=gw/2/s,sh=gh/2/s;o.globalCompositeOperation='source-over';o.clearRect(0,0,gw,gh);o.drawImage(im,fx/2-sw/2,fy/2-sh/2,sw,sh,0,0,gw,gh);
+   const m=o.createRadialGradient(gw/2,gh/2,gw*.1,gw/2,gh/2,gw*.5);m.addColorStop(0,'#000');m.addColorStop(1,'rgba(0,0,0,0)');o.globalCompositeOperation='destination-in';o.fillStyle=m;o.fillRect(0,0,gw,gh);g.drawImage(oc,fx-gw/2,fy-gh/2+Math.sin(t*1.5)*.006*H)}
+  g.globalCompositeOperation='lighter';fxf(t);
+  P.forEach(p=>{p.y-=p.v*dt;p.x+=p.dx*dt;if(p.y<-.02){p.y=1.02;p.x=R()}glow(p.x*W,p.y*H,W*.008*p.s,.3+.3*Math.sin(t*3+p.ph))});
+  const ph=(t%4.5)/1.3;if(ph<1){g.save();g.beginPath();g.rect(.20*W,.60*H,.60*W,.14*H);g.clip();const x=(.12+ph*.8)*W,d=g.createLinearGradient(x-.08*W,0,x+.08*W,0);d.addColorStop(0,col(0));d.addColorStop(.5,'rgba(255,255,255,.4)');d.addColorStop(1,col(0));g.fillStyle=d;g.fillRect(0,.60*H,W,.14*H);g.restore()}
+  g.globalCompositeOperation='source-over'};
+ const loop=ts=>{if(!SL.open)return;frame(ts);SL.raf=requestAnimationFrame(loop)};
+ cancelAnimationFrame(SL.raf);
+ if(calm)frame(1200);else SL.raf=requestAnimationFrame(loop)}
+async function slOpen(it){
+ if(SL.open)return;
+ slBuild();SL.open=true;SL.go=false;SL.it=it;
+ const n=(it.i|0),f=SL_F[n%5],c=f.c;
+ SL.img.src='art/strange_light_'+(n%5+1)+'.webp?v='+window.__BUILD;
+ SL.el.querySelector('.slt').textContent=it.name||('Strange Light '+(n+1));
+ SL.card.style.setProperty('--tc',f.t);SL.card.style.setProperty('--tg','rgba('+c.join(',')+',.6)');SL.card.style.setProperty('--tf','rgba('+c.join(',')+',.85)');
+ SL.el.querySelectorAll('.slz').forEach(z=>z.disabled=false);
+ SL.el.querySelector('.slf').classList.remove('go');
+ SL.el.style.display='flex';
+ await Promise.race([SL.img.decode?SL.img.decode().catch(()=>{}):0,new Promise(r=>setTimeout(r,1500))]);
+ if(!SL.open||SL.it!==it)return;
+ requestAnimationFrame(()=>SL.el.classList.add('on'));
+ slStart(n)}
+function slClose(){
+ if(!SL.open)return;SL.open=false;SL.go=false;
+ cancelAnimationFrame(SL.raf);
+ SL.el.classList.remove('on');
+ setTimeout(()=>{if(!SL.open)SL.el.style.display='none'},320)}
+function slGo(){
+ const it=SL.it;if(!it||SL.go)return;
+ if(dist(targetLL,it.ll)>RANGE){slClose();return tooFar(dist(targetLL,it.ll))}
+ if(it.used||it.busy)return slClose();
+ SL.go=true;it.busy=true;SL.el.querySelectorAll('.slz').forEach(z=>z.disabled=true);
+ const fl=SL.el.querySelector('.slf');fl.classList.remove('go');void fl.offsetWidth;fl.classList.add('go');
+ setTimeout(()=>slClose(),420);
+ questVisit(it).catch(e=>console.warn('strange light visit',e)).finally(()=>{it.busy=false})}
 
 /* ---- interactive mimic combat (chest ambush) ---- */
 const mimicArt=strong=>{const B=strong?'#3d2a52':'#7a4a1f',D=strong?'#24162f':'#4a2b10',G=strong?'#b8a0d8':'#d6b050',E=strong?'#ff3b30':'#ffd83a',T='#f6f1e3',sp=strong?'<path d="M45 22l8-24 8 24zM85 14l10-30 10 30zM125 22l8-24 8 24z" fill="'+G+'"/>':'',tt=(a,y,d,n)=>Array.from({length:n},(_,i)=>'<path d="M'+(a+i*22)+' '+y+'l7 '+d+' 7 '+(-d)+'z" fill="'+T+'"/>').join('');
