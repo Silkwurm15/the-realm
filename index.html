@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.788';window.__BUILD=B;
+(function(){var B='1.789';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2466,7 +2466,7 @@ function sqCard(id){return sqList().filter(q=>id?q.id===id:!QLINES[q.id]).map(q=
 function sqAbandon(id){if(confirm('Abandon this quest? You will not get the reward.'))act('quest',{op:'abandon',qid:id}).then(()=>{rf.style.display='none';render();try{syncQPoints()}catch(e){}})}
 function sqPanel(id){const q=sqGet(id);if(!q){render();return}const i=sqInfo(q);
  if(q.id==='door'){showModal('quest',{icon:'🚪',title:i.name,text:'The riddle is still waiting.\n'+i.left+' min left',primary:'Open Riddle',onPrimary:()=>{hideModal('quest');act('quest',{op:'resume',qid:q.qid}).then(r=>{if(r&&r.result&&r.result.sq)sqShow(r.result.sq)})},secondary:'Abandon Quest',onSecondary:()=>{hideModal('quest');sqAbandon(q.qid)}});return}
- const nl=q.id==='slumber'||q.id==='calaun'||q.id==='selora';qpGeneric({title:i.name,desc:i.sub,note:()=>{const l=nl?'No time limit':sqInfo(q).left+' min left';return l+'\nAbandoning forfeits the reward'+(nl?' and the quest returns tomorrow.':'.')},btn:'Abandon Quest',on:()=>sqAbandon(q.qid)})}
+ const nl=q.id==='slumber'||q.id==='calaun'||q.id==='selora';qpGeneric({title:i.name,desc:i.sub,note:()=>nl?'Abandoning forfeits the reward and the quest returns tomorrow.':sqInfo(q).left+' min left\nAbandoning forfeits the reward.',btn:'Abandon Quest',on:()=>sqAbandon(q.qid)})}
 function sqClose(){rf.style.display='none';hud();try{render()}catch(e){}try{syncQPoints()}catch(e){}try{if(inv.classList.contains('open'))invRender()}catch(e){}}
 
 /* ---- LOST IN SLUMBER: a daily marker the server places near you (S.slm), then pop-up screens with art banners and pill buttons. The server decides every step; this only draws it. ---- */
@@ -2489,7 +2489,7 @@ async function slmWake(qid,pick){const r=await act('quest',{op:'wake',qid,pick,l
  if(!r||!r.result||!r.result.sq)return slmDraw({img:SLM_IMG.asleep,title:'Titan Ulfur',text:act.err||'Could not reach the server.',btns:[{html:'Try again',fn:()=>act('quest',{op:'visit',qid,i:3,ll:targetLL,quiet:true}).then(x=>x&&x.result&&x.result.sq?slmShow(x.result.sq):sqClose())},{html:'Close',alt:1,fn:sqClose}]});
  sqSnd(r.result.sq);slmShow(r.result.sq)}
 function slmShow(sq){
- if(sq.phase==='start')return slmDraw({img:SLM_IMG.asleep,title:sq.name,text:'The great warrior has vanished, and no one knows where he went. You\'ll need to search for him. There is no time limit.',lines:['QUEST OBJECTIVES','• Search 3 of the locations below. The game picks them at random. (0 / 3)','• Find the warrior at the final location. (0 / 1)','','POSSIBLE LOCATIONS (10 TOTAL)',sq.locs.join(' · ')],btns:[{html:'Continue',fn:sqClose}]});
+ if(sq.phase==='start')return slmDraw({img:SLM_IMG.asleep,title:sq.name,text:'The great warrior has vanished, and no one knows where he went. You\'ll need to search for him.',lines:['QUEST OBJECTIVES','• Search 3 of the locations below. The game picks them at random. (0 / 3)','• Find the warrior at the final location. (0 / 1)','','POSSIBLE LOCATIONS (10 TOTAL)',sq.locs.join(' · ')],btns:[{html:'Continue',fn:sqClose}]});
  if(sq.phase==='clue'){const l=sq.loc;try{Sound.queue('quest_progress')}catch(e){}
   return slmDraw({img:SLM_IMG[l.id],title:l.name,text:l.text,lines:[l.item?'You found: '+l.item[0]+'\n'+l.item[1]:'','Clue '+sq.n+' of 3. Titan Ulfur is nowhere to be found.'].filter(Boolean),btns:[{html:'Continue',fn:sq.last?()=>slmShow({phase:'reveal'}):sqClose}]})}
  if(sq.phase==='reveal')return slmDraw({img:SLM_IMG.reveal,title:'The Final Location',text:'After your third search, the clues finally point to one last location.',lines:['The final location has been revealed on your map.'],btns:[{html:'View on Map',fn:sqClose}]});
@@ -2525,7 +2525,7 @@ async function calChest(it){calN=4;const r=await act('loot',{t:'chest',cq:it.qid
 async function calRift(it){const r=await act('rift',{op:'enter',cq:it.qid,i:it.i,ll:targetLL});if(r&&r.result&&r.result.rift)rfRoom(r.result.rift.room)}
 async function calFightStart(qid,pick){const r=await act('quest',{op:'cal',qid,pick,ll:targetLL});if(r&&r.result&&r.result.fight){rf.style.display='none';cbShow(r.result.fight)}else calShow({phase:'choice',qid,step:6})}
 function calShow(sq){const n=sq.step|0;calN=n;const T=CAL_T[n]||CAL_T[0],tag='Sir Calaun Dawnblight · Quest '+(n+1)+' of 8';
- if(sq.phase==='start')return calDraw({title:T.t,wild:tag,text:'Your quest has begun. There is no time limit.',lines:['QUEST OBJECTIVE','• '+T.o+' (0 / '+T.n+')'],btns:[{html:'Continue',fn:sqClose}]});
+ if(sq.phase==='start')return calDraw({title:T.t,wild:tag,text:'Your quest has begun.',lines:['QUEST OBJECTIVE','• '+T.o+' (0 / '+T.n+')'],btns:[{html:'Continue',fn:sqClose}]});
  if(sq.phase==='clue'){try{Sound.queue('quest_progress')}catch(e){}return calDraw({title:sq.stop.name,wild:tag,text:sq.stop.text,lines:['Stop '+sq.n+' of '+sq.total+'.'],btns:[{html:'Continue',fn:sqClose}]})}
  if(sq.phase==='choice')return calDraw({title:'The Confrontation',wild:tag,text:'Sir Calaun Dawnblight stands before you, blade drawn, while the bounty hunters close in from behind.\n\nWhose side are you on? Lose the fight and the quest fails until the next daily reset.',btns:[
   {html:'Help Bring Him In<small>Fight Sir Calaun Dawnblight</small>',fn:()=>calFightStart(sq.qid,'bring')},
@@ -2595,7 +2595,7 @@ async function selChest(it){selN=1;const n0=(S.sel&&S.sel.n)|0;const r=await act
 async function selRift(it){const r=await act('rift',{op:'enter',cq:it.qid,i:it.i,ll:targetLL});if(r&&r.result&&r.result.rift)rfRoom(r.result.rift.room)}
 async function selAnswer(qid,i){const r=await act('quest',{op:'selans',qid,pick:i,ll:targetLL});if(!r||!r.result||!r.result.sq)return selDraw({title:'The note is silent',text:act.err||'Could not reach the server.',btns:[{html:'Close',alt:1,fn:sqClose}]});sqSnd(r.result.sq);selShow(r.result.sq)}
 function selShow(sq){const n=sq.step|0;selN=n;const T=SEL_T[n]||SEL_T[0],tag='Selora Dawnblight · Quest '+(n+1)+' of 8';
- if(sq.phase==='start')return selDraw({title:T.t,wild:tag,text:'Your quest has begun. There is no time limit.',lines:['QUEST OBJECTIVE','• '+T.o+' (0 / '+SEL_N[n]+')'],btns:[{html:'Continue',fn:sqClose}]});
+ if(sq.phase==='start')return selDraw({title:T.t,wild:tag,text:'Your quest has begun.',lines:['QUEST OBJECTIVE','• '+T.o+' (0 / '+SEL_N[n]+')'],btns:[{html:'Continue',fn:sqClose}]});
  if(sq.phase==='clue'){try{Sound.queue('quest_progress')}catch(e){}return selDraw({title:sq.stop.name,wild:tag,text:sq.stop.text,lines:['Stop '+sq.n+' of '+sq.total+'.'],btns:[{html:'Continue',fn:sqClose}]})}
  if(sq.phase==='riddle'){const d=sq.riddle.dead||[];return selDraw({title:sq.title||T.t,wild:tag,text:(sq.msg?sq.msg+'\n\n':'')+sq.riddle.q,btns:[...sq.riddle.opts.map((o,i)=>d.includes(i)?{html:esc(o),alt:1,dis:true,fn:()=>{}}:{html:esc(o),fn:()=>selAnswer(sq.qid,i)}),{html:'Not now',alt:1,fn:sqClose}]})}
  if(sq.phase==='done'){const rest=(sq.lines||[]).slice(1).filter(l=>l&&!T.done.includes(l)),msg='Quest complete'+(rest.length?': '+rest.join(' · '):''),fin=()=>selScreen(n,'done',{go:()=>{selHide();toast(msg);sqClose()},x:()=>{selHide();toast(msg);sqClose()}});
