@@ -759,7 +759,7 @@ let bestFirst=null,firstTimer=null,roughTimer=null;
 function startGPS(){hideModal();gpsLost=false;bestFirst=null;clearTimeout(firstTimer);firstTimer=null;clearTimeout(roughTimer);roughTimer=null;
  if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null}
  gpsState('Locating…','#e5b94c');
- if(!gotFirst){try{showModal('locwait',{icon:'🔮',title:'The Oracle Is Scrying…',text:'Hold fast, adventurer! The Oracle peers through the mists to find where you stand in the realm. Roll a Patience check while the map unveils itself. It should only take a moment.',primary:'Consulting the stars…'});const pb=$('mPrimary');pb.disabled=true;pb.style.opacity='.65'}catch(e){}   // closes by itself on the first fix (applyFix calls hideModal)
+ if(!gotFirst){/* old 'Oracle Is Scrying' pop-up removed: the loading screen replaces it */   // closes by itself on the first fix (applyFix calls hideModal)
   roughTimer=setTimeout(()=>{if(!gotFirst)triggerLost('Only a rough location is available, not an accurate GPS fix.')},ROUGH_WAIT)}
  watchId=navigator.geolocation.watchPosition(onFix,onGpsErr,GOPTS);
  if(!gotFirst)navigator.geolocation.getCurrentPosition(onFix,()=>{},{enableHighAccuracy:true,maximumAge:0,timeout:20000})}   // parallel one-shot so the first fix lands as fast as possible
@@ -3082,7 +3082,7 @@ window.showLoadScreen=function(){if(shown||gone)return;shown=1;el.classList.add(
  setTimeout(hide,CAP);
  var md=document.getElementById('modal'),auto=0;
  function chk(){if(gone||!md||!md.classList.contains('open'))return;var t=(document.getElementById('mTitle').textContent||'');
-  if(/enable location/i.test(t)&&!auto){auto=1;setTimeout(function(){var b=document.getElementById('mPrimary');if(b)b.click()},60)}else hide()}   // location prompt is accepted automatically; any other pop-up (errors) is revealed so it can be used
+  if(/enable location/i.test(t)&&!auto){auto=1;setTimeout(function(){var b=document.getElementById('mPrimary');if(b)b.click()},60)}else if(!/scrying/i.test(t))hide()}   // location prompt is accepted automatically; any other pop-up (errors) is revealed so it can be used
  if(md){new MutationObserver(function(){setTimeout(chk,0)}).observe(md,{attributes:true,attributeFilter:['class']});chk()}};
 })();
 </script></body></html>
