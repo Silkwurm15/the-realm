@@ -2813,11 +2813,11 @@ window.TC_PRE=['art/tc_chest.webp','art/tc_loot.webp'].map(function(u){var i=new
 #riftOv .rfb.libx[data-lib="5"]{--img:url(art/lib_5.webp);--ar:0.8194;--pl:0.1882;--pr:0.1745;--pt:0.2767;--tt:#4a3416;--tx:#2f2819;--bb:linear-gradient(#fffefb,#e9e2d2);--bd:#c9a24d;--gl:#d9b45b66;--bl:#2a2010;--sb:#6d5c3a}
 @media(min-width:700px){#riftOv .rfb.libx{--w:460px}}
 /* Library scene 6 = animated FULL-SCREEN art (art/lib_a_full.webp): empty text area + ornate button plates; live text and buttons sit on top. */
-#riftOv.liba{overflow:hidden;background:#0b0618}
+#riftOv.liba{overflow:hidden;background:#0b0618;inset:calc(var(--hudh) + 8px) 0 calc(72px + env(safe-area-inset-bottom,0px)) 0;padding:0;container-type:size}   /* sits BETWEEN the header (HUD) and the bottom nav */
 #riftOv.liba::before{content:'';position:absolute;inset:-5%;z-index:0;pointer-events:none;background:url(art/lib_a_full.webp) center/cover;filter:blur(24px) brightness(.5)}
 #riftOv.liba>.rfb{z-index:1}
-#riftOv .rfb.libx[data-lib="6"]{--w:max(100vw,calc(100vh*2/3));--w:max(100vw,calc(100dvh*2/3));--ar:.6667;position:absolute;left:50%;top:50%;translate:-50% -50%;margin:0;padding:0;flex:none;transform-origin:50% 40%;animation:lbBreathe 20s ease-in-out infinite alternate}
-@media(min-aspect-ratio:3/4){#riftOv .rfb.libx[data-lib="6"]{--w:min(100vw,calc(100vh*2/3));--w:min(100vw,calc(100dvh*2/3))}}
+#riftOv .rfb.libx[data-lib="6"]{--w:max(100vw,calc(100vh*2/3));--w:max(100vw,calc(100dvh*2/3));--w:max(100cqw,calc(100cqh*2/3));--ar:.6667;position:absolute;left:50%;top:50%;translate:-50% -50%;margin:0;padding:0;flex:none;transform-origin:50% 40%;animation:lbBreathe 20s ease-in-out infinite alternate}
+@media(min-aspect-ratio:3/4){#riftOv .rfb.libx[data-lib="6"]{--w:min(100vw,calc(100vh*2/3));--w:min(100vw,calc(100dvh*2/3));--w:min(100cqw,calc(100cqh*2/3))}}
 #riftOv .rfb.libx[data-lib="6"]::before{content:none}
 #riftOv .rfb.libx[data-lib="6"] .rft{position:absolute;left:0;right:0;top:calc(var(--w)*.536);margin:0;font:700 calc(var(--w)*.049)/1.15 Georgia,serif;color:#f4dca6;text-shadow:0 1px 3px #000a,0 0 calc(var(--w)*.02) #0008}
 #riftOv .rfb.libx[data-lib="6"] .rfx{position:absolute;left:calc(var(--w)*.2);right:calc(var(--w)*.2);top:calc(var(--w)*.5975);margin:0;font:400 calc(var(--w)*.0305)/1.17 Georgia,serif;color:#f1e8d2;white-space:pre-line;text-shadow:0 1px 2px #000a}
