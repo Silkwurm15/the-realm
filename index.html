@@ -310,33 +310,33 @@ html.hc .mk .badge svg{width:24px;height:24px}
 .topbar.has-ttl .eyebrow{display:block!important;position:absolute;left:24.2%;top:41.5%;width:57%;height:3.1cqw;margin:0;font:italic 600 2.8cqw/3.1cqw Georgia,'Palatino Linotype',serif;letter-spacing:.03em;text-transform:none;color:#e6c77e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
 .topbar.has-ttl .hpbar{top:55%;height:13.6%!important}.topbar.has-ttl .xpbar{top:71%;height:13.6%!important}
 .topbar.has-ttl .hptext,.topbar.has-ttl .xptext{font-size:3cqw!important}
-</style><style id="ldCss">
-#ldScreen{position:fixed;inset:0;z-index:2500;background:#07050f;display:none;align-items:center;justify-content:center;opacity:1;transition:opacity .9s ease;overflow:hidden;container-type:size}
+</style><link rel="preload" as="image" href="art/oracle_loading.jpg"><style id="ldCss">
+#ldScreen{--ldimg:url(art/oracle_loading.jpg);position:fixed;inset:0;z-index:2500;background:#07050f;display:none;align-items:center;justify-content:center;overflow:hidden;opacity:1;transition:opacity .9s ease}
 #ldScreen.on{display:flex}#ldScreen.out{opacity:0;pointer-events:none}
-body:has(#modal.open:not([data-kind="locwait"])) #ldScreen{opacity:0;pointer-events:none}
-#modal[data-kind="locwait"]{visibility:hidden}
-#ldScreen .stage{position:relative;flex:none;width:min(100cqw,150cqh);aspect-ratio:3/2;overflow:hidden;background:#000;z-index:1}
+#ldScreen .back{position:absolute;inset:-6%;background:var(--ldimg) center/cover;filter:blur(26px) brightness(.55);display:none}
+#ldScreen .stage{position:relative;flex:none;width:max(100vw,calc(100vh*.6667));width:max(100vw,calc(100dvh*.6667));aspect-ratio:2/3;overflow:hidden;background:#000}
+@media (min-aspect-ratio:3/4){#ldScreen .back{display:block}#ldScreen .stage{width:min(100vw,calc(100vh*.6667));width:min(100vw,calc(100dvh*.6667))}}
 #ldScreen .layer{position:absolute;inset:0}
-#ldScreen .cam{position:absolute;inset:0;transform-origin:50% 40%;animation:ldZoom 24s ease-in-out infinite alternate}
-#ldScreen{--ld:url(art/oracle_loading.jpg)}#ldScreen .bg{background:var(--ld) center/cover}#ldScreen::before{content:"";position:absolute;inset:-8%;background:var(--ld) center/cover;filter:blur(26px) brightness(.55) saturate(1.2)}
+#ldScreen .cam{position:absolute;inset:0;transform-origin:50% 50%;animation:ldZoom 24s ease-in-out infinite alternate}
+#ldScreen .bg{background:var(--ldimg) center/cover}
 @keyframes ldZoom{from{transform:scale(1)}to{transform:scale(1.06) translate(-.6%,-.8%)}}
-#ldScreen .fx{position:absolute;inset:0;clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,12.5% 44.5%,87.5% 44.5%,87.5% 84%,12.5% 84%,12.5% 44.5%)}
-#ldScreen .orb{position:absolute;left:50%;top:34.5%;width:22%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(190,170,255,.55),rgba(120,150,255,.25) 45%,transparent 70%);mix-blend-mode:screen;animation:ldPulse 3.2s ease-in-out infinite}
+#ldScreen .fx{position:absolute;inset:0;clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,18% 60%,82% 60%,82% 77.8%,18% 77.8%,18% 60%)}
+#ldScreen .orb{position:absolute;left:50.3%;top:51.4%;width:34%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(190,170,255,.55),rgba(120,150,255,.25) 45%,transparent 70%);mix-blend-mode:screen;animation:ldPulse 3.2s ease-in-out infinite}
 @keyframes ldPulse{0%,100%{opacity:.35;scale:.9}50%{opacity:1;scale:1.25}}
-#ldScreen .ring{position:absolute;left:50%;top:34.5%;width:14%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;border:2px solid rgba(200,190,255,.7);mix-blend-mode:screen;animation:ldRing 3.2s ease-out infinite}
-@keyframes ldRing{from{scale:.6;opacity:.9}to{scale:2.2;opacity:0}}
-#ldScreen .flame{position:absolute;left:9.8%;top:43%;width:7%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(255,200,100,.7),transparent 65%);mix-blend-mode:screen;animation:ldFlick .18s steps(1) infinite alternate}
+#ldScreen .ring{position:absolute;left:50.3%;top:51.4%;width:22%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;border:2px solid rgba(200,190,255,.7);mix-blend-mode:screen;animation:ldRing 3.2s ease-out infinite}
+@keyframes ldRing{from{scale:.6;opacity:.9}to{scale:2;opacity:0}}
+#ldScreen .flame{position:absolute;left:9.6%;top:52%;width:12%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(255,200,100,.7),transparent 65%);mix-blend-mode:screen;animation:ldFlick .18s steps(1) infinite alternate}
 @keyframes ldFlick{0%{opacity:.5;scale:1}30%{opacity:.9;scale:1.15}60%{opacity:.6;scale:.95}100%{opacity:1;scale:1.08}}
-#ldScreen .crystal{position:absolute;left:95.5%;top:79%;width:9%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(200,120,255,.7),transparent 65%);mix-blend-mode:screen;animation:ldPulse 4.5s ease-in-out infinite}
-#ldScreen .sheen{position:absolute;left:14%;top:46.6%;width:72%;height:35%;overflow:hidden;mix-blend-mode:soft-light;pointer-events:none}
+#ldScreen .crystal{position:absolute;left:95%;top:77%;width:16%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(200,120,255,.7),transparent 65%);mix-blend-mode:screen;animation:ldPulse 4.5s ease-in-out infinite}
+#ldScreen .sheen{position:absolute;left:19.5%;top:61.7%;width:61%;height:14.5%;overflow:hidden;mix-blend-mode:soft-light;pointer-events:none}
 #ldScreen .sheen::after{content:"";position:absolute;top:0;bottom:0;width:25%;left:-30%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.9),transparent);animation:ldSweep 6s ease-in-out infinite}
 @keyframes ldSweep{0%{left:-30%}60%,100%{left:120%}}
-#ldScreen .mist{position:absolute;left:-25%;width:150%;height:35%;filter:blur(30px);mix-blend-mode:screen;opacity:.35;background:radial-gradient(ellipse at 20% 50%,rgba(170,150,255,.8),transparent 40%),radial-gradient(ellipse at 70% 50%,rgba(130,170,255,.7),transparent 45%)}
-#ldScreen .m1{top:55%;animation:ldDrift 28s linear infinite}#ldScreen .m2{top:0;opacity:.2;animation:ldDrift 40s linear infinite reverse}
+#ldScreen .mist{position:absolute;left:-25%;width:150%;height:22%;filter:blur(30px);mix-blend-mode:screen;opacity:.35;background:radial-gradient(ellipse at 20% 50%,rgba(170,150,255,.8),transparent 40%),radial-gradient(ellipse at 70% 50%,rgba(130,170,255,.7),transparent 45%)}
+#ldScreen .m1{top:80%;animation:ldDrift 28s linear infinite}#ldScreen .m2{top:40%;opacity:.25;animation:ldDrift 40s linear infinite reverse}
 @keyframes ldDrift{from{translate:-8% 0}to{translate:8% 3%}}
 #ldScreen canvas{position:absolute;inset:0;width:100%;height:100%}
 #ldScreen .vig{background:radial-gradient(ellipse at center,transparent 60%,rgba(5,0,20,.45))}
-</style></head><body><div id="ldScreen" aria-hidden="true"><div class="stage"><div class="cam"><div class="layer bg"></div><div class="fx"><div class="mist m2"></div><div class="mist m1"></div><div class="orb"></div><div class="ring"></div><div class="ring" style="animation-delay:1.6s"></div><div class="flame"></div><div class="crystal"></div><canvas id="ldC"></canvas></div><div class="sheen"></div></div><div class="layer vig"></div></div></div>
+</style></head><body><div id="ldScreen" aria-hidden="true"><div class="back"></div><div class="stage"><div class="cam"><div class="layer bg"></div><div class="fx"><div class="mist m2"></div><div class="mist m1"></div><div class="orb"></div><div class="ring"></div><div class="ring" style="animation-delay:1.6s"></div><div class="flame"></div><div class="crystal"></div><canvas id="ldC"></canvas></div><div class="sheen"></div></div><div class="layer vig"></div></div></div>
 <div id="auth"><div class="build-tag" id="buildTag"></div><canvas id="aFx"></canvas>
 <div class="amain">
 <div class="hero"><div class="heroin"><img class="himg" alt="Titan's Path — your next adventure awaits" src="art/himg.jpg">
@@ -737,13 +737,13 @@ map.on('load',()=>{
 /* ---------- Modal (permission prompt + errors) ---------- */
 const modal=$('modal');let modalKind=null;
 const MCART={start:'start',denied:'denied',lost:'lost',drive:'drive',offline:'offline',secure:'secure',nogps:'nogps',quest:'quest',sell:'sell','switch':'switch',title:'title',tutdone:'tutdone',shop:'shop',shopgen:'title',shopdone:'shopdone',rename:'rename'};
-function showModal(kind,o){modalKind=kind;modal.dataset.kind=kind;if(o.iconHtml)$('mIcon').innerHTML=o.iconHtml;else $('mIcon').textContent=o.icon;$('mTitle').textContent=o.title;$('mText').textContent=o.text;
+function showModal(kind,o){modalKind=kind;if(o.iconHtml)$('mIcon').innerHTML=o.iconHtml;else $('mIcon').textContent=o.icon;$('mTitle').textContent=o.title;$('mText').textContent=o.text;
  const mc=modal.firstElementChild;skinSet(mc,o.skin);const mcn=o.skin?null:MCART[kind==='shop'&&!/key/i.test(o.title||'')?'shopgen':kind];mc.classList.toggle('mcard',!!mcn);if(mcn)mc.dataset.mc=mcn;else if(!o.skin)delete mc.dataset.mc;
  mc.style.borderColor=(o.skin||mcn)?'':(o.color||'');mc.style.boxShadow=(o.skin||mcn)?'':(o.color?'0 0 22px '+o.color+'66':'');$('mTitle').style.color=mcn?'':(o.color||'');
  const b1=$('mPrimary'),b2=$('mSecondary');b1.disabled=false;b2.disabled=false;b1.style.opacity='';b1.textContent=o.primary;b1.onclick=o.onPrimary;modal.classList.toggle('art',o.skin==='chest'||o.skin==='loot');
  if(o.secondary){b2.style.display='block';b2.textContent=o.secondary;b2.onclick=o.onSecondary}else b2.style.display='none';
  modal.classList.add('open');if(kind==='poi'&&o.skin==='quest'&&o.title==='The Whispering Door'){try{wdOpen()}catch(e){}}else{try{wdClose()}catch(e){}}}
-function hideModal(kind){if(!kind||modalKind===kind){modal.classList.remove('open');delete modal.dataset.kind;modalKind=null;try{wdClose()}catch(e){}}}
+function hideModal(kind){if(!kind||modalKind===kind){modal.classList.remove('open');modalKind=null;try{wdClose()}catch(e){}}}
 
 /* ---------- GPS ---------- */
 function gpsState(){} // status pill removed; errors are shown as pop-ups
@@ -3079,6 +3079,10 @@ window.showLoadScreen=function(){if(shown||gone)return;shown=1;el.classList.add(
  function armHide(){setTimeout(hide,HOLD)}
  if(m&&!m.classList.contains('wait'))armHide();
  else if(m){var mo=new MutationObserver(function(){if(!m.classList.contains('wait')){mo.disconnect();armHide()}});mo.observe(m,{attributes:true,attributeFilter:['class']})}
- setTimeout(hide,CAP)};
+ setTimeout(hide,CAP);
+ var md=document.getElementById('modal'),auto=0;
+ function chk(){if(gone||!md||!md.classList.contains('open'))return;var t=(document.getElementById('mTitle').textContent||'');
+  if(/enable location/i.test(t)&&!auto){auto=1;setTimeout(function(){var b=document.getElementById('mPrimary');if(b)b.click()},60)}else hide()}   // location prompt is accepted automatically; any other pop-up (errors) is revealed so it can be used
+ if(md){new MutationObserver(function(){setTimeout(chk,0)}).observe(md,{attributes:true,attributeFilter:['class']});chk()}};
 })();
 </script></body></html>
