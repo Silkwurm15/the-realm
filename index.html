@@ -2468,24 +2468,26 @@ const LibFX=(function(){
    if(b.dir>0&&b.px>W+120||b.dir<0&&b.px<-120)spawn(b,false)});
   raf=requestAnimationFrame(frame)}
  function spark(){if(document.hidden||!sp||!sp.isConnected)return;const e=document.createElement('div');e.className='lb-spark';const fb=Math.random()<.6;
-  e.style.left=(fb?42+Math.random()*16:Math.random()*100)+'%';e.style.top=(fb?26+Math.random()*6:30+Math.random()*70)+'%';sp.appendChild(e);
+  let lx,ty,tt=0;do{lx=Math.random()*100;ty=Math.random()*100;tt++}while(tt<8&&lx>17&&lx<83.5&&ty>35.5&&ty<77.5);e.style.left=lx+'%';e.style.top=ty+'%';sp.appendChild(e);
   e.animate([{opacity:0,transform:'translateY(0)'},{opacity:1,offset:.3},{opacity:0,transform:'translateY(-'+(80+Math.random()*160)+'px)'}],{duration:2500+Math.random()*3000}).onfinish=()=>e.remove()}
  function stop(){run=false;cancelAnimationFrame(raf);clearInterval(spT);list=[];stage=null}
  function start(st){
   if(stage===st&&run)return;stop();const cl=document.documentElement.classList;
   if(cl.contains('fx-off')||cl.contains('rm')||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
   stage=st;const low=cl.contains('fx-low');
-  assets().then(ok=>{if(!ok||stage!==st||!st.isConnected)return;
+  Promise.resolve(true).then(ok=>{if(!ok||stage!==st||!st.isConnected)return;
    books=st.querySelector('.lb-books');sp=st.querySelector('.lb-sp');W=st.clientWidth;H=st.clientHeight;if(!W||!H)return;
-   for(let i=0;i<(low?4:10);i++)list.push(Book());list.forEach(b=>spawn(b,true));
+   
    run=true;last=performance.now();raf=requestAnimationFrame(frame);spT=setInterval(spark,low?320:120)})}
  return{start,stop,assets}})();
+const LIBG=[[51.3,15.4,30,'190,150,255',4,0],[35.2,16.3,12,'110,190,255',3.2,.4],[65.9,19.9,12,'200,120,255',3.6,1],[64.5,14,5,'255,170,80',2.4,.2],[25.6,21.4,5,'255,170,80',2.8,.9],[49.3,26,26,'255,215,140',3.4,.3],[87.9,13,14,'160,200,255',5,.5],[12.7,86,20,'110,180,255',3.8,.2],[91.8,90.2,16,'255,200,120',3.1,1.1],[95.2,49.8,12,'210,120,255',2.9,.7],[8.8,4.6,13,'110,170,255',4.2,.1],[16.6,13,10,'255,200,120',3.3,1.4],[4.9,64.5,12,'255,190,110',3.7,.6],[73.2,8.8,9,'255,200,120',2.7,.3],[5.9,70,16,'190,110,255',2.6,.9],[94.7,60,16,'190,110,255',3,.2],[23.4,51.4,6,'150,210,255',2.4,0],[23.4,60.2,6,'150,210,255',2.4,.8],[23.4,68.7,6,'150,210,255',2.4,1.6],[49.8,84,8,'150,210,255',2.8,.4],[48.6,8.1,6,'150,210,255',2.6,1.2],[49.3,32.9,6,'150,210,255',2.2,.9]];
+const LIBA_HTML='<img class="lb-bg" alt="" src="art/lib_a_full.webp"><div class="lb-gal"></div><div class="lb-beam"></div>'+LIBG.map(g=>'<div class="lb-g" style="left:'+g[0]+'%;top:'+g[1]+'%;width:'+g[2]+'%;--c:'+g[3]+';--p:'+g[4]+'s;--d:'+g[5]+'s"></div>').join('')+'<div class="lb-sp"></div>';
 function libStage(card,on){const old=card.querySelector('#libA');
- if(on){let a=old;if(!a){a=document.createElement('div');a.id='libA';a.innerHTML='<img class="lb-bg" alt="" src="art/lib_a_bg.webp"><div class="lb-books"></div><img class="lb-panel" alt="" src="art/lib_a_panel.webp"><div class="lb-aura"></div><div class="lb-gem" style="left:50%;top:9%"></div><div class="lb-gem" style="left:50%;top:86.6%;animation-delay:1.6s"></div><div class="lb-sp"></div>';card.insertBefore(a,card.firstChild)}LibFX.start(a)}
+ if(on){let a=old;if(!a){a=document.createElement('div');a.id='libA';a.innerHTML=LIBA_HTML;card.insertBefore(a,card.firstChild)}LibFX.start(a)}
  else if(old){LibFX.stop();old.remove()}}
 const LIB_ORDER=[6,1,2,3,4,5];
 function libNext(){let i=0;try{i=(+localStorage.getItem('realm_lib')||0)%LIB_ORDER.length}catch(e){}try{localStorage.setItem('realm_lib',String((i+1)%LIB_ORDER.length))}catch(e){}return LIB_ORDER[i]}
-function rfRoom(room){if(room&&room.id==='library'){const n=libNext(),dec=u=>{const im=new Image();im.src=u;return im.decode?im.decode():Promise.resolve()};Promise.race([n===6?Promise.all([dec('art/lib_a_panel.webp'),dec('art/lib_a_bg.webp'),LibFX.assets()]):dec('art/lib_'+n+'.webp'),new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{window.__libN=n;rfRoom0(room)})}else rfRoom0(room)}
+function rfRoom(room){if(room&&room.id==='library'){const n=libNext(),dec=u=>{const im=new Image();im.src=u;return im.decode?im.decode():Promise.resolve()};Promise.race([n===6?dec('art/lib_a_full.webp'):dec('art/lib_'+n+'.webp'),new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{window.__libN=n;rfRoom0(room)})}else rfRoom0(room)}
 function rfRoom0(room){if(room&&room.id==='wild'&&room.choices&&room.choices.length&&window.wrOpen){try{rf.style.display='none';wrOpen(room,id=>riftPick(id));return}catch(e){}}try{if(room&&room.id==='beast'&&!PT.open)Sound.music('battle_rift')}catch(e){}rfDraw({skin:room.id==='library'?null:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',wild:'rift'})[room.id]||'rift',lib:room.id==='library'?(window.__libN||1):0,icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:(room.text||'')+(room.wild?'\n'+room.wild.text:''),
  btns:((room.choices&&room.choices.length)?room.choices:[{id:'__leave',label:'Leave the rift'}]).map(c=>{const o=c.fight?(c.odds?'You should win this':'You would likely lose'):c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':''),sub=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' · ');return{html:esc(c.label)+(sub?'<small>'+esc(sub)+'</small>':''),dis:c.afford===false,fn:c.id==='__leave'?rfClose:()=>riftPick(c.id)}})})}
 async function riftPick(id){const r=await act('rift',{op:'pick',pick:id});
@@ -2759,7 +2761,7 @@ next()})}catch(e){}})();
 <script>
 /* preload chest art so Treasure Chest -> Chest Opened flips with no blank frame */
 setTimeout(function(){[1,2,3,4,5].forEach(function(n){var i=new Image();i.src='art/lib_'+n+'.webp'})},3000);
-setTimeout(function(){['art/lib_a_panel.webp','art/lib_a_bg.webp','art/lib_a_cover.jpg','art/lib_a_pages.jpg'].forEach(function(u){var i=new Image();i.src=u})},3500);
+setTimeout(function(){['art/lib_a_full.webp'].forEach(function(u){var i=new Image();i.src=u})},3500);
 window.TC_PRE=['art/tc_chest.webp','art/tc_loot.webp'].map(function(u){var i=new Image();i.src=u;return i.decode?i.decode().catch(function(){}):Promise.resolve()});
 </script>
 <style id="chestArt">
@@ -2810,28 +2812,34 @@ window.TC_PRE=['art/tc_chest.webp','art/tc_loot.webp'].map(function(u){var i=new
 #riftOv .rfb.libx[data-lib="4"]{--img:url(art/lib_4.webp);--ar:0.8566;--pl:0.2200;--pr:0.2113;--pt:0.2562;--tt:#ffe0ae;--tx:#ffe5d8;--bb:linear-gradient(#a81515,#4e0707);--bd:#e6b9ad;--gl:#ff463a55;--bl:#fff0e6;--sb:#ffc3b5}
 #riftOv .rfb.libx[data-lib="5"]{--img:url(art/lib_5.webp);--ar:0.8194;--pl:0.1882;--pr:0.1745;--pt:0.2767;--tt:#4a3416;--tx:#2f2819;--bb:linear-gradient(#fffefb,#e9e2d2);--bd:#c9a24d;--gl:#d9b45b66;--bl:#2a2010;--sb:#6d5c3a}
 @media(min-width:700px){#riftOv .rfb.libx{--w:460px}}
-/* Library scene 6 = animated (art/lib_a_*) */
+/* Library scene 6 = animated FULL-SCREEN art (art/lib_a_full.webp): empty text area + ornate button plates; live text and buttons sit on top. */
 #riftOv.liba{overflow:hidden;background:#0b0618}
-#riftOv.liba::before{content:'';position:absolute;inset:-5%;z-index:0;pointer-events:none;background:url(art/lib_a_bg.webp) center/cover;filter:blur(24px) brightness(.5)}
+#riftOv.liba::before{content:'';position:absolute;inset:-5%;z-index:0;pointer-events:none;background:url(art/lib_a_full.webp) center/cover;filter:blur(24px) brightness(.5)}
 #riftOv.liba>.rfb{z-index:1}
-#riftOv .rfb.libx[data-lib="6"]{--w:min(100vw,calc(100dvh*2/3 - 20px),520px);--ar:.6667;--pl:.2152;--pr:.1850;--pt:.5821;--tt:#f4dca6;--tx:#f1e8d2;--bb:linear-gradient(#17356f,#0a1b48);--bd:#dcaa4c;--gl:#4aa0ff66;--bl:#fdebc8;--sb:#cfe0ff;animation:lbBreathe 14s ease-in-out infinite alternate}
+#riftOv .rfb.libx[data-lib="6"]{--w:max(100vw,calc(100vh*2/3));--w:max(100vw,calc(100dvh*2/3));--ar:.6667;position:absolute;left:50%;top:50%;translate:-50% -50%;margin:0;padding:0;flex:none;transform-origin:50% 40%;animation:lbBreathe 20s ease-in-out infinite alternate}
+@media(min-aspect-ratio:3/4){#riftOv .rfb.libx[data-lib="6"]{--w:min(100vw,calc(100vh*2/3));--w:min(100vw,calc(100dvh*2/3))}}
 #riftOv .rfb.libx[data-lib="6"]::before{content:none}
-#riftOv .rfb.libx[data-lib="6"]{flex:none}#riftOv .rfb.libx[data-lib="6"] .rft{font-size:calc(var(--w)*.047);margin-bottom:calc(var(--w)*.006)}#riftOv .rfb.libx[data-lib="6"] .rfx{font-size:calc(var(--w)*.0285);margin-bottom:calc(var(--w)*.012)}#riftOv .rfb.libx[data-lib="6"] #rfC{gap:calc(var(--w)*.01)}#riftOv .rfb.libx[data-lib="6"] #rfC button{padding-top:calc(var(--w)*.0105);padding-bottom:calc(var(--w)*.0105);font-size:calc(var(--w)*.034)}#riftOv .rfb.libx[data-lib="6"] #rfC button small{font-size:calc(var(--w)*.0245)}
+#riftOv .rfb.libx[data-lib="6"] .rft{position:absolute;left:0;right:0;top:calc(var(--w)*.536);margin:0;font:700 calc(var(--w)*.049)/1.15 Georgia,serif;color:#f4dca6;text-shadow:0 1px 3px #000a,0 0 calc(var(--w)*.02) #0008}
+#riftOv .rfb.libx[data-lib="6"] .rfx{position:absolute;left:calc(var(--w)*.2);right:calc(var(--w)*.2);top:calc(var(--w)*.5975);margin:0;font:400 calc(var(--w)*.0305)/1.17 Georgia,serif;color:#f1e8d2;white-space:pre-line;text-shadow:0 1px 2px #000a}
+#riftOv .rfb.libx[data-lib="6"] #rfC{position:absolute;left:calc(var(--w)*.176);right:calc(var(--w)*.175);top:calc(var(--w)*.7227);margin:0;gap:calc(var(--w)*.0205)}
+#riftOv .rfb.libx[data-lib="6"] #rfC button{position:relative;overflow:hidden;height:calc(var(--w)*.109);padding:0 calc(var(--w)*.1);clip-path:inset(10% 5% 10% 5%);display:flex;flex-direction:column;align-items:center;justify-content:center;background:none;border:0;border-radius:0;box-shadow:none;font:700 calc(var(--w)*.0365)/1.15 Georgia,serif;color:#f6e4b4;text-shadow:0 1px 2px #000d}
+#riftOv .rfb.libx[data-lib="6"] #rfC button small{margin-top:calc(var(--w)*.002);font:400 calc(var(--w)*.0265)/1.15 Georgia,serif;color:#efe0bd;opacity:1}
+#riftOv .rfb.libx[data-lib="6"] #rfC button::after{content:"";position:absolute;top:0;bottom:0;width:22%;left:-30%;pointer-events:none;background:linear-gradient(100deg,transparent,rgba(255,236,190,.2),transparent);animation:lbSweep 7s ease-in-out infinite}
+#riftOv .rfb.libx[data-lib="6"] #rfC button:nth-child(2)::after{animation-delay:.6s}#riftOv .rfb.libx[data-lib="6"] #rfC button:nth-child(3)::after{animation-delay:1.2s}
+#riftOv .rfb.libx[data-lib="6"] #rfC button:active{background:radial-gradient(ellipse,rgba(255,225,160,.22),transparent 70%)}
 #riftOv .rfb.libx>#libA{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-#libA .lb-bg,#libA .lb-panel{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
-#libA .lb-books{position:absolute;inset:0}
-#libA .lb-bk{position:absolute;left:0;top:0;will-change:transform}
-#libA .lb-gem{position:absolute;width:14%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(110,190,255,.85),rgba(80,120,255,.25) 45%,transparent 70%);mix-blend-mode:screen;animation:lbGem 3.2s ease-in-out infinite}
-#libA .lb-aura{position:absolute;left:50%;top:25%;width:60%;aspect-ratio:1;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,220,150,.55),rgba(170,110,255,.25) 40%,transparent 70%);mix-blend-mode:screen;animation:lbGem 4.5s ease-in-out infinite}
+#libA .lb-bg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#libA .lb-g{position:absolute;translate:-50% -50%;aspect-ratio:1;border-radius:50%;mix-blend-mode:screen;opacity:.3;background:radial-gradient(circle,rgba(var(--c),.85),rgba(var(--c),.25) 40%,transparent 68%);animation:lbP var(--p,3s) ease-in-out var(--d,0s) infinite}
+#libA .lb-gal{position:absolute;left:51.3%;top:15.4%;width:36%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;mix-blend-mode:screen;opacity:.45;background:conic-gradient(from 0deg,transparent,rgba(200,170,255,.7),transparent 22%,rgba(110,170,255,.6) 45%,transparent 62%,rgba(255,190,120,.5) 80%,transparent);-webkit-mask:radial-gradient(circle,#000 0,transparent 66%);mask:radial-gradient(circle,#000 0,transparent 66%);animation:lbSpin 34s linear infinite}
+#libA .lb-beam{position:absolute;left:49.3%;top:27%;width:7%;height:15%;translate:-50% -100%;filter:blur(7px);mix-blend-mode:screen;opacity:.5;background:linear-gradient(to top,rgba(255,220,150,.9),rgba(170,150,255,.4) 60%,transparent);animation:lbBeam 4s ease-in-out infinite}
 #libA .lb-sp{position:absolute;inset:0}
 #libA .lb-spark{position:absolute;width:4px;height:4px;border-radius:50%;background:#f3e2ff;box-shadow:0 0 8px 2px #b98cff;opacity:0}
-@keyframes lbBreathe{from{transform:scale(1)}to{transform:scale(1.03)}}
-@keyframes lbGem{0%,100%{opacity:.1;transform:translate(-50%,-50%) scale(.8)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
-#riftOv .rfb.libx[data-lib="6"] #rfC button{position:relative}
-#riftOv .rfb.libx[data-lib="6"] #rfC button::before,#riftOv .rfb.libx[data-lib="6"] #rfC button::after{content:'';position:absolute;top:50%;width:calc(var(--w)*.03);aspect-ratio:1;background:radial-gradient(circle,#bfe3ff,#3c8cff 55%,#1a4fb8);transform:translateY(-50%) rotate(45deg);box-shadow:0 0 calc(var(--w)*.02) #4aa0ff;animation:lbPulse 3.2s ease-in-out infinite}
-#riftOv .rfb.libx[data-lib="6"] #rfC button::before{left:calc(var(--w)*.012)}#riftOv .rfb.libx[data-lib="6"] #rfC button::after{right:calc(var(--w)*.012);animation-delay:.6s}
-@keyframes lbPulse{0%,100%{opacity:.45}50%{opacity:1}}
-.rm #riftOv .rfb.libx[data-lib="6"],.fx-off #riftOv .rfb.libx[data-lib="6"],.rm #libA *,.fx-off #libA *,.rm #riftOv .libx #rfC button::before,.rm #riftOv .libx #rfC button::after,.fx-off #riftOv .libx #rfC button::before,.fx-off #riftOv .libx #rfC button::after{animation:none!important}
+@keyframes lbBreathe{from{transform:scale(1)}to{transform:scale(1.035)}}
+@keyframes lbP{0%,100%{opacity:.15;scale:.8}50%{opacity:.95;scale:1.2}}
+@keyframes lbSpin{to{rotate:360deg}}
+@keyframes lbBeam{0%,100%{opacity:.35;scale:1 .8}50%{opacity:.9;scale:1.2 1.1}}
+@keyframes lbSweep{0%{left:-30%}35%,100%{left:120%}}
+.rm #riftOv .rfb.libx[data-lib="6"],.fx-off #riftOv .rfb.libx[data-lib="6"],.rm #libA *,.fx-off #libA *,.rm #riftOv .libx #rfC button::after,.fx-off #riftOv .libx #rfC button::after{animation:none!important}
 </style>
 <script>
 /* Chest FX: coin glints over the Treasure Chest art, flickering wall torches over the Chest Opened art.
