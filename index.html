@@ -2,13 +2,14 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.792';window.__BUILD=B;
+(function(){var B='1.793';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
  if(jobs.length)Promise.all(jobs).then(function(){if(!sessionStorage.getItem('tp_reloaded')){sessionStorage.setItem('tp_reloaded','1');location.reload()}}).catch(function(){})}}catch(e){}})();
 </script>
 <link rel="manifest" href="manifest.json">
+<script src="realm_anim.js" defer></script>
 <meta name="theme-color" content="#14261d">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1512,7 +1513,7 @@ const MIMIC_IMG='<img alt="Mimic" draggable="false" src="art/mimic_img.webp">';
 const STRONG_MIMIC_IMG='<img alt="Strong Mimic" draggable="false" src="art/strong_mimic_img.webp" style="display:block;width:100%;max-width:250px;margin:0 auto;filter:drop-shadow(0 8px 14px #000c)">';   // artwork for the Strong Mimic
 function cbDraw(title,btns,bars){$('cbT').textContent=title;$('cbA').innerHTML=(C.k==='smimic'?STRONG_MIMIC_IMG:MIMIC_IMG);
  $('cbB').innerHTML=bars?'<div class="cbh"><span>'+C.e.n+'</span><span>'+Math.max(0,C.eh)+' / '+C.e.hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*C.eh/C.e.hp)+'%;background:#d6304a"></i></div><div class="cbh"><span>You</span><span>'+Math.floor(H().hp)+' / '+stats().hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*H().hp/stats().hp)+'%;background:#4caf50"></i></div>':'';
- $('cbL').textContent=C.log.slice(-4).join('\n');$('cbR').innerHTML='';btns.forEach(b=>{const x=document.createElement('button');x.textContent=b[0];if(b[2])x.className='alt';x.onclick=b[1];$('cbR').appendChild(x)});cb.style.display='flex'}
+ $('cbL').textContent=C.log.slice(-4).join('\n');$('cbR').innerHTML='';btns.forEach(b=>{const x=document.createElement('button');x.textContent=b[0];if(b[2])x.className='alt';x.onclick=b[1];$('cbR').appendChild(x)});cb.style.display='flex';try{window.RealmAnim&&RealmAnim.battle({k:C.k,title:title,btns:btns,bars:bars,e:C.e,eh:C.eh,hp:H().hp,max:stats().hp,log:C.log})}catch(e){}}
 function cbShow(f){fighting=true;try{if(f.phase==='intro')Sound.music(f.strong?'battle_strongmimic':'battle_mimic');else if(f.phase==='fallen')Sound.sfx('lose');else if(f.phase==='end'||!['intro','choice','fallen'].includes(f.phase)){Sound.music('map');if(/victory/i.test(f.title||''))Sound.sfx('win');else if(/defeat/i.test(f.title||''))Sound.sfx('lose')}}catch(e){}C={k:f.strong?'smimic':'mimic',m:{name:f.m.name},e:{n:f.e.n,hp:f.e.hp},eh:f.eh,log:f.log};
  if(f.phase==='intro'){cbDraw(f.title,[['Defend Yourself!',()=>cbOp('start')]],false);{const lk=f.strong?'strong':(/mimic/i.test(((f.e&&f.e.n)||'')+' '+((f.m&&f.m.name)||''))?'mimic':null);if(lk){try{lmOpen(()=>cbOp('start'),lk)}catch(e){}}}}
  else if(f.phase==='choice')cbDraw('Your move!',[['Attack',()=>cbOp('attack')],['Flee',()=>cbOp('flee'),1]],true);
@@ -2492,7 +2493,7 @@ function rfRoom0(room){if(room&&room.id==='wild'&&room.choices&&room.choices.len
  btns:((room.choices&&room.choices.length)?room.choices:[{id:'__leave',label:'Leave the rift'}]).map(c=>{const o=c.fight?(c.odds?'You should win this':'You would likely lose'):c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':''),sub=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' · ');return{html:esc(c.label)+(sub?'<small>'+esc(sub)+'</small>':''),dis:c.afford===false,fn:c.id==='__leave'?rfClose:()=>riftPick(c.id)}})})}
 async function riftPick(id){const r=await act('rift',{op:'pick',pick:id});
  if(!r||!r.result||!r.result.rift)return rfDraw({icon:'✨',title:'The rift flickers',text:(act.err||'Could not reach the server.')+'\nIf the rift is still open you can try again.',btns:[{html:'Try again',fn:()=>act('rift',{op:'resume',quiet:true}).then(x=>x&&x.result&&x.result.rift?rfRoom(x.result.rift.room):rfClose())},{html:'Close',alt:1,fn:rfClose}]});
- const x=r.result.rift;try{if(id==='fight')Sound.hit(S.cls)}catch(e){}rfDraw({icon:x.ic||(x.ok?'✨':'💥'),title:x.ttl||(x.ok?'The Rift Yields':'The Rift Snaps Shut'),text:x.room,lines:x.lines,btns:[{html:'Continue',fn:rfClose}]})}
+ const x=r.result.rift;try{if(id==='fight')Sound.hit(S.cls)}catch(e){}rfDraw({icon:x.ic||(x.ok?'✨':'💥'),title:x.ttl||(x.ok?'The Rift Yields':'The Rift Snaps Shut'),text:x.room,lines:x.lines,btns:[{html:'Continue',fn:rfClose}]});try{window.RealmAnim&&RealmAnim.knowledge(x,rfClose)}catch(e){}}
 async function riftEnter(it){const r=await useMarker(it,()=>act('rift',{op:'enter',key:it.key,exp:it.exp,ll:targetLL}));if(r&&r.result&&r.result.rift)rfRoom(r.result.rift.room)}
 /* ---- Story quests: the four quest markers are mini-series. The server picks the quest, places the points, checks every step and pays out. ---- */
 const SQ_ICON={selora:'🏴‍☠️',calaun:'🐉',slumber:'😴',lights:'✨',door:'🚪',satchel:'🎒',traveler:'🧙'};
