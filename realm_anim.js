@@ -176,11 +176,13 @@
     if (cssDone) return; cssDone = true;
     var s = document.createElement('style'); s.id = 'ra-css';
     s.textContent =
-      '#cbt.ra-on{padding:0;background:#000}#cbt.ra-on>.cbb{display:none}' +
-      '.ra{position:fixed;inset:0;z-index:1501;display:none;align-items:center;justify-content:center;overflow:hidden;background:#05040a;font-family:Georgia,"Palatino Linotype",serif;-webkit-user-select:none;user-select:none}' +
+      ':root{--ra-top:calc(max(0px,env(safe-area-inset-top)) + var(--hudh,92px) + 4px);--ra-bot:calc(72px + env(safe-area-inset-bottom,0px))}' +
+      '#cbt.ra-on{top:var(--ra-top);bottom:var(--ra-bot);padding:0;background:#05040a;align-items:stretch;justify-content:stretch}#cbt.ra-on>.cbb{display:none}' +
+      '.ra{position:fixed;top:var(--ra-top);bottom:var(--ra-bot);left:0;right:0;z-index:1501;display:none;align-items:center;justify-content:center;overflow:hidden;container-type:size;background:#05040a;font-family:Georgia,"Palatino Linotype",serif;-webkit-user-select:none;user-select:none}' +
+      '#cbt .ra{position:absolute;top:0;bottom:0}' +
       '.ra.on{display:flex}' +
       '.ra .ra-back{position:absolute;inset:-6%;background:var(--ra-img) center/cover;filter:blur(26px) brightness(.5)}' +
-      '.ra .ra-stg{position:relative;flex:none;aspect-ratio:2/3;width:min(100vw,calc(100vh*2/3));width:min(100vw,calc(100dvh*2/3));container-type:inline-size;background:#05040a;overflow:hidden}' +
+      '.ra .ra-stg{position:relative;flex:none;aspect-ratio:2/3;width:min(100vw,calc((100vh - 170px)*2/3));width:min(100cqw,calc(100cqh*2/3));container-type:inline-size;background:#05040a;overflow:hidden}' +
       '.ra canvas{position:absolute;inset:0;width:100%;height:100%;display:block}' +
       '.ra .ra-x{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;color:#f3e6c4;text-shadow:0 2px 3px #000,0 0 10px #000a;white-space:pre-line;overflow:hidden}' +
       '.ra .ra-t{font-weight:700;color:#f6e3ae;white-space:nowrap}' +
@@ -189,11 +191,11 @@
       '.ra .ra-lines{justify-content:flex-start;align-items:flex-start;text-align:left;line-height:1.38;font-weight:400;color:#f1e8d2}' +
       '.ra .ra-lines .ra-i div{margin:0 0 1.3cqw}' +
       '.ra .ra-i{display:block;width:100%}.ra .ra-i.nw{display:inline-block;width:auto;white-space:nowrap}' +
-      '.ra .ra-b{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 7%;border:0;border-radius:0;background:none;color:#fff0cf;font:700 5.3cqw/1.05 Georgia,serif;text-shadow:0 2px 3px #000,0 0 10px #000a;cursor:pointer;-webkit-tap-highlight-color:transparent;box-sizing:border-box;white-space:pre-line}' +
-      '.ra .ra-b:active{background:radial-gradient(ellipse,rgba(255,225,160,.25),transparent 70%)}' +
-      '.ra .ra-b:disabled{opacity:.55;cursor:default}' +
-      '.ra .ra-b:focus-visible{outline:2px solid #ecc47e;outline-offset:-6px}' +
-      '.ra .ra-b.ra-dim{pointer-events:none;visibility:hidden}';
+      '.ra .ra-b,#cbt .ra .ra-b{position:absolute;display:flex;flex:none;align-items:center;justify-content:center;text-align:center;margin:0;padding:0 7%;border:0;border-radius:0;background:none;box-shadow:none;color:#fff0cf;font:700 5.3cqw/1.05 Georgia,serif;text-shadow:0 2px 3px #000,0 0 10px #000a;cursor:pointer;-webkit-tap-highlight-color:transparent;box-sizing:border-box;white-space:pre-line}' +
+      '.ra .ra-b:active,#cbt .ra .ra-b:active{background:radial-gradient(ellipse,rgba(255,225,160,.22),transparent 70%)}' +
+      '.ra .ra-b:disabled,#cbt .ra .ra-b:disabled{opacity:.55;cursor:default;background:none}' +
+      '.ra .ra-b:focus-visible,#cbt .ra .ra-b:focus-visible{outline:2px solid #ecc47e;outline-offset:-6px}' +
+      '.ra .ra-b.ra-dim,#cbt .ra .ra-b.ra-dim{pointer-events:none;visibility:hidden}';
     document.head.appendChild(s);
   }
 
@@ -228,7 +230,7 @@
 
   function battle(o) {
     try {
-      if (!o || !o.bars || (o.k !== 'smimic' && o.k !== 'mimic')) { battleOff(); return false; }
+      if (!o || (o.k !== 'smimic' && o.k !== 'mimic')) { battleOff(); return false; }
       var b = mountBattle(); if (!b) return false;
       var cbt = document.getElementById('cbt'), s = SCENES[o.k], first = battleKey !== o.k || !b.root.classList.contains('on');
       battleKey = o.k; b.p.set(s); setBack(b.root, s.src);
@@ -278,6 +280,10 @@
     } catch (err) { try { knowledgeOff(); } catch (e2) {} return false; }
   }
   function knowledgeOff() { if (K) K.root.classList.remove('on'); }
+
+  /* decode the art early so the first screen never flashes empty */
+  function preload() { ['art/strong_battle.webp', 'art/mimic_battle.webp', 'art/library_knowledge.webp'].forEach(function (u) { var i = new Image(); i.src = u; }); }
+  if (document.readyState === 'complete') setTimeout(preload, 300); else addEventListener('load', function () { setTimeout(preload, 300); });
 
   window.RealmAnim = { battle: battle, battleOff: battleOff, knowledge: knowledge, knowledgeOff: knowledgeOff };
 })();
