@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.794';window.__BUILD=B;
+(function(){var B='1.795';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -628,10 +628,10 @@ layers:[
 {id:'building',type:'fill-extrusion',source:'om','source-layer':'building',minzoom:14,paint:{'fill-extrusion-color':['interpolate',['linear'],['coalesce',['get','render_height'],6],0,'#9c7a52',12,'#8b7355',40,'#8a8794'],'fill-extrusion-height':['coalesce',['get','render_height'],6],'fill-extrusion-base':['coalesce',['get','render_min_height'],0],'fill-extrusion-opacity':.92,'fill-extrusion-vertical-gradient':true}}
 ]};
 
-const map=new maplibregl.Map({container:'map',style,center:FALLBACK,zoom:START.zoom,pitch:START.pitch,bearing:START.bearing,maxPitch:75,minZoom:14,maxZoom:19,attributionControl:{compact:true},dragRotate:true,touchPitch:false});
-map.dragPan.disable();map.doubleClickZoom.disable();map.scrollZoom.enable({around:'center'});map.touchZoomRotate.enable({around:'center'});
+const map=new maplibregl.Map({container:'map',style,center:FALLBACK,zoom:START.zoom,pitch:START.pitch,bearing:START.bearing,maxPitch:75,minZoom:14,maxZoom:19,attributionControl:{compact:true},dragRotate:true,touchPitch:true});
+map.dragPan.enable();map.doubleClickZoom.disable();map.scrollZoom.enable();map.touchZoomRotate.enable();
 /* One finger drag spins the camera around the player (left/right) and tilts it (up/down). The camera stays locked on the player; two fingers pinch to zoom. */
-(function(){const el=map.getCanvasContainer();let x0=0,y0=0,xl=0,yl=0,on=false,spin=false;
+(function(){return;const el=map.getCanvasContainer();let x0=0,y0=0,xl=0,yl=0,on=false,spin=false;
  el.addEventListener('touchstart',e=>{if(e.touches.length===1){x0=xl=e.touches[0].clientX;y0=yl=e.touches[0].clientY;on=true;spin=false}else on=false},{passive:true});
  el.addEventListener('touchmove',e=>{if(!on||e.touches.length!==1)return;const x=e.touches[0].clientX,y=e.touches[0].clientY;if(!spin&&Math.hypot(x-x0,y-y0)<6)return;spin=true;
   map.jumpTo({bearing:map.getBearing()-(x-xl)*0.4,pitch:Math.max(0,Math.min(map.getMaxPitch(),map.getPitch()-(y-yl)*0.25))});xl=x;yl=y},{passive:true});
@@ -711,7 +711,26 @@ async function runOnboarding(){
 // player = position shown on screen (glides smoothly); targetLL = latest real GPS fix.
 let targetLL=player.slice(),gotFirst=false,gpsLost=false,lastFix=0,intro=false,probing=false,rangeAt=[0,0],spawnAt=null;
 map.setPadding({top:Math.round(window.innerHeight*0.22),bottom:0,left:0,right:0}); // player sits lower on screen, like Pokémon GO
-function setFollow(on){following=on}
+function setFollow(on){following=false}
+/* ===== TEMP FREE ROAM (test copy only) =====
+   Drag the map anywhere. When you let go, you are moved to the middle of the screen, so nodes
+   around that spot load and can be collected. The yellow pill's button snaps you back to real GPS. */
+const FREE={real:null};
+function freeGo(ll,recenter){
+ targetLL=ll.slice();player=ll.slice();anchorLL=ll.slice();fixBuf=[ll.slice()];rangeAt=ll.slice();lastWalk=ll.slice(); // lastWalk reset: a jump never counts as walking
+ playerMarker.setLngLat(ll);map.getSource('range').setData(ringPoly(ll,RANGE));
+ if(recenter)map.jumpTo({center:ll});
+ try{updateCards()}catch(e){}
+ map.once('idle',()=>setTimeout(()=>{try{spawn()}catch(e){}},300))}
+(function(){let panned=false;
+ map.on('dragstart',()=>{panned=true});
+ map.on('moveend',()=>{if(!panned)return;panned=false;if(!gotFirst||intro)return;const c=map.getCenter();freeGo([c.lng,c.lat],false)});
+ const pill=document.createElement('div');
+ pill.style.cssText='position:fixed;left:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:520;display:flex;gap:8px;align-items:center;font:600 12px system-ui,sans-serif;color:#1b1400;background:#e5c77b;border-radius:14px;padding:6px 10px;box-shadow:0 2px 8px #0008';
+ pill.innerHTML='<span>TEMP · free roam</span><button type="button" style="border:0;border-radius:10px;padding:4px 8px;font:inherit;background:#fff;color:#1b1400">📍 Back to me</button>';
+ pill.querySelector('button').addEventListener('click',()=>{if(FREE.real)freeGo(FREE.real,true)});
+ document.body.appendChild(pill)})();
+
 let frameN=0;
 function frame(now){track();
  const dx=targetLL[0]-player[0],dy=targetLL[1]-player[1],moved=Math.abs(dx)>1e-9||Math.abs(dy)>1e-9;
@@ -777,7 +796,7 @@ function speedCheck(pos,ll,nowT){
   if(spdArmed&&spdHits>=SPD_FIXES&&!modalKind){spdArmed=false;
    showModal('drive',{icon:'🚗',title:'Stay Safe!',text:'It looks like you are travelling in a motor vehicle. Never play while driving. Keep your eyes on the road and your hands on the wheel. If you are a passenger, enjoy the ride!',color:'#e5c77b',primary:'OK',onPrimary:()=>hideModal('drive')})}}
  else{spdHits=0;if(v<WARN_MS*.5){if(!spdLow)spdLow=nowT;else if(nowT-spdLow>=SPD_REARM_MS)spdArmed=true}else spdLow=0}}
-function onFix(pos){lastFix=Date.now();const acc=pos.coords.accuracy||0;
+function onFix(pos){lastFix=Date.now();try{FREE.real=[pos.coords.longitude,pos.coords.latitude]}catch(e){}if(gotFirst)return;const acc=pos.coords.accuracy||0;
  if(!gotFirst){
   if(!bestFirst||acc<(bestFirst.coords.accuracy||1e9))bestFirst=pos;
   if(acc>ACC_GOOD){   // not accurate enough yet: wait briefly for a better fix, then settle for the best one if it is at least decent
