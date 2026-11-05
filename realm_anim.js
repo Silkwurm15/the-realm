@@ -19,7 +19,7 @@
   var BATTLE_BTN_GLOW = [[300, 1370, 210, 2.2, 0], [740, 1370, 210, 2.2, 1.6]];
   var SCENES = {
     smimic: {
-      src: 'assets/mimic/strong_battle.webp', label: 'Strong Mimic battle', kind: 'battle',
+      src: 'assets/mimic/mimic_strong_battle.webp', label: 'Strong Mimic battle', kind: 'battle',
       sky: [850, 100, 330, '110,170,255'],
       flames: [[85, 295, 120], [985, 405, 95], [120, 470, 55], [230, 595, 45], [915, 548, 55]],
       glows: [{ x: 250, y: 520, r: 420, col: '255,150,60', a: .12, sp: 5 }, { x: 540, y: 440, r: 230, col: '255,40,30', a: .2, sp: 1.6 },
@@ -43,7 +43,7 @@
       log: [165, 1066, 694, 220], btns: [[69, 1320, 434, 111], [526, 1320, 432, 111]]
     },
     knowledge: {
-      src: 'assets/library/library_knowledge.webp', label: 'Knowledge Gained, Multiversal Library', kind: 'knowledge', vig: .1,
+      src: 'assets/library/lib_knowledge.webp', label: 'Knowledge Gained, Multiversal Library', kind: 'knowledge', vig: .1,
       flames: [[22, 1015, 60]],
       glows: [{ x: 510, y: 140, r: 260, col: '170,130,255', a: .34, sp: 1.6 }, { x: 520, y: 300, r: 300, col: '255,225,150', a: .2, sp: 1.3, ph: 1 },
         { x: 170, y: 100, r: 210, col: '120,170,255', a: .2, sp: .7 }, { x: 880, y: 100, r: 210, col: '120,170,255', a: .2, sp: .7, ph: 2 },
@@ -301,7 +301,7 @@
   function knowledgeOff() { if (K) K.root.classList.remove('on'); }
 
   /* decode the art early so the first screen never flashes empty */
-  function preload() { ['assets/mimic/strong_battle.webp', 'assets/mimic/mimic_battle.webp', 'assets/library/library_knowledge.webp'].forEach(function (u) { var i = new Image(); i.src = u; }); }
+  function preload() { ['assets/mimic/mimic_strong_battle.webp', 'assets/mimic/mimic_battle.webp', 'assets/library/lib_knowledge.webp'].forEach(function (u) { var i = new Image(); i.src = u; }); }
   if (document.readyState === 'complete') setTimeout(preload, 300); else addEventListener('load', function () { setTimeout(preload, 300); });
 
   window.RealmAnim = { battle: battle, battleOff: battleOff, knowledge: knowledge, knowledgeOff: knowledgeOff };
