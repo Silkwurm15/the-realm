@@ -2902,7 +2902,9 @@ addEventListener('resize',()=>{if(mode)fit()});labels();sync();
 .scn .stg img,.scn .stg canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 .scn .hot{position:absolute;background:transparent;border:0;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:0}
 #wdDlg{clip-path:polygon(33.2% 34.6%,67.4% 34.6%,78.1% 38.4%,87.4% 40%,87.9% 81.7%,11.7% 81.7%,12.2% 40%,22% 38.4%)}
-#lmOv{background:#07040a}
+#lmOv{background:#07040a;top:calc(max(0px,env(safe-area-inset-top)) + var(--hudh,92px) + 4px);bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:1501;container-type:size;overflow:hidden}   /* sits between the header and the bottom nav, like the battle screen */
+#lmOv::before{content:"";position:absolute;inset:-6%;background:var(--lm-img) center/cover;filter:blur(26px) brightness(.5)}
+#lmOv .stg{width:min(100cqw,calc(100cqh*2/3))}
 #wdOv.bg{z-index:1499;pointer-events:none}
 #wdOv.bg #wdDlg,#wdOv.bg .hot{display:none}
 #wdOv.bg .stg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100vw,calc(100dvh*2/3))}
@@ -3013,10 +3015,12 @@ function lframe(ms){if(!lmOv.classList.contains('open')){lRaf=0;return}
  v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,`rgba(0,0,0,${0.22+0.04*Math.sin(t*9)})`);
  ctx.fillStyle=v;ctx.fillRect(0,0,1024,1536);
  lRaf=requestAnimationFrame(lframe)}
-window.lmOpen=function(cb,k){cur=LM[k==='mimic'?'mimic':'strong'];lmCb=cb||null;parts=[];drops=[];sparks=[];lmOv.setAttribute('aria-label',cur.label);const g=$$('lmGo').style;[g.left,g.top,g.width,g.height]=cur.go.map(v=>v+'%');lmOv.classList.add('open');if(!lRaf)lRaf=requestAnimationFrame(lframe)};
+window.lmOpen=function(cb,k){cur=LM[k==='mimic'?'mimic':'strong'];lmCb=cb||null;parts=[];drops=[];sparks=[];lmOv.setAttribute('aria-label',cur.label);lmOv.style.setProperty('--lm-img','url('+cur.src+')');const g=$$('lmGo').style;[g.left,g.top,g.width,g.height]=cur.go.map(v=>v+'%');lmOv.classList.add('open');if(!lRaf)lRaf=requestAnimationFrame(lframe)};
 window.lmClose=function(){lmOv.classList.remove('open')};
 let lmCb=null;
 $$('lmGo').onclick=()=>{const f=lmCb;lmCb=null;lmClose();if(f)f()};
+/* the footer stays visible under the intro, but the encounter is mandatory: ignore nav taps until the player answers it */
+{const nv=document.querySelector('.bottom-nav');if(nv)['click','pointerdown','touchstart'].forEach(ev=>nv.addEventListener(ev,e=>{if(lmOv.classList.contains('open')){e.stopPropagation();e.preventDefault()}},true))}
 })();
 </script>
 

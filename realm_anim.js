@@ -58,7 +58,7 @@
   function Painter(cv) {
     var ctx = cv.getContext('2d'), sc = null, raf = 0, last = 0, root = null;
     var parts = [], drops = [], sparks = [], motes = [], stars = [], orbs = [];
-    var bt = [0, 0], bd = [0, 0], imgs = {}, dimR = null;
+    var bt = [0, 0], bd = [0, 0], imgs = {}, dimR = null, mergeR = null, mergeC = null, mergeK = '';
 
     function img(s) {
       var i = imgs[s.src];
@@ -69,6 +69,23 @@
     function glint(x, y, r, col, a) { ctx.fillStyle = 'rgba(' + col + ',' + a + ')'; ctx.fillRect(x - r, y - .8, r * 2, 1.6); ctx.fillRect(x - .8, y - r, 1.6, r * 2); }
     function dot(x, y, r, col, a) { ctx.fillStyle = 'rgba(' + col + ',' + a + ')'; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); }
     function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arc(x + w - r, y + r, r, -Math.PI / 2, 0); ctx.lineTo(x + w, y + h - r); ctx.arc(x + w - r, y + h - r, r, 0, Math.PI / 2); ctx.lineTo(x + r, y + h); ctx.arc(x + r, y + h - r, r, Math.PI / 2, Math.PI); ctx.lineTo(x, y + r); ctx.arc(x + r, y + r, r, Math.PI, Math.PI * 1.5); ctx.closePath(); }
+
+    /* one wide button: the art paints two button frames side by side. Keep the left end of the left frame and the right end of the right frame,
+       and stretch a clean strip from the middle of the left frame across everything between, so the pair reads as a single full-width button */
+    function mergeBtn(im) {
+      var A = mergeR[0], B2 = mergeR[1], key = sc.src + '|' + A.join() + '|' + B2.join();
+      if (mergeK !== key) {
+        var cap = Math.round(A[2] * .26), x0 = A[0] + cap, w = (B2[0] + B2[2] - cap) - x0, h = A[3];
+        var sw = Math.round(A[2] * .22), sx = A[0] + Math.round((A[2] - sw) / 2);
+        var c = document.createElement('canvas'); c.width = w; c.height = h; var cc = c.getContext('2d');
+        cc.drawImage(im, sx, A[1], sw, h, 0, 0, w, h);
+        var g = cc.createLinearGradient(0, 0, w, 0), f = Math.min(.1, 16 / w);
+        g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(f, '#000'); g.addColorStop(1 - f, '#000'); g.addColorStop(1, 'rgba(0,0,0,0)');
+        cc.globalCompositeOperation = 'destination-in'; cc.fillStyle = g; cc.fillRect(0, 0, w, h);
+        mergeC = { c: c, x: x0, y: A[1] }; mergeK = key;
+      }
+      ctx.drawImage(mergeC.c, mergeC.x, mergeC.y);
+    }
 
     /* live health bar fill, drawn into the empty trough that is part of the art */
     function bar(b, f, enemy) {
@@ -112,7 +129,7 @@
     function frame(t, dt, level) {
       var s = sc, i, f, k, p, g, im = img(s);
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
-      if (im.complete && im.naturalWidth) ctx.drawImage(im, 0, 0, W, H); else { ctx.fillStyle = '#05040a'; ctx.fillRect(0, 0, W, H); }
+      if (im.complete && im.naturalWidth) { ctx.drawImage(im, 0, 0, W, H); if (mergeR) mergeBtn(im); } else { ctx.fillStyle = '#05040a'; ctx.fillRect(0, 0, W, H); }
       if (s.bars) { bar(s.bars[0], bd[0], true); bar(s.bars[1], bd[1], false); }
       if (!level) { ctx.globalCompositeOperation = 'source-over'; if (dimR) { rr(dimR[0] + 6, dimR[1] + 8, dimR[2] - 12, dimR[3] - 16, 18); ctx.fillStyle = 'rgba(8,2,2,.62)'; ctx.fill(); } return; }
       ctx.globalCompositeOperation = 'lighter';
@@ -166,6 +183,7 @@
       },
       bars: function (e, p, snap) { bt[0] = Math.max(0, Math.min(1, e)); bt[1] = Math.max(0, Math.min(1, p)); if (snap) { bd[0] = bt[0]; bd[1] = bt[1]; } },
       dim: function (r) { dimR = r || null; },
+      merge: function (r) { mergeR = r || null; },
       start: kick, redraw: function () { if (!raf) still(); }
     };
   }
@@ -248,7 +266,8 @@
         el.className = 'ra-b'; el.disabled = false; setText(el, d[0]); el.setAttribute('aria-label', d[0]);
         el.onclick = function () { b.b.forEach(function (x) { x.disabled = true; }); d[1](); };
       });
-      b.p.dim(btns.length < 2 ? s.btns[1] : null);
+      if (btns.length < 2) { var l0 = s.btns[0], r0 = s.btns[1]; pos(b.b[0], l0[0], l0[1], r0[0] + r0[2] - l0[0], l0[3]); }
+      b.p.dim(null); b.p.merge(btns.length < 2 ? s.btns : null);
       cbt.classList.add('ra-on'); b.root.classList.add('on');
       b.tMax = 5.2; b.fitAll(); b.p.start(); b.p.redraw();
       return true;
