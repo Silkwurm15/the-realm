@@ -254,7 +254,7 @@ html.hc .mk .badge svg{width:24px;height:24px}
 .skc[data-skin]:not([data-skin="door"])::before,.skc[data-skin]:not([data-skin="door"])::after{content:"";position:absolute;top:0;bottom:0;left:auto;right:auto;border:0;border-radius:0;font-size:0;color:transparent;pointer-events:none;background-repeat:repeat-y;background-position:0 0;background-size:100% auto}
 .skc[data-skin]:not([data-skin="door"])::before{left:calc(var(--w)*var(--bl)*-1);width:calc(var(--w)*var(--lsw));background-image:var(--ls)}
 .skc[data-skin]:not([data-skin="door"])::after{right:calc(var(--w)*var(--br)*-1);width:calc(var(--w)*var(--rsw));background-image:var(--rs)}
-.skc[data-skin="door"],#riftOv .rfb.skc[data-skin="door"]{--w:min(380px,calc(100vw - 28px));box-sizing:border-box;width:var(--w);max-width:none;max-height:none;margin:auto;border-style:solid;border-color:transparent;border-radius:0;border-width:calc(var(--w)*.2886) calc(var(--w)*.0606) calc(var(--w)*.075) calc(var(--w)*.0606);border-image:url(assets/wd_frame.webp) 200 42 52 42/calc(var(--w)*.2886) calc(var(--w)*.0606) calc(var(--w)*.075) calc(var(--w)*.0606) round;padding:2px calc(var(--w)*.015) calc(var(--w)*.02);background:url(assets/wd_tex.webp) 0 0/calc(var(--w)*.46) auto repeat;background-clip:padding-box;background-origin:padding-box;box-shadow:none;overflow:visible;filter:drop-shadow(0 10px 22px rgba(0,0,0,.65))}
+.skc[data-skin="door"],#riftOv .rfb.skc[data-skin="door"]{--w:min(380px,calc(100vw - 28px));box-sizing:border-box;width:var(--w);max-width:none;max-height:none;margin:auto;border-style:solid;border-color:transparent;border-radius:0;border-width:calc(var(--w)*.2886) calc(var(--w)*.0606) calc(var(--w)*.075) calc(var(--w)*.0606);border-image:url(assets/door/wd_frame.webp) 200 42 52 42/calc(var(--w)*.2886) calc(var(--w)*.0606) calc(var(--w)*.075) calc(var(--w)*.0606) round;padding:2px calc(var(--w)*.015) calc(var(--w)*.02);background:url(assets/door/wd_tex.webp) 0 0/calc(var(--w)*.46) auto repeat;background-clip:padding-box;background-origin:padding-box;box-shadow:none;overflow:visible;filter:drop-shadow(0 10px 22px rgba(0,0,0,.65))}
 .skc[data-skin] .m-icon,.skc[data-skin] .rfi,.skc[data-skin] .rfw,#riftOv .skc[data-skin] .rfi,#riftOv .skc[data-skin] .rfw{display:none}
 .skc[data-skin] #mTitle,.skc[data-skin] .rft,#riftOv .skc[data-skin] .rft{margin:0;font:700 24px/1.15 Georgia,serif;color:#f6e8c1;text-shadow:0 2px 3px #000,0 0 14px rgba(255,214,120,.4);text-align:center}
 .skc[data-skin="door"] .rft,#riftOv .skc[data-skin="door"] .rft{font-size:26px;font-weight:700;color:#f6e3b0;margin-top:2px}
@@ -296,13 +296,13 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #riftOv .skc[data-skin="sat"] .rft{margin-top:calc(var(--w)*-0.0705);font-size:27px;color:#f3dfa0;text-shadow:0 2px 3px #000,0 0 16px rgba(255,200,90,.45)}#riftOv .skc[data-skin="sat"] .rfl{margin:10px 0 6px;text-align:center}#riftOv .skc[data-skin="sat"] #rfC button{width:calc(100% + var(--w)*.1);margin:2px calc(var(--w)*-.05) 0;font-size:22px;color:#f6e3a8}
 #riftOv .skc[data-skin="qc"] .rft{margin-top:calc(var(--w)*-0.0717);font-size:27px;color:#f3dfa0;text-shadow:0 2px 3px #000,0 0 16px rgba(255,200,90,.45)}#riftOv .skc[data-skin="qc"] .rfl{margin:10px 0 6px;text-align:center}#riftOv .skc[data-skin="qc"] #rfC button{width:calc(100% + var(--w)*.1);margin:2px calc(var(--w)*-.05) 0;font-size:22px;color:#f6e3a8}#riftOv .skc[data-skin="qc"] .rfx{font:700 19px/1.2 Georgia,serif;color:#f0d78c;margin:2px 0 10px}#riftOv .skc[data-skin="qc"] .rfx::after{content:"";display:block;margin:6px auto 0;width:calc(var(--w)*.62);height:calc(var(--w)*.075);background:var(--div) center/100% 100% no-repeat}
 /* /SKIN-SAT-QC */
-.skc[data-skin="door"]{--bh:0.135;--bh2:.07;--dw:0.62;--dh:0.0492;--div:url(assets/wd_div.webp)}
+.skc[data-skin="door"]{--bh:0.135;--bh2:.07;--dw:0.62;--dh:0.0492;--div:url(assets/door/wd_div.webp)}
 /* Whispering Door riddle: painted buttons (3-slice border-image) in different colours */
-#riftOv .skc[data-skin="door"] #rfC button{--bi:url(assets/wd_btn_teal.webp);--sl:102;--sr:100;--cl:.1721;--cr:.1688;min-height:calc(var(--w)*.135);margin:7px 0 0;padding:2px 0;border-style:solid;border-color:transparent;border-width:0 calc(var(--w)*var(--cr)) 0 calc(var(--w)*var(--cl));border-image:var(--bi) 0 var(--sr) 0 var(--sl) fill/0 calc(var(--w)*var(--cr)) 0 calc(var(--w)*var(--cl)) round;background:none;font-size:19px}
-#riftOv .skc[data-skin="door"] #rfC button:nth-child(4n+1){--bi:url(assets/wd_btn_red.webp);--sl:89;--sr:83;--cl:.1502;--cr:.1401}
-#riftOv .skc[data-skin="door"] #rfC button:nth-child(4n+3){--bi:url(assets/wd_btn_purple.webp)}
-#riftOv .skc[data-skin="door"] #rfC button.alt{--bi:url(assets/wd_btn_green.webp)}
-#riftOv .skc[data-skin="door"] #rfC button.alt:last-child{--bi:url(assets/wd_btn_grey.webp)}
+#riftOv .skc[data-skin="door"] #rfC button{--bi:url(assets/door/wd_btn_teal.webp);--sl:102;--sr:100;--cl:.1721;--cr:.1688;min-height:calc(var(--w)*.135);margin:7px 0 0;padding:2px 0;border-style:solid;border-color:transparent;border-width:0 calc(var(--w)*var(--cr)) 0 calc(var(--w)*var(--cl));border-image:var(--bi) 0 var(--sr) 0 var(--sl) fill/0 calc(var(--w)*var(--cr)) 0 calc(var(--w)*var(--cl)) round;background:none;font-size:19px}
+#riftOv .skc[data-skin="door"] #rfC button:nth-child(4n+1){--bi:url(assets/door/wd_btn_red.webp);--sl:89;--sr:83;--cl:.1502;--cr:.1401}
+#riftOv .skc[data-skin="door"] #rfC button:nth-child(4n+3){--bi:url(assets/door/wd_btn_purple.webp)}
+#riftOv .skc[data-skin="door"] #rfC button.alt{--bi:url(assets/door/wd_btn_green.webp)}
+#riftOv .skc[data-skin="door"] #rfC button.alt:last-child{--bi:url(assets/door/wd_btn_grey.webp)}
 
 /* title cards are tappable; the equipped title shows in the top bar under the name */
 .tap{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}.tap:active{filter:brightness(1.18)}.tap:focus-visible{outline:2px solid #e5c77b;outline-offset:2px}
@@ -1233,20 +1233,20 @@ async function gatherNature(it){const pre=H().hp,r=await useMarker(it,()=>act('n
  try{const h=H(),mx=stats().hp;if(h&&h.hp<mx&&h.hp<=pre+.5){const add=Math.max(1,Math.round(mx*.05)),before=h.hp;h.hp=Math.min(mx,h.hp+add);upDown();save();hud();lines.push('+'+Math.round(h.hp-before)+' HP')}}catch(e){console.warn('nature heal',e)}
  try{Sound.sfx(H().hp>pre+.5?'nature_heal':'nature_plain')}catch(e){}
  return lines}   // the rewards are shown on the Nature Discovery result screen (stays until Continue), not as a vanishing toast
-/* ---------- Nature Discovery screens: two animated full-art screens (assets/nature_discovery.webp, assets/nature_found.webp) ----------
+/* ---------- Nature Discovery screens: two animated full-art screens (assets/nature/nature_discovery.webp, assets/nature/nature_found.webp) ----------
    Screen 1 replaces the old pop-up box (Gather / Close). Screen 2 replaces the toast that vanished: it stays until the player taps Continue.
    Both fill the area between the player header and the footer buttons. Effects are drawn live over the painted art. */
 const NAT={el:null,v:[],raf:0,last:0,it:null,state:'idle',open:false,rm:!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)};
 const NAT_W=1024,NAT_H=1536;
 const NAT_VIEWS=[
- {id:'ask',img:'assets/nature_discovery.webp',panel:[150,540,880,1190],
+ {id:'ask',img:'assets/nature/nature_discovery.webp',panel:[150,540,880,1190],
   zones:[{z:'go',x:225,y:872,w:580,h:116,pri:1,l:'Gather'},{z:'close',x:225,y:1038,w:575,h:84,l:'Close'}],
   rays:{x:350,y:110,a0:.15,a1:1.45,n:7,len:1500,al:.13},
   glows:[{x:512,y:400,r:150,c:'150,255,110',a:.30,sp:1.4},{x:350,y:110,r:280,c:'255,240,170',a:.24,sp:.7},{x:94,y:486,r:48,c:'170,255,120',a:.55,sp:3},{x:960,y:628,r:48,c:'170,255,120',a:.55,sp:2.6},{x:72,y:935,r:48,c:'170,255,120',a:.55,sp:3.4}],
   orbit:{x:512,y:400,r:122,n:5},
   gems:[[158,465],[868,465],[145,1182],[866,1182],[512,305],[512,1230],[512,680]],
   flies:26,leaves:7,mist:[{x0:885,x1:985,y0:360,y1:1090,n:26}],glints:{x0:560,x1:900,y0:1320,y1:1430,n:7}},
- {id:'found',img:'assets/nature_found.webp',panel:[100,830,930,1340],
+ {id:'found',img:'assets/nature/nature_found.webp',panel:[100,830,930,1340],
   zones:[{z:'cont',x:230,y:1208,w:570,h:108,pri:1,l:'Continue'}],
   rays:{x:930,y:20,a0:1.7,a1:2.85,n:7,len:1500,al:.14},
   glows:[{x:640,y:210,r:240,c:'150,255,70',a:.30,sp:1.2},{x:512,y:786,r:120,c:'150,255,110',a:.30,sp:1.4},{x:900,y:80,r:280,c:'255,240,170',a:.22,sp:.6}],
@@ -2249,7 +2249,7 @@ $('chaosButton').addEventListener('click',chaosOpen);
 var PT={el:null,open:false,state:'idle',it:null,raf:0,timers:[],boost:1,last:0,room:null};
 const PT_MUSIC={beast:'battle_rift'};   // rooms with their own track. Any room not listed keeps the map music.
 const PT_CSS=`
-#portalOv{--void:#05040a;--cyan:#4fe3ff;--violet:#8a5cff;--img:url("assets/rift_portal.jpg");position:fixed;inset:0;z-index:1490;display:none;opacity:0;transition:opacity .55s ease;background:var(--void);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden;font-family:Cinzel,Georgia,serif;color-scheme:dark}
+#portalOv{--void:#05040a;--cyan:#4fe3ff;--violet:#8a5cff;--img:url("assets/rift/rift_portal.jpg");position:fixed;inset:0;z-index:1490;display:none;opacity:0;transition:opacity .55s ease;background:var(--void);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden;font-family:Cinzel,Georgia,serif;color-scheme:dark}
 #portalOv.on{opacity:1}
 #portalOv *,#portalOv *::before,#portalOv *::after{box-sizing:border-box}
 #portalOv .ptScene{position:absolute;inset:0;perspective:1200px;display:grid;grid-template:minmax(0,1fr)/minmax(0,1fr);place-items:center}
@@ -2432,12 +2432,12 @@ function rfDraw(o){try{wdBg(!!window.wdBgNext||o.skin==='door')}catch(e){}window
  const c=$('rfC');c.innerHTML='';(o.btns||[]).forEach(b=>{const x=document.createElement('button');x.innerHTML=b.html;if(b.alt)x.className='alt';x.onclick=()=>{c.querySelectorAll('button').forEach(y=>y.disabled=true);b.fn()};if(b.dis)x.disabled=true;c.appendChild(x)});rf.style.display='flex'}
 const rfClose=()=>{rf.style.display='none';try{if(Sound.now()!=='map')Sound.music('map')}catch(e){}try{ptHide(false)}catch(e){}hud();try{if(inv.classList.contains('open'))invRender()}catch(e){}};
 const esc=t=>String(t).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-/* ---- Multiversal Library animated scene (assets/lib_a_*): flapping books, aura, gems, sparkles. Respects Settings fx low/off + reduced motion. ---- */
+/* ---- Multiversal Library animated scene (assets/library/lib_a_*): flapping books, aura, gems, sparkles. Respects Settings fx low/off + reduced motion. ---- */
 const LibFX=(function(){
  const KEY=[6,28,58,86,96,74,58,90,62,26,6],HUES=[0,0,-35,40,150],CW=360,CH=290,K=2,TW=180,TH=210;
  let COVER,COVERM,PAGES,ready=null,list=[],W=0,H=0,run=false,raf=0,spT=0,stage=null,last=0,books=null,sp=null;
  const load=u=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=u});
- function assets(){return ready||(ready=Promise.all([load('assets/lib_a_cover.jpg'),load('assets/lib_a_pages.jpg')]).then(([c,p])=>{if(!c||!p){ready=null;return false}COVER=c;PAGES=p;const m=document.createElement('canvas');m.width=TW;m.height=TH;const x=m.getContext('2d');x.translate(TW,0);x.scale(-1,1);x.drawImage(c,0,0,TW,TH);COVERM=m;return true}))}
+ function assets(){return ready||(ready=Promise.all([load('assets/library/lib_a_cover.jpg'),load('assets/library/lib_a_pages.jpg')]).then(([c,p])=>{if(!c||!p){ready=null;return false}COVER=c;PAGES=p;const m=document.createElement('canvas');m.width=TW;m.height=TH;const x=m.getContext('2d');x.translate(TW,0);x.scale(-1,1);x.drawImage(c,0,0,TW,TH);COVERM=m;return true}))}
  const theta=ph=>{const x=ph*10,i=Math.min(9,Math.floor(x)),f=x-i,e=(1-Math.cos(f*Math.PI))/2;return KEY[i]+(KEY[i+1]-KEY[i])*e};
  function Book(){const c=document.createElement('canvas');c.width=CW;c.height=CH;c.className='lb-bk';books.appendChild(c);return{c,x:c.getContext('2d')}}
  function sheet(ctx,s,beta,len,shade){const r=beta*Math.PI/180,tx=s*Math.sin(r)*len,ty=Math.cos(r)*len;
@@ -2482,13 +2482,13 @@ const LibFX=(function(){
    run=true;last=performance.now();raf=requestAnimationFrame(frame);spT=setInterval(spark,low?320:120)})}
  return{start,stop,assets}})();
 const LIBG=[[51.3,15.4,30,'190,150,255',4,0],[35.2,16.3,12,'110,190,255',3.2,.4],[65.9,19.9,12,'200,120,255',3.6,1],[64.5,14,5,'255,170,80',2.4,.2],[25.6,21.4,5,'255,170,80',2.8,.9],[49.3,26,26,'255,215,140',3.4,.3],[87.9,13,14,'160,200,255',5,.5],[12.7,86,20,'110,180,255',3.8,.2],[91.8,90.2,16,'255,200,120',3.1,1.1],[95.2,49.8,12,'210,120,255',2.9,.7],[8.8,4.6,13,'110,170,255',4.2,.1],[16.6,13,10,'255,200,120',3.3,1.4],[4.9,64.5,12,'255,190,110',3.7,.6],[73.2,8.8,9,'255,200,120',2.7,.3],[5.9,70,16,'190,110,255',2.6,.9],[94.7,60,16,'190,110,255',3,.2],[23.4,51.4,6,'150,210,255',2.4,0],[23.4,60.2,6,'150,210,255',2.4,.8],[23.4,68.7,6,'150,210,255',2.4,1.6],[49.8,84,8,'150,210,255',2.8,.4],[48.6,8.1,6,'150,210,255',2.6,1.2],[49.3,32.9,6,'150,210,255',2.2,.9]];
-const LIBA_HTML='<img class="lb-bg" alt="" src="assets/lib_a_full.webp"><div class="lb-gal"></div><div class="lb-beam"></div>'+LIBG.map(g=>'<div class="lb-g" style="left:'+g[0]+'%;top:'+g[1]+'%;width:'+g[2]+'%;--c:'+g[3]+';--p:'+g[4]+'s;--d:'+g[5]+'s"></div>').join('')+'<div class="lb-sp"></div>';
+const LIBA_HTML='<img class="lb-bg" alt="" src="assets/library/lib_a_full.webp"><div class="lb-gal"></div><div class="lb-beam"></div>'+LIBG.map(g=>'<div class="lb-g" style="left:'+g[0]+'%;top:'+g[1]+'%;width:'+g[2]+'%;--c:'+g[3]+';--p:'+g[4]+'s;--d:'+g[5]+'s"></div>').join('')+'<div class="lb-sp"></div>';
 function libStage(card,on){const old=card.querySelector('#libA');
  if(on){let a=old;if(!a){a=document.createElement('div');a.id='libA';a.innerHTML=LIBA_HTML;card.insertBefore(a,card.firstChild)}LibFX.start(a)}
  else if(old){LibFX.stop();old.remove()}}
 const LIB_ORDER=[6,1,2,3,4,5];
 function libNext(){let i=0;try{i=(+localStorage.getItem('realm_lib')||0)%LIB_ORDER.length}catch(e){}try{localStorage.setItem('realm_lib',String((i+1)%LIB_ORDER.length))}catch(e){}return LIB_ORDER[i]}
-function rfRoom(room){if(room&&room.id==='library'){const n=libNext(),dec=u=>{const im=new Image();im.src=u;return im.decode?im.decode():Promise.resolve()};Promise.race([n===6?dec('assets/lib_a_full.webp'):dec('assets/lib_'+n+'.webp'),new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{window.__libN=n;rfRoom0(room)})}else rfRoom0(room)}
+function rfRoom(room){if(room&&room.id==='library'){const n=libNext(),dec=u=>{const im=new Image();im.src=u;return im.decode?im.decode():Promise.resolve()};Promise.race([n===6?dec('assets/library/lib_a_full.webp'):dec('assets/library/lib_'+n+'.webp'),new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{window.__libN=n;rfRoom0(room)})}else rfRoom0(room)}
 function rfRoom0(room){if(room&&room.id==='wild'&&room.choices&&room.choices.length&&window.wrOpen){try{rf.style.display='none';wrOpen(room,id=>riftPick(id));return}catch(e){}}try{if(room&&room.id==='beast'&&!PT.open)Sound.music('battle_rift')}catch(e){}rfDraw({skin:room.id==='library'?null:({beast:'creature',temptation:'tempt',trap:'trap',cursed:'cursed',shrine:'shrine',gambler:'gambler',wild:'rift'})[room.id]||'rift',lib:room.id==='library'?(window.__libN||1):0,icon:room.icon,title:room.name,wild:room.wild&&room.wild.name,text:(room.text||'')+(room.wild?'\n'+room.wild.text:''),
  btns:((room.choices&&room.choices.length)?room.choices:[{id:'__leave',label:'Leave the rift'}]).map(c=>{const o=c.fight?(c.odds?'You should win this':'You would likely lose'):c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':''),sub=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' · ');return{html:esc(c.label)+(sub?'<small>'+esc(sub)+'</small>':''),dis:c.afford===false,fn:c.id==='__leave'?rfClose:()=>riftPick(c.id)}})})}
 async function riftPick(id){const r=await act('rift',{op:'pick',pick:id});
@@ -2520,8 +2520,8 @@ function syncSlm(){if(slmBusy||!window.realmCloud||!S||S.tutDone===false||!targe
  const now=Date.now();if(slmLL&&now-slmT<6e5&&dist(slmLL,targetLL)<400)return;   // ask the server again every 10 minutes, or after moving 400 m
  const cands=gatherCands();if(!cands.length)return;slmBusy=true;slmT=now;slmLL=targetLL.slice();
  act('slm',{op:'sync',ll:targetLL,cands,quiet:true}).finally(()=>{slmBusy=false;try{drawSlm()}catch(e){}})}
-const SLM_IMG={"tree": "assets/slumber/slm_img_tree.webp", "giver": "assets/slumber/slm_img_giver.webp", "asleep": "assets/slumber/slm_img_asleep.webp", "awake": "assets/slumber/slm_img_awake.webp", "boulder": "assets/slumber/slm_img_boulder.webp", "shrine": "assets/slumber/slm_img_shrine.webp", "camp": "assets/slumber/slm_img_camp.webp", "bridge": "assets/slumber/slm_img_bridge.webp", "meadow": "assets/slumber/slm_img_meadow.webp", "cabin": "assets/cabin.webp", "cliff": "assets/cliff.webp", "watchtower": "assets/watchtower.webp", "cave": "assets/cave.webp", "reveal": "assets/reveal.webp"};
-(function(){const st=document.createElement('style');st.textContent='#riftOv .rfb.slm{padding:0 0 16px;border:2px solid #d6a84a;border-radius:14px;background:#0b1730;box-shadow:0 14px 50px #000c,0 0 0 3px #050a16,0 0 0 4px #7a5f26;overflow-y:auto}#riftOv .rfb.slm>*:not(#rfImg){margin-left:16px;margin-right:16px}#riftOv .rfb.slm #rfImg{width:100%;height:176px;object-fit:cover;border-radius:12px 12px 0 0;border-bottom:1px solid #d6a84a88;margin:0 0 12px}#riftOv .slm .rfi:empty{display:none}#riftOv .slm .rft{display:flex;align-items:center;justify-content:center;gap:8px;color:#f3d98b;letter-spacing:.03em}#riftOv .slm .rft::before{content:"";width:30px;height:34px;flex:none;background:url(assets/rft_background.webp) center/contain no-repeat}#riftOv .slm .rfx,#riftOv .slm .rfl{color:#e9e4d4}#riftOv .slm button{border-radius:999px;border:1.5px solid #d6a84a;background:linear-gradient(#2a6bd6,#143a86);color:#fff;letter-spacing:.04em;box-shadow:inset 0 1px 0 #ffffff44}#riftOv .slm button.alt{background:#0c1731;border-color:#3b4f7d;color:#9fb0cc}#riftOv .slm button small{color:#cfe0ff}';document.head.appendChild(st)})();
+const SLM_IMG={"tree": "assets/slumber/slm_img_tree.webp", "giver": "assets/slumber/slm_img_giver.webp", "asleep": "assets/slumber/slm_img_asleep.webp", "awake": "assets/slumber/slm_img_awake.webp", "boulder": "assets/slumber/slm_img_boulder.webp", "shrine": "assets/slumber/slm_img_shrine.webp", "camp": "assets/slumber/slm_img_camp.webp", "bridge": "assets/slumber/slm_img_bridge.webp", "meadow": "assets/slumber/slm_img_meadow.webp", "cabin": "assets/slumber/cabin.webp", "cliff": "assets/slumber/cliff.webp", "watchtower": "assets/slumber/watchtower.webp", "cave": "assets/slumber/cave.webp", "reveal": "assets/slumber/reveal.webp"};
+(function(){const st=document.createElement('style');st.textContent='#riftOv .rfb.slm{padding:0 0 16px;border:2px solid #d6a84a;border-radius:14px;background:#0b1730;box-shadow:0 14px 50px #000c,0 0 0 3px #050a16,0 0 0 4px #7a5f26;overflow-y:auto}#riftOv .rfb.slm>*:not(#rfImg){margin-left:16px;margin-right:16px}#riftOv .rfb.slm #rfImg{width:100%;height:176px;object-fit:cover;border-radius:12px 12px 0 0;border-bottom:1px solid #d6a84a88;margin:0 0 12px}#riftOv .slm .rfi:empty{display:none}#riftOv .slm .rft{display:flex;align-items:center;justify-content:center;gap:8px;color:#f3d98b;letter-spacing:.03em}#riftOv .slm .rft::before{content:"";width:30px;height:34px;flex:none;background:url(assets/rift/rft_background.webp) center/contain no-repeat}#riftOv .slm .rfx,#riftOv .slm .rfl{color:#e9e4d4}#riftOv .slm button{border-radius:999px;border:1.5px solid #d6a84a;background:linear-gradient(#2a6bd6,#143a86);color:#fff;letter-spacing:.04em;box-shadow:inset 0 1px 0 #ffffff44}#riftOv .slm button.alt{background:#0c1731;border-color:#3b4f7d;color:#9fb0cc}#riftOv .slm button small{color:#cfe0ff}';document.head.appendChild(st)})();
 function slmDraw(o){rfDraw({slm:1,icon:'',...o})}
 function slmIntro(it){slmDraw({img:SLM_IMG.giver,title:'Lost in Slumber',text:'Townfolk:\n“Adventurer! Thank the gods you\'ve come. Titan Ulfur has vanished!”\n\n“He\'s a mighty warrior, a slayer of beasts, a breaker of armies. But lately, he\'s been seen wandering into the strangest places…”',btns:[{html:'Accept Quest',fn:()=>{rf.style.display='none';slmAccept(it)}},{html:'Not now',alt:1,fn:sqClose}]})}
 async function slmAccept(it){if(it.used||it.busy)return;it.busy=true;let r;try{r=await useMarker(it,()=>act('quest',{op:'start',t:'slumber',key:it.key,ll:targetLL,cands:gatherCands()}))}finally{it.busy=false}
@@ -2761,8 +2761,8 @@ next()})}catch(e){}})();
 </script>
 <script>
 /* preload chest art so Treasure Chest -> Chest Opened flips with no blank frame */
-setTimeout(function(){[1,2,3,4,5].forEach(function(n){var i=new Image();i.src='assets/lib_'+n+'.webp'})},3000);
-setTimeout(function(){['assets/lib_a_full.webp'].forEach(function(u){var i=new Image();i.src=u})},3500);
+setTimeout(function(){[1,2,3,4,5].forEach(function(n){var i=new Image();i.src='assets/library/lib_'+n+'.webp'})},3000);
+setTimeout(function(){['assets/library/lib_a_full.webp'].forEach(function(u){var i=new Image();i.src=u})},3500);
 window.TC_PRE=['assets/loot/tc_chest.webp','assets/loot/tc_loot.webp'].map(function(u){var i=new Image();i.src=u;return i.decode?i.decode().catch(function(){}):Promise.resolve()});
 </script>
 <style id="chestArt">
@@ -2797,7 +2797,7 @@ window.TC_PRE=['assets/loot/tc_chest.webp','assets/loot/tc_loot.webp'].map(funct
 /* chest art modal: leave the player header and footer buttons showing */
 #modal.art{top:calc(max(0px,env(safe-area-inset-top)) + var(--hudh) + 2px);bottom:calc(72px + env(safe-area-inset-bottom));padding:0;background:#0a0806}
 @media(min-width:700px){#modal.art{top:calc(var(--hudh) + 2px);left:50%;right:auto;width:min(700px,90vw);transform:translateX(-50%)}}
-/* Multiversal Library: rotating full-art popups (assets/lib_1..5.webp). The art is an empty frame; live text + buttons sit inside it. */
+/* Multiversal Library: rotating full-art popups (assets/library/lib_1..5.webp). The art is an empty frame; live text + buttons sit inside it. */
 #riftOv .rfb.libx{--w:min(calc(100vw - 12px),460px);position:relative;box-sizing:border-box;width:var(--w);max-width:none;max-height:none;aspect-ratio:var(--ar);margin:auto;overflow:visible;border:0;border-radius:0;background:none;box-shadow:none;padding:calc(var(--w)*var(--pt)) calc(var(--w)*var(--pr)) 0 calc(var(--w)*var(--pl));text-align:center;color:var(--tx)}
 #riftOv .rfb.libx::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:var(--img) center/100% 100% no-repeat;-webkit-mask-image:linear-gradient(to right,transparent,#000 4%,#000 96%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 96%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 4%,#000 96%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 96%,transparent);mask-composite:intersect}
 #riftOv .rfb.libx>*{position:relative;z-index:1}#riftOv .rfb.libx .rfi,#riftOv .rfb.libx #rfImg,#riftOv .rfb.libx .rfw{display:none!important}
@@ -2807,15 +2807,15 @@ window.TC_PRE=['assets/loot/tc_chest.webp','assets/loot/tc_loot.webp'].map(funct
 #riftOv .rfb.libx #rfC button{display:block;width:100%;box-sizing:border-box;margin:0;padding:calc(var(--w)*.013) calc(var(--w)*.03);font:700 calc(var(--w)*.036)/1.15 Georgia,serif;color:var(--bl);background:var(--bb);border:1.5px solid var(--bd);border-radius:12px;box-shadow:0 0 calc(var(--w)*.02) var(--gl),inset 0 1px 0 #ffffff40;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #riftOv .rfb.libx #rfC button small{display:block;margin-top:2px;font:400 calc(var(--w)*.026)/1.15 Georgia,serif;color:var(--sb);opacity:.95}
 #riftOv .rfb.libx #rfC button:active{filter:brightness(1.15)}#riftOv .rfb.libx #rfC button:disabled{opacity:.5}
-#riftOv .rfb.libx[data-lib="1"]{--img:url(assets/lib_1.webp);--ar:0.9691;--pl:0.1519;--pr:0.1434;--pt:0.2295;--tt:#f3dc9d;--tx:#f3ead2;--bb:linear-gradient(#1d56b3,#0b2a64);--bd:#d8ab52;--gl:#3b8bff66;--bl:#fff4d8;--sb:#bcd3ff}
-#riftOv .rfb.libx[data-lib="2"]{--img:url(assets/lib_2.webp);--ar:0.9691;--pl:0.1562;--pr:0.1434;--pt:0.2295;--tt:#eab0ff;--tx:#f1e6ff;--bb:linear-gradient(#7d2fc2,#3d1068);--bd:#d9b9ff;--gl:#b45cff66;--bl:#ffffff;--sb:#e2c8ff}
-#riftOv .rfb.libx[data-lib="3"]{--img:url(assets/lib_3.webp);--ar:0.7933;--pl:0.1843;--pr:0.1796;--pt:0.2810;--tt:#f5e3a6;--tx:#e9f6d9;--bb:linear-gradient(#319633,#135619);--bd:#e2bb5c;--gl:#5bd35b55;--bl:#fffbe6;--sb:#c9efc0}
-#riftOv .rfb.libx[data-lib="4"]{--img:url(assets/lib_4.webp);--ar:0.8566;--pl:0.2200;--pr:0.2113;--pt:0.2562;--tt:#ffe0ae;--tx:#ffe5d8;--bb:linear-gradient(#a81515,#4e0707);--bd:#e6b9ad;--gl:#ff463a55;--bl:#fff0e6;--sb:#ffc3b5}
-#riftOv .rfb.libx[data-lib="5"]{--img:url(assets/lib_5.webp);--ar:0.8194;--pl:0.1882;--pr:0.1745;--pt:0.2767;--tt:#4a3416;--tx:#2f2819;--bb:linear-gradient(#fffefb,#e9e2d2);--bd:#c9a24d;--gl:#d9b45b66;--bl:#2a2010;--sb:#6d5c3a}
+#riftOv .rfb.libx[data-lib="1"]{--img:url(assets/library/lib_1.webp);--ar:0.9691;--pl:0.1519;--pr:0.1434;--pt:0.2295;--tt:#f3dc9d;--tx:#f3ead2;--bb:linear-gradient(#1d56b3,#0b2a64);--bd:#d8ab52;--gl:#3b8bff66;--bl:#fff4d8;--sb:#bcd3ff}
+#riftOv .rfb.libx[data-lib="2"]{--img:url(assets/library/lib_2.webp);--ar:0.9691;--pl:0.1562;--pr:0.1434;--pt:0.2295;--tt:#eab0ff;--tx:#f1e6ff;--bb:linear-gradient(#7d2fc2,#3d1068);--bd:#d9b9ff;--gl:#b45cff66;--bl:#ffffff;--sb:#e2c8ff}
+#riftOv .rfb.libx[data-lib="3"]{--img:url(assets/library/lib_3.webp);--ar:0.7933;--pl:0.1843;--pr:0.1796;--pt:0.2810;--tt:#f5e3a6;--tx:#e9f6d9;--bb:linear-gradient(#319633,#135619);--bd:#e2bb5c;--gl:#5bd35b55;--bl:#fffbe6;--sb:#c9efc0}
+#riftOv .rfb.libx[data-lib="4"]{--img:url(assets/library/lib_4.webp);--ar:0.8566;--pl:0.2200;--pr:0.2113;--pt:0.2562;--tt:#ffe0ae;--tx:#ffe5d8;--bb:linear-gradient(#a81515,#4e0707);--bd:#e6b9ad;--gl:#ff463a55;--bl:#fff0e6;--sb:#ffc3b5}
+#riftOv .rfb.libx[data-lib="5"]{--img:url(assets/library/lib_5.webp);--ar:0.8194;--pl:0.1882;--pr:0.1745;--pt:0.2767;--tt:#4a3416;--tx:#2f2819;--bb:linear-gradient(#fffefb,#e9e2d2);--bd:#c9a24d;--gl:#d9b45b66;--bl:#2a2010;--sb:#6d5c3a}
 @media(min-width:700px){#riftOv .rfb.libx{--w:460px}}
-/* Library scene 6 = animated FULL-SCREEN art (assets/lib_a_full.webp): empty text area + ornate button plates; live text and buttons sit on top. */
+/* Library scene 6 = animated FULL-SCREEN art (assets/library/lib_a_full.webp): empty text area + ornate button plates; live text and buttons sit on top. */
 #riftOv.liba{overflow:hidden;background:#0b0618;inset:calc(var(--hudh) + 8px) 0 calc(72px + env(safe-area-inset-bottom,0px)) 0;padding:0;container-type:size}   /* sits BETWEEN the header (HUD) and the bottom nav */
-#riftOv.liba::before{content:'';position:absolute;inset:-5%;z-index:0;pointer-events:none;background:url(assets/lib_a_full.webp) center/cover;filter:blur(24px) brightness(.5)}
+#riftOv.liba::before{content:'';position:absolute;inset:-5%;z-index:0;pointer-events:none;background:url(assets/library/lib_a_full.webp) center/cover;filter:blur(24px) brightness(.5)}
 #riftOv.liba>.rfb{z-index:1}
 #riftOv .rfb.libx[data-lib="6"]{--w:max(100vw,calc(100vh*2/3));--w:max(100vw,calc(100dvh*2/3));--w:max(100cqw,calc(100cqh*2/3));--ar:.6667;position:absolute;left:50%;top:50%;translate:-50% -50%;margin:0;padding:0;flex:none;transform-origin:50% 40%;animation:lbBreathe 20s ease-in-out infinite alternate}
 @media(min-aspect-ratio:3/4){#riftOv .rfb.libx[data-lib="6"]{--w:min(100vw,calc(100vh*2/3));--w:min(100vw,calc(100dvh*2/3));--w:min(100cqw,calc(100cqh*2/3))}}
@@ -2910,7 +2910,7 @@ addEventListener('resize',()=>{if(mode)fit()});labels();sync();
 #wdOv.bg .stg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100vw,calc(100dvh*2/3))}
 </style>
 <div class="scn" id="wdOv" role="dialog" aria-modal="true" aria-label="The Whispering Door"><div class="stg">
-<img alt="" src="assets/whispering_door.webp"><canvas id="wdC"></canvas><img id="wdDlg" alt="" src="assets/whispering_door.webp">
+<img alt="" src="assets/door/whispering_door.webp"><canvas id="wdC"></canvas><img id="wdDlg" alt="" src="assets/door/whispering_door.webp">
 <button class="hot" id="wdGo" aria-label="Begin Quest" style="left:17%;top:64.5%;width:66%;height:7%"></button>
 <button class="hot" id="wdNo" aria-label="Close" style="left:18%;top:72.3%;width:64%;height:6.2%"></button>
 </div></div>
@@ -3028,7 +3028,7 @@ $$('lmGo').onclick=()=>{const f=lmCb;lmCb=null;lmClose();if(f)f()};
 <style>
 #wrOv{position:fixed;inset:0;z-index:1600;display:none;align-items:center;justify-content:center;background:#07041a;overflow:hidden}
 #wrOv.open{display:flex}
-#wrOv #wrS{position:relative;flex:none;width:min(100vw,calc(100dvh*941/1672));aspect-ratio:941/1672;container-type:inline-size;overflow:hidden;--img:url(assets/wild_room.webp)}
+#wrOv #wrS{position:relative;flex:none;width:min(100vw,calc(100dvh*941/1672));aspect-ratio:941/1672;container-type:inline-size;overflow:hidden;--img:url(assets/rift/wild_room.webp)}
 @media (max-aspect-ratio:941/1672){#wrOv #wrS{width:calc(100dvh*941/1672)}}  /* tall phones: fill the whole screen */
 #wrOv .wl{position:absolute;inset:0;background:var(--img) center/100% 100%}
 #wrOv #wrBase{animation:wrHue 14s ease-in-out infinite alternate}   /* no drift/zoom: the live text must stay lined up with the painted buttons */
@@ -3055,7 +3055,7 @@ $$('lmGo').onclick=()=>{const f=lmCb;lmCb=null;lmClose();if(f)f()};
 @media (prefers-reduced-motion:reduce){#wrOv *{animation:none!important}}
 </style>
 <div id="wrOv" role="dialog" aria-modal="true" aria-label="Wild Room"><div id="wrS">
-<div class="wl" id="wrBase"></div><div id="wrPw"><img id="wrPt" alt="" src="assets/wild_swirl.webp"></div>
+<div class="wl" id="wrBase"></div><div id="wrPw"><img id="wrPt" alt="" src="assets/rift/wild_swirl.webp"></div>
 <div class="wg" id="wrG0"></div><div class="wg" id="wrG1"></div><div class="wg" id="wrG2"></div><div class="wg" id="wrG3"></div>
 <canvas id="wrC"></canvas><div class="wv"></div>
 <div id="wrWeave"></div>

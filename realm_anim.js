@@ -1,6 +1,6 @@
 /* realm_anim.js: animated full-screen art for the Mimic battle, Strong Mimic battle and Multiversal Library "Knowledge Gained" screens.
    Loaded as its own file (<script src="realm_anim.js" defer>). index.html only calls RealmAnim.battle(...) and RealmAnim.knowledge(...).
-   The art in art/ has NO text baked in: everything the player reads (title, HP numbers, combat log, buttons, result lines) is live text drawn on top.
+   The art in assets/mimic and assets/library has NO text baked in: everything the player reads (title, HP numbers, combat log, buttons, result lines) is live text drawn on top.
    Respects the game's Settings: html.rm (reduced motion), html.fx-low, html.fx-off, and the OS reduced-motion setting. */
 (function () {
   'use strict';
@@ -43,7 +43,7 @@
       log: [165, 1066, 694, 220], btns: [[69, 1320, 434, 111], [526, 1320, 432, 111]]
     },
     knowledge: {
-      src: 'art/library_knowledge.webp', label: 'Knowledge Gained, Multiversal Library', kind: 'knowledge', vig: .1,
+      src: 'assets/library/library_knowledge.webp', label: 'Knowledge Gained, Multiversal Library', kind: 'knowledge', vig: .1,
       flames: [[22, 1015, 60]],
       glows: [{ x: 510, y: 140, r: 260, col: '170,130,255', a: .34, sp: 1.6 }, { x: 520, y: 300, r: 300, col: '255,225,150', a: .2, sp: 1.3, ph: 1 },
         { x: 170, y: 100, r: 210, col: '120,170,255', a: .2, sp: .7 }, { x: 880, y: 100, r: 210, col: '120,170,255', a: .2, sp: .7, ph: 2 },
@@ -301,7 +301,7 @@
   function knowledgeOff() { if (K) K.root.classList.remove('on'); }
 
   /* decode the art early so the first screen never flashes empty */
-  function preload() { ['assets/mimic/strong_battle.webp', 'assets/mimic/mimic_battle.webp', 'art/library_knowledge.webp'].forEach(function (u) { var i = new Image(); i.src = u; }); }
+  function preload() { ['assets/mimic/strong_battle.webp', 'assets/mimic/mimic_battle.webp', 'assets/library/library_knowledge.webp'].forEach(function (u) { var i = new Image(); i.src = u; }); }
   if (document.readyState === 'complete') setTimeout(preload, 300); else addEventListener('load', function () { setTimeout(preload, 300); });
 
   window.RealmAnim = { battle: battle, battleOff: battleOff, knowledge: knowledge, knowledgeOff: knowledgeOff };
