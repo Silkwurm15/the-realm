@@ -194,10 +194,11 @@
     if (cssDone) return; cssDone = true;
     var s = document.createElement('style'); s.id = 'ra-css';
     s.textContent =
-      ':root{--ra-top:calc(max(0px,env(safe-area-inset-top)) + var(--hudh,92px) + 4px);--ra-bot:calc(72px + env(safe-area-inset-bottom,0px))}' +
+      ':root{--ra-top:0px;--ra-bot:0px}' +
       '#cbt.ra-on{top:var(--ra-top);bottom:var(--ra-bot);padding:0;background:#05040a;align-items:stretch;justify-content:stretch}#cbt.ra-on>.cbb{display:none}' +
       '.ra{position:fixed;top:var(--ra-top);bottom:var(--ra-bot);left:0;right:0;z-index:1501;display:none;align-items:center;justify-content:center;overflow:hidden;container-type:size;background:#05040a;font-family:Georgia,"Palatino Linotype",serif;-webkit-user-select:none;user-select:none}' +
       '#cbt .ra{position:absolute;top:0;bottom:0}' +
+      '#raKn{top:0;bottom:0}' +   /* Knowledge Gained fills the whole screen (covers the HUD and bottom nav); the blurred art behind the card fills the space above and below */
       '.ra.on{display:flex}' +
       '.ra .ra-back{position:absolute;inset:-6%;background:var(--ra-img) center/cover;filter:blur(26px) brightness(.5)}' +
       '.ra .ra-stg{position:relative;flex:none;aspect-ratio:2/3;width:min(100vw,calc((100vh - 170px)*2/3));width:min(100cqw,calc(100cqh*2/3));container-type:inline-size;background:#05040a;overflow:hidden}' +
