@@ -1509,8 +1509,8 @@ const mimicArt=strong=>{const B=strong?'#3d2a52':'#7a4a1f',D=strong?'#24162f':'#
 const cbs=document.createElement('style');cbs.textContent='#cbt{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;padding:14px;background:#000d;font-family:Georgia,serif;color:#ead8ac}#cbt .cbb{width:100%;max-width:380px;max-height:100%;overflow-y:auto;padding:18px 16px;border:1px solid #b99a52;border-radius:6px;background:linear-gradient(135deg,#251d12,#0e0c09);box-shadow:0 14px 50px #000c,inset 0 0 0 3px #1b140b;text-align:center}#cbt .cbt{font-size:19px;font-weight:700;color:#fff0c6;margin-bottom:6px}#cbt .cbh{font-size:12px;margin:8px 0 2px;display:flex;justify-content:space-between}#cbt .cbbar{height:9px;border-radius:5px;background:#000;border:1px solid #5a4725;overflow:hidden}#cbt .cbbar i{display:block;height:100%}#cbt .cbl{min-height:62px;margin:12px 0;font-size:14px;line-height:1.45;color:#e6d6ae;white-space:pre-line}#cbt .cbr{display:flex;gap:8px}#cbt button{flex:1;padding:13px 6px;border:1px solid #d6b866;border-radius:4px;background:linear-gradient(#5a4725,#33280f);color:#fff0c6;font:700 16px Georgia,serif;cursor:pointer}#cbt button.alt{background:#15110a}';document.head.appendChild(cbs);
 const cb=document.createElement('div');cb.id='cbt';cb.innerHTML='<div class="cbb"><div class="cbt" id="cbT"></div><div id="cbA"></div><div id="cbB"></div><div class="cbl" id="cbL"></div><div class="cbr" id="cbR"></div></div>';document.body.appendChild(cb);
 let C=null;
-const MIMIC_IMG='<img alt="Mimic" draggable="false" src="assets/mimic_img.webp">';
-const STRONG_MIMIC_IMG='<img alt="Strong Mimic" draggable="false" src="assets/strong_mimic_img.webp" style="display:block;width:100%;max-width:250px;margin:0 auto;filter:drop-shadow(0 8px 14px #000c)">';   // artwork for the Strong Mimic
+const MIMIC_IMG='<img alt="Mimic" draggable="false" src="assets/mimic/mimic_img.webp">';
+const STRONG_MIMIC_IMG='<img alt="Strong Mimic" draggable="false" src="assets/mimic/strong_mimic_img.webp" style="display:block;width:100%;max-width:250px;margin:0 auto;filter:drop-shadow(0 8px 14px #000c)">';   // artwork for the Strong Mimic
 function cbDraw(title,btns,bars){$('cbT').textContent=title;$('cbA').innerHTML=(C.k==='smimic'?STRONG_MIMIC_IMG:MIMIC_IMG);
  $('cbB').innerHTML=bars?'<div class="cbh"><span>'+C.e.n+'</span><span>'+Math.max(0,C.eh)+' / '+C.e.hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*C.eh/C.e.hp)+'%;background:#d6304a"></i></div><div class="cbh"><span>You</span><span>'+Math.floor(H().hp)+' / '+stats().hp+'</span></div><div class="cbbar"><i style="width:'+Math.max(0,100*H().hp/stats().hp)+'%;background:#4caf50"></i></div>':'';
  $('cbL').textContent=C.log.slice(-4).join('\n');$('cbR').innerHTML='';btns.forEach(b=>{const x=document.createElement('button');x.textContent=b[0];if(b[2])x.className='alt';x.onclick=b[1];$('cbR').appendChild(x)});cb.style.display='flex';try{window.RealmAnim&&RealmAnim.battle({k:C.k,title:title,btns:btns,bars:bars,e:C.e,eh:C.eh,hp:H().hp,max:stats().hp,log:C.log})}catch(e){}}
@@ -2763,13 +2763,13 @@ next()})}catch(e){}})();
 /* preload chest art so Treasure Chest -> Chest Opened flips with no blank frame */
 setTimeout(function(){[1,2,3,4,5].forEach(function(n){var i=new Image();i.src='assets/lib_'+n+'.webp'})},3000);
 setTimeout(function(){['assets/lib_a_full.webp'].forEach(function(u){var i=new Image();i.src=u})},3500);
-window.TC_PRE=['assets/tc_chest.webp','assets/tc_loot.webp'].map(function(u){var i=new Image();i.src=u;return i.decode?i.decode().catch(function(){}):Promise.resolve()});
+window.TC_PRE=['assets/loot/tc_chest.webp','assets/loot/tc_loot.webp'].map(function(u){var i=new Image();i.src=u;return i.decode?i.decode().catch(function(){}):Promise.resolve()});
 </script>
 <style id="chestArt">
 /* Treasure Chest + Chest Opened: your full illustrated art fills the whole map area. Title and buttons are part of the art; only the body text is live. */
 #modal .skc[data-skin="chest"],#modal .skc[data-skin="loot"]{--A:min(100cqw,calc(100cqh/var(--ar)));--ah:calc(var(--A)*var(--ar));--ax:calc((100cqw - var(--A))/2);--ay:calc((100cqh - var(--ah))/2);position:absolute;inset:0;z-index:1;width:auto;max-width:none;height:auto;max-height:none;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:#0a0806;overflow:hidden;container-type:size;filter:none;text-align:center}
-#modal .skc[data-skin="chest"]{--ar:1.47407;--img:url(assets/tc_chest.webp)}
-#modal .skc[data-skin="loot"]{--ar:1.5;--img:url(assets/tc_loot.webp)}
+#modal .skc[data-skin="chest"]{--ar:1.47407;--img:url(assets/loot/tc_chest.webp)}
+#modal .skc[data-skin="loot"]{--ar:1.5;--img:url(assets/loot/tc_loot.webp)}
 #modal .skc[data-skin="chest"]::after,#modal .skc[data-skin="loot"]::after{content:"";display:block;position:absolute;left:-8%;right:-8%;top:-8%;bottom:-8%;width:auto;height:auto;z-index:0;background:var(--img) center/cover no-repeat;filter:blur(16px) brightness(.55);pointer-events:none;border:0;font-size:0}
 #modal .skc[data-skin="chest"]::before,#modal .skc[data-skin="loot"]::before{content:"";display:block;position:absolute;left:var(--ax);top:var(--ay);right:auto;bottom:auto;width:var(--A);height:var(--ah);z-index:1;background:var(--img) 0 0/100% 100% no-repeat;pointer-events:none;border:0;font-size:0;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(to right,transparent,#000 2.5%,#000 97.5%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent,#000 2.5%,#000 97.5%,transparent),linear-gradient(to right,transparent,#000 2.5%,#000 97.5%,transparent);mask-composite:intersect}
 #modal .skc[data-skin="chest"] #mIcon,#modal .skc[data-skin="loot"] #mIcon{display:none}
@@ -2964,10 +2964,10 @@ const ss=(a,b,x)=>{x=Math.min(1,Math.max(0,(x-a)/(b-a)));return x*x*(3-2*x)};
 const R=Math.random;
 /* one entry per intro scene: art, label, hotspot [left,top,width,height]%, sky/ambient/mouth/button glows [x,y,r], torch flames [x,y,r], fang tips (drool), coin sparkle spots, drool floor y, drool rate */
 const LM={
- strong:{src:'assets/living_mimic.webp',label:'Strong Mimic',go:[12,77,76,9],sky:[820,110,300],amb:[250,500,420],mouth:[560,430,230],btn:[512,1250,330],
+ strong:{src:'assets/mimic/living_mimic.webp',label:'Strong Mimic',go:[12,77,76,9],sky:[820,110,300],amb:[250,500,420],mouth:[560,430,230],btn:[512,1250,330],
   flames:[[52,330,130],[922,540,100],[975,438,60]],fangs:[[455,350],[535,300],[600,300],[690,320],[420,330]],
   coins:[[300,812],[700,792],[880,805],[150,748],[620,800],[200,770],[960,985],[420,1500]],floor:780,drip:0.03},
- mimic:{src:'assets/mimic_intro.webp',label:'Mimic',go:[13,79,74,8.5],sky:[790,120,300],amb:[250,500,420],mouth:[520,490,230],btn:[512,1275,330],
+ mimic:{src:'assets/mimic/mimic_intro.webp',label:'Mimic',go:[13,79,74,8.5],sky:[790,120,300],amb:[250,500,420],mouth:[520,490,230],btn:[512,1275,330],
   flames:[[105,300,130],[968,428,95]],fangs:[[395,455],[432,478],[505,440],[585,430],[660,445]],
   coins:[[300,870],[690,890],[880,875],[120,830],[620,905],[200,860],[960,1060],[430,1470],[760,1440]],floor:880,drip:0.02}
 };

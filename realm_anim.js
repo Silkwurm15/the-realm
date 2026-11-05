@@ -19,7 +19,7 @@
   var BATTLE_BTN_GLOW = [[300, 1370, 210, 2.2, 0], [740, 1370, 210, 2.2, 1.6]];
   var SCENES = {
     smimic: {
-      src: 'art/strong_battle.webp', label: 'Strong Mimic battle', kind: 'battle',
+      src: 'assets/mimic/strong_battle.webp', label: 'Strong Mimic battle', kind: 'battle',
       sky: [850, 100, 330, '110,170,255'],
       flames: [[85, 295, 120], [985, 405, 95], [120, 470, 55], [230, 595, 45], [915, 548, 55]],
       glows: [{ x: 250, y: 520, r: 420, col: '255,150,60', a: .12, sp: 5 }, { x: 540, y: 440, r: 230, col: '255,40,30', a: .2, sp: 1.6 },
@@ -31,7 +31,7 @@
       log: [165, 1074, 694, 190], btns: [[78, 1309, 422, 114], [531, 1309, 415, 114]]
     },
     mimic: {
-      src: 'art/mimic_battle.webp', label: 'Mimic battle', kind: 'battle',
+      src: 'assets/mimic/mimic_battle.webp', label: 'Mimic battle', kind: 'battle',
       sky: [850, 110, 330, '110,170,255'],
       flames: [[75, 250, 120], [985, 370, 95], [232, 475, 55], [900, 525, 55]],
       glows: [{ x: 250, y: 520, r: 420, col: '255,150,60', a: .12, sp: 5 }, { x: 540, y: 500, r: 220, col: '255,40,30', a: .2, sp: 1.6 },
@@ -282,7 +282,7 @@
   function knowledgeOff() { if (K) K.root.classList.remove('on'); }
 
   /* decode the art early so the first screen never flashes empty */
-  function preload() { ['art/strong_battle.webp', 'art/mimic_battle.webp', 'art/library_knowledge.webp'].forEach(function (u) { var i = new Image(); i.src = u; }); }
+  function preload() { ['assets/mimic/strong_battle.webp', 'assets/mimic/mimic_battle.webp', 'art/library_knowledge.webp'].forEach(function (u) { var i = new Image(); i.src = u; }); }
   if (document.readyState === 'complete') setTimeout(preload, 300); else addEventListener('load', function () { setTimeout(preload, 300); });
 
   window.RealmAnim = { battle: battle, battleOff: battleOff, knowledge: knowledge, knowledgeOff: knowledgeOff };
