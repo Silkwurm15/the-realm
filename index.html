@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.805';window.__BUILD=B;
+(function(){var B='1.806';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -647,6 +647,7 @@ let errShown=false;map.on('error',e=>{console.error(e&&e.error||e);if(!errShown)
 /* ---------- Game layers ---------- */
 const RANGE=100; // meters: radius of the circle around the player (diameter = 2 x RANGE = 200 m)
 let player=FALLBACK.slice(),following=false,watchId=null,playerMarker=null;
+function DEV(){try{return !!(SET.dev&&SET.devOK)}catch(e){return false}}   // Developer Mode: GPS ignored, camera free
 const SVG={
  quest:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 3h3l-.6 11h-1.8zM12 16.6a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8z"/></svg>',
  chest:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 11V8a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v3"/><rect x="3" y="11" width="18" height="9" rx="1.5"/><path d="M3 14h18M12 12v4"/></svg>',
@@ -752,7 +753,7 @@ function gpsState(){} // status pill removed; errors are shown as pop-ups
 const GOPTS={enableHighAccuracy:true,maximumAge:0,timeout:20000};
 function showStart(){showModal('start',{icon:'🧭',title:'Enable Location',text:'The Realm is built on the real world. Allow location access so your adventurer can walk the map as you move.',primary:'Allow Location & Begin',onPrimary:startGPS})}
 function showDenied(){gpsState('GPS blocked','#ed6d63');showModal('denied',{icon:'🚫',title:'Location is blocked',text:'Location access is turned off for this page. In Chrome, tap the icon at the left of the address bar, then Permissions, then Location, and choose Allow. Then tap Try Again.',primary:'Try Again',onPrimary:startGPS})}
-function triggerLost(reason){if(gpsLost)return;gpsLost=true;gpsState('GPS signal lost','#ed6d63');
+function triggerLost(reason){if(gpsLost||DEV())return;gpsLost=true;gpsState('GPS signal lost','#ed6d63');
  if(modalKind!=='offline')showModal('lost',{icon:'📡',title:'GPS signal lost',text:reason+' Move to an open area. The game reconnects automatically.',primary:'Retry GPS',onPrimary:startGPS})}
 // First-fix gate: the browser often hands back a rough Wi-Fi/cell/IP fix first (can be tens of km off). The server's anti-teleport check
 // would then flag the real position as a "location jump", so we hold out for an accurate fix and ignore coarse ones afterwards.
@@ -778,7 +779,7 @@ function speedCheck(pos,ll,nowT){
   if(spdArmed&&spdHits>=SPD_FIXES&&!modalKind){spdArmed=false;
    showModal('drive',{icon:'🚗',title:'Stay Safe!',text:'It looks like you are travelling in a motor vehicle. Never play while driving. Keep your eyes on the road and your hands on the wheel. If you are a passenger, enjoy the ride!',color:'#e5c77b',primary:'OK',onPrimary:()=>hideModal('drive')})}}
  else{spdHits=0;if(v<WARN_MS*.5){if(!spdLow)spdLow=nowT;else if(nowT-spdLow>=SPD_REARM_MS)spdArmed=true}else spdLow=0}}
-function onFix(pos){lastFix=Date.now();const acc=pos.coords.accuracy||0;
+function onFix(pos){if(DEV())return;lastFix=Date.now();const acc=pos.coords.accuracy||0;
  if(!gotFirst){
   if(!bestFirst||acc<(bestFirst.coords.accuracy||1e9))bestFirst=pos;
   if(acc>ACC_GOOD){   // not accurate enough yet: wait briefly for a better fix, then settle for the best one if it is at least decent
@@ -798,18 +799,20 @@ function applyFix(pos){const nowT=Date.now();lastFix=nowT;const ll=[pos.coords.l
   if(!anchorLL||dist(anchorLL,cand)>=thr){anchorLL=cand.slice();targetLL=cand;updateCards()}}
  gpsState('GPS Connected','#8fd18b')}
 function onGpsErr(err){
+ if(DEV())return;
  if(err.code===1){showDenied();return}
  if(!gotFirst)return;   // still acquiring the first fix: keep waiting quietly; the rough-fix timer warns if it drags on
  triggerLost(err.code===3?'GPS is taking too long to respond.':'Your device could not determine its position.')}
 function probe(){if(probing)return;probing=true;
  navigator.geolocation.getCurrentPosition(p=>{probing=false;onFix(p)},()=>{probing=false;triggerLost('No GPS updates were received.')},{enableHighAccuracy:true,maximumAge:0,timeout:8000})}
 // Watchdog: if the browser stops sending updates, check the GPS directly before raising the alarm.
-setInterval(()=>{if(gotFirst&&!gpsLost&&!document.hidden&&Date.now()-lastFix>30000)probe()},5000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&gotFirst)probe()});
+setInterval(()=>{if(!DEV()&&gotFirst&&!gpsLost&&!document.hidden&&Date.now()-lastFix>30000)probe()},5000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&gotFirst&&!DEV())probe()});
 window.addEventListener('offline',()=>showModal('offline',{icon:'📶',title:'Connection lost',text:'No internet connection. The map and quests need a signal. The game reconnects automatically.',primary:'OK',onPrimary:()=>hideModal('offline')}));
 window.addEventListener('online',()=>{hideModal('offline');toast('Back online')});
 
 async function boot(){
+ if(DEV()){devStart();return}
  if(!window.isSecureContext){showModal('secure',{icon:'🔒',title:'Secure page needed',text:'GPS only works on an https page. Open the game from its https link, not a downloaded file.',primary:'Reload',onPrimary:()=>location.reload()});return}
  if(!navigator.geolocation){showModal('nogps',{icon:'⚠️',title:'GPS not supported',text:'This browser cannot provide your location, so the game cannot track your adventurer.',primary:'Reload',onPrimary:()=>location.reload()});return}
  let state='prompt';
@@ -883,7 +886,7 @@ function ev(){}   // quest progress now lives on the server: it counts only the 
 let syncAt=0;
 function rollover(){if(fighting||!window.realmCloud||Date.now()-syncAt<15000)return;syncAt=Date.now();act('sync',{quiet:true})}   // period resets are decided by the server's clock
 // walking progress: ignore GPS jumps (>=80 m between frames) so teleports don't count
-function track(){if(!gotFirst)return;if(!lastWalk){lastWalk=targetLL.slice();return}const d=dist(lastWalk,targetLL);if(d<3)return;lastWalk=targetLL.slice();if(d<80){acc+=d;if(acc>=150)flushWalk()}}
+function track(){if(!gotFirst)return;if(DEV()){lastWalk=targetLL.slice();return}if(!lastWalk){lastWalk=targetLL.slice();return}const d=dist(lastWalk,targetLL);if(d<3)return;lastWalk=targetLL.slice();if(d<80){acc+=d;if(acc>=150)flushWalk()}}
 function flushWalk(){if(acc<20||!window.realmCloud)return;const m=acc;acc=0;act('walk',{m,ll:targetLL,quiet:true})}   // raw meters; the server caps the speed and applies class bonuses
 
 /* ---- location safety: fail closed (no map data = no quest locations) ---- */
@@ -1317,7 +1320,7 @@ function setName(v){const n=cleanName(v);if(!n){toast('Names are 3-16 letters, n
 /* ---- rewards: chest + boss ---- */
 // Server-authoritative: the server verifies the marker, rolls the d20, fights the boss, grants loot and XP. This only shows the answer.
 function retire(it){it.used=true;if(it.key)S.taken[it.key]=it.exp;const i=items.indexOf(it);if(markers[i])markers[i].remove();save()}
-async function useMarker(it,call,keep){const r=await call();if(!r){if(['Already claimed.','That marker has vanished.','Marker mismatch.','No marker there.'].includes(act.err))retire(it);return null}if(!(keep&&keep(r.result)))retire(it);return r}
+async function useMarker(it,call,keep){const r=await call();if(!r){if(['Already claimed.','That marker has vanished.','Marker mismatch.','No marker there.','Unknown marker.'].includes(act.err))retire(it);return null}if(!(keep&&keep(r.result)))retire(it);return r}
 async function markerUse(it){const r=await useMarker(it,()=>act('marker',{t:it.t,key:it.key,exp:it.exp,ll:targetLL}));if(r)toast((POI[it.t]?POI[it.t].go:'Done')+' ✓')}
 function showBonusChoice(choice,lines,res){const prior=document.getElementById('bonusChoiceButtons');if(prior)prior.remove();const base=(lines||[]).join('\n'),title='Empower Your '+choice.itemName;showModal('loot',{skin:'loot',icon:'✨',title,text:base+'\n\nChoose which existing attribute receives the bonus. A negative attribute can be improved toward zero.',primary:'Choose an attribute above',onPrimary:()=>{hideModal('loot');if(res)act('usepot',{k:'res'})}});const primary=$('mPrimary'),secondary=$('mSecondary'),host=document.createElement('div');host.id='bonusChoiceButtons';host.style.cssText='display:grid;grid-template-columns:1fr;gap:7px;margin:12px 0';primary.disabled=true;secondary.style.display='none';$('mText').after(host);choice.options.forEach(o=>{const b=document.createElement('button');b.className='qbtn';const sign=v=>(v>0?'+':'')+v+(o.unit||'');b.textContent=o.name+'  ('+sign(o.current)+' → '+sign(o.after)+')';b.onclick=async()=>{if(b.disabled)return;host.querySelectorAll('button').forEach(x=>x.disabled=true);const r=await act('bonus',{stat:o.k});if(!r){host.querySelectorAll('button').forEach(x=>x.disabled=false);return}host.remove();$('mText').textContent=base+'\n\n✦ '+(r.result.lines||[]).join('\n');const next=r.result.bonusChoice;primary.disabled=false;primary.textContent=next?'Next bonus':'Continue';primary.onclick=()=>{hideModal('loot');if(res)act('usepot',{k:'res'});if(next)showBonusChoice(next,['Another equipment bonus is waiting for '+next.itemName+'.'],false)};try{if(inv.classList.contains('open'))invRender()}catch(e){}};host.appendChild(b)})}
 async function lootFrom(it,confirm){const r=await useMarker(it,()=>act('loot',{t:it.t,key:it.key,exp:it.exp,ll:targetLL,...(confirm?{confirm:1}:{})}),o=>!!(o&&o.detect));if(!r)return;const o=r.result;
@@ -2222,7 +2225,7 @@ inv.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)retu
 
 /* ---- Settings (saved on this device only) ---- */
 const SET_KEY='tp_settings_v1';
-const SET_DEF={master:80,music:70,sfx:80,mute:false,bld:true,tilt:'angled',fx:'full',fps:'max',low:false,bigtext:false,hc:false,rm:false};
+const SET_DEF={master:80,music:70,sfx:80,mute:false,bld:true,tilt:'angled',fx:'full',fps:'max',low:false,bigtext:false,hc:false,rm:false,devOK:false,dev:false};
 const sysReduced=()=>{try{return !!(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)}catch(e){return false}};
 let SET=(()=>{let o={};try{o=JSON.parse(localStorage.getItem(SET_KEY)||'{}')||{}}catch(e){}return{...SET_DEF,rm:sysReduced(),...o}})();
 function setSave(){try{localStorage.setItem(SET_KEY,JSON.stringify(SET))}catch(e){}}
@@ -2282,10 +2285,11 @@ const setBtn=(to,label)=>'<button class="m-btn" data-sp="'+to+'">'+label+'</butt
 let curPage='home';
 function setPage(p){const card=$('setCard'),modal=$('setModal');let h='';p=p||'home';curPage=p;
  modal.classList.toggle('peek',p==='video'||p==='access');
- if(p==='home')h='<h2>Settings</h2>'+setBtn('audio','🔊 &nbsp; Audio')+setBtn('video','🖥 &nbsp; Video')+setBtn('access','♿ &nbsp; Accessibility')+setBtn('notif','🔔 &nbsp; Notifications')+'<div class="setnote">'+SET_NOTE+'</div><button class="m-btn ghost" data-sp="close">Close</button>';
+ if(p==='home')h='<h2>Settings</h2>'+setBtn('audio','🔊 &nbsp; Audio')+setBtn('video','🖥 &nbsp; Video')+setBtn('access','♿ &nbsp; Accessibility')+setBtn('notif','🔔 &nbsp; Notifications')+setBtn('dev','🛠 &nbsp; Developer Mode')+'<div class="setnote">'+SET_NOTE+'</div><button class="m-btn ghost" data-sp="close">Close</button>';
  else if(p==='audio')h='<h2>Audio</h2>'+slider('master','Master volume')+slider('music','Music')+slider('sfx','Sound effects')+onoff('mute','Mute everything')+'<div class="setnote">'+SET_NOTE+'</div><button class="m-btn ghost" data-sp="home">← Back</button>';
  else if(p==='video')h='<h2>Video</h2><div class="sdesc">Changes show on the map right away.</div>'+onoff('bld','3D buildings','Turning this off makes the game faster on older phones.')+seg('tilt','Map tilt','',[['angled','Angled'],['flat','Flat']])+seg('fx','Visual effects','Marker glow animations and screen overlays.',[['full','Full'],['low','Low'],['off','Off']])+seg('fps','Frame rate','Lower saves battery.',[['max','Max'],['45','45'],['30','30']])+'<div class="sgroup">Low-power mode<small>Turns off 3D buildings, uses Low effects and a 30 frame cap.</small><div class="seg"><button data-sk="low" data-sv="1" class="'+(SET.low?'on':'')+'">On</button><button data-sk="low" data-sv="0" class="'+(SET.low?'':'on')+'">Off</button></div></div><div class="setnote">'+SET_NOTE+'</div><button class="m-btn ghost" data-sp="home">← Back</button>';
  else if(p==='access')h='<h2>Accessibility</h2>'+onoff('bigtext','Larger text','Makes menus and messages bigger.')+onoff('hc','High-contrast markers','White outlines and brighter beams on map markers.')+onoff('rm','Reduce motion','Stops animations and screen movement.')+'<div class="setnote">'+SET_NOTE+'</div><button class="m-btn ghost" data-sp="home">← Back</button>';
+ else if(p==='dev')h=devPage();
  else if(p==='notif')h='<h2>Notifications</h2><div class="sdesc">Coming soon.</div><div class="setnote">'+SET_NOTE+'</div><button class="m-btn ghost" data-sp="home">← Back</button>';
  card.innerHTML=h;card.scrollTop=0}
 function openSettings(p){setPage(p||'home');$('setModal').classList.add('open')}
@@ -2300,7 +2304,71 @@ $('setModal').addEventListener('click',e=>{if(e.target===$('setModal'))return cl
 $('setModal').addEventListener('input',e=>{const r=e.target.closest('[data-rk]');if(!r)return;const k=r.dataset.rk;SET[k]=+r.value;const o=$('sv_'+k);if(o)o.textContent=r.value;setSave();Sound.refresh()});
 $('setModal').addEventListener('change',e=>{const r=e.target.closest('[data-rk]');if(!r)return;if(r.dataset.rk==='music'){Sound.music('map')}else Sound.sfx('tap')});   // letting go of a slider plays a sample so you can hear the level
 function hardReload(){const jobs=[];try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(r=>Promise.all(r.map(x=>x.unregister()))))}catch(e){}try{if(window.caches&&caches.keys)jobs.push(caches.keys().then(k=>Promise.all(k.map(n=>caches.delete(n)))))}catch(e){}Promise.all(jobs).catch(()=>{}).then(()=>location.replace(location.pathname+'?u='+Date.now()))}
-function resetSettings(){SET={...SET_DEF,rm:sysReduced()};setSave();applySettings();toast('Settings reset to default.')}
+function resetSettings(){SET={...SET_DEF,rm:sysReduced()};setSave();applySettings();toast('Settings reset to default.');if(DEV!==undefined)devApply()}
+
+/* ================= DEVELOPER MODE ================= */
+// Menu > Settings > Developer Mode. Unlock with the passcode, then switch it On. While on: real GPS is ignored, the camera is free to drag,
+// and you move yourself with the on-screen pad (hold to walk), keyboard arrows / WASD, or by double-tapping the map. Walking in this mode earns no step credit.
+const DEV_HASH=8782237141623466,DEV_POS='tp_devpos_v1';
+function devHash(str,seed){seed=seed||0;let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0)}
+function devPage(){
+ if(!SET.devOK)return '<h2>Developer Mode</h2><div class="sdesc">Enter the passcode to unlock developer tools.</div><div class="sgroup"><input id="devPass" type="password" inputmode="numeric" autocomplete="off" maxlength="16" placeholder="Passcode" style="width:100%;box-sizing:border-box;padding:10px;font-size:16px;text-align:center;letter-spacing:4px;background:#0d0c0a;color:#f1e2bd;border:1px solid #8b6937;border-radius:4px"></div><button class="m-btn" data-dev="unlock">Unlock</button><button class="m-btn ghost" data-sp="home">← Back</button>';
+ return '<h2>Developer Mode</h2><div class="sdesc">Ignores real GPS and frees the camera. Move with the on-screen pad, arrow keys or WASD, or double-tap the map to jump there. Walking here earns no step credit.</div>'+onoff('dev','Developer Mode')+'<div class="setnote">Player ID (for the server\'s DEV_UIDS secret, so spawned markers can be claimed):<br><b style="user-select:all;-webkit-user-select:all;word-break:break-all">'+(()=>{try{return realmCloud.uid()||'not signed in'}catch(e){return 'not signed in'}})()+'</b></div><button class="m-btn ghost" data-dev="lock">Lock &amp; Forget Passcode</button><button class="m-btn ghost" data-sp="home">← Back</button>'}
+let devSpd=0,devHold={},devT=0,devSaved=0;const DEV_SPEEDS=[['Walk',4],['Run',16],['Fast',60]];
+function devPad(){let el=$('devPad');if(el)return el;el=document.createElement('div');el.id='devPad';
+ el.innerHTML='<div class="dv-t">🛠 DEV</div><div class="dv-g"><i></i><button data-d="0" aria-label="Up">▲</button><i></i><button data-d="270" aria-label="Left">◀</button><button data-c="1" aria-label="Recenter camera">⌖</button><button data-d="90" aria-label="Right">▶</button><i></i><button data-d="180" aria-label="Down">▼</button><i></i></div><div class="dv-g dv-sp"><button data-spawn="chest" aria-label="Spawn chest">🧰</button><button data-spawn="nature" aria-label="Spawn nature">🌿</button><button data-spawn="rift" aria-label="Spawn rift">✨</button><button data-spawn="quest" aria-label="Spawn quest">📜</button><button data-spawn="boss" aria-label="Spawn dark lair">💀</button><button data-spawn="clear" aria-label="Clear dev spawns">🗑</button></div><button class="dv-s" data-sp2="1">Walk</button>';
+ const bar=document.querySelector('.bottom-nav');(bar&&bar.parentNode||document.body).appendChild(el);
+ const stop=()=>{devHold={}};
+ el.addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();
+  if(b.dataset.d!==undefined){devHold[b.dataset.d]=1;try{b.setPointerCapture(e.pointerId)}catch(x){}}
+  else if(b.dataset.c){map.easeTo({center:player,duration:350})}
+  else if(b.dataset.spawn){devSpawn(b.dataset.spawn)}
+  else if(b.dataset.sp2){devSpd=(devSpd+1)%DEV_SPEEDS.length;b.textContent=DEV_SPEEDS[devSpd][0]}});
+ ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,e=>{const b=e.target.closest&&e.target.closest('button');if(b&&b.dataset.d!==undefined)delete devHold[b.dataset.d]}));
+ window.addEventListener('blur',stop);return el}
+let devN=0;   // Spawn buttons: markers appear 35 m ahead of the camera (fanned out so they do not stack) and exist only on this device.
+// Claiming one needs the server to accept it: the server's DEV_UIDS secret must list your player ID (shown in Settings > Developer Mode).
+function devSpawn(t){if(!DEV())return;
+ if(t==='clear'){for(let i=items.length-1;i>=0;i--)if(items[i].dev)dropItem(i);updateCards();toast('Dev spawns cleared');return}
+ if(!gotFirst)return;const n=devN++,now=Date.now(),ll=dest(targetLL,map.getBearing()+((n%5)-2)*28,35);
+ if(t==='boss'){act('lairs',{list:[ll],ll:targetLL,dev:1}).then(r=>{if(!r)return;activeLairs().forEach(l=>{if(!items.some(i=>i.key===l.key)){l.dev=1;addItem(l)}});updateCards();toast('Spawned: Dark Lair')});return}
+ const it={t,ll,key:'dev|'+t+'|'+now.toString(36)+n,exp:now+30*6e4,dev:1};
+ if(t==='quest')it.name=QN[n%QN.length];
+ addItem(it);updateCards();toast('Spawned: '+(LABEL[t]||t))}
+function devMove(ll,jump){targetLL=ll.slice();if(spawnAt&&dist(spawnAt,ll)>800){spawnAt=ll.slice();spawn(ll)}updateCards();
+ if(jump){player=ll.slice();playerMarker.setLngLat(player);rangeAt=player.slice();try{map.getSource('range').setData(ringPoly(player,RANGE))}catch(e){}}
+ if(Date.now()-devSaved>2000){devSaved=Date.now();try{localStorage.setItem(DEV_POS,JSON.stringify(ll))}catch(e){}}}
+function devStep(){if(!DEV()||!gotFirst)return;const ks=Object.keys(devHold);if(!ks.length)return;
+ let x=0,y=0;ks.forEach(k=>{const a=(+k+map.getBearing())*Math.PI/180;x+=Math.sin(a);y+=Math.cos(a)});if(!x&&!y)return;
+ const m=DEV_SPEEDS[devSpd][1]*0.06/Math.max(1,Math.hypot(x,y)),lat=targetLL[1];
+ devMove([targetLL[0]+x*m/(111320*Math.cos(lat*Math.PI/180)),targetLL[1]+y*m/111320])}
+function devStart(){   // first fix without any GPS: start from the last developer position (or the default start)
+ let ll=FALLBACK.slice();try{const v=JSON.parse(localStorage.getItem(DEV_POS)||'null');if(Array.isArray(v)&&v.length===2&&v.every(Number.isFinite))ll=v}catch(e){}
+ if(!gotFirst)applyFix({coords:{longitude:ll[0],latitude:ll[1],accuracy:5,speed:0}});
+ devApply()}
+let devWasOn=false;
+function devApply(){const on=DEV();
+ if(on){if(watchId!==null){try{navigator.geolocation.clearWatch(watchId)}catch(e){}watchId=null}
+  clearTimeout(firstTimer);clearTimeout(roughTimer);firstTimer=roughTimer=null;
+  if(gpsLost){gpsLost=false;hideModal('lost')}
+  if(!gotFirst){devStart();return}
+  setFollow(false);map.dragPan.enable();devPad().style.display='flex';
+  if(!devWasOn)toast('Developer Mode on')}
+ else{const el=$('devPad');if(el)el.style.display='none';devHold={};
+  if(devWasOn){map.dragPan.disable();setFollow(true);map.easeTo({center:player,duration:300});anchorLL=null;fixBuf=[];boot();toast('Developer Mode off')}}
+ devWasOn=on}
+map.on('dblclick',e=>{if(!DEV()||!gotFirst)return;e.preventDefault();devMove([e.lngLat.lng,e.lngLat.lat],false)});
+const DEV_KEYS={ArrowUp:0,w:0,W:0,ArrowRight:90,d:90,D:90,ArrowDown:180,s:180,S:180,ArrowLeft:270,a:270,A:270};
+window.addEventListener('keydown',e=>{if(!DEV()||!(e.key in DEV_KEYS))return;if(/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||''))return;devHold[DEV_KEYS[e.key]]=1;e.preventDefault()});
+window.addEventListener('keyup',e=>{if(e.key in DEV_KEYS)delete devHold[DEV_KEYS[e.key]]});
+setInterval(devStep,60);
+$('setModal').addEventListener('click',e=>{const b=e.target.closest('[data-dev]');if(!b)return;
+ if(b.dataset.dev==='unlock'){const v=($('devPass')||{}).value||'';
+  if(devHash(v)===DEV_HASH){SET.devOK=true;setSave();Sound.sfx('tap');setPage('dev')}
+  else{toast('Incorrect passcode.');const i=$('devPass');if(i)i.value=''}}
+ else if(b.dataset.dev==='lock'){SET.dev=false;SET.devOK=false;setSave();devApply();setPage('dev')}});
+$('setModal').addEventListener('click',e=>{if(e.target.closest('[data-sk="dev"]'))setTimeout(devApply,0)},false);
+try{const st=document.createElement('style');st.textContent='#devPad{position:absolute;z-index:504;right:10px;bottom:calc(86px + env(safe-area-inset-bottom));display:none;flex-direction:column;align-items:center;gap:5px;padding:7px;background:rgba(13,12,10,.82);border:1px solid #8b6937;border-radius:8px;touch-action:none;user-select:none;-webkit-user-select:none}#devPad .dv-t{font:700 10px Georgia,serif;letter-spacing:1.5px;color:#e5c77b}#devPad .dv-g{display:grid;grid-template-columns:repeat(3,40px);grid-auto-rows:40px;gap:4px}#devPad button{border:1px solid #b08a49;background:linear-gradient(180deg,#3a2c1c,#14100b);color:#f1e2bd;border-radius:6px;font-size:16px;padding:0;touch-action:none;-webkit-tap-highlight-color:transparent}#devPad button:active{background:#6a4f26}#devPad .dv-sp{grid-auto-rows:30px}#devPad .dv-sp button{font-size:15px}#devPad .dv-s{width:100%;height:28px;font-size:12px}';document.head.appendChild(st)}catch(e){}
 
 
 /* ================= TUTORIAL QUEST ================= */
