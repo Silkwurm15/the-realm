@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.800';window.__BUILD=B;
+(function(){var B='1.801';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1066,7 +1066,7 @@ panel.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b|
  const dd=dist(targetLL,o.ll),base={icon:o.photo?'📷':'🧭',title:a==='rgo'?o.title:(LABEL[o.t]||'Discovery'),text:`${ft(dd)} away\nReward: +${a==='rgo'?o.xp:100} XP`};
  if(dd>RANGE)return tooFar(dd);
  popup({...base,btn:o.photo?'📷 Enter Photo':'Enter',on:()=>{if(dist(targetLL,o.ll)>RANGE)return tooFar(dist(targetLL,o.ll));o.photo?askPhoto({o,done:()=>completeLoc(a,o)}):completeLoc(a,o)}})});
-rollover();save();hud();setInterval(()=>{flushWalk();rollover();offerRandom()},20000);setInterval(lairTick,15000);setInterval(()=>{if(!lastSync||dist(lastSync,targetLL)>80||Date.now()-lastSyncT>6e4)syncWorld()},10000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)rollover()});
+rollover();save();hud();setInterval(()=>{flushWalk();rollover();offerRandom()},20000);setInterval(lairTick,15000);setInterval(()=>{let fx=false;try{const f=discFx();fx=(f.nature+'|'+f.chest+'|'+f.radius)!==discSig}catch(e){}if(fx||!lastSync||dist(lastSync,targetLL)>80||Date.now()-lastSyncT>6e4)syncWorld()},10000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)rollover()});
 
 /* ---- Dark lairs: appear on even hours (12, 2, 4 ... local time), vanish 20 min later, >=500 ft apart ---- */
 const LAIR={max:3,minGap:152.4,life:20*6e4,rMin:150,rMax:600}; // max per window; min spacing (m); lifetime (ms); spawn ring around player (m)
@@ -1102,24 +1102,28 @@ function wcSeen(ll){try{if(!map.areTilesLoaded())return false;const q=map.projec
 function addItem(it){if(S&&S.tutDone===false)return;items.push(it);const el=mkEl(it.t);el.addEventListener('click',e=>{e.stopPropagation();openPoi(it)});markers.push(new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(it.ll).addTo(map))}
 function dropItem(i){if(markers[i])markers[i].remove();items.splice(i,1);markers.splice(i,1)}
 function dropExpired(){const now=Date.now();let ch=false;for(let i=items.length-1;i>=0;i--)if(items[i].exp&&items[i].exp<=now){dropItem(i);ch=true}return ch}
-function syncWorld(){const c=safeCtx();if(!c.ready)return false;const now=Date.now(),G=GRID,[lng,lat]=targetLL;
+/* Phase 3 discovery attributes. Visibility/spawn chance only: interaction range (RANGE), GPS handling and story-quest markers are untouched. Server still validates every claim. */
+const DISC_MIN_R=RANGE+50;   // discovery radius never shrinks below interaction range plus GPS grace
+function discFx(){let s={};try{s=stats()}catch(e){}const m=k=>Math.max(0,1+(+s[k]||0)/100);return{nature:m('natureDiscovery'),chest:m('chestDiscovery'),radius:Math.max(DISC_MIN_R,Math.round(GRID.radius*m('discoveryRadius')))}}
+let discSig='';
+function syncWorld(){const c=safeCtx();if(!c.ready)return false;const now=Date.now(),G=GRID,[lng,lat]=targetLL,FX=discFx(),RR=Math.max(G.radius,FX.radius);discSig=FX.nature+'|'+FX.chest+'|'+FX.radius;
  c.pois=feats('poi');c.green=[...feats('park'),...feats('landuse',['in',['get','class'],['literal',['park','garden','playground','recreation_ground']]]),...feats('landcover',['in',['get','class'],['literal',['wood','grass','wetland']]])]; // 'park' is its own tile layer in OpenMapTiles (the map draws it from there)
  const cnt={};c.pois.forEach(f=>{if(f.geometry.type!=='Point')return;const[x,y]=f.geometry.coordinates,k=Math.floor(x/G.cell)+','+Math.floor(y/G.cell);cnt[k]=(cnt[k]||0)+1});
- const dLat=G.radius/110540,dLng=G.radius/(111320*Math.cos(rad(lat))),want=new Map(),WCs=wcLoad();let dirty=false,need=false;
+ const dLat=RR/110540,dLng=RR/(111320*Math.cos(rad(lat))),want=new Map(),WCs=wcLoad();let dirty=false,need=false;
  for(let cx=Math.floor((lng-dLng)/G.cell);cx<=Math.floor((lng+dLng)/G.cell);cx++)for(let cy=Math.floor((lat-dLat)/G.cell);cy<=Math.floor((lat+dLat)/G.cell);cy++){
   const ck2=cx+','+cy;let dens=WCs.c[ck2]; // busier areas spawn more; rural keeps a 0.7x floor (decided once per cell, then remembered)
   if(dens===undefined){if(wcSeen([(cx+.5)*G.cell,(cy+.5)*G.cell])){dens=Math.min(2,Math.max(.7,.7+(cnt[ck2]||0)*.12));WCs.c[ck2]=dens;dirty=true}else{need=true;continue}}
   for(const t in G.types){const T=G.types[t];for(let j=0;j<T.n;j++){
    const sk=`${cx},${cy},${t},${j}`,ll=siteLL(cx,cy,t,j);
-   const d0=dist(ll,targetLL);if(d0>G.radius+60)continue;   // +60 m grace so GPS wobble cannot flip edge markers
+   const Rt=t==='quest'?G.radius:FX.radius,tm=t==='nature'?FX.nature:t==='chest'?FX.chest:1,d0=dist(ll,targetLL);if(d0>Rt+60)continue;   // +60 m grace so GPS wobble cannot flip edge markers
    const life=T.life*6e4,ph=rnd(sk+'p')*life,n=Math.floor((now+ph)/life),key=sk+'|'+n,r0=rnd(key),base=T.p*dens;
-   if(r0>=(t==='nature'?base*2:base))continue;   // cannot be active this hour either way
+   if(r0>=(t==='nature'?base*2:base)*tm)continue;   // cannot be active this hour either way
    if(S.taken[key])continue;
    let st=WCs.s[sk];   // [safe, inPark], decided once
    if(!st){if(!wcSeen(ll)){need=true;continue}st=[safeAt(ll,c)?1:0,(t==='nature'&&c.green.some(f=>inPoly(ll,f.geometry)))?1:0];WCs.s[sk]=st;dirty=true}
-   let p=base;const gr=!!st[1];if(gr)p*=2;   // parks and woods: more nature
+   let p=base*tm;const gr=!!st[1];if(gr)p*=2;   // parks and woods: more nature
    if(r0>=p||!st[0])continue;
-   if(d0>G.radius&&!items.some(i=>i.key===key))continue;
+   if(d0>Rt&&!items.some(i=>i.key===key))continue;
    want.set(key,{t,ll,key,grid:1,green:gr,exp:(n+1)*life-ph,name:t==='quest'?QN[Math.floor(rnd(sk+'n'+n)*QN.length)]:undefined})}}}
  const near=[...want.values()].sort((a,b)=>dist(a.ll,targetLL)-dist(b.ll,targetLL)).slice(0,G.max);want.clear();near.forEach(o=>want.set(o.key,o));
  let ch=dropExpired();
@@ -1313,10 +1317,13 @@ function setName(v){const n=cleanName(v);if(!n){toast('Names are 3-16 letters, n
 /* ---- rewards: chest + boss ---- */
 // Server-authoritative: the server verifies the marker, rolls the d20, fights the boss, grants loot and XP. This only shows the answer.
 function retire(it){it.used=true;if(it.key)S.taken[it.key]=it.exp;const i=items.indexOf(it);if(markers[i])markers[i].remove();save()}
-async function useMarker(it,call){const r=await call();if(!r){if(['Already claimed.','That marker has vanished.','Marker mismatch.','No marker there.'].includes(act.err))retire(it);return null}retire(it);return r}
+async function useMarker(it,call,keep){const r=await call();if(!r){if(['Already claimed.','That marker has vanished.','Marker mismatch.','No marker there.'].includes(act.err))retire(it);return null}if(!(keep&&keep(r.result)))retire(it);return r}
 async function markerUse(it){const r=await useMarker(it,()=>act('marker',{t:it.t,key:it.key,exp:it.exp,ll:targetLL}));if(r)toast((POI[it.t]?POI[it.t].go:'Done')+' ✓')}
 function showBonusChoice(choice,lines,res){const prior=document.getElementById('bonusChoiceButtons');if(prior)prior.remove();const base=(lines||[]).join('\n'),title='Empower Your '+choice.itemName;showModal('loot',{skin:'loot',icon:'✨',title,text:base+'\n\nChoose which existing attribute receives the bonus. A negative attribute can be improved toward zero.',primary:'Choose an attribute above',onPrimary:()=>{hideModal('loot');if(res)act('usepot',{k:'res'})}});const primary=$('mPrimary'),secondary=$('mSecondary'),host=document.createElement('div');host.id='bonusChoiceButtons';host.style.cssText='display:grid;grid-template-columns:1fr;gap:7px;margin:12px 0';primary.disabled=true;secondary.style.display='none';$('mText').after(host);choice.options.forEach(o=>{const b=document.createElement('button');b.className='qbtn';const sign=v=>(v>0?'+':'')+v+(o.unit||'');b.textContent=o.name+'  ('+sign(o.current)+' → '+sign(o.after)+')';b.onclick=async()=>{if(b.disabled)return;host.querySelectorAll('button').forEach(x=>x.disabled=true);const r=await act('bonus',{stat:o.k});if(!r){host.querySelectorAll('button').forEach(x=>x.disabled=false);return}host.remove();$('mText').textContent=base+'\n\n✦ '+(r.result.lines||[]).join('\n');const next=r.result.bonusChoice;primary.disabled=false;primary.textContent=next?'Next bonus':'Continue';primary.onclick=()=>{hideModal('loot');if(res)act('usepot',{k:'res'});if(next)showBonusChoice(next,['Another equipment bonus is waiting for '+next.itemName+'.'],false)};try{if(inv.classList.contains('open'))invRender()}catch(e){}};host.appendChild(b)})}
-async function lootFrom(it){const r=await useMarker(it,()=>act('loot',{t:it.t,key:it.key,exp:it.exp,ll:targetLL}));if(!r)return;const o=r.result;if(o.fight)return cbShow(o.fight);
+async function lootFrom(it,confirm){const r=await useMarker(it,()=>act('loot',{t:it.t,key:it.key,exp:it.exp,ll:targetLL,...(confirm?{confirm:1}:{})}),o=>!!(o&&o.detect));if(!r)return;const o=r.result;
+ if(o.detect){   // Mimic Detection (server decided): the chest stays on the map until you open it anyway
+  showModal('loot',{skin:'loot',icon:'🔍',title:'Mimic Detected!',text:'Something is wrong with this chest. It is a '+o.detect.name+'.\n\nOpen it anyway and you strike first, or leave it alone.',primary:'Open Anyway',onPrimary:()=>{if(it.busy||it.used)return;hideModal('loot');it.busy=true;lootFrom(it,true).finally(()=>{it.busy=false})},secondary:'Leave It',onSecondary:()=>hideModal('loot')});return}
+ if(o.fight)return cbShow(o.fight);
  try{Sound.sfx('chest')}catch(e){}if(o.bonusChoice){showBonusChoice(o.bonusChoice,o.lines,o.res);return}showModal('loot',{skin:'loot',icon:o.icon,title:o.title,text:o.lines.join('\n')+(o.res?'\n\nUse a Resurrect Potion? You have '+potN('res')+'.':''),primary:o.res?'Use Resurrect Potion':'Continue',onPrimary:()=>{hideModal('loot');if(o.res)act('usepot',{k:'res'}).then(x=>{if(x)toast('You rise again at '+Math.floor(S.hero.hp)+' HP.')})},...(o.res?{secondary:'Stay Downed',onSecondary:()=>hideModal('loot')}:{})})}
 async function gatherNature(it){const pre=H().hp,r=await useMarker(it,()=>act('nature',{key:it.key,exp:it.exp,ll:targetLL,green:!!it.green}));
  if(!r)return null;let lines=(r.result&&r.result.lines||[]).slice();
@@ -1700,7 +1707,6 @@ function sqcBuild(){
  ov.addEventListener('click',e=>{if(!SQC.o||SQC.busy)return;if(e.target.closest('.sqb'))return sqcGo();if(e.target.closest('.sqz')||(e.target===ov&&SQC.o.close))sqcClose()});
  addEventListener('keydown',e=>{if(e.key==='Escape'&&SQC.o&&SQC.o.close&&!SQC.busy)sqcClose()})}
 async function sqcOpen(o){
- if(sqnWants(o))return sqnOpen(o);   // painted-text Strange Lights art for the start page
  sqcBuild();SQC.o=o;SQC.busy=false;
  SQC.img.src='assets/lights/lights_card_quest.webp?v='+window.__BUILD;SQC.el.querySelector('.sqc').style.setProperty('--sqi','url(assets/lights/lights_card_quest.webp?v='+window.__BUILD+')');
  const q=s=>SQC.el.querySelector(s);
@@ -1712,128 +1718,6 @@ async function sqcOpen(o){
 function sqcHide(){sqfxStop();SQC.el.classList.remove('on');setTimeout(()=>{if(!SQC.o)SQC.el.style.display='none'},320)}
 function sqcClose(){const o=SQC.o;if(!o)return;SQC.o=null;sqcHide();if(o.onClose)o.onClose()}
 function sqcGo(){const o=SQC.o;if(!o)return;SQC.o=null;sqcHide();if(o.onGo)o.onGo()}
-
-/* ---------- Strange Lights card, painted-text version (assets/lights/lights_card_baked.webp, 1024x1536).
-   This art has the title, the text and the Continue button painted in, so it is used only for the start page ("Visit all 3 lights ... 60 minutes").
-   Every other Strange Lights page keeps the live-text card above. Animated like that card: aurora ripple + hue flow, lantern flicker + embers,
-   waterfall streaks + mist + splash + pool ripples, runes, drifting sparkles. Coordinates are in the art's own 1024x1536 pixels.
-   Honors html.rm / html.fx-off (no motion) and html.fx-low (lighter). ---------- */
-const SQN={},SQNF={};
-const SQN_ART='assets/lights/lights_card_baked.webp';
-const SQN_CSS=SQFX_CSS.replace(/#sqcOv/g,'#sqnOv').replace(/sqk/g,'sqn').replace(/#sqnRipple/g,'#sqnRipple').replace(/sqcRipple/g,'sqnRipple').replace(/\/941\*100%/g,'/1024*100%')
- +'#sqnOv .sq-lamp{background:radial-gradient(circle,rgba(255,200,100,.8) 0%,rgba(255,150,60,.38) 32%,transparent 68%)}'
- +'#sqnOv .sq-pool{mix-blend-mode:screen;background:radial-gradient(ellipse at 50% 50%,rgba(200,255,230,.5),rgba(110,200,255,.2) 45%,transparent 70%);animation:sqnMist 3.9s ease-in-out infinite}'
- +'#sqnOv .sq-ripple,#sqnOv .sq-hue{-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 30%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 30%,transparent 100%)}#sqnOv .sq-hue{opacity:.32}'
- +'#sqnOv .sq-river{position:absolute;overflow:hidden;pointer-events:none;mix-blend-mode:screen;-webkit-mask-image:radial-gradient(ellipse at 50% 50%,#000 38%,transparent 78%);mask-image:radial-gradient(ellipse at 50% 50%,#000 38%,transparent 78%)}'
- +'#sqnOv .sq-flow{position:absolute;inset:0;background:repeating-linear-gradient(100deg,transparent 0 22px,rgba(190,235,255,.30) 24px 26px,transparent 30px 52px);-webkit-mask-image:repeating-linear-gradient(0deg,#000 0 6px,transparent 14px 22px);mask-image:repeating-linear-gradient(0deg,#000 0 6px,transparent 14px 22px);animation:sqnRiv 2.6s linear infinite}'
- +'@keyframes sqnRiv{from{background-position:0 0}to{background-position:104px 0}}'
- +'#sqnOv.sq-calm .sq-flow,#sqnOv.sq-calm .sq-pool{animation:none}'
- +'#sqnOv{position:absolute;inset:0;z-index:1100;display:none;align-items:center;justify-content:center;background:rgba(5,4,12,.92);opacity:0;transition:opacity .3s;touch-action:manipulation;-webkit-user-select:none;user-select:none}#sqnOv.on{opacity:1}'
- +'#sqnOv .sqc{--w:min(100vw,calc(100vh*1024/1536));position:relative;width:var(--w);aspect-ratio:1024/1536;overflow:hidden;transform:scale(.97);transition:transform .3s}#sqnOv.on .sqc{transform:none}'
- +'#sqnOv .sqc img{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}'
- +'#sqnOv .sqb{position:absolute;box-sizing:border-box;left:15.5%;top:62%;width:69%;height:5.6%;margin:0;padding:0;border:0;border-radius:999px;overflow:hidden;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:0;font-size:0;color:transparent}'
- +'#sqnOv .sqb:active{background:rgba(255,255,255,.16)}#sqnOv .sqb:focus-visible{box-shadow:0 0 0 2px #fff8}'
- +'#sqnOv .sqb::after{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:26%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5) 50%,transparent);transform:translateX(-140%) skewX(-18deg);mix-blend-mode:screen;animation:sqnSh 4.8s ease-in-out 1.2s infinite}@keyframes sqnSh{0%{transform:translateX(-140%) skewX(-18deg)}55%,100%{transform:translateX(520%) skewX(-18deg)}}'
- +'#sqnOv .sqz{position:absolute;top:max(10px,env(safe-area-inset-top));right:10px;width:38px;height:38px;border-radius:50%;border:1.5px solid #c9a24b;background:rgba(10,7,22,.72);color:#f3e9c9;font:700 18px/1 Georgia,serif;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;-webkit-tap-highlight-color:transparent}#sqnOv.cl .sqz{display:flex}'
- +'html.rm #sqnOv .sqb::after,html.fx-off #sqnOv .sqb::after{animation:none}@media(prefers-reduced-motion:reduce){#sqnOv .sqb::after{animation:none}}';
-function sqnfxBuild(ov){
- const W0=1024,H0=1536,w=ov.querySelector('.sqw'),st=document.createElement('style');st.textContent=SQN_CSS;document.head.appendChild(st);
- const ns='http://www.w3.org/2000/svg',sv=document.createElementNS(ns,'svg');sv.setAttribute('width','0');sv.setAttribute('height','0');sv.setAttribute('aria-hidden','true');sv.style.cssText='position:absolute;pointer-events:none';
- sv.innerHTML='<filter id="sqnRipple" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feTurbulence id="sqnTurb" type="fractalNoise" baseFrequency="0.004 0.009" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="38" xChannelSelector="R" yChannelSelector="G"/></filter>';
- document.body.appendChild(sv);
- const cv=document.createElement('canvas');cv.className='sq-fx';w.appendChild(cv);
- const add=e=>{w.insertBefore(e,cv);return e},pc=v=>(v*100)+'%';
- const region=(cls,x,y,rw,rh,extra)=>{const e=document.createElement('div');e.className='sq-rg '+cls;e.style.cssText='left:'+pc(x/W0)+';top:'+pc(y/H0)+';width:'+pc(rw/W0)+';height:'+pc(rh/H0)+';background-size:'+pc(W0/rw)+' '+pc(H0/rh)+';background-position:'+pc(x/(W0-rw))+' '+pc(y/(H0-rh))+';'+(extra||'');return add(e)};
- const spot=(cls,x,y,size,extra)=>{const e=document.createElement('div');e.className=cls;e.style.cssText='left:'+pc(x/W0)+';top:'+pc(y/H0)+';width:'+pc(size/W0)+';aspect-ratio:1;'+(extra||'');return add(e)};
- const box=(cls,x,y,bw,bh,extra)=>{const e=document.createElement('div');e.className=cls;e.style.cssText='left:'+pc(x/W0)+';top:'+pc(y/H0)+';width:'+pc(bw/W0)+';height:'+pc(bh/H0)+';'+(extra||'');return add(e)};
- /* aurora */
- region('sq-ripple',330,0,694,400);region('sq-hue',330,0,694,400);region('sq-hue',450,240,300,170,'animation-delay:-5s');
- /* rainbow wisps hugging the frame */
- region('sq-wisps sq-soft',0,560,110,420);region('sq-wisps sq-soft',914,560,110,420,'animation-delay:-7s');
- /* runes: arch, left stone, blue stone */
- region('sq-rune sq-soft',925,180,80,230);region('sq-rune sq-soft',100,1150,125,210,'animation-delay:-2.1s');region('sq-rune sq-soft',250,1150,90,150,'animation-delay:-3.2s');
- /* button glow */
- region('sq-btn sq-soft',143,943,754,104);
- /* sparkle glints on the frame + near the lamps */
- [[300,455],[724,455],[512,718],[70,640],[955,640],[85,1005],[940,1005],[512,1118]].forEach((g,i)=>spot('sq-glint',g[0],g[1],i<2?70:56,'--s:'+(i<2?70:56)+';--d:'+(3.6+(i%3)*.8)+'s;--delay:'+(-i*.9).toFixed(2)+'s;'));
- /* lantern glow */
- SQNF.lamps=[spot('sq-lamp',263,402,175),spot('sq-lamp',757,402,175)];
- /* waterfall (main + small right fall), mist, river */
- const mk=c=>{const d=document.createElement('div');d.className='sq-stream'+(c?' '+c:'');return d};
- const fall=box('sq-fall',448,1192,200,142);fall.appendChild(mk());fall.appendChild(mk('b'));fall.appendChild(mk('c'));
- box('sq-fall',788,1250,46,124).appendChild(mk());
- box('sq-mist',440,1300,225,90);box('sq-mist',770,1345,100,60);
- box('sq-river',500,1350,500,170).innerHTML='<div class="sq-flow"></div>';
- box('sq-pool',745,1415,170,80);
- SQNF.sprites=[];for(let i=0;i<12;i++){const c=document.createElement('canvas');c.width=c.height=48;const g=c.getContext('2d'),gr=g.createRadialGradient(24,24,0,24,24,24),h=i*30;gr.addColorStop(0,'hsla('+h+',100%,92%,1)');gr.addColorStop(.2,'hsla('+h+',100%,70%,.85)');gr.addColorStop(.55,'hsla('+h+',100%,55%,.22)');gr.addColorStop(1,'hsla('+h+',100%,50%,0)');g.fillStyle=gr;g.fillRect(0,0,48,48);SQNF.sprites.push(c)}
- SQNF.cv=cv;SQNF.ov=ov;SQNF.turb=sv.querySelector('#sqnTurb');SQNF.W0=W0;SQNF.H0=H0;SQNF.raf=0;
- ov.addEventListener('pointerdown',e=>{if(!SQNF.run||e.target.closest('.sqb,.sqz'))return;const c=ov.querySelector('.sqc'),r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W0,y=(e.clientY-r.top)/r.height*H0;if(x<0||y<0||x>W0||y>H0)return;const R=(a,b)=>a+Math.random()*(b-a);for(let i=0;i<14;i++){const a=R(0,6.283),v=R(30,130);SQNF.P.push({k:'brst',x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-30,r:R(3,7),hue:R(0,360),life:0,max:R(.6,1.1),ph:0,sw:0})}});
- addEventListener('resize',()=>{if(SQNF.run)sqnfxSize()});
-}
-function sqnfxSize(){const F=SQNF,c=F.cv,k=Math.min(devicePixelRatio||1,F.low?1.25:2),w=c.parentNode.clientWidth,h=c.parentNode.clientHeight;if(!w)return;c.width=Math.round(w*k);c.height=Math.round(h*k);F.S=c.width/F.W0}
-function sqnfxStop(){if(!SQNF.cv)return;SQNF.run=false;cancelAnimationFrame(SQNF.raf)}
-function sqnfxStart(){
- const F=SQNF;if(!F.cv)return;cancelAnimationFrame(F.raf);
- const rc=document.documentElement.classList,calm=rc.contains('rm')||rc.contains('fx-off')||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
- F.low=rc.contains('fx-low');F.ov.classList.toggle('sq-calm',!!calm);F.ov.classList.toggle('sq-low',F.low);
- if(calm){F.run=false;return}
- const W0=F.W0,H0=F.H0,ctx=F.cv.getContext('2d'),R=(a,b)=>a+Math.random()*(b-a),sp=h=>F.sprites[((Math.round(h/30)%12)+12)%12],MAX=F.low?90:170,K=F.low?.55:1;
- F.run=true;sqnfxSize();const P=F.P=[],Wt=[],acc={m:0,a:0,e:0,r:0},wa={f:0,r:0,m:0,s:0,p:0,g:0};
- const mote=()=>P.push({k:'mote',x:R(0,W0),y:R(980,H0),vx:R(-6,6),vy:R(-22,-8),r:R(5,13),hue:R(0,360),life:0,max:R(7,13),ph:R(0,6.28),sw:R(8,22)});
- const aur=()=>P.push({k:'aur',x:R(560,720),y:R(300,360),vx:R(10,28),vy:R(-46,-24),r:R(6,14),hue:[10,50,120,170,210,280][Math.floor(Math.random()*6)],life:0,max:R(5,9),ph:R(0,6.28),sw:R(14,30)});
- const emb=()=>{const lx=Math.random()<.5?263:757;P.push({k:'emb',x:lx+R(-12,12),y:372+R(-8,6),vx:R(-8,8),vy:R(-44,-18),r:R(3,6.5),hue:R(20,45),life:0,max:R(2,4),ph:R(0,6.28),sw:R(6,14)})};
- const riv=()=>P.push({k:'twk',x:R(560,980),y:R(1380,1510),vx:R(-30,-70),vy:R(2,10),r:R(3,7),hue:R(170,215),life:0,max:R(1.2,2.4),ph:0,sw:0});
- const Y0=1196,YE=1334;
- const streak=pre=>{const p={k:'st',x:R(458,640),y0:Y0,yEnd:YE+R(-4,4),v:R(170,300),len:R(14,42),w:R(.7,1.9),a:R(.35,.85)};p.y=pre?Y0+R(0,YE-Y0):Y0+R(0,6);Wt.push(p)};
- const streakR=()=>Wt.push({k:'st',x:R(795,826),y0:1256,y:1256+R(0,5),yEnd:1368+R(-4,4),v:R(120,200),len:R(10,26),w:R(.6,1.3),a:R(.3,.7)});
- const mist=()=>Wt.push({k:'ms',x:R(460,645),y:R(1320,1345),vx:R(-8,10),vy:R(-14,-5),r:R(20,38),life:0,max:R(2.5,4.5)});
- const splash=()=>Wt.push({k:'sp',x:R(460,645),y:YE,vx:R(-30,30),vy:R(-110,-40),r:R(1.5,3.2),life:0,max:R(.5,.9)});
- const rip=()=>Wt.push({k:'rp',x:R(480,640),y:R(1338,1356),life:0,max:R(1.4,2.2),R:R(24,48)});
- const whirl=()=>Wt.push({k:'rp',x:820+R(-8,8),y:1450+R(-4,4),life:0,max:R(1.6,2.4),R:R(18,52)});
- const water=dt=>{const S=F.S;wa.f+=dt*60*K;wa.r+=dt*18*K;wa.m+=dt*6*K;wa.s+=dt*14*K;wa.p+=dt*2.5;wa.g+=dt*1.6;
-  if(Wt.length<320){while(wa.f>1){wa.f--;streak(false)}while(wa.r>1){wa.r--;streakR()}while(wa.m>1){wa.m--;mist()}while(wa.s>1){wa.s--;splash()}while(wa.p>1){wa.p--;rip()}while(wa.g>1){wa.g--;whirl()}}else wa.f=wa.r=wa.m=wa.s=wa.p=wa.g=0;
-  ctx.lineCap='round';
-  for(let i=Wt.length-1;i>=0;i--){const p=Wt[i];let a;
-   if(p.k==='st'){p.y+=p.v*dt;if(p.y-p.len>p.yEnd){Wt.splice(i,1);continue}const top=Math.max(p.y0,p.y-p.len),bot=Math.min(p.y,p.yEnd);a=p.a*Math.min(1,(p.y-p.y0)/16)*Math.min(1,(p.yEnd-top)/14);if(a<=0||bot<=top)continue;ctx.globalAlpha=Math.min(1,a);ctx.strokeStyle='rgb(215,236,255)';ctx.lineWidth=Math.max(1,p.w*S);ctx.beginPath();ctx.moveTo(p.x*S,top*S);ctx.lineTo(p.x*S,bot*S);ctx.stroke();continue}
-   p.life+=dt;if(p.life>=p.max){Wt.splice(i,1);continue}const u=p.life/p.max;
-   if(p.k==='ms'){p.x+=p.vx*dt;p.y+=p.vy*dt;ctx.globalAlpha=Math.sin(Math.PI*u)*.17;const d=p.r*2*S*(1+u*.6);ctx.drawImage(sp(210),p.x*S-d/2,p.y*S-d/2,d,d)}
-   else if(p.k==='sp'){p.vy+=300*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;ctx.globalAlpha=Math.sin(Math.PI*u)*.9;const d=p.r*2*S;ctx.drawImage(sp(200),p.x*S-d/2,p.y*S-d/2,d,d)}
-   else if(p.k==='rp'){const rx=p.R*u;ctx.globalAlpha=(1-u)*.5;ctx.strokeStyle='rgb(200,230,255)';ctx.lineWidth=Math.max(1,1.2*S);ctx.beginPath();ctx.ellipse(p.x*S,p.y*S,Math.max(.5,rx*S),Math.max(.3,rx*S*.28),0,0,6.283);ctx.stroke()}}};
- const step=dt=>{const S=F.S;acc.m+=dt*7*K;acc.a+=dt*9*K;acc.e+=dt*6*K;acc.r+=dt*7*K;
-  while(acc.m>1){acc.m--;if(P.length<MAX)mote()}while(acc.a>1){acc.a--;if(P.length<MAX)aur()}while(acc.e>1){acc.e--;if(P.length<MAX)emb()}while(acc.r>1){acc.r--;if(P.length<MAX)riv()}
-  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,F.cv.width,F.cv.height);ctx.globalCompositeOperation='lighter';
-  for(let i=P.length-1;i>=0;i--){const p=P[i];p.life+=dt;if(p.life>=p.max){P.splice(i,1);continue}const u=p.life/p.max;
-   if(p.k==='brst'){p.vy+=260*dt;p.vx*=(1-1.4*dt)}
-   p.x+=(p.vx+Math.sin(p.life*1.6+p.ph)*p.sw*.5)*dt;p.y+=p.vy*dt;
-   let a=Math.sin(Math.PI*u);if(p.k==='emb')a*=.9;if(p.k==='twk')a=Math.pow(Math.sin(Math.PI*u),2);
-   ctx.globalAlpha=Math.max(0,Math.min(1,a))*(p.k==='mote'?.75:1);const hue=p.k==='brst'?p.hue+p.life*120:p.hue,d=p.r*2*S;ctx.drawImage(sp(hue),p.x*S-d/2,p.y*S-d/2,d,d)}
-  water(dt);ctx.globalAlpha=1};
- for(let i=0;i<(F.low?16:40);i++)mote();for(let i=0;i<(F.low?14:36);i++)streak(true);for(let i=0;i<(F.low?8:20);i++){aur();P[P.length-1].life=R(0,4)}
- let t0=performance.now(),last=t0,fr=0;
- const loop=now=>{if(!F.run)return;F.raf=requestAnimationFrame(loop);const dt=Math.min(.05,(now-last)/1000);last=now;const t=(now-t0)/1000;fr++;
-  F.lamps&&F.lamps.forEach((l,i)=>{const f=.62+.22*Math.sin(t*(7.3+i*1.9)+i)+.14*Math.sin(t*(13.1+i)+i*2.2)+(Math.random()-.5)*.16;l.style.opacity=Math.max(.25,Math.min(1,f)).toFixed(3);l.style.transform='translate(-50%,-50%) scale('+(.94+f*.1).toFixed(3)+')'});
-  if(!F.low&&fr%3===0&&F.turb)F.turb.setAttribute('baseFrequency',(.0042+.0011*Math.sin(t*.32)).toFixed(5)+' '+(.0095+.0022*Math.sin(t*.21+1.3)).toFixed(5));
-  step(dt)};
- F.raf=requestAnimationFrame(loop)}
-function sqnBuild(){
- if(SQN.el)return;
- const ov=document.createElement('div');ov.id='sqnOv';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','Investigate the Strange Lights');
- ov.innerHTML='<div class="sqc"><div class="sqw"><img alt="Investigate the Strange Lights. Strange lights flicker at the edge of sight. Visit all 3 lights before they fade. You have 60 minutes." draggable="false"></div><button type="button" class="sqb" aria-label="Continue">Continue</button><button type="button" class="sqz" aria-label="Close">\u2715</button></div>';
- (modal.parentElement||document.body).appendChild(ov);
- SQN.el=ov;SQN.img=ov.querySelector('img');try{sqnfxBuild(ov)}catch(e){console.warn('sqnfx build',e)}
- ov.addEventListener('click',e=>{if(!SQN.o||SQN.busy)return;if(e.target.closest('.sqb'))return sqnGo();if(e.target.closest('.sqz')||(e.target===ov&&SQN.o.close))sqnClose()});
- addEventListener('keydown',e=>{if(e.key==='Escape'&&SQN.o&&SQN.o.close&&!SQN.busy)sqnClose()})}
-function sqnWants(o){return !!o&&/strange lights/i.test(o.title||'')&&/edge of sight/i.test(o.text||'')&&/visit all 3 lights/i.test(o.text||'')}
-async function sqnOpen(o){
- sqnBuild();SQN.o=o;SQN.busy=false;
- SQN.img.src=SQN_ART+'?v='+window.__BUILD;SQN.el.querySelector('.sqc').style.setProperty('--sqi','url('+SQN_ART+'?v='+window.__BUILD+')');
- SQN.el.classList.toggle('cl',!!o.close);SQN.el.style.display='flex';
- await Promise.race([SQN.img.decode?SQN.img.decode().catch(()=>{}):0,new Promise(r=>setTimeout(r,1500))]);
- if(SQN.o!==o)return;
- requestAnimationFrame(()=>SQN.el.classList.add('on'));try{sqnfxStart()}catch(e){console.warn('sqnfx start',e)}}
-function sqnHide(){sqnfxStop();SQN.el.classList.remove('on');setTimeout(()=>{if(!SQN.o)SQN.el.style.display='none'},320)}
-function sqnClose(){const o=SQN.o;if(!o)return;SQN.o=null;sqnHide();if(o.onClose)o.onClose()}
-function sqnGo(){const o=SQN.o;if(!o)return;SQN.o=null;sqnHide();if(o.onGo)o.onGo()}
 
 /* ---- interactive mimic combat (chest ambush) ---- */
 const mimicArt=strong=>{const B=strong?'#3d2a52':'#7a4a1f',D=strong?'#24162f':'#4a2b10',G=strong?'#b8a0d8':'#d6b050',E=strong?'#ff3b30':'#ffd83a',T='#f6f1e3',sp=strong?'<path d="M45 22l8-24 8 24zM85 14l10-30 10 30zM125 22l8-24 8 24z" fill="'+G+'"/>':'',tt=(a,y,d,n)=>Array.from({length:n},(_,i)=>'<path d="M'+(a+i*22)+' '+y+'l7 '+d+' 7 '+(-d)+'z" fill="'+T+'"/>').join('');
@@ -1946,7 +1830,7 @@ function sortedInv(list){let a=list.slice();const R=it=>RAR.indexOf(CAT[it.cid].
 const shardOf=it=>CAT[it.cid].unique?0:(SHARD_VAL[CAT[it.cid].rarity]||1);
 function findItem(uid){const h=H();return h.inv.find(x=>x.uid===uid)||SLOTS.map(k=>h.eq[k]).find(x=>x&&x.uid===uid)||null}
 function pendingBonusClient(){const p=H().pendingBonus,it=p&&findItem(p.uid);if(!it||it.bonusAttr)return null;const options=(it.attrs||[]).filter(a=>a&&ATTR[a.k]&&a.v).map(a=>{const add=Math.max(1,Math.round(Math.abs(a.v)*.25)),gain=a.v<0?Math.min(add,Math.abs(a.v)):add,d=ATTR[a.k];return{k:a.k,name:d.name,unit:d.unit||'',current:a.v,after:a.v+gain}});return options.length?{uid:it.uid,itemName:CAT[it.cid].name,rarity:CAT[it.cid].rarity,options}:null}
-const ATTR_TIPS={atk:'Increases Attack.',def:'Increases Defense.',maxHp:'Increases Maximum HP.',bonusDamage:'Increases damage dealt.',damageReduction:'Reduces incoming damage.',criticalChance:'Increases the chance to land a critical hit.',criticalDamage:'Increases critical-hit damage.',armorPenetration:'Ignores a portion of enemy Defense.',lifesteal:'Restores HP based on actual damage dealt.',counterattackChance:'Chance to make a basic counterattack.',mimicDamage:'Increases damage against Mimics.',arenaDamage:'Increases damage in Arena combat.',darkLairDamage:'Increases damage against Dark Lair enemies.',explorationBonus:'Increases eligible non-XP exploration rewards.',natureDiscovery:'Improves eligible nature-discovery chances.',discoveryRadius:'Expands discovery detection radius, not GPS accuracy.',movementBonus:'Increases eligible walking/exploration credit; does not change real movement speed.',mimicDetection:'Chance to detect a Mimic before opening.',chestDiscovery:'Improves eligible chest-discovery chances.',chaosRollBonus:'Adds to eligible d20 checks.',criticalSuccessBonus:'Improves eligible rewards after a critical success.',criticalFailureProtection:'Reduces eligible critical-failure consequences.',rerollChance:'Chance for one additional eligible failed-check attempt.',rareLootChance:'Improves eligible higher-rarity loot chances.',lootQuality:'Advances eligible loot quality without bypassing source restrictions.',questRewardBonus:'Adds chances for eligible bonus non-currency quest rewards.',riftShardBonus:'Increases eligible Rift Shard rewards.',potionDiscovery:'Improves eligible potion-discovery chances.',resurrectionBonus:'Increases HP restored by eligible resurrection effects.',healingEffectiveness:'Improves non-potion healing.',potionEffectiveness:'Improves potion healing only.',statusResistance:'Reduces the chance of negative status effects being applied.',elementalResistance:'Reduces incoming elemental damage.',buffDuration:'Extends eligible positive effects within their duration limits.',groupRewardBonus:'Increases eligible group reward quantities for qualifying contributors.'};
+const ATTR_TIPS={atk:'Increases Attack.',def:'Increases Defense.',maxHp:'Increases Maximum HP.',bonusDamage:'Increases damage dealt.',damageReduction:'Reduces incoming damage.',criticalChance:'Increases the chance to land a critical hit.',criticalDamage:'Increases critical-hit damage.',armorPenetration:'Ignores a portion of enemy Defense.',lifesteal:'Restores HP based on actual damage dealt.',counterattackChance:'Chance to make a basic counterattack.',mimicDamage:'Increases damage against Mimics.',arenaDamage:'Increases damage in Arena combat.',darkLairDamage:'Increases damage against Dark Lair enemies.',explorationBonus:'Will boost non-XP exploration rewards. Not active yet: no eligible reward sources exist until a later update. Never increases XP.',natureDiscovery:'Raises (or lowers) the chance that Nature Discovery markers appear nearby. Does not change rewards.',discoveryRadius:'Changes how far away Chests, Nature Discoveries and Rifts show up on the map. Does not change how close you must be to use them, and never affects GPS accuracy.',movementBonus:'Changes the walking credit you earn toward daily, weekly and monthly walk quests. Does not change real movement speed or your miles-walked total.',mimicDetection:'Chance to spot a Mimic before opening a chest. If you do, you can leave it or open it and strike first. A chance, never a guarantee.',chestDiscovery:'Raises (or lowers) the chance that Treasure Chests appear nearby. Story-quest chests are not affected.',chaosRollBonus:'Adds to eligible d20 checks.',criticalSuccessBonus:'Improves eligible rewards after a critical success.',criticalFailureProtection:'Reduces eligible critical-failure consequences.',rerollChance:'Chance for one additional eligible failed-check attempt.',rareLootChance:'Improves eligible higher-rarity loot chances.',lootQuality:'Advances eligible loot quality without bypassing source restrictions.',questRewardBonus:'Adds chances for eligible bonus non-currency quest rewards.',riftShardBonus:'Increases eligible Rift Shard rewards.',potionDiscovery:'Improves eligible potion-discovery chances.',resurrectionBonus:'Increases HP restored by eligible resurrection effects.',healingEffectiveness:'Improves non-potion healing.',potionEffectiveness:'Improves potion healing only.',statusResistance:'Reduces the chance of negative status effects being applied.',elementalResistance:'Reduces incoming elemental damage.',buffDuration:'Extends eligible positive effects within their duration limits.',groupRewardBonus:'Increases eligible group reward quantities for qualifying contributors.'};
 const attrEsc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function attrHTML(it){const c=CAT[it.cid],vals={};(it.attrs||[]).forEach(x=>{if(ATTR[x.k])vals[x.k]=(vals[x.k]||0)+x.v});if(it.bonusAttr&&ATTR[it.bonusAttr.k])vals[it.bonusAttr.k]=(vals[it.bonusAttr.k]||0)+(Number(it.bonusAttr.v)||0);const a=Object.entries(vals).map(([k,n])=>{const d=ATTR[k],v=(n>0?'+':'')+n+(d.unit||''),boost=it.bonusAttr&&it.bonusAttr.k===k,tip=d.name+': '+v+'. '+(boost?'Empowered attribute bonus. ':'')+(ATTR_TIPS[k]||'');return'<span class="'+(boost?'attr-special':n<0?'attr-neg':'attr-pos')+'" title="'+attrEsc(tip)+'">'+(boost?'✦ ':'')+attrEsc(v+' '+d.name)+'</span>'});if(c.xpPct)a.push('<span class="attr-special" title="Unique experience bonus; applies until level '+c.xpMaxLvl+'">+'+c.xpPct+'% XP Bonus</span>');return a.length?'<div class="attr-list">'+a.join('')+'</div>':''}
 function compareHTML(it){const c=CAT[it.cid],slots=TYPE_SLOT[c.type]||[],slot=slots.find(k=>H().eq[k])||slots[0],old=slot&&H().eq[slot];if(!old)return'<div class="attr-compare">No '+(SN[slot]||'matching slot')+' currently equipped.</div>';const a={},b={};(it.attrs||[]).forEach(x=>a[x.k]=x.v);(old.attrs||[]).forEach(x=>b[x.k]=x.v);if(it.bonusAttr)a[it.bonusAttr.k]=(a[it.bonusAttr.k]||0)+it.bonusAttr.v;if(old.bonusAttr)b[old.bonusAttr.k]=(b[old.bonusAttr.k]||0)+old.bonusAttr.v;const keys=[...new Set([...Object.keys(a),...Object.keys(b)])],diff=keys.map(k=>({k,v:(a[k]||0)-(b[k]||0)})).filter(x=>x.v).map(x=>{const d=ATTR[x.k];return'<span class="'+(x.v>0?'attr-pos':'attr-neg')+'">'+(x.v>0?'+':'')+x.v+(d.unit||'')+' '+d.name+'</span>'});const wd=(CAT[it.cid].weaponDamage||0)-(CAT[old.cid].weaponDamage||0);if(wd)diff.push('<span class="'+(wd>0?'attr-pos':'attr-neg')+'">'+(wd>0?'+':'')+wd+' Base DMG</span>');return'<div class="attr-compare">Compared with '+attrEsc(SN[slot]||'equipped gear')+': '+(diff.length?diff.join(' · '):'No attribute difference')+'</div>'}
