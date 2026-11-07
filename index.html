@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.815';window.__BUILD=B;
+(function(){var B='1.816';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1103,7 +1103,7 @@ const WK='tp_world_v1';let WC=null,wcT=0;
 function wcLoad(){if(WC)return WC;try{WC=JSON.parse(localStorage.getItem(WK))}catch(e){}if(!WC||!WC.c||!WC.s)WC={c:{},s:{}};return WC}
 function wcSave(){clearTimeout(wcT);wcT=setTimeout(()=>{try{const w=wcLoad();for(const k of['c','s']){const ks=Object.keys(w[k]);if(ks.length>4000)ks.slice(0,ks.length-3000).forEach(x=>delete w[k][x])}localStorage.setItem(WK,JSON.stringify(w))}catch(e){}},1500)}
 function wcSeen(ll){try{if(!map.areTilesLoaded())return false;const q=map.project(ll),cv=map.getCanvas(),w=cv.clientWidth,h=cv.clientHeight;return q.x>40&&q.x<w-40&&q.y>h*.3&&q.y<h-40}catch(e){return false}}
-function addItem(it){if(S&&S.tutDone===false)return;items.push(it);const el=mkEl(it.t==='qpoint'&&it.q==='slumber'?'slumber':it.t);el.addEventListener('click',e=>{e.stopPropagation();openPoi(it)});markers.push(new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(it.ll).addTo(map))}
+function addItem(it){if(S&&S.tutDone===false)return;items.push(it);const el=mkEl(it.t==='qpoint'&&(it.q==='slumber'||it.q==='calaun'||it.q==='selora')?it.q:it.t);el.addEventListener('click',e=>{e.stopPropagation();openPoi(it)});markers.push(new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat(it.ll).addTo(map))}
 function dropItem(i){if(markers[i])markers[i].remove();items.splice(i,1);markers.splice(i,1)}
 function dropExpired(){const now=Date.now();let ch=false;for(let i=items.length-1;i>=0;i--)if(items[i].exp&&items[i].exp<=now){dropItem(i);ch=true}return ch}
 /* Phase 3 discovery attributes. Visibility/spawn chance only: interaction range (RANGE), GPS handling and story-quest markers are untouched. Server still validates every claim. */
