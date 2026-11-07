@@ -198,7 +198,8 @@
       '#cbt.ra-on{top:var(--ra-top);bottom:var(--ra-bot);padding:0;background:#05040a;align-items:stretch;justify-content:stretch}#cbt.ra-on>.cbb{display:none}' +
       '.ra{position:fixed;top:var(--ra-top);bottom:var(--ra-bot);left:0;right:0;z-index:1501;display:none;align-items:center;justify-content:center;overflow:hidden;container-type:size;background:#05040a;font-family:Georgia,"Palatino Linotype",serif;-webkit-user-select:none;user-select:none}' +
       '#cbt .ra{position:absolute;top:0;bottom:0}' +
-      '#raKn{top:0;bottom:0}' +   /* Knowledge Gained fills the whole screen (covers the HUD and bottom nav); the blurred art behind the card fills the space above and below */
+      '#raKn{top:var(--ra-top);bottom:var(--ra-bot)}' +   /* Knowledge Gained sits between the top banner and the bottom nav, so both stay visible */
+      '#raKn .ra-stg{width:min(calc(100vw*1.22),calc(100vh*2/3));width:min(calc(100cqw*1.22),calc(100cqh*2/3))}' +   /* art up to 22% wider on tall screens (sides trimmed, text stays clear) */
       '.ra.on{display:flex}' +
       '.ra .ra-back{position:absolute;inset:-6%;background:var(--ra-img) center/cover;filter:blur(26px) brightness(.5)}' +
       '.ra .ra-stg{position:relative;flex:none;aspect-ratio:2/3;width:min(100vw,calc((100vh - 170px)*2/3));width:min(100cqw,calc(100cqh*2/3));container-type:inline-size;background:#05040a;overflow:hidden}' +
