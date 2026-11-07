@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.806';window.__BUILD=B;
+(function(){var B='1.807';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2316,13 +2316,14 @@ function devPage(){
  return '<h2>Developer Mode</h2><div class="sdesc">Ignores real GPS and frees the camera. Move with the on-screen pad, arrow keys or WASD, or double-tap the map to jump there. Walking here earns no step credit.</div>'+onoff('dev','Developer Mode')+'<div class="setnote">Player ID (for the server\'s DEV_UIDS secret, so spawned markers can be claimed):<br><b style="user-select:all;-webkit-user-select:all;word-break:break-all">'+(()=>{try{return realmCloud.uid()||'not signed in'}catch(e){return 'not signed in'}})()+'</b></div><button class="m-btn ghost" data-dev="lock">Lock &amp; Forget Passcode</button><button class="m-btn ghost" data-sp="home">← Back</button>'}
 let devSpd=0,devHold={},devT=0,devSaved=0;const DEV_SPEEDS=[['Walk',4],['Run',16],['Fast',60]];
 function devPad(){let el=$('devPad');if(el)return el;el=document.createElement('div');el.id='devPad';
- el.innerHTML='<div class="dv-t">🛠 DEV</div><div class="dv-g"><i></i><button data-d="0" aria-label="Up">▲</button><i></i><button data-d="270" aria-label="Left">◀</button><button data-c="1" aria-label="Recenter camera">⌖</button><button data-d="90" aria-label="Right">▶</button><i></i><button data-d="180" aria-label="Down">▼</button><i></i></div><div class="dv-g dv-sp"><button data-spawn="chest" aria-label="Spawn chest">🧰</button><button data-spawn="nature" aria-label="Spawn nature">🌿</button><button data-spawn="rift" aria-label="Spawn rift">✨</button><button data-spawn="quest" aria-label="Spawn quest">📜</button><button data-spawn="boss" aria-label="Spawn dark lair">💀</button><button data-spawn="clear" aria-label="Clear dev spawns">🗑</button></div><button class="dv-s" data-sp2="1">Walk</button>';
+ el.innerHTML='<div class="dv-t">🛠 DEV</div><div class="dv-g"><i></i><button data-d="0" aria-label="Up">▲</button><i></i><button data-d="270" aria-label="Left">◀</button><button data-c="1" aria-label="Recenter camera">⌖</button><button data-d="90" aria-label="Right">▶</button><i></i><button data-d="180" aria-label="Down">▼</button><i></i></div><div class="dv-g dv-sp"><button data-spawn="chest" aria-label="Spawn chest">🧰</button><button data-spawn="nature" aria-label="Spawn nature">🌿</button><button data-spawn="rift" aria-label="Spawn rift">✨</button><button data-spawn="quest" aria-label="Spawn quest">📜</button><button data-spawn="boss" aria-label="Spawn dark lair">💀</button><button data-spawn="clear" aria-label="Clear dev spawns">🗑</button></div><div class="dv-tl"><button data-tool="keys" aria-label="Fill Keys of the Forsaken">🗝 Keys</button><button data-tool="heal" aria-label="Full heal">❤ Heal</button></div><button class="dv-s" data-sp2="1">Walk</button>';
  const bar=document.querySelector('.bottom-nav');(bar&&bar.parentNode||document.body).appendChild(el);
  const stop=()=>{devHold={}};
  el.addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b)return;e.preventDefault();
   if(b.dataset.d!==undefined){devHold[b.dataset.d]=1;try{b.setPointerCapture(e.pointerId)}catch(x){}}
   else if(b.dataset.c){map.easeTo({center:player,duration:350})}
   else if(b.dataset.spawn){devSpawn(b.dataset.spawn)}
+  else if(b.dataset.tool){devTool(b.dataset.tool)}
   else if(b.dataset.sp2){devSpd=(devSpd+1)%DEV_SPEEDS.length;b.textContent=DEV_SPEEDS[devSpd][0]}});
  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,e=>{const b=e.target.closest&&e.target.closest('button');if(b&&b.dataset.d!==undefined)delete devHold[b.dataset.d]}));
  window.addEventListener('blur',stop);return el}
@@ -2335,6 +2336,7 @@ function devSpawn(t){if(!DEV())return;
  const it={t,ll,key:'dev|'+t+'|'+now.toString(36)+n,exp:now+30*6e4,dev:1};
  if(t==='quest')it.name=QN[n%QN.length];
  addItem(it);updateCards();toast('Spawned: '+(LABEL[t]||t))}
+function devTool(op){if(!DEV())return;act('dev',{op}).then(r=>{if(r)toast(op==='keys'?'Keys of the Forsaken filled':'Fully healed')})}   // server-side, DEV_UIDS accounts only
 function devMove(ll,jump){targetLL=ll.slice();if(spawnAt&&dist(spawnAt,ll)>800){spawnAt=ll.slice();spawn(ll)}updateCards();
  if(jump){player=ll.slice();playerMarker.setLngLat(player);rangeAt=player.slice();try{map.getSource('range').setData(ringPoly(player,RANGE))}catch(e){}}
  if(Date.now()-devSaved>2000){devSaved=Date.now();try{localStorage.setItem(DEV_POS,JSON.stringify(ll))}catch(e){}}}
@@ -2368,7 +2370,7 @@ $('setModal').addEventListener('click',e=>{const b=e.target.closest('[data-dev]'
   else{toast('Incorrect passcode.');const i=$('devPass');if(i)i.value=''}}
  else if(b.dataset.dev==='lock'){SET.dev=false;SET.devOK=false;setSave();devApply();setPage('dev')}});
 $('setModal').addEventListener('click',e=>{if(e.target.closest('[data-sk="dev"]'))setTimeout(devApply,0)},false);
-try{const st=document.createElement('style');st.textContent='#devPad{position:absolute;z-index:504;right:10px;bottom:calc(86px + env(safe-area-inset-bottom));display:none;flex-direction:column;align-items:center;gap:5px;padding:7px;background:rgba(13,12,10,.82);border:1px solid #8b6937;border-radius:8px;touch-action:none;user-select:none;-webkit-user-select:none}#devPad .dv-t{font:700 10px Georgia,serif;letter-spacing:1.5px;color:#e5c77b}#devPad .dv-g{display:grid;grid-template-columns:repeat(3,40px);grid-auto-rows:40px;gap:4px}#devPad button{border:1px solid #b08a49;background:linear-gradient(180deg,#3a2c1c,#14100b);color:#f1e2bd;border-radius:6px;font-size:16px;padding:0;touch-action:none;-webkit-tap-highlight-color:transparent}#devPad button:active{background:#6a4f26}#devPad .dv-sp{grid-auto-rows:30px}#devPad .dv-sp button{font-size:15px}#devPad .dv-s{width:100%;height:28px;font-size:12px}';document.head.appendChild(st)}catch(e){}
+try{const st=document.createElement('style');st.textContent='#devPad{position:absolute;z-index:504;right:10px;bottom:calc(86px + env(safe-area-inset-bottom));display:none;flex-direction:column;align-items:center;gap:5px;padding:7px;background:rgba(13,12,10,.82);border:1px solid #8b6937;border-radius:8px;touch-action:none;user-select:none;-webkit-user-select:none}#devPad .dv-t{font:700 10px Georgia,serif;letter-spacing:1.5px;color:#e5c77b}#devPad .dv-g{display:grid;grid-template-columns:repeat(3,40px);grid-auto-rows:40px;gap:4px}#devPad button{border:1px solid #b08a49;background:linear-gradient(180deg,#3a2c1c,#14100b);color:#f1e2bd;border-radius:6px;font-size:16px;padding:0;touch-action:none;-webkit-tap-highlight-color:transparent}#devPad button:active{background:#6a4f26}#devPad .dv-sp{grid-auto-rows:30px}#devPad .dv-sp button{font-size:15px}#devPad .dv-tl{display:grid;grid-template-columns:1fr 1fr;gap:4px;width:100%}#devPad .dv-tl button{height:28px;font-size:12px}#devPad .dv-s{width:100%;height:28px;font-size:12px}';document.head.appendChild(st)}catch(e){}
 
 
 /* ================= TUTORIAL QUEST ================= */
