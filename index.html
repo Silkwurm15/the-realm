@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.816';window.__BUILD=B;
+(function(){var B='1.817';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2682,13 +2682,13 @@ $('chaosButton').addEventListener('click',chaosOpen);
 var PT={el:null,open:false,state:'idle',it:null,raf:0,timers:[],boost:1,last:0,room:null};
 const PT_MUSIC={beast:'battle_rift'};   // rooms with their own track. Any room not listed keeps the map music.
 const PT_CSS=`
-#portalOv{--void:#05040a;--cyan:#4fe3ff;--violet:#8a5cff;--img:url("assets/rift/rift_portal.jpg");position:fixed;inset:0;z-index:1490;display:none;opacity:0;transition:opacity .55s ease;background:var(--void);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden;font-family:Cinzel,Georgia,serif;color-scheme:dark}
+#portalOv{--void:#05040a;--cyan:#4fe3ff;--violet:#8a5cff;--img:url("assets/rift/rift_portal.jpg");position:fixed;inset:calc(max(0px,env(safe-area-inset-top)) + var(--hudh,92px) + 4px) 0 calc(72px + env(safe-area-inset-bottom,0px)) 0;container-type:size;z-index:1490;display:none;opacity:0;transition:opacity .55s ease;background:var(--void);box-sizing:border-box;padding:0;overflow:hidden;font-family:Cinzel,Georgia,serif;color-scheme:dark}
 #portalOv.on{opacity:1}
 #portalOv *,#portalOv *::before,#portalOv *::after{box-sizing:border-box}
 #portalOv .ptScene{position:absolute;inset:0;perspective:1200px;display:grid;grid-template:minmax(0,1fr)/minmax(0,1fr);place-items:center}
 #portalOv .ptStage{position:relative;width:min(100%,calc(100dvh * .94));aspect-ratio:1080/1149;transform-style:preserve-3d;transition:transform .25s ease-out;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
 #portalOv .ptStage>*{position:absolute;pointer-events:none}
-@media (max-aspect-ratio:94/100){#portalOv .ptStage{width:max(100%,calc(100dvh * .94));width:max(100%,calc(100vh * .94));width:max(100%,calc(100dvh * .94))}}   /* tall phone screens: fill the whole screen (cover) instead of letterboxing */
+@media (max-aspect-ratio:94/100){#portalOv .ptStage{width:max(100%,calc(100cqh * .94))}}   /* tall phone screens: fill the whole screen (cover) instead of letterboxing */
 #portalOv .ptBase{inset:0;background:var(--img) center/100% 100% no-repeat}
 #portalOv .ptGate{left:31%;top:21.3%;width:36.6%;height:62.7%;border-radius:50% 50% 46% 46% / 40% 40% 50% 50%;overflow:hidden;animation:ptBreathe 4.5s ease-in-out infinite}
 #portalOv .ptWarp{position:absolute;inset:0;background:var(--img) 48.9% 57.1%/273% auto no-repeat;filter:url(#ptRipple)}
@@ -2711,7 +2711,7 @@ const PT_CSS=`
 #portalOv .ptVoid{position:absolute;inset:0;z-index:5;opacity:0;pointer-events:none;transition:opacity 1.5s ease-in;background:#000}
 #portalOv .ptVoid.on{opacity:1;pointer-events:auto}
 #portalOv .ptFlash{inset:0;background:radial-gradient(ellipse at 50% 50%,#fff,var(--cyan) 25%,var(--violet) 55%,transparent 80%);opacity:0;mix-blend-mode:screen}
-#portalOv .ptBack{position:absolute;z-index:6;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;padding:8px 14px;border:1px solid rgba(138,92,255,.7);border-radius:18px;background:rgba(5,4,10,.6);color:#cfe2ff;font:600 13px Cinzel,Georgia,serif;letter-spacing:.08em;cursor:pointer;transition:opacity .4s}
+#portalOv .ptBack{position:absolute;z-index:6;top:12px;right:14px;padding:8px 14px;border:1px solid rgba(138,92,255,.7);border-radius:18px;background:rgba(5,4,10,.6);color:#cfe2ff;font:600 13px Cinzel,Georgia,serif;letter-spacing:.08em;cursor:pointer;transition:opacity .4s}
 #portalOv .ptBack.hide{opacity:0;pointer-events:none}
 @keyframes ptSpin{to{transform:rotate(360deg)}}
 @keyframes ptBreathe{50%{filter:brightness(1.28) saturate(1.2)}}
@@ -3549,7 +3549,8 @@ $$('lmGo').onclick=()=>{const f=lmCb;lmCb=null;lmClose();if(f)f()};
 <style>
 #wrOv{position:fixed;inset:calc(max(0px,env(safe-area-inset-top)) + var(--hudh,92px) + 4px) 0 calc(72px + env(safe-area-inset-bottom,0px)) 0;container-type:size;z-index:1600;display:none;align-items:center;justify-content:center;background:#07041a;overflow:hidden}
 #wrOv.open{display:flex}
-#wrOv #wrS{position:relative;flex:none;width:min(calc(100cqw*1.12),calc(100cqh*941/1672));aspect-ratio:941/1672;container-type:inline-size;overflow:hidden;--img:url(assets/rift/rift_wild_room.webp)}
+#wrOv::before{content:"";position:absolute;inset:-8%;background:url(assets/rift/rift_wild_room.webp) center/cover;filter:blur(18px) brightness(.55) saturate(1.2);pointer-events:none}
+#wrOv #wrS{position:relative;z-index:1;flex:none;-webkit-mask-image:linear-gradient(to right,transparent,#000 3%,#000 97%,transparent);mask-image:linear-gradient(to right,transparent,#000 3%,#000 97%,transparent);width:min(calc(100cqw*1.12),calc(100cqh*941/1672));aspect-ratio:941/1672;container-type:inline-size;overflow:hidden;--img:url(assets/rift/rift_wild_room.webp)}
 /* wild room: art fills the space between the header and the bottom nav */
 #wrOv .wl{position:absolute;inset:0;background:var(--img) center/100% 100%}
 #wrOv #wrBase{animation:wrHue 14s ease-in-out infinite alternate}   /* no drift/zoom: the live text must stay lined up with the painted buttons */
