@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.818';window.__BUILD=B;
+(function(){var B='1.822';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -3076,7 +3076,7 @@ function slmShow(sq){
  sqClose()}
 /* ---- SIR CALAUN DAWNBLIGHT: 8 quests, one per daily reset. A dragon marker appears near you; the server decides every step, this only draws it. ---- */
 const CAL_T=[{"t": "The Hundred-Thousand-Gold Man", "o": "Visit 3 marked locations to investigate sightings of Sir Calaun Dawnblight.", "s": ["“Adventurer! Have you seen this Dragonborn? Sir Calaun Dawnblight. Dangerous, unpredictable, and worth a fortune to anyone who brings him in.”", "“One hundred thousand gold pieces. Dead or alive. Find out where he's been seen, and report back.”"], "k": "visit", "n": 3}, {"t": "The Missing Merchant", "o": "Visit a marked location and recover the merchant's missing satchel.", "s": ["“That scaled brute took my supplies and left my guards in the dirt! Said something about protecting the cargo. Protecting it from what, I ask you?”", "“Find my missing goods. If you find Calaun, tell him I want answers!”"], "k": "visit", "n": 1}, {"t": "Fire in His Blood", "o": "Visit 3 marked magical sites to investigate strange arcane disturbances.", "s": ["“Red fire, blue frost, and a Dragonborn who leaves scorch marks on ancient stone. That sounds like our friend.”", "“Whatever he was doing there, the magic hasn't faded. Investigate the ruins. And try not to get yourself cursed.”"], "k": "visit", "n": 3}, {"t": "The Company He Keeps", "o": "Discover 3 marked locations connected to a suspected mercenary network.", "s": ["“Calaun has always had questionable acquaintances. Mercenaries, smugglers, sellswords... the sort who'd sell their own boots if the price were right.”", "“Find their hideout. If they're working with him, I want to know why.”"], "k": "visit", "n": 3}, {"t": "The Thing Worth Stealing", "o": "Locate and open 3 marked chests to uncover clues about an ancient relic.", "s": ["“An ancient relic. That's what this is about? All this bloodshed over an old trinket?”", "“Don't be a fool. If Calaun risked a hundred-thousand-gold bounty to take it, that relic is worth more than gold. Find it before someone worse does.”"], "k": "chest", "n": 3}, {"t": "A Rift Unbound", "o": "Reach and investigate 3 marked rifts.", "s": ["“The rifts are spreading! If that seal breaks completely, we'll have more than mercenaries and angry merchants to worry about.”", "“Calaun must have been trying to repair it. Find the disturbances and stabilize them before the damage becomes irreversible!”"], "k": "rift", "n": 3}, {"t": "Dead or Alive", "o": "Visit the marked confrontation site and complete the encounter.", "s": ["“There he is. Sir Calaun Dawnblight. The most wanted Dragonborn in the realm.”", "“The bounty hunters are closing in. You have a choice, adventurer. Help bring him in, or discover why he's willing to die rather than let that relic fall into their hands.”", "“Choose carefully. Some mistakes cost more than gold.”"], "k": "fight", "n": 1}, {"t": "The Dragon's Final Gambit", "o": "Visit 3 marked locations to complete the final sealing ritual.", "s": ["“You've followed me across half the realm, endured mercenaries, rifts, and enough bad decisions to fill a royal library.”", "“Fine. You deserve the truth. The relic keeps something ancient asleep. The people who placed that bounty don't want justice. They want what's behind the seal.”", "“Help me finish this, adventurer. Afterward, you can decide whether I'm worth one hundred thousand gold.”"], "k": "visit", "n": 3}];
-const CAL_IMG="assets/calaun/cal_img_01.webp",CAL_IMGS=["assets/calaun/cal_img_02.webp", "assets/calaun/cal_img_03.webp", "assets/calaun/cal_img_04.webp", "assets/calaun/cal_img_05.webp", "assets/calaun/cal_img_06.webp", "assets/calaun/cal_img_07.webp", "assets/calaun/cal_img_08.webp", "assets/calaun/cal_img_09.webp"],CAL_ICO="assets/calaun/cal_icon.webp";var calN=0;
+const CAL_IMG="assets/calaun/cal_img_01.webp",CAL_IMGS=["assets/calaun/cal_img_02.webp", "assets/calaun/cal_img_03.webp", "assets/calaun/cal_img_04.webp", "assets/calaun/cal_img_05.webp", "assets/calaun/cal_img_06.webp", "assets/calaun/cal_img_07.webp", "assets/calaun/cal_img_08.webp", "assets/calaun/cal_img_09.webp"],CAL_ICO="assets/calaun/cal_icon.webp",CAL_PICK=["assets/calaun/cal_pick_01.webp"];var calN=0;   // CAL_PICK[n] = art for the quest pickup screen only (quest n+1); falls back to CAL_IMGS when missing
 var calT=0,calLL=null,calBusy=false;
 function drawCal(){const m=S.cal,n=m?(m.n|0):0,on=!!(m&&n<8&&m.st===0&&m.ll&&!sqList().some(q=>q.id==='calaun')&&!(S&&S.tutDone===false)),key=on?'cal|'+m.d+'|'+n:'';let have=false,ch=false;
  for(let i=items.length-1;i>=0;i--){const it=items[i];if(it.t!=='calaun')continue;if(on&&!it.used&&it.key===key&&it.ll[0]===m.ll[0]&&it.ll[1]===m.ll[1])have=true;else{dropItem(i);ch=true}}
@@ -3090,7 +3090,7 @@ function syncCal(){if(calBusy||!window.realmCloud||!S||S.tutDone===false||!targe
 function calDraw(o){rfDraw({slm:1,icon:'',img:CAL_IMGS[calN]||CAL_IMG,...o});rf.firstElementChild.classList.add('cal')}
 function calPoi(it){const k=it.k;return k==='chest'?['A marked chest sits here, quietly waiting.','Open Chest']:k==='rift'?['A rift shimmers here, scarred by dragonfire.','Enter Rift']:k==='fight'?['Sir Calaun Dawnblight stands here, and the bounty hunters are closing in.','Confront']:['Something about this spot is worth a closer look.','Investigate']}
 function calIntro(it){const n=Math.min(7,(S.cal&&S.cal.n)|0),T=CAL_T[n];calN=n;
- calDraw({title:T.t,wild:'Sir Calaun Dawnblight · Quest '+(n+1)+' of 8',text:T.s.join('\n\n'),btns:[{html:'Accept Quest',fn:()=>{rf.style.display='none';calAccept(it)}},{html:'Not now',alt:1,fn:sqClose}]})}
+ calDraw({...(CAL_PICK[n]?{img:CAL_PICK[n]}:{}),title:T.t,wild:'Sir Calaun Dawnblight · Quest '+(n+1)+' of 8',text:T.s.join('\n\n'),btns:[{html:'Accept Quest',fn:()=>{rf.style.display='none';calAccept(it)}},{html:'Not now',alt:1,fn:sqClose}]})}
 async function calAccept(it){if(it.used||it.busy)return;it.busy=true;let r;try{r=await useMarker(it,()=>act('quest',{op:'start',t:'calaun',key:it.key,ll:targetLL,cands:gatherCands()}))}finally{it.busy=false}
  if(r&&r.result&&r.result.sq){try{Sound.queue('quest_start')}catch(e){}calShow(r.result.sq);try{syncQPoints()}catch(e){}}}
 async function calChest(it){calN=4;const r=await act('loot',{t:'chest',cq:it.qid,i:it.i,ll:targetLL});if(!r)return;const o=r.result;try{Sound.sfx('chest')}catch(e){}
@@ -3563,7 +3563,7 @@ $$('lmGo').onclick=()=>{const f=lmCb;lmCb=null;lmClose();if(f)f()};
 #wrOv{position:fixed;inset:calc(max(0px,env(safe-area-inset-top)) + var(--hudh,92px) + 4px) 0 calc(72px + env(safe-area-inset-bottom,0px)) 0;container-type:size;z-index:1600;display:none;align-items:center;justify-content:center;background:#07041a;overflow:hidden}
 #wrOv.open{display:flex}
 #wrOv::before{content:"";position:absolute;inset:-8%;background:url(assets/rift/rift_wild_room.webp) center/cover;filter:blur(18px) brightness(.55) saturate(1.2);pointer-events:none}
-#wrOv #wrS{position:relative;z-index:1;flex:none;-webkit-mask-image:linear-gradient(to right,transparent,#000 3%,#000 97%,transparent);mask-image:linear-gradient(to right,transparent,#000 3%,#000 97%,transparent);width:min(calc(100cqw*1.12),calc(100cqh*941/1672));aspect-ratio:941/1672;container-type:inline-size;overflow:hidden;--img:url(assets/rift/rift_wild_room.webp)}
+#wrOv #wrS{position:relative;z-index:1;flex:none;width:max(100cqw,calc(100cqh*941/1672));aspect-ratio:941/1672;container-type:inline-size;overflow:hidden;--img:url(assets/rift/rift_wild_room.webp)}
 /* wild room: art fills the space between the header and the bottom nav */
 #wrOv .wl{position:absolute;inset:0;background:var(--img) center/100% 100%}
 #wrOv #wrBase{animation:wrHue 14s ease-in-out infinite alternate}   /* no drift/zoom: the live text must stay lined up with the painted buttons */
@@ -3585,15 +3585,12 @@ $$('lmGo').onclick=()=>{const f=lmCb;lmCb=null;lmClose();if(f)f()};
 #wrOv .wb[disabled]{cursor:default}
 #wrOv .wt{position:absolute;left:50%;transform:translate(-50%,-50%);width:60%;text-align:center;font:400 2.55cqw/1.15 "IM Fell English",Georgia,serif;color:#f3e8f2;text-shadow:0 1px 3px #000,0 0 8px rgba(10,5,30,.9);pointer-events:none;white-space:nowrap}
 #wrOv .wd{opacity:.4;filter:grayscale(.6)}
-#wrOv #wrWeave{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 2.2cqw);max-width:84%;padding:1.1cqw 3cqw;border:1px solid rgba(190,150,255,.65);border-radius:4cqw;background:rgba(10,5,30,.62);color:#efe6ff;font:400 2.5cqw/1.25 "IM Fell English",Georgia,serif;text-align:center;pointer-events:none;display:none;backdrop-filter:blur(2px)}
-#wrOv #wrWeave b{color:#ffd98a;font-weight:600}
 @media (prefers-reduced-motion:reduce){#wrOv *{animation:none!important}}
 </style>
 <div id="wrOv" role="dialog" aria-modal="true" aria-label="Wild Room"><div id="wrS">
 <div class="wl" id="wrBase"></div><div id="wrPw"><img id="wrPt" alt="" src="assets/rift/rift_wild_swirl.webp"></div>
 <div class="wg" id="wrG0"></div><div class="wg" id="wrG1"></div><div class="wg" id="wrG2"></div><div class="wg" id="wrG3"></div>
 <canvas id="wrC"></canvas><div class="wv"></div>
-<div id="wrWeave"></div>
 <div class="wt" id="wrT0" style="top:62.5%"></div><div class="wt" id="wrT1" style="top:74.6%"></div><div class="wt" id="wrT2" style="top:86.2%"></div>
 <button class="wb" id="wrB0" type="button" style="top:54.7%" aria-label="Step in boldly"></button>
 <button class="wb" id="wrB1" type="button" style="top:67.6%" aria-label="Slip through"></button>
@@ -3623,7 +3620,6 @@ window.wrOpen=function(room,pick){
   const o=c.odds===1&&!c.note?'':(c.odds!=null&&c.odds<1?Math.round(c.odds*100)+'% chance':'');
   t.textContent=[o,c.note,c.fit?'Your class excels':''].filter(Boolean).join(' \u00B7 ');
   b.onclick=()=>{if(b.disabled)return;wrClose();pick(id)}});
- const w=$$('wrWeave');if(room.wild&&room.wild.name){w.innerHTML='<b>'+esc(room.wild.name)+'</b> \u2014 '+esc(room.wild.text||'');w.style.display='block'}else w.style.display='none';
  if(!P.length)for(let i=0;i<110;i++)P.push(mk(true));
  ov.classList.add('open');rs();if(!raf)raf=requestAnimationFrame(frame)};
 window.wrClose=function(){ov.classList.remove('open')};
