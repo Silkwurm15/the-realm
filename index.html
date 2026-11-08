@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.823';window.__BUILD=B;
+(function(){var B='1.824';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -3091,7 +3091,7 @@ function calDraw(o){rfDraw({slm:1,icon:'',img:CAL_IMGS[calN]||CAL_IMG,...o});rf.
 function calPoi(it){const k=it.k;return k==='chest'?['A marked chest sits here, quietly waiting.','Open Chest']:k==='rift'?['A rift shimmers here, scarred by dragonfire.','Enter Rift']:k==='fight'?['Sir Calaun Dawnblight stands here, and the bounty hunters are closing in.','Confront']:['Something about this spot is worth a closer look.','Investigate']}
 function calIntro(it){const n=Math.min(7,(S.cal&&S.cal.n)|0),T=CAL_T[n];calN=n;
  const std=()=>calDraw({title:T.t,wild:'Sir Calaun Dawnblight · Quest '+(n+1)+' of 8',text:T.s.join('\n\n'),btns:[{html:'Accept Quest',fn:()=>{rf.style.display='none';calAccept(it)}},{html:'Not now',alt:1,fn:sqClose}]});
- if(CAL_PICK[n]&&window.calPick)return calPick(it,n,std);std()}
+ if(CAL_PICK[n]&&window.calPick)return calPick(CAL_PICK[n],()=>{rf.style.display='none';calAccept(it)},()=>sqClose(),std);std()}
 async function calAccept(it){if(it.used||it.busy)return;it.busy=true;let r;try{r=await useMarker(it,()=>act('quest',{op:'start',t:'calaun',key:it.key,ll:targetLL,cands:gatherCands()}))}finally{it.busy=false}
  if(r&&r.result&&r.result.sq){try{Sound.queue('quest_start')}catch(e){}calShow(r.result.sq);try{syncQPoints()}catch(e){}}}
 async function calChest(it){calN=4;const r=await act('loot',{t:'chest',cq:it.qid,i:it.i,ll:targetLL});if(!r)return;const o=r.result;try{Sound.sfx('chest')}catch(e){}
@@ -3675,10 +3675,10 @@ window.showLoadScreen=function(){if(shown||gone)return;shown=1;el.classList.add(
 <div id="cpOv" role="dialog" aria-modal="true" aria-label="Quest"><div id="cpS"><button class="cb" id="cpA" type="button" aria-label="Accept Quest"></button><button class="cb" id="cpN" type="button" aria-label="Not now"></button></div></div>
 <script>
 (function(){const ov=document.getElementById('cpOv'),A=document.getElementById('cpA'),N=document.getElementById('cpN');
-window.calPick=function(it,n,fb){const u=CAL_PICK[n],im=new Image();
+window.calPick=function(u,onAccept,onNot,fb){const im=new Image();   // everything it needs is passed in: this script is outside the game closure
  im.onload=()=>{ov.style.setProperty('--img','url("'+u+'")');
-  A.onclick=()=>{ov.classList.remove('open');rf.style.display='none';calAccept(it)};
-  N.onclick=()=>{ov.classList.remove('open');sqClose()};
+  A.onclick=()=>{ov.classList.remove('open');onAccept()};
+  N.onclick=()=>{ov.classList.remove('open');onNot()};
   ov.classList.add('open')};
  im.onerror=()=>{fb()};im.src=u};
 })();
