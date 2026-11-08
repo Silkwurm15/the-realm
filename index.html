@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.825';window.__BUILD=B;
+(function(){var B='1.826';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -3112,7 +3112,8 @@ function calShow(sq){const n=sq.step|0;calN=n;const T=CAL_T[n]||CAL_T[0],tag='Si
   {html:'Protect Calaun<small>Fight the bounty hunters</small>',fn:()=>calFightStart(sq.qid,'protect')},
   {html:'Not now',alt:1,fn:sqClose}]});
  if(sq.phase==='done'){const std=()=>calDraw({title:'Quest Complete',wild:tag,text:sq.name,lines:sq.lines,btns:[{html:'Continue',fn:sqClose}]});
-  if(CAL_QUOTE[n]&&sq.last&&sq.xp!=null&&window.calDoneCard){const ex=(sq.lines||[]).filter(x=>/^Quest Reward Bonus/.test(x)).join(' ');if(calDoneCard(sq.last,n+1,CAL_QUOTE[n],sq.xp,ex,sqClose,std))return}
+  if(CAL_QUOTE[n]&&window.calDoneCard){const L=sq.lines||[],rw=L.map(x=>/Reward: \+(\d+) XP/.exec(x)).find(Boolean),xp=sq.xp!=null?sq.xp:rw?+rw[1]:null;   // last stop: server name, else matched from the stop text (first line)
+   if(xp!=null&&calDoneCard(sq.last||L[0]||'',n+1,CAL_QUOTE[n],xp,'',sqClose,std))return}
   return std()}
  sqClose()}
 /* ---- SELORA DAWNBLIGHT: a second questline (S.sel), separate from Sir Calaun. Same flow: daily marker -> parchment quest screen -> stops -> parchment completion. The server decides every step; this only draws it. ---- */
@@ -3711,7 +3712,8 @@ window.calPick=function(u,onAccept,onNot,fb){const im=new Image();   // everythi
 #csS .d{position:absolute;left:11%;right:11%;top:calc(var(--dy)*1%);bottom:calc(100% - var(--db,78.5)*1%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:600 5.3cqw/1.22 Georgia,serif;color:#fff;text-shadow:0 1px 0 #000,0 0 3px #000,0 2px 5px #000;white-space:pre-line}
 #csS .d small{display:block;margin-top:1.6cqw;font:700 3.6cqw/1 Georgia,serif;color:#f0cf86}
 @media(max-width:699px){#csS{width:min(100cqw,calc(100cqh*var(--ar,.5996)*1.25));height:100cqh;aspect-ratio:auto}}
-#csS button{position:absolute;left:30%;right:30%;top:calc(var(--bt,88.3)*1%);height:6.2%;border:1px solid #f0c860;border-radius:2.6cqw;font:700 4.6cqw/1 Georgia,serif;color:#fff1c8;background:linear-gradient(#b0802d,#74491a 55%,#4f310d);text-shadow:0 1px 2px #000;box-shadow:0 0 2.5cqw #000b,inset 0 1px 0 #ffe49a99;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#csS button{position:absolute;left:9%;right:9%;top:calc(var(--bt,88.3)*1%);height:6.3%;border:0;padding:0;isolation:isolate;font:700 5.3cqw/1 Georgia,serif;color:#fff;letter-spacing:.02em;background:linear-gradient(#ffe7a0,#e2b04a 45%,#a8741c);clip-path:polygon(0 50%,3.4cqw 0,calc(100% - 3.4cqw) 0,100% 50%,calc(100% - 3.4cqw) 100%,3.4cqw 100%);text-shadow:0 1px 2px #000b;cursor:pointer;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 .6cqw 1cqw #000c)}
+#csS button::before{content:"";position:absolute;inset:.55cqw .8cqw;z-index:-1;background:linear-gradient(#5b9bff,#2166e0 48%,#123c9c);clip-path:polygon(0 50%,3cqw 0,calc(100% - 3cqw) 0,100% 50%,calc(100% - 3cqw) 100%,3cqw 100%)}
 #csS button:active{filter:brightness(1.2)}
 #csS .t{position:absolute;left:9%;right:9%;top:calc(var(--ty,56)*1% - 4.6cqw);height:9.2cqw;display:none;align-items:center;justify-content:center;font:700 7.6cqw/1 Georgia,serif;color:#f8da86;white-space:nowrap;text-shadow:0 1px 0 #7a4a08,0 2px 2px #000c,0 0 7px #000a}
 #csS.hasT .t{display:flex}
@@ -3725,7 +3727,7 @@ window.calPick=function(u,onAccept,onNot,fb){const im=new Image();   // everythi
 <script>
 (function(){const ov=document.getElementById('csOv'),q=ov.querySelector('.q'),d=ov.querySelector('.d'),b=ov.querySelector('button'),stg=document.getElementById('csS');
 const t=ov.querySelector('.t'),DONE_ART={old_mill:1,market_crossroads:1,roadside_farmstead:1};   // stops that have a title-erased stop_*_done.webp
-const CFG={0:{ar:.5996,py:58.4,dy:62.9,db:78.5,bt:88.3},1:{ar:.5996,py:56.1,dy:60.4,db:78.5,bt:88.3},mill:{ar:551/717,py:63.4,dy:67.9,db:82.9,bt:89.1,ty:55.6},mkt:{ar:523/730,py:67.2,dy:71.7,db:86.1,bt:90.2,ty:59.6},farm:{ar:520/738,py:67.3,dy:71.7,db:86,bt:90,ty:59.6},start:{ar:1071/1469,py:0,dy:55.5,db:84,bt:86.3}};
+const CFG={0:{ar:.5996,py:58.4,dy:62.9,db:78.5,bt:88.3},1:{ar:.5996,py:56.1,dy:60.4,db:78.5,bt:88.3},mill:{ar:551/717,py:63.4,dy:67.9,db:82.9,bt:87.8,ty:55.6,dyc:63.8},mkt:{ar:523/730,py:67.2,dy:71.7,db:85.6,bt:88.4,ty:59.6,dyc:67.2},farm:{ar:520/738,py:67.3,dy:71.7,db:85.6,bt:88.4,ty:59.6,dyc:67.2},start:{ar:1071/1469,py:0,dy:55.5,db:84,bt:86.3}};
 const MAP=[[/old\s*mill/i,'old_mill','mill'],[/crossroads/i,'market_crossroads','mkt'],[/farmstead/i,'roadside_farmstead','farm'],[/scorched/i,'scorched_ruins',0],[/frozen|altar|alter\b/i,'frozen_alter',0],[/cracked\s*obelisk/i,'cracked_obelisk',0],[/mercenary\s*camp/i,'mercenary_camp',0],[/smuggler/i,'smugglers_cache',0],[/sellsword/i,'sellsword_hideout',1],[/confrontation\s*site/i,'confrontation_site',1],[/first\s*seal/i,'seal_stone_1',1],[/second\s*seal/i,'seal_stone_2',1],[/third\s*seal/i,'seal_stone_3',1]];
 const TX=[[/mill wall|the miller/i,'old_mill','mill'],[/trader describes|bandages/i,'market_crossroads','mkt'],[/farmer swears|scaled giant/i,'roadside_farmstead','farm'],[/blackened stone|melted metal/i,'scorched_ruins',0],[/buried in ice|runes\s+still\s+glowing/i,'frozen_alter',0],[/obelisk/i,'cracked_obelisk',0],[/empty camp|mercenar/i,'mercenary_camp',0],[/hidden stash|smuggl/i,'smugglers_cache',0],[/hideout|professional killers/i,'sellsword_hideout',1],[/fierce battle|victors/i,'confrontation_site',1],[/first seal/i,'seal_stone_1',1],[/second stone|second seal/i,'seal_stone_2',1],[/final stone|third seal/i,'seal_stone_3',1]];
 /* one card engine: o = {img, cfg, title?, pill?, nodes:[...], btn, done, fail}. title = text drawn on the (erased) ribbon, pill = text on the gold plaque (omit when it is painted into the art). */
@@ -3740,13 +3742,14 @@ const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=
 const find=(name,text)=>{const nm=String(name||'').replace(/[’‘`]/g,"'"),tx=String(text||'');return MAP.find(x=>x[0].test(nm))||TX.find(x=>x[0].test(tx))};
 window.calStopCard=function(name,n,text,sub,done){const m=find(name,text);if(!m)return false;
  const nodes=[el('div',0,text||'')];if(sub)nodes.push(el('small',0,sub));
- show({img:'assets/calaun/stop_'+m[1]+'.webp',cfg:CFG[m[2]],pill:'Quest '+n+' of 8',nodes,done,fail:()=>{if(done)done()}});return true};
+ const c=CFG[m[2]],noPill=c&&c.dyc;   // the three Quest 1 stops have the plaque painted out: no "Quest N of 8" banner, text starts higher
+ show({img:'assets/calaun/stop_'+m[1]+'.webp',cfg:noPill?Object.assign({},c,{dy:c.dyc}):c,pill:noPill?null:'Quest '+n+' of 8',nodes,done,fail:()=>{if(done)done()}});return true};
 /* quest START card: the painted pickup card with its text and buttons painted out; the objective and (0 / N) are drawn on top */
 window.calStartCard=function(img,n,objective,total,done,fail){
  const nodes=[el('span','lb','QUEST OBJECTIVE'),el('div',0,objective),el('span','ct','(0 / '+total+')')];
  show({img,cfg:CFG.start,nodes,btn:'Continue',done,fail});return true};
 /* quest COMPLETE card: art of the last stop with its title erased; "Quest Complete" on the ribbon, quote, big +XP */
-window.calDoneCard=function(lastName,n,quote,xp,extra,done,fail){const m=find(lastName,'');if(!m||!CFG[m[2]]||!CFG[m[2]].ty||!DONE_ART[m[1]])return false;
+window.calDoneCard=function(lastName,n,quote,xp,extra,done,fail){const m=find(lastName,lastName);if(!m||!CFG[m[2]]||!CFG[m[2]].ty||!DONE_ART[m[1]])return false;
  const nodes=[el('div','qt',quote),el('span','xp','+'+xp+' XP')];if(extra)nodes.push(el('small',0,extra));
  show({img:'assets/calaun/stop_'+m[1]+'_done.webp',cfg:CFG[m[2]],title:'Quest Complete',pill:'Quest '+n+' of 8',nodes,btn:'Continue',done,fail});return true};
 })();
