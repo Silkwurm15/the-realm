@@ -2334,9 +2334,10 @@ function devPad(){let el=$('devPad');if(el)return el;el=document.createElement('
   else if(b.dataset.c){map.easeTo({center:player,duration:350})}
   else if(b.dataset.spawn){devSpawn(b.dataset.spawn)}
   else if(b.dataset.tool){devTool(b.dataset.tool)}
-  else if(b.dataset.quests){devQuests()}
+  else if(b.dataset.quests){/* opened on click, below */}
   else if(b.dataset.sp2){devSpd=(devSpd+1)%DEV_SPEEDS.length;b.textContent=DEV_SPEEDS[devSpd][0]}});
  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,e=>{const b=e.target.closest&&e.target.closest('button');if(b&&b.dataset.d!==undefined)delete devHold[b.dataset.d]}));
+ el.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b&&b.dataset.quests)devQuests()});   // open on CLICK, not pointerdown: opening under the finger let the trailing tap hit the picker backdrop and close it at once
  window.addEventListener('blur',stop);return el}
 let devN=0;   // Spawn buttons: markers appear 35 m ahead of the camera (fanned out so they do not stack) and exist only on this device.
 // Claiming one needs the server to accept it: the server's DEV_UIDS secret must list your player ID (shown in Settings > Developer Mode).
@@ -2355,11 +2356,11 @@ function devQuests(){let el=$('devQ');if(!el){el=document.createElement('div');e
  const rowN=l=>'<div class="dq-r">'+[1,2,3,4,5,6,7,8].map(n=>'<button data-ql="'+l+'" data-n="'+n+'">'+n+'</button>').join('')+'</div>';
  el.innerHTML='<div class="dq-c"><h3>Spawn Quest</h3><div class="dq-s">Sir Calaun Dawnblight, quest</div>'+rowN('calaun')+'<div class="dq-s">Selora Dawnblight, quest</div>'+rowN('selora')+'<div class="dq-s">Explorable quests</div><div class="dq-l">'+QN.map((q,i)=>'<button data-ex="'+i+'">'+q+'</button>').join('')+'<button data-slm="1">Lost in Slumber</button></div><button class="dq-x" data-close="1">Close</button></div>';
  document.body.appendChild(el);
- el.addEventListener('click',e=>{const b=e.target.closest('button');if(e.target===el||(b&&b.dataset.close)){el.style.display='none';return}if(!b||!DEV()||!gotFirst)return;
+ el.addEventListener('click',e=>{const b=e.target.closest('button');if(e.target===el&&Date.now()-(el._t||0)<500)return;if(e.target===el||(b&&b.dataset.close)){el.style.display='none';return}if(!b||!DEV()||!gotFirst)return;
   if(b.dataset.ql){const l=b.dataset.ql,n=+b.dataset.n;act('dev',{op:'ql',line:l,n,list:[devAhead(0)]}).then(r=>{if(!r)return;(l==='selora'?drawSel:drawCal)();el.style.display='none';toast((l==='selora'?'Selora':'Calaun')+' quest '+n+': marker placed ahead')})}
   else if(b.dataset.slm){act('dev',{op:'slm',list:[devAhead(0)]}).then(r=>{if(!r)return;drawSlm();el.style.display='none';toast('Lost in Slumber: marker placed ahead')})}
   else if(b.dataset.ex!==undefined){const qi=+b.dataset.ex,now=Date.now(),n=devN++;addItem({t:'quest',ll:devAhead(0),key:'dev|quest|'+DEV_QIDS[qi]+now.toString(36)+n,exp:now+30*6e4,dev:1,name:QN[qi]});updateCards();el.style.display='none';toast('Spawned: '+QN[qi])}})}
- el.style.display='flex'}
+ el._t=Date.now();el.style.display='flex'}
 function devMove(ll,jump){targetLL=ll.slice();if(spawnAt&&dist(spawnAt,ll)>800){spawnAt=ll.slice();spawn(ll)}updateCards();
  if(jump){player=ll.slice();playerMarker.setLngLat(player);rangeAt=player.slice();try{map.getSource('range').setData(ringPoly(player,RANGE))}catch(e){}}
  if(Date.now()-devSaved>2000){devSaved=Date.now();try{localStorage.setItem(DEV_POS,JSON.stringify(ll))}catch(e){}}}
@@ -3678,6 +3679,7 @@ window.showLoadScreen=function(){if(shown||gone)return;shown=1;el.classList.add(
 #cpOv #cpS{position:relative;z-index:1;flex:none;width:min(100cqw,calc(100cqh*1071/1469));aspect-ratio:1071/1469;background:var(--img) center/100% 100%}
 #cpOv .cb{position:absolute;background:transparent;border:0;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:0;border-radius:3cqw}
 #cpOv .cb:active{background:rgba(255,255,255,.18)}
+@media(max-width:699px){#cpOv #cpS{width:100cqw;height:min(100cqh,calc(100cqw*1469/1071*1.25));aspect-ratio:auto}}
 #cpOv #cpA{left:11%;width:78%;top:76.6%;height:7.7%}
 #cpOv #cpN{left:10.5%;width:79%;top:85.9%;height:5.7%}
 </style>
@@ -3701,14 +3703,16 @@ window.calPick=function(u,onAccept,onNot,fb){const im=new Image();   // everythi
 #csS .q{position:absolute;left:30%;right:30%;top:calc(var(--py)*1% - 3.2cqw);height:6.4cqw;display:flex;align-items:center;justify-content:center;font:700 4.9cqw/1 Georgia,serif;color:#2b1a06;white-space:nowrap}
 #csS .d{position:absolute;left:11%;right:11%;top:calc(var(--dy)*1%);bottom:calc(100% - 78.5%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:600 5.3cqw/1.22 Georgia,serif;color:#fff;text-shadow:0 1px 0 #000,0 0 3px #000,0 2px 5px #000;white-space:pre-line}
 #csS .d small{display:block;margin-top:1.6cqw;font:700 3.6cqw/1 Georgia,serif;color:#f0cf86}
+@media(max-width:699px){#csS{width:min(100cqw,calc(100cqh*307/512*1.25));height:100cqh;aspect-ratio:auto}}
 #csS button{position:absolute;left:30%;right:30%;top:88.3%;height:6.2%;border:1px solid #f0c860;border-radius:2.6cqw;font:700 4.6cqw/1 Georgia,serif;color:#fff1c8;background:linear-gradient(#b0802d,#74491a 55%,#4f310d);text-shadow:0 1px 2px #000;box-shadow:0 0 2.5cqw #000b,inset 0 1px 0 #ffe49a99;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #csS button:active{filter:brightness(1.2)}
 </style>
 <div id="csOv" role="dialog" aria-modal="true"><div id="csS"><div class="q"></div><div class="d"></div><button type="button">Continue</button></div></div>
 <script>
 (function(){const ov=document.getElementById('csOv'),q=ov.querySelector('.q'),d=ov.querySelector('.d'),b=ov.querySelector('button'),stg=document.getElementById('csS');
-const MAP=[[/scorched/i,'scorched_ruins',0],[/frozen/i,'frozen_alter',0],[/cracked\s*obelisk/i,'cracked_obelisk',0],[/mercenary\s*camp/i,'mercenary_camp',0],[/smuggler/i,'smugglers_cache',0],[/sellsword/i,'sellsword_hideout',1],[/confrontation\s*site/i,'confrontation_site',1],[/first\s*seal/i,'seal_stone_1',1],[/second\s*seal/i,'seal_stone_2',1],[/third\s*seal/i,'seal_stone_3',1]];
-window.calStopCard=function(name,n,text,sub,done){const m=MAP.find(x=>x[0].test(String(name||'')));if(!m)return false;
+const MAP=[[/scorched/i,'scorched_ruins',0],[/frozen|altar|alter\b/i,'frozen_alter',0],[/cracked\s*obelisk/i,'cracked_obelisk',0],[/mercenary\s*camp/i,'mercenary_camp',0],[/smuggler/i,'smugglers_cache',0],[/sellsword/i,'sellsword_hideout',1],[/confrontation\s*site/i,'confrontation_site',1],[/first\s*seal/i,'seal_stone_1',1],[/second\s*seal/i,'seal_stone_2',1],[/third\s*seal/i,'seal_stone_3',1]];
+const TX=[[/blackened stone|melted metal/i,'scorched_ruins',0],[/buried in ice|runes\s+still\s+glowing/i,'frozen_alter',0],[/obelisk/i,'cracked_obelisk',0],[/empty camp|mercenar/i,'mercenary_camp',0],[/hidden stash|smuggl/i,'smugglers_cache',0],[/hideout|professional killers/i,'sellsword_hideout',1],[/fierce battle|victors/i,'confrontation_site',1],[/first seal/i,'seal_stone_1',1],[/second stone|second seal/i,'seal_stone_2',1],[/final stone|third seal/i,'seal_stone_3',1]];
+window.calStopCard=function(name,n,text,sub,done){const nm=String(name||'').replace(/[’‘`]/g,"'"),tx=String(text||''),m=MAP.find(x=>x[0].test(nm))||TX.find(x=>x[0].test(tx));if(!m)return false;
  const u='assets/calaun/stop_'+m[1]+'.webp',im=new Image();
  im.onload=()=>{ov.style.setProperty('--img','url("'+u+'")');stg.style.setProperty('--py',m[2]?56.1:58.4);stg.style.setProperty('--dy',m[2]?60.4:62.9);
   q.textContent='Quest '+n+' of 8';d.innerHTML='';const t=document.createElement('div');t.textContent=text||'';d.appendChild(t);if(sub){const s=document.createElement('small');s.textContent=sub;d.appendChild(s)}
