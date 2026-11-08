@@ -3660,6 +3660,15 @@ window.showLoadScreen=function(){if(shown||gone)return;shown=1;el.classList.add(
 #riftOv.libfull::before{content:"";position:absolute;inset:-6%;z-index:0;pointer-events:none;background:var(--lbimg) center/cover no-repeat;filter:blur(24px) brightness(.55) saturate(1.2)}
 #riftOv.libfull>.rfb.libx{--w:min(calc(100vw*var(--k,1)),calc(100dvh*var(--ar)));--w:min(calc(100cqw*var(--k,1)),calc(100cqh*var(--ar)));position:relative;z-index:1}
 @media(min-width:700px){#riftOv.libfull>.rfb.libx{--w:min(100vw,calc(100dvh*var(--ar)))}}
+/* Library cards 1-5 FILL the area between header and footer: the painted frame is sliced (top ornament + bottom ornament kept at true proportions, the plain middle stretches) so nothing is distorted and there is no bar above or below. */
+#riftOv .rfb.libx[data-lib="1"],#riftOv .rfb.libx[data-lib="2"]{--iw:470;--st:160;--sb:100;--k:1.06}
+#riftOv .rfb.libx[data-lib="3"]{--iw:426;--st:170;--sb:150}
+#riftOv .rfb.libx[data-lib="4"]{--iw:460;--st:170;--sb:150}
+#riftOv .rfb.libx[data-lib="5"]{--iw:440;--st:170;--sb:150}
+@media(max-width:699px){
+#riftOv.libfull>.rfb.libx{--w:calc(100cqw*var(--k,1));width:var(--w);height:100cqh;aspect-ratio:auto;flex:none;padding-top:calc(var(--w)*var(--pt) + max(0px,100cqh - var(--w)/var(--ar))*.4)}
+#riftOv.libfull>.rfb.libx::before{background:none;-webkit-mask-image:none;mask-image:none;box-sizing:border-box;border-style:solid;border-color:transparent;border-width:calc(var(--w)*var(--st)/var(--iw)) 0 calc(var(--w)*var(--sb)/var(--iw)) 0;border-image-source:var(--img);border-image-slice:var(--st) 0 var(--sb) 0 fill;border-image-width:1 0 1 0;border-image-repeat:stretch}
+}
 </style>
 <!-- Calaun quest pickup: the whole painted card (art, title, text, buttons) shown between the header and the footer nav; taps sit on the painted buttons -->
 <style>

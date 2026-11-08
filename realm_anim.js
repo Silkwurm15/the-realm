@@ -198,7 +198,8 @@
       '#cbt.ra-on{top:var(--ra-top);bottom:var(--ra-bot);padding:0;background:#05040a;align-items:stretch;justify-content:stretch}#cbt.ra-on>.cbb{display:none}' +
       '.ra{position:fixed;top:var(--ra-top);bottom:var(--ra-bot);left:0;right:0;z-index:1501;display:none;align-items:center;justify-content:center;overflow:hidden;container-type:size;background:#05040a;font-family:Georgia,"Palatino Linotype",serif;-webkit-user-select:none;user-select:none}' +
       '#cbt .ra{position:absolute;top:0;bottom:0}' +
-      '#raKn{top:var(--ra-top);bottom:var(--ra-bot)}' +   /* Knowledge Gained sits between the top banner and the bottom nav, so both stay visible */
+      '#raKn{top:var(--ra-top);bottom:var(--ra-bot)}' +
+      '#riftOv.ra-kn{background:transparent!important;visibility:hidden}' +   /* the dark backdrop of the Rift popup must not dim the header/footer while Knowledge Gained is up */   /* Knowledge Gained sits between the top banner and the bottom nav, so both stay visible */
       '#raKn .ra-stg{width:min(calc(100vw*1.22),calc(100vh*2/3));width:min(calc(100cqw*1.22),calc(100cqh*2/3))}' +   /* art up to 22% wider on tall screens (sides trimmed, text stays clear) */
       '.ra.on{display:flex}' +
       '.ra .ra-back{position:absolute;inset:-6%;background:var(--ra-img) center/cover;filter:blur(26px) brightness(.5)}' +
@@ -296,11 +297,11 @@
       if (!x || !/knowledge/i.test(String(x.ttl || ''))) return false;
       var k = mountKnowledge(); k.done = done;
       k.l.innerHTML = ''; var wr = document.createElement('div'); wr.className = 'ra-i'; (x.lines || []).forEach(function (ln) { var d = document.createElement('div'); d.textContent = ln; wr.appendChild(d); }); k.l.appendChild(wr); k.l._i = wr;
-      k.root.classList.add('on'); fit(k.l, 3.3, 2); k.p.start(); k.p.redraw();
+      k.root.classList.add('on'); var rf0 = document.getElementById('riftOv'); if (rf0) rf0.classList.add('ra-kn'); fit(k.l, 3.3, 2); k.p.start(); k.p.redraw();
       return true;
     } catch (err) { try { knowledgeOff(); } catch (e2) {} return false; }
   }
-  function knowledgeOff() { if (K) K.root.classList.remove('on'); }
+  function knowledgeOff() { if (K) K.root.classList.remove('on'); var rf0 = document.getElementById('riftOv'); if (rf0) rf0.classList.remove('ra-kn'); }
 
   /* decode the art early so the first screen never flashes empty */
   function preload() { ['assets/mimic/mimic_strong_battle.webp', 'assets/mimic/mimic_battle.webp', 'assets/library/lib_knowledge.webp'].forEach(function (u) { var i = new Image(); i.src = u; }); }
