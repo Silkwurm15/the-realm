@@ -3100,7 +3100,7 @@ async function calRift(it){const r=await act('rift',{op:'enter',cq:it.qid,i:it.i
 async function calFightStart(qid,pick){const r=await act('quest',{op:'cal',qid,pick,ll:targetLL});if(r&&r.result&&r.result.fight){rf.style.display='none';cbShow(r.result.fight)}else calShow({phase:'choice',qid,step:6})}
 function calShow(sq){const n=sq.step|0;calN=n;const T=CAL_T[n]||CAL_T[0],tag='Sir Calaun Dawnblight · Quest '+(n+1)+' of 8';
  if(sq.phase==='start')return calDraw({title:T.t,wild:tag,text:'Your quest has begun.',lines:['QUEST OBJECTIVE','• '+T.o+' (0 / '+T.n+')'],btns:[{html:'Continue',fn:sqClose}]});
- if(sq.phase==='clue'){try{Sound.queue('quest_progress')}catch(e){}return calDraw({title:sq.stop.name,wild:tag,text:sq.stop.text,lines:['Stop '+sq.n+' of '+sq.total+'.'],btns:[{html:'Continue',fn:sqClose}]})}
+ if(sq.phase==='clue'){try{Sound.queue('quest_progress')}catch(e){}if(window.calStopCard&&calStopCard(sq.stop.name,n+1,sq.stop.text,'Stop '+sq.n+' of '+sq.total,sqClose))return;return calDraw({title:sq.stop.name,wild:tag,text:sq.stop.text,lines:['Stop '+sq.n+' of '+sq.total+'.'],btns:[{html:'Continue',fn:sqClose}]})}
  if(sq.phase==='choice')return calDraw({title:'The Confrontation',wild:tag,text:'Sir Calaun Dawnblight stands before you, blade drawn, while the bounty hunters close in from behind.\n\nWhose side are you on? Lose the fight and the quest fails until the next daily reset.',btns:[
   {html:'Help Bring Him In<small>Fight Sir Calaun Dawnblight</small>',fn:()=>calFightStart(sq.qid,'bring')},
   {html:'Protect Calaun<small>Fight the bounty hunters</small>',fn:()=>calFightStart(sq.qid,'protect')},
@@ -3690,6 +3690,31 @@ window.calPick=function(u,onAccept,onNot,fb){const im=new Image();   // everythi
   N.onclick=()=>{ov.classList.remove('open');onNot()};
   ov.classList.add('open')};
  im.onerror=()=>{fb()};im.src=u};
+})();
+</script>
+<!-- Calaun stop cards: painted location card (title kept, old "Quest 1 of 8" + description painted out) between header and footer; live quest number + stop text drawn on top -->
+<style>
+#csOv{position:fixed;inset:calc(max(0px,env(safe-area-inset-top)) + var(--hudh,92px) + 4px) 0 calc(72px + env(safe-area-inset-bottom,0px)) 0;container-type:size;z-index:1600;display:none;align-items:center;justify-content:center;background:#07040a;overflow:hidden;font-family:Georgia,serif}
+#csOv.open{display:flex}
+#csOv::before{content:"";position:absolute;inset:-8%;background:var(--img) center/cover;filter:blur(18px) brightness(.5) saturate(1.2);pointer-events:none}
+#csS{position:relative;z-index:1;flex:none;width:min(100cqw,calc(100cqh*307/512));aspect-ratio:307/512;background:var(--img) center/100% 100%;container-type:inline-size}
+#csS .q{position:absolute;left:30%;right:30%;top:calc(var(--py)*1% - 3.2cqw);height:6.4cqw;display:flex;align-items:center;justify-content:center;font:700 4.9cqw/1 Georgia,serif;color:#2b1a06;white-space:nowrap}
+#csS .d{position:absolute;left:11%;right:11%;top:calc(var(--dy)*1%);bottom:calc(100% - 78.5%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:600 5.3cqw/1.22 Georgia,serif;color:#fff;text-shadow:0 1px 0 #000,0 0 3px #000,0 2px 5px #000;white-space:pre-line}
+#csS .d small{display:block;margin-top:1.6cqw;font:700 3.6cqw/1 Georgia,serif;color:#f0cf86}
+#csS button{position:absolute;left:30%;right:30%;top:88.3%;height:6.2%;border:1px solid #f0c860;border-radius:2.6cqw;font:700 4.6cqw/1 Georgia,serif;color:#fff1c8;background:linear-gradient(#b0802d,#74491a 55%,#4f310d);text-shadow:0 1px 2px #000;box-shadow:0 0 2.5cqw #000b,inset 0 1px 0 #ffe49a99;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#csS button:active{filter:brightness(1.2)}
+</style>
+<div id="csOv" role="dialog" aria-modal="true"><div id="csS"><div class="q"></div><div class="d"></div><button type="button">Continue</button></div></div>
+<script>
+(function(){const ov=document.getElementById('csOv'),q=ov.querySelector('.q'),d=ov.querySelector('.d'),b=ov.querySelector('button'),stg=document.getElementById('csS');
+const MAP=[[/scorched/i,'scorched_ruins',0],[/frozen/i,'frozen_alter',0],[/cracked\s*obelisk/i,'cracked_obelisk',0],[/mercenary\s*camp/i,'mercenary_camp',0],[/smuggler/i,'smugglers_cache',0],[/sellsword/i,'sellsword_hideout',1],[/confrontation\s*site/i,'confrontation_site',1],[/first\s*seal/i,'seal_stone_1',1],[/second\s*seal/i,'seal_stone_2',1],[/third\s*seal/i,'seal_stone_3',1]];
+window.calStopCard=function(name,n,text,sub,done){const m=MAP.find(x=>x[0].test(String(name||'')));if(!m)return false;
+ const u='assets/calaun/stop_'+m[1]+'.webp',im=new Image();
+ im.onload=()=>{ov.style.setProperty('--img','url("'+u+'")');stg.style.setProperty('--py',m[2]?56.1:58.4);stg.style.setProperty('--dy',m[2]?60.4:62.9);
+  q.textContent='Quest '+n+' of 8';d.innerHTML='';const t=document.createElement('div');t.textContent=text||'';d.appendChild(t);if(sub){const s=document.createElement('small');s.textContent=sub;d.appendChild(s)}
+  b.onclick=()=>{ov.classList.remove('open');if(done)done()};ov.classList.add('open');
+  const fit=()=>{let f=5.3;d.style.fontSize=f+'cqw';while(d.scrollHeight>d.clientHeight+1&&f>3.2){f-=.2;d.style.fontSize=f+'cqw'}};fit()};
+ im.onerror=()=>{if(done)done()};im.src=u;return true};
 })();
 </script>
 </body></html>
