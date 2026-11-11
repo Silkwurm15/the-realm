@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.833';window.__BUILD=B;
+(function(){var B='1.834';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2069,10 +2069,11 @@ const invCss=document.createElement('style');invCss.textContent=`
 .bpt .bpb{position:absolute;inset:8%;border:2px solid var(--rc);border-radius:4px;box-shadow:0 0 9px var(--rc),inset 0 0 8px #0009;display:flex;align-items:center;justify-content:center;background:radial-gradient(#1c1710,#0a0806)}
 .bpt .bpb img{width:62%;height:62%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}.bpt .bpb i{position:absolute;top:1px;right:2px;font-style:normal;font-size:11px}.bpt .bpb u{position:absolute;bottom:0;left:3px;text-decoration:none;font-size:10px}
 .bpt.has:active{transform:scale(.96)}
-.bpfoot{position:sticky;bottom:-18px;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0 6px;margin-top:6px;background:linear-gradient(#0b0a0800,#0b0a08 35%)}
-.bpcap{position:relative;width:41%;flex:0 0 41%}.bpcap img{width:100%;display:block}.bpcap span{position:absolute;left:44%;right:6%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font:700 clamp(15px,5.2vw,24px) Georgia,serif;color:#fff0c6;text-shadow:0 2px 3px #000}.bpcap.full span{color:#ff8a7a}
-.bpsort{width:34%;flex:0 0 34%;cursor:pointer}.bpsort img{width:100%;display:block;pointer-events:none}
-.bpclean{flex:1;min-width:0;padding:10px 2px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 12px Georgia,serif;cursor:pointer;white-space:nowrap}
+.bpfoot{position:sticky;bottom:-18px;z-index:4;display:flex;align-items:center;gap:6px;padding:12px 0 6px;margin-top:6px;background:linear-gradient(#0b0a0800,#0b0a08 35%)}
+.bpcap{position:relative;container-type:inline-size;flex:3.375 1 0;min-width:0}.bpcap img{width:100%;display:block}
+.bpcap span{position:absolute;left:42%;right:4%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:.3em;white-space:nowrap;font:700 13cqw/1 "Times New Roman",Times,"Liberation Serif",serif;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.02em;background:linear-gradient(#fff3c8 25%,#e8b457);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 1.5px 1px #000d)}
+.bpcap.long span{font-size:10.5cqw}.bpcap span i{font-style:normal;opacity:.6}.bpcap.full span{background:linear-gradient(#ffd9cf 25%,#ff6a58);-webkit-background-clip:text;background-clip:text}
+.bpsort,.bpclean{flex:2.988 1 0;min-width:0;cursor:pointer}.bpsort img,.bpclean img{width:100%;display:block;pointer-events:none}.bpsort:active,.bpclean:active{transform:scale(.97)}
 .vsbtn{cursor:pointer}
 .lol{display:grid;grid-template-columns:36% 1fr;gap:8px;margin-top:8px}.lolist{display:flex;flex-direction:column;gap:6px}
 .lob{position:relative;cursor:pointer}.lob>img.fr{width:100%;display:block;pointer-events:none}.lob.on>img.fr{filter:drop-shadow(0 0 6px #ff3b1a)}.lob .li{position:absolute;left:5%;top:12%;bottom:12%;width:25%;display:flex;align-items:center;justify-content:center;pointer-events:none}.lob .li img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}
@@ -2124,7 +2125,7 @@ function bpPage(){const h=H(),cap=bagCap(),list=bpList(),n=sellList(h,'all').len
   o+='<div class="bpt has" data-it="'+it.uid+'"><div class="bpb" style="--rc:'+itC(it)+'"><img alt="" src="'+IV('inv_ico_'+GLY[CAT[it.cid].type])+'">'+(it.lock?'<i>🔒</i>':'')+(loOf(it.uid)>=0?'<u>📦</u>':'')+'</div></div>'}
  o+='</div>';
  if(!list.length)o+='<div class="qaw">'+(h.inv.length?'No equipment in this category.':'No items yet. Open chests!')+'</div>';
- o+='<div class="bpfoot"><div class="bpcap'+(h.inv.length>=cap?' full':'')+'"><img alt="" src="'+IV('inv_cap')+'"><span>'+h.inv.length+' / '+cap+'</span></div><button class="bpclean" data-a="clean">🧹 Clean Up</button><div class="bpsort" data-sortmenu="1"><img alt="Sort" src="'+IV('inv_sort')+'"></div></div>';
+ o+='<div class="bpfoot"><div class="bpcap'+(h.inv.length>=cap?' full':'')+(String(h.inv.length).length+String(cap).length>4?' long':'')+'"><img alt="" src="'+IV('inv_cap')+'"><span><b>'+h.inv.length+'</b><i>/</i><b>'+cap+'</b></span></div><div class="bpclean" data-a="clean"><img alt="Clean Up" src="'+IV('inv_cleanup')+'"></div><div class="bpsort" data-sortmenu="1"><img alt="Sort" src="'+IV('inv_sort')+'"></div></div>';
  return o}
 /* ---- Loadouts ---- */
 const LO_ICO=['sword','shield','leaf','flame','star'];let loSel=0,loPg=0;
