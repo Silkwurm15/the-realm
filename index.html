@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.830';window.__BUILD=B;
+(function(){var B='1.831';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1949,7 +1949,7 @@ function openClass(first){cl.innerHTML='<div class="qh" style="margin-top:6px"><
 cl.addEventListener('click',e=>{if(e.target.dataset.x)cl.style.display='none';const k=e.target.dataset.c;if(!k||!CLASSES[k])return;if(S.cls===k)return;if(S.cls&&!(S.cu>0))return toast('Your class is locked. Use a Class Unlock from the Shop to change it.');if(!confirm(S.cls?'Switch to '+CLASSES[k].n+'? This uses 1 Class Unlock. Each class keeps its own level and XP.':'Choose '+CLASSES[k].n+'? Your class will be locked until you use a Class Unlock from the Shop.'))return;const nm=document.getElementById('cName');if((nm&&nm.value.trim())||!S.name){if(!setName(nm?nm.value:''))return}act('setclass',{cls:k}).then(r=>{if(r){cl.style.display='none';invRender();hud();toast('You are now a '+CLASSES[k].n)}})});
 /* ---- inventory / character screen ---- */
 const inv=document.createElement('div');inv.className='qpanel';inv.id='inv';panel.parentNode.appendChild(inv);
-function invToggle(on){inv.classList.toggle('open',on);if(on){heroSec='hub';heroSub={character:'gear',social:'friends',profile:'classes'};invRender()}}
+function invToggle(on){inv.classList.toggle('open',on);if(on){heroSec='hub';heroSub={character:'equipped',social:'friends',profile:'classes'};invRender()}}
 /* ---- Inventory: sort by rarity, lock items, sell for Rift Shards ---- */
 const SHARD_VAL={common:2,uncommon:5,rare:12,mythic:30,legendary:75};   // must match the server (A.discard)
 let invSort='new',invFilter='all';try{invSort=localStorage.getItem('invSort')||'new';invFilter=localStorage.getItem('invFilter')||'all'}catch(e){}
@@ -1999,7 +1999,7 @@ function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,
  const filteredInv=sortedInv(h.inv);ge+=`<div class="qh"><span>Unequipped</span><span style="${h.inv.length>=bagCap()?'color:#ff8a7a':''}">${h.inv.length} / ${bagCap()}</span></div>`+(h.inv.length?bagTools(h)+(filteredInv.length?filteredInv.map(it=>rowX(it,'Equip','eq',it.uid,true)).join(''):'<div class="qaw">No equipment matches this filter.</div>'):'<div class="qaw">No items yet. Open chests!</div>')+'';
  const st=inv.scrollTop,sub=heroSub[heroSec]||'';let o;
  if(heroSec==='hub')o=heroHub();
- else if(heroSec==='character')o=(sub==='potions'?po:sub==='loadouts'?heroLoadouts():ge);
+ else if(heroSec==='character')o=(sub==='loadouts'?loPage():sub==='backpack'?bpPage():eqPage());
  else if(heroSec==='social')o=sub==='mail'?heroMail():sub==='friends'?heroFriends():heroPH(sub);
  else o=sub==='achievements'?heroAch():sub==='cosmetics'?heroCosm():heroClasses();
  inv.innerHTML=(heroSec==='hub'?'':heroTabs())+o;inv.scrollTop=st}
@@ -2011,7 +2011,7 @@ const BAG_START=10,BAG_MAX=250,LO_MAX=12,LO_BASE=1,HOLD_CAP=20;   // mirrors the
 const bagCap=()=>Math.max(BAG_START,Math.min(BAG_MAX,Math.floor(+S.bag)||BAG_START));
 const keysN=()=>S.keys|0,coinsN=()=>S.coins|0,loList=()=>Array.isArray(S.lo)?S.lo:[];
 const loOf=uid=>{const L=loList();for(let i=0;i<L.length;i++)if(L[i]&&L[i].s&&Object.values(L[i].s).includes(uid))return i;return-1};
-let heroSub={character:'gear',social:'friends',profile:'classes'};
+let heroSub={character:'equipped',social:'friends',profile:'classes'};
 const HERO_PH={friends:['👥','Friends','Add friends with a friend code, see their class and level, and send a free gift each day.'],mail:['✉️','Mailbox','Rewards, compensation and announcements from the realm will arrive here.'],titles:['📛','Titles','Titles you earn will appear here.'],flairs:['✨','Flairs','Flairs you unlock will appear here.'],scores:['🏆','Scores','Compare chests opened, Dark Lairs cleared, Nature Discoveries, Rifts closed, distance walked, Mimics defeated and Chaos rolls with your friends.']};
 function heroTabs(){
  const u=MAILS.filter(x=>!x.read).length+fbN(),ar=achReady();
@@ -2019,7 +2019,7 @@ function heroTabs(){
  const SUB={character:[['potions','Potions',0],['gear','Gear',0],['loadouts','Loadouts',0]],social:[['friends','Friends',fbN()],['mail','Mailbox',u],['scores','Scores',0]],profile:[['classes','Classes',0],['achievements','Achievements',ar],['cosmetics','Cosmetics',0]]};
  const dot=b=>b?'<i style="position:absolute;top:5px;right:6px;min-width:16px;padding:0 4px;border-radius:8px;background:#e5c77b;color:#241a0c;font:700 10px/16px Arial,sans-serif;font-style:normal">'+b+'</i>':'';
  const btn=(at,k,n,b,on,sm)=>'<div class="qtab'+(on?' on':'')+'" '+at+'="'+k+'" style="position:relative;white-space:nowrap'+(sm?';padding:9px 2px;font-size:12.5px':'')+'">'+n+dot(b)+'</div>';
- return'<div style="position:sticky;top:-10px;z-index:5;padding:12px 0 8px;margin:-10px 0 4px;background:linear-gradient(#0b0a08 88%,#0b0a0800)">'+('<div style="display:flex;align-items:center;gap:10px;margin:0 0 8px"><button data-hback="1" style="padding:9px 14px;border-radius:5px;border:1px solid #77552b;background:linear-gradient(145deg,#34291b,#0b0b09);color:#cdb98a;font:700 13px Georgia,serif;cursor:pointer">← Hero</button><b style="font:700 16px Georgia,serif;color:#e5c77b">'+({character:'Inventory',social:'Social',profile:'Profile'}[heroSec])+'</b></div>')+'<div class="qtabs">'+SUB[heroSec].map(t=>btn('data-hsub',t[0],t[1],t[2],t[0]===heroSub[heroSec],0)).join('')+'</div></div>'}
+ return'<div style="position:sticky;top:-10px;z-index:5;padding:12px 0 8px;margin:-10px 0 4px;background:linear-gradient(#0b0a08 88%,#0b0a0800)">'+('<div style="display:flex;align-items:center;gap:10px;margin:0 0 8px"><button data-hback="1" style="padding:9px 14px;border-radius:5px;border:1px solid #77552b;background:linear-gradient(145deg,#34291b,#0b0b09);color:#cdb98a;font:700 13px Georgia,serif;cursor:pointer">← Hero</button><b style="font:700 16px Georgia,serif;color:#e5c77b">'+({character:'Inventory',social:'Social',profile:'Profile'}[heroSec])+'</b></div>')+(heroSec==='character'?'<div class="itabs">'+['equipped','backpack','loadouts'].map(t=>{const on=(['backpack','loadouts'].includes(heroSub.character)?heroSub.character:'equipped')===t;return'<div class="itab'+(on?' on':'')+'" data-hsub="'+t+'"><img alt="'+t+'" src="'+IV('inv_tab_'+t+(on?'_on':''))+'"></div>'}).join('')+'</div></div>':'<div class="qtabs">'+SUB[heroSec].map(t=>btn('data-hsub',t[0],t[1],t[2],t[0]===heroSub[heroSec],0)).join('')+'</div></div>')}
 function heroLoadouts(){const L=loList(),n=S.los||LO_BASE,wear=new Set(Object.values(H().eq).filter(Boolean).map(x=>x.uid));
  let o='<div class="qcard ms"><div class="qs">Save your current gear as a custom loadout. Note: Unequipped items still occupy backpack space.</div></div>';
  for(let i=0;i<n;i++){const l=L[i];
@@ -2036,6 +2036,151 @@ inv.addEventListener('click',e=>{const b=e.target.closest('[data-lo]');if(!b)ret
  if(a==='name'){const t=prompt('Rename loadout (up to 16 characters)',(l&&l.n)||'');if(t==null)return;act('lo_name',{i,name:t});return}
  if(a==='save'){if(l&&!confirm('Replace "'+l.n+'" with the gear you are wearing now?'))return;const t=prompt('Name this loadout (up to 16 characters)',(l&&l.n)||'Loadout '+(i+1));if(t==null)return;act('lo_save',{i,name:t})}});
 function goShop(fn){const t=document.querySelector('.nav-item[data-tab="Shop"]');if(t)t.click();setTimeout(fn,0)}
+/* ================= New Inventory pages: Equipped | Backpack | Loadouts (art in assets/inv/) ================= */
+const IV=n=>'assets/inv/'+n+'.webp?v='+window.__BUILD;
+const invCss=document.createElement('style');invCss.textContent=`
+.itabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.itab{cursor:pointer;position:relative}.itab img{width:100%;display:block;pointer-events:none}.itab.on img{filter:drop-shadow(0 0 6px #ff3b1a)}
+.eqg{position:relative;width:100%;aspect-ratio:1150/1189;margin-top:6px}.isl{position:absolute;container-type:inline-size;cursor:pointer}.isl>img.fr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.isl .isi{position:absolute;left:9%;right:9%;top:7%;bottom:24%;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:4px;pointer-events:none;overflow:hidden}
+.isl .isi img{width:60%;max-height:70%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}.isl .isi b{font:700 7cqw/1.1 Georgia,serif;text-align:center;margin-top:2px;padding:0 3%;text-shadow:0 1px 2px #000}
+.isl .isi i{position:absolute;top:2px;right:4px;font-style:normal;font-size:7cqw}
+.isl.empty .isi{opacity:.0}.isl.mini .isi b{display:none}.isl.press:active{transform:scale(.98)}
+.isl.nothing{cursor:default}.isl.nothing img.fr{opacity:.85}
+.bpflt{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:6px}.bf{cursor:pointer}.bf img{width:100%;display:block;pointer-events:none}.bf.on img{filter:drop-shadow(0 0 5px #ff4a22)}
+.bpg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}.bpt{position:relative;aspect-ratio:1;background:url(${IV('inv_cell')}) center/100% 100% no-repeat}.bpt.has{cursor:pointer}
+.bpt .bpb{position:absolute;inset:8%;border:2px solid var(--rc);border-radius:4px;box-shadow:0 0 9px var(--rc),inset 0 0 8px #0009;display:flex;align-items:center;justify-content:center;background:radial-gradient(#1c1710,#0a0806)}
+.bpt .bpb img{width:62%;height:62%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}.bpt .bpb i{position:absolute;top:1px;right:2px;font-style:normal;font-size:11px}.bpt .bpb u{position:absolute;bottom:0;left:3px;text-decoration:none;font-size:10px}
+.bpt.has:active{transform:scale(.96)}
+.bpfoot{position:sticky;bottom:-18px;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0 6px;margin-top:6px;background:linear-gradient(#0b0a0800,#0b0a08 35%)}
+.bpcap{position:relative;width:41%;flex:0 0 41%}.bpcap img{width:100%;display:block}.bpcap span{position:absolute;left:44%;right:6%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font:700 clamp(15px,5.2vw,24px) Georgia,serif;color:#fff0c6;text-shadow:0 2px 3px #000}.bpcap.full span{color:#ff8a7a}
+.bpsort{width:34%;flex:0 0 34%;cursor:pointer}.bpsort img{width:100%;display:block;pointer-events:none}
+.bpclean{flex:1;min-width:0;padding:10px 2px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 12px Georgia,serif;cursor:pointer;white-space:nowrap}
+.vsbtn{cursor:pointer}
+.lol{display:grid;grid-template-columns:36% 1fr;gap:8px;margin-top:8px}.lolist{display:flex;flex-direction:column;gap:6px}
+.lob{position:relative;cursor:pointer}.lob>img.fr{width:100%;display:block;pointer-events:none}.lob.on>img.fr{filter:drop-shadow(0 0 6px #ff3b1a)}.lob .li{position:absolute;left:5%;top:12%;bottom:12%;width:25%;display:flex;align-items:center;justify-content:center;pointer-events:none}.lob .li img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}
+.lob .ln{position:absolute;left:32%;right:6%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;font:700 clamp(10px,3.2vw,17px)/1.1 Georgia,serif;color:#f6e3ae;text-shadow:0 2px 3px #000;pointer-events:none;overflow:hidden}.lob .ln small{font:700 9px Arial,sans-serif;color:#cdb98a;margin-top:2px}
+.lob.lock{opacity:.5}.lob.lock>img.fr{filter:grayscale(.7)}
+.lopg{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px}.lopg b{width:36px;height:30px;display:grid;place-items:center;border:1px solid #77552b;border-radius:5px;background:linear-gradient(145deg,#34291b,#0b0b09);color:#f2d795;font:700 16px Georgia,serif;cursor:pointer}.lopg b.off{opacity:.35;cursor:default}.lopg span{font:700 10px Arial,sans-serif;color:#cdb98a}
+.lopan{position:relative;padding:8px 6px 10px;border:2px solid #8a5a2a;border-radius:10px;background:linear-gradient(180deg,#14100c,#0a0806);box-shadow:inset 0 0 0 2px #2b1c0f,inset 0 0 14px #000}
+.lorib{position:relative;margin:0 auto 0 1%;width:78%;display:flex;align-items:center;justify-content:center}.lorib img.rb{width:100%;display:block}.lorib span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 clamp(12px,4vw,20px) Georgia,serif;color:#2b1a0c;padding:0 16%;text-align:center;white-space:nowrap;overflow:hidden}
+.lopen{position:absolute;right:1.5%;top:3%;width:15%;cursor:pointer}.lopen img{width:100%;display:block;pointer-events:none}
+.lobtns{display:grid;grid-template-columns:1.15fr 1fr .85fr;gap:6px;margin-top:10px}.lobtns img,.lonew img{width:100%;display:block;pointer-events:none}.lobtns>div,.lonew{cursor:pointer}.lobtns>div.off,.lonew.off{opacity:.45;filter:grayscale(.5);cursor:default}.lonew{width:70%;margin:8px auto 0}
+.ipop{position:absolute;inset:0;z-index:1100;background:rgba(5,8,6,.78);display:none;align-items:center;justify-content:center;padding:14px}.ipop.open{display:flex}
+.ipc{position:relative;width:100%;max-width:380px;max-height:86%;overflow-y:auto;padding:14px 14px 12px;border:2px solid #8a5a2a;border-radius:10px;background:linear-gradient(180deg,#1a140e,#0b0907);box-shadow:0 10px 35px #000d,inset 0 0 0 2px #2b1c0f;color:#ead8ac}
+.ipc h2{font:700 19px Georgia,serif;color:#fff0c6;margin:0 30px 2px 0}.ipc .ix{position:absolute;top:6px;right:6px;width:38px;cursor:pointer}.ipc .ix img{width:100%;display:block;pointer-events:none}
+.ipc .ist{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0 4px}.ipc .ist div{padding:8px;text-align:center;font:700 13px Georgia,serif;color:#cdb98a;border:1px solid #77552b;border-radius:5px;background:linear-gradient(145deg,#34291b,#0b0b09);cursor:pointer}.ipc .ist div.on{color:#fff0c6;border-color:#e5c77b;background:linear-gradient(180deg,#7a2a1a,#2a0c08)}
+.ipc .ibtns{display:flex;gap:6px;margin-top:10px}.ipc .ibtns button{flex:1;margin:0;width:auto;padding:10px 2px}.ipc .ibtns button:disabled{opacity:.4;filter:grayscale(.8)}
+.ipc table{width:100%;border-collapse:collapse;margin-top:8px;font:12px Arial,sans-serif}.ipc td,.ipc th{padding:4px 5px;text-align:center;border-bottom:1px solid #3a2c1a}.ipc th{color:#f2d795;font-weight:700}.ipc td:first-child{text-align:left;color:#cdb98a}.ipc .up{color:#7ee29a}.ipc .dn{color:#ff8178}
+.ipc .prow{display:flex;align-items:center;gap:10px;padding:10px;margin-top:8px;border:1px solid #77552b;border-radius:6px;background:linear-gradient(135deg,#2d2216f2,#0e0c09f2)}.ipc .prow .pi{font-size:30px}.ipc .prow .pn{flex:1;font:700 14px Georgia,serif}.ipc .prow .pn small{display:block;font:11px Arial,sans-serif;color:#c8b894;margin-top:2px}.ipc .prow .pc{font:700 18px Georgia,serif;color:#f2d795}
+.ipc .srt{display:flex;align-items:center;gap:10px;padding:12px;margin-top:8px;border:1px solid #77552b;border-radius:6px;background:linear-gradient(135deg,#2d2216f2,#0e0c09f2);font:700 14px Georgia,serif;cursor:pointer}.ipc .srt.on{border-color:#e5c77b;box-shadow:inset 0 0 0 2px #4b371d;color:#fff0c6}.ipc .srt i{width:20px;font-style:normal;color:#e5c77b}
+`;document.head.appendChild(invCss);
+const FRAME={helm:'helm',chest:'chest',feet:'boots',hands:'gloves',main:'main',off:'off',amulet:'amulet',ring1:'ring1',ring2:'ring2',cloak:'cloak',belt:'belt',trinket:'trinket',potions:'potions',stats:'stats'};
+const GLY={helm:'helm',chest:'chest',feet:'feet',hands:'hands',main:'main',off:'off',amulet:'amulet',ring:'ring',ring1:'ring',ring2:'ring',cloak:'cloak',belt:'belt',trinket:'trinket'};
+const SLOT12=['main','off','helm','chest','belt','hands','feet','ring1','ring2','amulet','cloak','trinket'];   // the 12 gear positions; belt and trinket have no server support yet, so they show empty
+const EQBOX={stats:[53,42,405,245],helm:[429,10,772,256],trinket:[802,41,1175,251],main:[35,261,389,618],off:[824,261,1177,620],chest:[407,262,805,619],ring2:[215,625,399,802],gloves:[420,625,801,842],hands:[420,625,801,842],ring1:[35,626,214,801],cloak:[825,629,1177,1193],amulet:[34,809,215,987],potions:[219,809,402,986],feet:[423,848,801,1195],belt:[33,995,403,1194]};
+const BIGNAME=new Set(['main','off','chest','cloak','feet']);
+const itC=it=>CAT[it.cid].color||RC[CAT[it.cid].rarity];
+function slotBox(k){const b=EQBOX[k],X0=30,Y0=8,W=1150,H=1189;return'left:'+((b[0]-X0)/W*100).toFixed(2)+'%;top:'+((b[1]-Y0)/H*100).toFixed(2)+'%;width:'+((b[2]-b[0])/W*100).toFixed(2)+'%;height:'+((b[3]-b[1])/H*100).toFixed(2)+'%'}
+function slotHTML(k,it,mini,attr){const has=!!it,c=has?itC(it):'';
+ return'<div class="isl press'+(has?'':' empty')+(mini?' mini':'')+'" style="'+slotBox(k)+'" '+attr+'><img class="fr" alt="'+SN[k]+'" src="'+IV('inv_slot_'+FRAME[k])+'">'
+  +(has?'<div class="isi" style="box-shadow:inset 0 0 0 2px '+c+',inset 0 0 12px '+c+'88;background:radial-gradient(#1c1710cc,#0a0806cc)"><img alt="" src="'+IV('inv_ico_'+GLY[k])+'">'+(CAT[it.cid].unique?'':'')+(BIGNAME.has(k)?'<b style="color:'+c+'">'+attrEsc(CAT[it.cid].name)+'</b>':'')+(it.lock?'<i>🔒</i>':'')+'</div>':'')+'</div>'}
+function eqPage(){const h=H();
+ let o='<div class="eqg">'+'<div class="isl vsbtn press" style="'+slotBox('stats')+'" data-vstats="1"><img class="fr" alt="View Stats" src="'+IV('inv_slot_stats')+'"></div>';
+ SLOT12.forEach(k=>{const it=h.eq[k]||null;o+=slotHTML(k,it,false,it?'data-it="'+it.uid+'"':(SLOTS.includes(k)?'data-emp="'+k+'"':'data-nosl="'+k+'"'))});
+ o+='<div class="isl vsbtn press mini" style="'+slotBox('potions')+'" data-pill="1"><img class="fr" alt="Potions" src="'+IV('inv_slot_potions')+'"></div></div>';
+ return o}
+/* ---- Backpack ---- */
+const BF=[['all','all'],['type:main','main'],['type:off','off'],['type:helm','helm'],['type:chest','chest'],['type:cloak','cloak'],['type:hands','hands'],['type:feet','feet'],['type:belt','belt'],['type:amulet','amulet'],['type:trinket','trinket'],['type:ring','ring']];
+const SORTS=[['old','Oldest to Newest'],['rar','Rarity'],['type','Equipment Type'],['name','Item Name']];
+const TYPE_ORDER=['main','off','helm','chest','cloak','hands','feet','belt','amulet','trinket','ring'];
+if(!BF.some(f=>f[0]===invFilter))invFilter='all';if(!SORTS.some(s=>s[0]===invSort))invSort='old';
+function bpList(){let a=H().inv.map((it,ix)=>({it,ix}));if(invFilter!=='all'){const t=invFilter.slice(5);a=a.filter(o=>CAT[o.it.cid].type===t)}
+ const R=o=>RAR.indexOf(CAT[o.it.cid].rarity),T=o=>{const i=TYPE_ORDER.indexOf(CAT[o.it.cid].type);return i<0?99:i},N=o=>CAT[o.it.cid].name;
+ if(invSort==='rar')a.sort((x,y)=>R(y)-R(x)||x.ix-y.ix);else if(invSort==='type')a.sort((x,y)=>T(x)-T(y)||x.ix-y.ix);else if(invSort==='name')a.sort((x,y)=>N(x).localeCompare(N(y))||x.ix-y.ix);
+ return a.map(o=>o.it)}
+function bpPage(){const h=H(),cap=bagCap(),list=bpList(),n=sellList(h,'all').length;
+ let o='<div class="bpflt">'+BF.map(f=>'<div class="bf'+(f[0]===invFilter?' on':'')+'" data-bf="'+f[0]+'"><img alt="" src="'+IV('inv_flt_'+f[1]+(f[0]===invFilter?'_on':''))+'"></div>').join('')+'</div>';
+ const total=Math.max(30,Math.ceil((invFilter==='all'?Math.max(cap,list.length):list.length)/6)*6);
+ o+='<div class="bpg">';
+ for(let i=0;i<total;i++){const it=list[i];if(!it){o+='<div class="bpt"></div>';continue}
+  o+='<div class="bpt has" data-it="'+it.uid+'"><div class="bpb" style="--rc:'+itC(it)+'"><img alt="" src="'+IV('inv_ico_'+GLY[CAT[it.cid].type])+'">'+(it.lock?'<i>🔒</i>':'')+(loOf(it.uid)>=0?'<u>📦</u>':'')+'</div></div>'}
+ o+='</div>';
+ if(!list.length)o+='<div class="qaw">'+(h.inv.length?'No equipment in this category.':'No items yet. Open chests!')+'</div>';
+ o+='<div class="bpfoot"><div class="bpcap'+(h.inv.length>=cap?' full':'')+'"><img alt="" src="'+IV('inv_cap')+'"><span>'+h.inv.length+' / '+cap+'</span></div><button class="bpclean" data-a="clean">🧹 Clean Up</button><div class="bpsort" data-sortmenu="1"><img alt="Sort" src="'+IV('inv_sort')+'"></div></div>';
+ return o}
+/* ---- Loadouts ---- */
+const LO_ICO=['sword','shield','leaf','flame','star'];let loSel=0,loPg=0;
+function loPage(){const L=loList(),n=S.los||LO_BASE,h=H();if(loSel>=n)loSel=0;
+ const wear=new Set(Object.values(h.eq).filter(Boolean).map(x=>x.uid));
+ let lst='';for(let j=0;j<6;j++){const i=loPg*6+j,owned=i<n,l=L[i],on=owned&&i===loSel;
+  lst+='<div class="lob'+(on?' on':'')+(owned?'':' lock')+'" data-lsel="'+i+'"><img class="fr" alt="" src="'+IV(on?'inv_lo_btn_on':'inv_lo_btn')+'"><div class="li">'+(owned?'<img alt="" src="'+IV('inv_lo_ico_'+LO_ICO[i%5])+'">':'<span style="font-size:22px">🔒</span>')+'</div><div class="ln"><span>'+esc(owned&&l&&l.n?l.n:'Loadout '+(i+1))+'</span><small>'+(owned?(l&&l.s?Object.keys(l.s).length+' pieces':'Empty'):'Get in Shop')+'</small></div></div>'}
+ const pg='<div class="lopg"><b class="'+(loPg?'':'off')+'" data-lpg="-1">◀</b><span>'+(loPg*6+1)+'–'+(loPg*6+6)+'</span><b class="'+(loPg<1?'':'off')+'" data-lpg="1">▶</b></div>';
+ const l=L[loSel],owned=loSel<n,saved=!!(l&&l.s),nm=esc(l&&l.n?l.n:'Loadout '+(loSel+1));
+ const ids=saved?Object.values(l.s):[],isOn=saved&&ids.length>0&&ids.every(u=>wear.has(u))&&wear.size===ids.length;
+ let sl='<div class="eqg" style="margin-top:6px">';SLOT12.forEach(k=>{const it=saved&&l.s[k]?findItem(l.s[k]):null;sl+=slotHTML(k,it,true,it?'data-it="'+it.uid+'"':'data-x="1"')});
+ sl+='<div class="isl vsbtn press mini" style="'+slotBox('potions')+'" data-pill="1"><img class="fr" alt="Potions" src="'+IV('inv_slot_potions')+'"></div></div>';
+ const btn=(a,img,off)=>'<div class="'+(off?'off':'')+'" data-l2="'+a+'"><img alt="" src="'+IV(img)+'"></div>';
+ return'<div class="lol"><div><div class="lolist">'+lst+'</div>'+pg+'</div><div class="lopan"><div class="lorib"><img class="rb" alt="" src="'+IV('inv_lo_ribbon')+'"><span>'+nm+'</span></div>'+(saved?'<div class="lopen" data-l2="name"><img alt="Rename" src="'+IV('inv_lo_pencil')+'"></div>':'')+sl+'</div></div>'
+  +'<div class="lobtns">'+btn('save','inv_lo_save',!owned)+btn('load','inv_lo_load',!saved||isOn)+btn('del','inv_lo_del',!saved)+'</div>'
+  +'<div class="lonew'+(n>=LO_MAX?' off':'')+'" data-l2="new"><img alt="Create New Loadout" src="'+IV('inv_lo_new')+'"></div>'
+  +'<div class="qs" style="text-align:center;margin-top:6px">'+n+' / '+LO_MAX+' loadouts owned. Unequipped items still use backpack space.</div>'}
+/* ---- popups (item, pillbox, stats, sort) ---- */
+const ipop=document.createElement('div');ipop.className='ipop';ipop.id='ipop';modal.parentNode.appendChild(ipop);
+const closeX='<div class="ix" data-pclose="1"><img alt="Close" src="'+IV('inv_close')+'"></div>';
+let ipTab='d',ipUid=null;
+const closePop=()=>{ipop.classList.remove('open');ipop.innerHTML='';ipUid=null};
+function openPop(html){ipop.innerHTML='<div class="ipc">'+closeX+html+'</div>';ipop.classList.add('open')}
+function eqSlotOf(uid){return SLOTS.find(k=>H().eq[k]&&H().eq[k].uid===uid)||null}
+function itemVals(it){const v={};(it.attrs||[]).forEach(x=>{if(ATTR[x.k])v['a:'+x.k]=(v['a:'+x.k]||0)+x.v});if(it.bonusAttr&&ATTR[it.bonusAttr.k])v['a:'+it.bonusAttr.k]=(v['a:'+it.bonusAttr.k]||0)+(Number(it.bonusAttr.v)||0);const c=CAT[it.cid];if(c.atk)v.atk=c.atk;if(c.def)v.def=c.def;if(c.hp)v.hp=c.hp;if(c.weaponDamage)v.wd=c.weaponDamage;return v}
+const vName=k=>k==='atk'?'ATK':k==='def'?'DEF':k==='hp'?'HP':k==='wd'?'Base DMG':ATTR[k.slice(2)].name,vUnit=k=>k.startsWith('a:')?(ATTR[k.slice(2)].unit||''):'';
+const sgn=n=>(n>0?'+':'')+n;
+function compareBody(it){const c=CAT[it.cid],slots=TYPE_SLOT[c.type]||[],slot=slots.find(k=>H().eq[k])||slots[0],old=slot&&H().eq[slot];
+ if(!old)return'<div class="qaw">'+(SN[slot]||'This slot')+' is empty. Nothing to compare with.</div>'+attrHTML(it);
+ const a=itemVals(it),b=itemVals(old),keys=[...new Set([...Object.keys(a),...Object.keys(b)])];
+ return'<table><tr><th></th><th style="color:'+itC(it)+'">'+attrEsc(c.name)+'<br><small>'+cap(c.rarity)+' · selected</small></th><th style="color:'+itC(old)+'">'+attrEsc(CAT[old.cid].name)+'<br><small>'+cap(CAT[old.cid].rarity)+' · equipped</small></th></tr>'
+  +keys.map(k=>{const x=a[k]||0,y=b[k]||0,d=x-y,u=vUnit(k);return'<tr><td>'+attrEsc(vName(k))+'</td><td class="'+(d>0?'up':d<0?'dn':'')+'">'+(x?sgn(x)+u:'–')+(d>0?' ▲':d<0?' ▼':'')+'</td><td>'+(y?sgn(y)+u:'–')+'</td></tr>'}).join('')+'</table>'}
+function itemPop(uid){const it=findItem(uid);if(!it)return;ipUid=uid;const c=CAT[it.cid],slot=eqSlotOf(uid),lo=loOf(uid),hold=!!it.lock||lo>=0,canCmp=!slot&&!c.unique&&(TYPE_SLOT[c.type]||[]).length>0;if(ipTab==='c'&&!canCmp)ipTab='d';
+ let h='<h2 style="color:'+itC(it)+'">'+(it.lock?'🔒 ':'')+attrEsc(c.name)+'</h2><div class="qs" style="margin:0">'+(c.unique?'Quest':cap(c.rarity))+' '+TN[c.type]+(slot?' · Equipped':'')+(lo>=0&&loList()[lo]?' · Loadout: '+esc(loList()[lo].n):'')+'</div>';
+ if(canCmp)h+='<div class="ist"><div class="'+(ipTab==='d'?'on':'')+'" data-ptab="d">Item Details</div><div class="'+(ipTab==='c'?'on':'')+'" data-ptab="c">Compare</div></div>';
+ if(ipTab==='c')h+=compareBody(it);
+ else{h+='<div class="qs" style="font-size:12px;margin-top:8px">'+fmtS({atk:c.atk||0,def:c.def||0,hp:c.hp||0,weaponDamage:c.weaponDamage||0,attrs:{}})+'</div>'+attrHTML(it)+(it.extra?'<div class="qs">legacy extra +'+it.extra.val+' '+it.extra.stat.toUpperCase()+'</div>':'')
+  +'<div class="ibtns">'+(slot?'<button class="qbtn" data-pa="un" data-u="'+slot+'">Unequip</button>':'<button class="qbtn" data-pa="eq" data-u="'+uid+'">Equip</button>')
+  +'<button class="qbtn" data-pa="lock" data-u="'+uid+'">'+(it.lock?'🔓 Unlock':'🔒 Lock')+'</button>'
+  +'<button class="qbtn" data-pa="sell" data-u="'+uid+'"'+(hold?' disabled':'')+'>'+(lo>=0?'In loadout':c.unique?'Delete':'Sell 💠'+shardOf(it))+'</button></div>'}
+ openPop(h)}
+function pillPop(){const h=H();openPop('<h2>Pillbox</h2><div class="qs" style="margin:0">Your potions. Earned potions stop at '+POT_CAP+' each.</div>'+Object.keys(POTS).map(k=>'<div class="prow"><div class="pi">'+POTS[k].icon+'</div><div class="pn">'+POTS[k].name+'<small>Earned '+(h.pot[k]||0)+' / '+POT_CAP+' · Bought '+(h.buy[k]||0)+'</small></div><div class="pc">x'+potN(k)+'</div>'+(potN(k)?'<button class="qbtn" style="width:auto;margin:0;padding:8px 12px" data-pa="pot" data-u="'+k+'">Use</button>':'')+'</div>').join(''))}
+function statsPop(){const h=H(),p=parts(),s=p.s,row=(n,v,x)=>'<div class="prow" style="padding:8px 10px"><div class="pn">'+n+(x?'<small>'+x+'</small>':'')+'</div><div class="pc" style="font-size:16px">'+v+'</div></div>';
+ const at=Object.keys(ATTR).filter(k=>!['atk','def','maxHp'].includes(k)&&s[k]).map(k=>{const d=ATTR[k],v=s[k];return'<div class="prow" style="padding:6px 10px"><div class="pn" style="font-size:12px">'+attrEsc(d.name)+'</div><div class="pc '+(v<0?'dn':'up')+'" style="font-size:14px">'+(v>0?'+':'')+v+(d.unit||'')+'</div></div>'}).join('');
+ openPop('<h2>Character Stats</h2><div class="qs" style="margin:0">Level '+S.lvl+' · totals include your equipped gear</div>'
+  +row('Health',(h.downed?'DOWNED':Math.floor(h.hp)+' / '+s.hp),'Level base '+p.b.hp+' · gear '+sg(p.g.hp))+row('Attack',s.atk,'Level base '+p.b.atk+' · gear '+sg(p.g.atk))+row('Base Damage',s.weaponDamage,'From your weapon: '+sg(p.g.weaponDamage))+row('Defense',s.def,'Level base '+p.b.def+' · gear '+sg(p.g.def))
+  +(at?'<div class="qh" style="margin-top:12px"><span>Gear and combat attributes</span></div>'+at:'<div class="qs" style="margin-top:10px">No gear attributes active.</div>'))}
+function sortPop(){openPop('<h2>Sort</h2>'+SORTS.map(s=>'<div class="srt'+(invSort===s[0]?' on':'')+'" data-srt="'+s[0]+'"><i>'+(invSort===s[0]?'✔':'')+'</i>'+s[1]+'</div>').join(''))}
+ipop.addEventListener('click',e=>{if(e.target===ipop||e.target.closest('[data-pclose]'))return closePop();
+ const t=e.target.closest('[data-ptab]');if(t){ipTab=t.dataset.ptab;return itemPop(ipUid)}
+ const s=e.target.closest('[data-srt]');if(s){invSort=s.dataset.srt;try{localStorage.setItem('invSort',invSort)}catch(x){}closePop();return invRender()}
+ const b=e.target.closest('[data-pa]');if(!b||b.disabled)return;const a=b.dataset.pa,u=b.dataset.u;
+ if(a==='sell'){closePop();return sellItems([u])}
+ b.disabled=true;
+ if(a==='pot')return void act('usepot',{k:u}).then(()=>{if(ipop.classList.contains('open'))pillPop()});
+ const p=a==='eq'?act('equip',{uid:u}):a==='un'?act('unequip',{slot:u}):act('lock',{uid:u,on:!(findItem(u)||{}).lock});
+ Promise.resolve(p).then(()=>{if(a==='lock'&&ipop.classList.contains('open'))itemPop(u);else closePop();invRender()},()=>{b.disabled=false})});
+inv.addEventListener('click',e=>{const t=e.target;let b;
+ if(b=t.closest('[data-it]'))return itemPop(b.dataset.it);
+ if(b=t.closest('[data-emp]')){const k=b.dataset.emp;invFilter='type:'+(k.startsWith('ring')?'ring':k);heroSub.character='backpack';invRender();inv.scrollTop=0;return}
+ if(b=t.closest('[data-nosl]'))return toast(SN[b.dataset.nosl]+' gear is coming in a later update.');
+ if(t.closest('[data-vstats]'))return statsPop();
+ if(t.closest('[data-pill]'))return pillPop();
+ if(b=t.closest('[data-bf]')){invFilter=b.dataset.bf;try{localStorage.setItem('invFilter',invFilter)}catch(x){}return invRender()}
+ if(t.closest('[data-sortmenu]'))return sortPop();
+ if(b=t.closest('[data-lsel]')){const i=+b.dataset.lsel;if(i>=(S.los||LO_BASE))return goShop(shopUnlocks);loSel=i;return invRender()}
+ if(b=t.closest('[data-lpg]')){const d=+b.dataset.lpg,np=loPg+d;if(np<0||np>1)return;loPg=np;return invRender()}
+ if(b=t.closest('[data-l2]')){if(b.classList.contains('off'))return;const a=b.dataset.l2,i=loSel,l=loList()[i];
+  if(a==='new'){return goShop(shopUnlocks)}
+  if(a==='load')return void act('lo_equip',{i});
+  if(a==='del'){if(confirm('Clear "'+((l&&l.n)||'this loadout')+'"? Its gear stays in your backpack.'))act('lo_del',{i});return}
+  if(a==='name'){const t2=prompt('Rename loadout (up to 16 characters)',(l&&l.n)||'');if(t2==null)return;act('lo_name',{i,name:t2});return}
+  if(a==='save'){if(l&&!confirm('Replace "'+l.n+'" with the gear you are wearing now?'))return;act('lo_save',{i,name:(l&&l.n)||'Loadout '+(i+1)})}}});
+
 function heroRow(k,ic,n,b){
  return'<div class="qcard" data-hs="'+k+'" style="position:relative;display:flex;align-items:center;gap:14px;cursor:pointer;padding:16px 14px"><div style="width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center">'+(HERO_IMG[k]?heroImg(k,52):'<span style="font-size:40px;line-height:1">'+ic+'</span>')+'</div><div class="qt" style="margin:0"><b>'+n+'</b></div>'
   +(b?'<span style="margin-left:auto;min-width:18px;padding:1px 6px;border-radius:9px;background:#e5c77b;color:#241a0c;font:700 11px Arial,sans-serif;text-align:center">'+b+'</span><span style="color:#e5c77b;font-size:20px">›</span>':'<span style="margin-left:auto;color:#e5c77b;font-size:20px">›</span>')+'</div>'}
