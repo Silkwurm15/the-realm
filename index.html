@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.838';window.__BUILD=B;
+(function(){var B='1.839';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2098,6 +2098,35 @@ const invCss=document.createElement('style');invCss.textContent=`
 .ipc table{width:100%;border-collapse:collapse;margin-top:8px;font:12px Arial,sans-serif}.ipc td,.ipc th{padding:4px 5px;text-align:center;border-bottom:1px solid #3a2c1a}.ipc th{color:#f2d795;font-weight:700}.ipc td:first-child{text-align:left;color:#cdb98a}.ipc .up{color:#7ee29a}.ipc .dn{color:#ff8178}
 .ipc .prow{display:flex;align-items:center;gap:10px;padding:10px;margin-top:8px;border:1px solid #77552b;border-radius:6px;background:linear-gradient(135deg,#2d2216f2,#0e0c09f2)}.ipc .prow .pi{font-size:30px}.ipc .prow .pn{flex:1;font:700 14px Georgia,serif}.ipc .prow .pn small{display:block;font:11px Arial,sans-serif;color:#c8b894;margin-top:2px}.ipc .prow .pc{font:700 18px Georgia,serif;color:#f2d795}
 .ipc .srt{display:flex;align-items:center;gap:10px;padding:12px;margin-top:8px;border:1px solid #77552b;border-radius:6px;background:linear-gradient(135deg,#2d2216f2,#0e0c09f2);font:700 14px Georgia,serif;cursor:pointer}.ipc .srt.on{border-color:#e5c77b;box-shadow:inset 0 0 0 2px #4b371d;color:#fff0c6}.ipc .srt i{width:20px;font-style:normal;color:#e5c77b}
+/* ---- inspect popup (item) ---- */
+.ipc.ipi{max-width:460px;padding:34px 9px 12px;border:3px solid #b8863b;border-radius:8px;background:radial-gradient(ellipse at 50% 0,#1f1710,#0b0907 70%);box-shadow:0 10px 35px #000d,inset 0 0 0 2px #2b1c0f,inset 0 0 0 4px #6e4a1f,inset 0 0 22px #000}
+.ipi::before{content:"";position:absolute;top:-1px;left:50%;width:34px;height:10px;transform:translateX(-50%);background:linear-gradient(#f0cd85,#8a5a2a);clip-path:polygon(0 0,100% 0,50% 100%)}
+.ipi .ix{top:-6px;right:-6px;width:40px;z-index:3}
+.ipi .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative}.ipi .cols::after{content:"";position:absolute;left:50%;top:6px;bottom:6px;width:1px;background:linear-gradient(transparent,#8a5a2a,transparent)}
+.ipi .one{max-width:250px;margin:0 auto}
+.ipi .icard{position:relative;margin-top:14px;padding:18px 7px 8px;border:2px solid #b8863b;border-radius:5px;background:linear-gradient(180deg,#171109,#0c0906);box-shadow:inset 0 0 0 1px #3a2610,inset 0 0 10px #000;min-width:0}
+.ipi .rib{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:84%;max-width:230px;height:26px;background:linear-gradient(#f0cd85,#8a5a2a);clip-path:polygon(9% 0,91% 0,100% 50%,91% 100%,9% 100%,0 50%);z-index:2}
+.ipi .rib span{position:absolute;inset:2px;display:flex;align-items:center;justify-content:center;gap:8px;clip-path:polygon(9% 0,91% 0,100% 50%,91% 100%,9% 100%,0 50%);background:#14100c;font:italic 700 13px Georgia,serif;color:#f6e3ae;white-space:nowrap}
+.ipi .rib.eq span{background:linear-gradient(#4a1510,#1a0806)}.ipi .rib.r2 span{background:linear-gradient(#1b2a45,#0a111f)}.ipi .rib.wide{max-width:none;width:78%}
+.ipi .rib em{font-style:italic;color:#ffd27a}
+.ipi .inm{font:700 clamp(13px,4vw,17px)/1.1 Georgia,serif;color:#f6e3ae;text-align:center;text-shadow:0 2px 3px #000;overflow-wrap:anywhere}
+.ipi .ity{font:700 11px Georgia,serif;color:#e8dcc0;text-align:center;margin:2px 0 6px}.ipi .ity i{font-style:normal}.ipi .ity small{font:10px Arial,sans-serif;color:#cdb98a}
+.ipi .irow{display:flex;gap:6px;align-items:flex-start}
+.ipi .ibox{flex:0 0 36%;aspect-ratio:1;border:2px solid #b8863b;border-radius:4px;background:#000;box-shadow:inset 0 0 8px #000;display:grid;place-items:center;overflow:hidden}.ipi .ibox img{width:94%;height:94%;object-fit:contain;display:block}
+.ipi .sts{flex:1;min-width:0}
+.ipi>.icard>.irow .ibox{flex:0 0 27%}
+.ipi .sh{font:700 11px/1.15 Georgia,serif;color:#f2d795;text-align:center;padding-bottom:3px;margin-bottom:2px;border-bottom:1px solid #4a3519}
+.ipi .sr{display:flex;justify-content:space-between;align-items:baseline;gap:5px;padding:2px 0;border-bottom:1px solid #2e2314;font:10.5px/1.15 Georgia,serif;color:#ead8ac}.ipi .sr:last-child{border-bottom:0}
+.ipi .sr b{white-space:nowrap;color:#e8e0cc;font-family:Georgia,serif}.ipi .sr b.up{color:#7ee29a}.ipi .sr b.dn{color:#ff8178}
+.ipi .irep{position:relative;margin-top:20px;padding:20px 12px 8px;border:2px solid #b8863b;border-radius:5px;background:linear-gradient(180deg,#120d08,#080604);box-shadow:inset 0 0 0 1px #3a2610,inset 0 0 10px #000}
+.ipi .irep .sh{font-size:12px;max-width:260px;margin:0 auto 2px}.ipi .irep .sr{max-width:260px;margin:0 auto;font-size:12px}
+.ipi .rrow .rg{display:grid;grid-template-columns:30% 1fr 1fr;gap:6px;align-items:start}.ipi .rrow .rl .ibox{width:100%;margin-top:4px}.ipi .rrow .rl .inm{font-size:clamp(11px,3.3vw,14px);text-align:left}.ipi .rrow .rl .ity{text-align:left;margin:1px 0 0;font-size:10px}
+.ipi .rrow .rp{border:1px solid #6e4a1f;border-radius:4px;padding:3px 5px;background:#0c0906}
+.ipi .ibr{display:grid;gap:6px;margin-top:12px}
+.ipi .ibt{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 4px;margin:0;border:2px solid #b8863b;border-radius:5px;background:linear-gradient(180deg,#3a2a14,#120d07);box-shadow:inset 0 0 0 1px #4b371d,0 2px 6px #000a;color:#f6e3ae;font:700 13px/1.05 Georgia,serif;cursor:pointer;min-width:0}
+.ipi .ibt svg{width:20px;height:20px;flex:0 0 auto}.ipi .ibt span{display:flex;flex-direction:column;align-items:center;text-align:left}.ipi .ibt small{font:10px Arial,sans-serif;color:#9fd6ff}
+.ipi .ibt:disabled{opacity:.45;filter:grayscale(.7);cursor:default}
+
 `;document.head.appendChild(invCss);
 const FRAME={helm:'helm',chest:'chest',feet:'boots',hands:'gloves',main:'main',off:'off',amulet:'amulet',ring1:'ring1',ring2:'ring2',cloak:'cloak',belt:'belt',trinket:'trinket',potions:'potions',stats:'stats'};
 const GLY={helm:'helm',chest:'chest',feet:'feet',hands:'hands',main:'main',off:'off',amulet:'amulet',ring:'ring',ring1:'ring',ring2:'ring',cloak:'cloak',belt:'belt',trinket:'trinket'};
@@ -2154,7 +2183,7 @@ const ipop=document.createElement('div');ipop.className='ipop';ipop.id='ipop';mo
 const closeX='<div class="ix" data-pclose="1"><img alt="Close" src="'+IV('inv_close')+'"></div>';
 let ipTab='d',ipUid=null;
 const closePop=()=>{ipop.classList.remove('open');ipop.innerHTML='';ipUid=null};
-function openPop(html){ipop.innerHTML='<div class="ipc">'+closeX+html+'</div>';ipop.classList.add('open')}
+function openPop(html,cls){ipop.innerHTML='<div class="ipc'+(cls?' '+cls:'')+'">'+closeX+html+'</div>';ipop.classList.add('open')}
 function eqSlotOf(uid){return SLOTS.find(k=>H().eq[k]&&H().eq[k].uid===uid)||null}
 function itemVals(it){const v={};(it.attrs||[]).forEach(x=>{if(ATTR[x.k])v['a:'+x.k]=(v['a:'+x.k]||0)+x.v});if(it.bonusAttr&&ATTR[it.bonusAttr.k])v['a:'+it.bonusAttr.k]=(v['a:'+it.bonusAttr.k]||0)+(Number(it.bonusAttr.v)||0);const c=CAT[it.cid];if(c.atk)v.atk=c.atk;if(c.def)v.def=c.def;if(c.hp)v.hp=c.hp;if(c.weaponDamage)v.wd=c.weaponDamage;return v}
 const vName=k=>k==='atk'?'ATK':k==='def'?'DEF':k==='hp'?'HP':k==='wd'?'Base DMG':ATTR[k.slice(2)].name,vUnit=k=>k.startsWith('a:')?(ATTR[k.slice(2)].unit||''):'';
@@ -2164,15 +2193,35 @@ function compareBody(it){const c=CAT[it.cid],slots=TYPE_SLOT[c.type]||[],slot=sl
  const a=itemVals(it),b=itemVals(old),keys=[...new Set([...Object.keys(a),...Object.keys(b)])];
  return'<table><tr><th></th><th style="color:'+itC(it)+'">'+attrEsc(iname(it))+'<br><small>'+cap(c.rarity)+' · selected</small></th><th style="color:'+itC(old)+'">'+attrEsc(iname(old))+'<br><small>'+cap(CAT[old.cid].rarity)+' · equipped</small></th></tr>'
   +keys.map(k=>{const x=a[k]||0,y=b[k]||0,d=x-y,u=vUnit(k);return'<tr><td>'+attrEsc(vName(k))+'</td><td class="'+(d>0?'up':d<0?'dn':'')+'">'+(x?sgn(x)+u:'–')+(d>0?' ▲':d<0?' ▼':'')+'</td><td>'+(y?sgn(y)+u:'–')+'</td></tr>'}).join('')+'</table>'}
-function itemPop(uid){const it=findItem(uid);if(!it)return;ipUid=uid;const c=CAT[it.cid],slot=eqSlotOf(uid),lo=loOf(uid),hold=!!it.lock||lo>=0,canCmp=!slot&&!c.unique&&(TYPE_SLOT[c.type]||[]).length>0;if(ipTab==='c'&&!canCmp)ipTab='d';
- let h='<h2 style="color:'+itC(it)+'">'+(it.lock?'🔒 ':'')+attrEsc(iname(it))+'</h2><div class="qs" style="margin:0">'+(c.unique?'Quest':cap(c.rarity))+' '+TN[c.type]+(slot?' · Equipped':'')+(lo>=0&&loList()[lo]?' · Loadout: '+esc(loList()[lo].n):'')+'</div>';
- if(canCmp)h+='<div class="ist"><div class="'+(ipTab==='d'?'on':'')+'" data-ptab="d">Item Details</div><div class="'+(ipTab==='c'?'on':'')+'" data-ptab="c">Compare</div></div>';
- if(ipTab==='c')h+=compareBody(it);
- else{h+='<div class="qs" style="font-size:12px;margin-top:8px">'+fmtS({atk:c.atk||0,def:c.def||0,hp:c.hp||0,weaponDamage:c.weaponDamage||0,attrs:{}})+'</div>'+attrHTML(it)+(it.extra?'<div class="qs">legacy extra +'+it.extra.val+' '+it.extra.stat.toUpperCase()+'</div>':'')
-  +'<div class="ibtns">'+(slot?'<button class="qbtn" data-pa="un" data-u="'+slot+'">Unequip</button>':'<button class="qbtn" data-pa="eq" data-u="'+uid+'">Equip</button>')
-  +'<button class="qbtn" data-pa="lock" data-u="'+uid+'">'+(it.lock?'🔓 Unlock':'🔒 Lock')+'</button>'
-  +'<button class="qbtn" data-pa="sell" data-u="'+uid+'"'+(hold?' disabled':'')+'>'+(lo>=0?'In loadout':c.unique?'Delete':'Dismantle 💠'+shardOf(it))+'</button></div>'}
- openPop(h)}
+const SV={shield:'<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z" fill="#e5b04a" stroke="#6a4310" stroke-width="1"/><path d="M12 2v20c4.6-1.7 8-6 8-11V5z" fill="#b97a22" opacity=".65"/></svg>',lock:'<svg viewBox="0 0 24 24"><path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10" fill="none" stroke="#e5b04a" stroke-width="2.4"/><rect x="4.5" y="10" width="15" height="11" rx="2" fill="#e5b04a" stroke="#6a4310" stroke-width="1"/><circle cx="12" cy="15" r="1.7" fill="#4a2e0c"/><rect x="11.2" y="15" width="1.6" height="3.4" fill="#4a2e0c"/></svg>',hammer:'<svg viewBox="0 0 24 24"><g transform="rotate(40 12 12)"><rect x="10.7" y="6" width="2.6" height="16" rx="1" fill="#b97a22" stroke="#6a4310" stroke-width=".8"/><rect x="5" y="2.5" width="14" height="6.5" rx="1.5" fill="#e5b04a" stroke="#6a4310" stroke-width="1"/></g></svg>',ring:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="15" rx="7" ry="6.5" fill="none" stroke="#e5b04a" stroke-width="2.6"/><path d="M8.5 5.5h7l2 3-5.5 4.5L6.5 8.5z" fill="#7fd0ff" stroke="#6a4310" stroke-width="1"/></svg>'};
+const IPO=['atk','def','hp','wd'];
+const ipV=it=>{const v=itemVals(it);if(it.extra&&['atk','def','hp'].includes(it.extra.stat))v[it.extra.stat]=(v[it.extra.stat]||0)+(Number(it.extra.val)||0);return v};
+const ipKeys=(...vs)=>{const q=new Set();vs.forEach(v=>Object.keys(v).forEach(k=>q.add(k)));return[...q].sort((x,y)=>{const a=IPO.indexOf(x),b=IPO.indexOf(y);return(a<0?9:a)-(b<0?9:b)})};
+const ipNone=t=>'<div class="sr"><span style="color:#8d7c5a">'+t+'</span></div>';
+const ipRows=v=>{const k=ipKeys(v);return k.length?k.map(x=>'<div class="sr"><span>'+attrEsc(vName(x))+'</span><b class="'+(v[x]>0?'up':v[x]<0?'dn':'')+'">'+sgn(v[x])+vUnit(x)+'</b></div>').join(''):ipNone('No stats')};
+const ipDiff=(a,b)=>{const k=ipKeys(a,b);return k.length?k.map(x=>{const d=Math.round(((a[x]||0)-(b[x]||0))*100)/100;return'<div class="sr"><span>'+attrEsc(vName(x))+'</span><b class="'+(d>0?'up':d<0?'dn':'')+'">'+(d?sgn(d)+vUnit(x):'0')+'</b></div>'}).join(''):ipNone('No change')};
+const ipTy=it=>{const c=CAT[it.cid],lo=loOf(it.uid);return TN[c.type]+' • <i style="color:'+itC(it)+'">'+(c.unique?'Quest':cap(c.rarity))+'</i>'+(lo>=0&&loList()[lo]?'<br><small>Loadout: '+esc(loList()[lo].n)+'</small>':'')};
+const ipNm=it=>(it.lock?'🔒 ':'')+attrEsc(iname(it));
+const ipCard=(it,rib,cls,hd)=>'<div class="icard"><div class="rib'+(cls?' '+cls:'')+'"><span>'+rib+'</span></div><div class="inm">'+ipNm(it)+'</div><div class="ity">'+ipTy(it)+'</div><div class="irow"><div class="ibox"><img alt="" src="'+itemImg(it)+'"></div><div class="sts"><div class="sh">'+(hd||'Item Stats')+'</div>'+ipRows(ipV(it))+'</div></div></div>';
+const ipEmpty=(type,rib,hd,cls)=>'<div class="icard"><div class="rib '+(cls||'eq')+'"><span>'+rib+'</span></div><div class="inm" style="color:#8d7c5a">Empty</div><div class="ity">'+TN[type]+' slot</div><div class="irow"><div class="ibox"><img alt="" style="opacity:.3" src="'+IV('inv_ico_'+GLY[type])+'"></div><div class="sts"><div class="sh">'+(hd||'Item Stats')+'</div>'+ipNone('Nothing equipped')+'</div></div></div>';
+const ipBtn=(ic,label,attrs,dis)=>'<button class="ibt" '+attrs+(dis?' disabled':'')+'>'+SV[ic]+'<span>'+label+'</span></button>';
+function itemPop(uid){const it=findItem(uid);if(!it)return;ipUid=uid;const c=CAT[it.cid],slot=eqSlotOf(uid),lo=loOf(uid),hold=!!it.lock||lo>=0,ring=c.type==='ring',slots=TYPE_SLOT[c.type]||[],cmp=!slot&&!c.unique&&slots.length>0,a=ipV(it);
+ const lk=ipBtn('lock',it.lock?'Unlock':'Lock','data-pa="lock" data-u="'+uid+'"'),ds=ipBtn('hammer',lo>=0?'In loadout':c.unique?'Delete':'Dismantle'+(shardOf(it)?'<small>💠'+shardOf(it)+'</small>':''),'data-pa="sell" data-u="'+uid+'"',hold);
+ let h,n=3,eq;
+ if(cmp&&ring){
+  const row=(sl,k)=>{const old=H().eq[sl],b=old?ipV(old):{};return'<div class="icard rrow"><div class="rib wide'+(k===2?' r2':' eq')+'"><span><b>Ring '+k+'</b><em>✦ '+(old?'Equipped':'Empty')+' ✦</em></span></div><div class="rg"><div class="rl"><div class="inm">'+(old?ipNm(old):'<span style="color:#8d7c5a">Empty</span>')+'</div><div class="ity">'+(old?ipTy(old):'Ring slot')+'</div><div class="ibox"><img alt="" '+(old?'':'style="opacity:.3" ')+'src="'+(old?itemImg(old):IV('inv_ico_ring'))+'"></div></div><div class="rs"><div class="sh">Stats</div>'+(old?ipRows(b):ipNone('Nothing equipped'))+'</div><div class="rp"><div class="sh">'+(old?'If Replaced<br>Stats':'If Equipped<br>Stats')+'</div>'+ipDiff(a,b)+'</div></div></div>'};
+  h=ipCard(it,'Unequipped','','Stats')+row('ring1',1)+row('ring2',2);n=4;
+  eq=ipBtn('ring','Equip<br>Ring 1','data-pa="eq" data-u="'+uid+'" data-slot="ring1"')+ipBtn('ring','Equip<br>Ring 2','data-pa="eq" data-u="'+uid+'" data-slot="ring2"');
+ }else if(cmp){
+  const sl=slots.find(k=>H().eq[k])||slots[0],old=H().eq[sl],b=old?ipV(old):{};
+  h='<div class="cols">'+ipCard(it,'Unequipped')+(old?ipCard(old,'Equipped','eq'):ipEmpty(c.type,'Equipped'))+'</div><div class="irep"><div class="rib"><span>'+(old?'If Replaced':'If Equipped')+'</span></div><div class="sh">Stats</div>'+ipDiff(a,b)+'</div>';
+  eq=ipBtn('shield','Equip','data-pa="eq" data-u="'+uid+'"');
+ }else{
+  h='<div class="one">'+ipCard(it,slot?'Equipped':'Unequipped',slot?'eq':'')+'</div>';
+  eq=slot?ipBtn('shield','Unequip','data-pa="un" data-u="'+slot+'"'):ipBtn('shield','Equip','data-pa="eq" data-u="'+uid+'"');
+ }
+ h+='<div class="ibr" style="grid-template-columns:repeat('+n+',1fr)">'+eq+lk+ds+'</div>';
+ openPop(h,'ipi')}
 function pillPop(){const h=H();openPop('<h2>Pillbox</h2><div class="qs" style="margin:0">Your potions. Earned potions stop at '+POT_CAP+' each.</div>'+Object.keys(POTS).map(k=>'<div class="prow"><div class="pi">'+POTS[k].icon+'</div><div class="pn">'+POTS[k].name+'<small>Earned '+(h.pot[k]||0)+' / '+POT_CAP+' · Bought '+(h.buy[k]||0)+'</small></div><div class="pc">x'+potN(k)+'</div>'+(potN(k)?'<button class="qbtn" style="width:auto;margin:0;padding:8px 12px" data-pa="pot" data-u="'+k+'">Use</button>':'')+'</div>').join(''))}
 function statsPop(){const h=H(),p=parts(),s=p.s,row=(n,v,x)=>'<div class="prow" style="padding:8px 10px"><div class="pn">'+n+(x?'<small>'+x+'</small>':'')+'</div><div class="pc" style="font-size:16px">'+v+'</div></div>';
  const at=Object.keys(ATTR).filter(k=>!['atk','def','maxHp'].includes(k)&&s[k]).map(k=>{const d=ATTR[k],v=s[k];return'<div class="prow" style="padding:6px 10px"><div class="pn" style="font-size:12px">'+attrEsc(d.name)+'</div><div class="pc '+(v<0?'dn':'up')+'" style="font-size:14px">'+(v>0?'+':'')+v+(d.unit||'')+'</div></div>'}).join('');
@@ -2187,7 +2236,7 @@ ipop.addEventListener('click',e=>{if(e.target===ipop||e.target.closest('[data-pc
  if(a==='sell'){closePop();const sl=eqSlotOf(u);return sl?dismantleEq(sl,u):sellItems([u],null,false,true)}
  b.disabled=true;
  if(a==='pot')return void act('usepot',{k:u}).then(()=>{if(ipop.classList.contains('open'))pillPop()});
- const p=a==='eq'?act('equip',{uid:u}):a==='un'?act('unequip',{slot:u}):act('lock',{uid:u,on:!(findItem(u)||{}).lock});
+ const p=a==='eq'?act('equip',b.dataset.slot?{uid:u,slot:b.dataset.slot}:{uid:u}):a==='un'?act('unequip',{slot:u}):act('lock',{uid:u,on:!(findItem(u)||{}).lock});
  Promise.resolve(p).then(()=>{if(a==='lock'&&ipop.classList.contains('open'))itemPop(u);else closePop();invRender()},()=>{b.disabled=false})});
 inv.addEventListener('click',e=>{const t=e.target;let b;
  if(b=t.closest('[data-it]'))return itemPop(b.dataset.it);
