@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.836';window.__BUILD=B;
+(function(){var B='1.837';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2059,7 +2059,7 @@ inv.addEventListener('click',e=>{const b=e.target.closest('[data-lo]');if(!b)ret
 function goShop(fn){const t=document.querySelector('.nav-item[data-tab="Shop"]');if(t)t.click();setTimeout(fn,0)}
 /* ================= New Inventory pages: Equipped | Backpack | Loadouts (art in assets/inv/) ================= */
 const IV=n=>'assets/inv/'+n+'.webp?v='+window.__BUILD;
-const ITEM_ART=new Set(['iron_sallet','rangers_helm','gloomguard_helm','nightveil_crown']);   // per-item art in assets/inv/items/<name>.webp (name lowercased, apostrophes dropped, spaces to _); add a name here when its file is added
+const ITEM_ART=new Set(['iron_sallet','rangers_helm','gloomguard_helm','nightveil_crown','gaze_of_the_last_sentinel','crown_of_the_hollow_king','dawnbreakers_visage']);   // per-item art in assets/inv/items/<name>.webp (name lowercased, apostrophes dropped, spaces to _); add a name here when its file is added
 const itemImg=it=>{const nm=(it&&CAT[it.cid]&&it.nm)?it.nm:(it&&CAT[it.cid]?CAT[it.cid].name:'');const k=String(nm).toLowerCase().replace(/[\u2019']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');return ITEM_ART.has(k)?'assets/inv/items/'+k+'.webp?v='+window.__BUILD:IV('inv_ico_'+GLY[CAT[it.cid].type])};
 const invCss=document.createElement('style');invCss.textContent=`
 .itabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.itab{cursor:pointer;position:relative}.itab img{width:100%;display:block;pointer-events:none}.itab.on img{filter:drop-shadow(0 0 6px #ff3b1a)}
