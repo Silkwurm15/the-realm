@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.835';window.__BUILD=B;
+(function(){var B='1.836';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2059,6 +2059,8 @@ inv.addEventListener('click',e=>{const b=e.target.closest('[data-lo]');if(!b)ret
 function goShop(fn){const t=document.querySelector('.nav-item[data-tab="Shop"]');if(t)t.click();setTimeout(fn,0)}
 /* ================= New Inventory pages: Equipped | Backpack | Loadouts (art in assets/inv/) ================= */
 const IV=n=>'assets/inv/'+n+'.webp?v='+window.__BUILD;
+const ITEM_ART=new Set(['iron_sallet','rangers_helm','gloomguard_helm','nightveil_crown']);   // per-item art in assets/inv/items/<name>.webp (name lowercased, apostrophes dropped, spaces to _); add a name here when its file is added
+const itemImg=it=>{const nm=(it&&CAT[it.cid]&&it.nm)?it.nm:(it&&CAT[it.cid]?CAT[it.cid].name:'');const k=String(nm).toLowerCase().replace(/[\u2019']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');return ITEM_ART.has(k)?'assets/inv/items/'+k+'.webp?v='+window.__BUILD:IV('inv_ico_'+GLY[CAT[it.cid].type])};
 const invCss=document.createElement('style');invCss.textContent=`
 .itabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.itab{cursor:pointer;position:relative}.itab img{width:100%;display:block;pointer-events:none}.itab.on img{filter:drop-shadow(0 0 6px #ff3b1a)}
 .eqg{position:relative;width:100%;aspect-ratio:1150/1189;margin-top:6px}.isl{position:absolute;container-type:inline-size;cursor:pointer}.isl>img.fr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -2070,7 +2072,7 @@ const invCss=document.createElement('style');invCss.textContent=`
 .bpflt{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:6px}.bf{cursor:pointer}.bf img{width:100%;display:block;pointer-events:none}.bf.on img{filter:drop-shadow(0 0 5px #ff4a22)}
 .bpg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}.bpt{position:relative;aspect-ratio:1;background:url(${IV('inv_cell')}) center/100% 100% no-repeat}.bpt.has{cursor:pointer}
 .bpt .bpb{position:absolute;inset:8%;border:2px solid var(--rc);border-radius:4px;box-shadow:0 0 9px var(--rc),inset 0 0 8px #0009;display:flex;align-items:center;justify-content:center;background:radial-gradient(#1c1710,#0a0806)}
-.bpt .bpb img{width:62%;height:62%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}.bpt .bpb i{position:absolute;top:1px;right:2px;font-style:normal;font-size:11px}.bpt .bpb u{position:absolute;bottom:0;left:3px;text-decoration:none;font-size:10px}
+.bpt .bpb img{width:62%;height:62%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}.bpb img[src*="/items/"]{width:94%;height:94%}.isi img[src*="/items/"]{width:86%;max-height:90%}.bpt .bpb i{position:absolute;top:1px;right:2px;font-style:normal;font-size:11px}.bpt .bpb u{position:absolute;bottom:0;left:3px;text-decoration:none;font-size:10px}
 .bpt.has:active{transform:scale(.96)}
 .bpfoot{position:sticky;bottom:-18px;z-index:4;display:flex;align-items:center;gap:6px;padding:12px 0 6px;margin-top:6px;background:linear-gradient(#0b0a0800,#0b0a08 35%)}
 .bpcap{position:relative;container-type:inline-size;flex:3.375 1 0;min-width:0}.bpcap img{width:100%;display:block}
@@ -2105,7 +2107,7 @@ const itC=it=>CAT[it.cid].color||RC[CAT[it.cid].rarity];
 function slotBox(k){const b=EQBOX[k],X0=30,Y0=8,W=1150,H=1189;return'left:'+((b[0]-X0)/W*100).toFixed(2)+'%;top:'+((b[1]-Y0)/H*100).toFixed(2)+'%;width:'+((b[2]-b[0])/W*100).toFixed(2)+'%;height:'+((b[3]-b[1])/H*100).toFixed(2)+'%'}
 function slotHTML(k,it,mini,attr){const has=!!it,c=has?itC(it):'';
  return'<div class="isl press'+(has?'':' empty')+(mini?' mini':'')+'" style="'+slotBox(k)+'" '+attr+'><img class="fr" alt="'+SN[k]+'" src="'+IV('inv_slot_'+FRAME[k])+'">'
-  +(has?'<div class="isi" style="box-shadow:inset 0 0 0 2px '+c+',inset 0 0 12px '+c+'88;background:radial-gradient(#1c1710cc,#0a0806cc)"><img alt="" src="'+IV('inv_ico_'+GLY[k])+'">'+(CAT[it.cid].unique?'':'')+(BIGNAME.has(k)?'<b style="color:'+c+'">'+attrEsc(iname(it))+'</b>':'')+(it.lock?'<i>🔒</i>':'')+'</div>':'')+'</div>'}
+  +(has?'<div class="isi" style="box-shadow:inset 0 0 0 2px '+c+',inset 0 0 12px '+c+'88;background:radial-gradient(#1c1710cc,#0a0806cc)"><img alt="" src="'+itemImg(it)+'">'+(CAT[it.cid].unique?'':'')+(BIGNAME.has(k)?'<b style="color:'+c+'">'+attrEsc(iname(it))+'</b>':'')+(it.lock?'<i>🔒</i>':'')+'</div>':'')+'</div>'}
 function eqPage(){const h=H();
  let o='<div class="eqg">'+'<div class="isl vsbtn press" style="'+slotBox('stats')+'" data-vstats="1"><img class="fr" alt="View Stats" src="'+IV('inv_slot_stats')+'"></div>';
  SLOT12.forEach(k=>{const it=h.eq[k]||null;o+=slotHTML(k,it,false,it?'data-it="'+it.uid+'"':(SLOTS.includes(k)?'data-emp="'+k+'"':'data-nosl="'+k+'"'))});
@@ -2125,7 +2127,7 @@ function bpPage(){const h=H(),cap=bagCap(),list=bpList(),n=sellList(h,'all').len
  const total=Math.max(30,Math.ceil((invFilter==='all'?Math.max(cap,list.length):list.length)/6)*6);
  o+='<div class="bpg">';
  for(let i=0;i<total;i++){const it=list[i];if(!it){o+='<div class="bpt"></div>';continue}
-  o+='<div class="bpt has" data-it="'+it.uid+'"><div class="bpb" style="--rc:'+itC(it)+'"><img alt="" src="'+IV('inv_ico_'+GLY[CAT[it.cid].type])+'">'+(it.lock?'<i>🔒</i>':'')+(loOf(it.uid)>=0?'<u>📦</u>':'')+'</div></div>'}
+  o+='<div class="bpt has" data-it="'+it.uid+'"><div class="bpb" style="--rc:'+itC(it)+'"><img alt="" src="'+itemImg(it)+'">'+(it.lock?'<i>🔒</i>':'')+(loOf(it.uid)>=0?'<u>📦</u>':'')+'</div></div>'}
  o+='</div>';
  if(!list.length)o+='<div class="qaw">'+(h.inv.length?'No equipment in this category.':'No items yet. Open chests!')+'</div>';
  o+='<div class="bpfoot"><div class="bpcap'+(h.inv.length>=cap?' full':'')+(String(h.inv.length).length+String(cap).length>4?' long':'')+'"><img alt="" src="'+IV('inv_cap')+'"><span><b>'+h.inv.length+'</b><i>/</i><b>'+cap+'</b></span></div><div class="bpclean" data-a="clean"><img alt="Clean Up" src="'+IV('inv_cleanup')+'"></div><div class="bpsort" data-sortmenu="1"><img alt="Sort" src="'+IV('inv_sort')+'"></div></div>';
