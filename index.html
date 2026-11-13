@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.840';window.__BUILD=B;
+(function(){var B='1.841';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2068,6 +2068,7 @@ const invCss=document.createElement('style');invCss.textContent=`
 .isl .isi{position:absolute;left:9%;right:9%;top:7%;bottom:24%;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:4px;pointer-events:none;overflow:hidden}
 .isl .isi img{width:60%;max-height:70%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}.isl .isi b{font:700 7cqw/1.1 Georgia,serif;text-align:center;margin-top:2px;padding:0 3%;text-shadow:0 1px 2px #000}
 .isl .isi i{position:absolute;top:2px;right:4px;font-style:normal;font-size:7cqw}
+.isl .pemb{position:absolute;left:9%;right:9%;top:7%;bottom:24%;display:flex;align-items:center;justify-content:center;pointer-events:none}.isl .pemb img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}
 .isl.empty .isi{opacity:.0}.isl.mini .isi b{display:none}.isl.press:active{transform:scale(.98)}
 .isl.nothing{cursor:default}.isl.nothing img.fr{opacity:.85}
 .bpflt{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:6px}.bf{cursor:pointer}.bf img{width:100%;display:block;pointer-events:none}.bf.on img{filter:drop-shadow(0 0 5px #ff4a22)}
@@ -2142,7 +2143,7 @@ function slotHTML(k,it,mini,attr,tall){const has=!!it,c=has?itC(it):'';
 function eqPage(){const h=H();
  let o='<div class="eqg" style="aspect-ratio:1150/1489">'+'<div class="isl vsbtn press" style="'+slotBox('stats',true)+'" data-vstats="1"><img class="fr" alt="View Stats" src="'+IV('inv_slot_stats')+'"></div>';
  SLOT12.forEach(k=>{const it=h.eq[k]||null;o+=slotHTML(k,it,false,it?'data-it="'+it.uid+'"':(SLOTS.includes(k)?'data-emp="'+k+'"':'data-nosl="'+k+'"'),true)});
- o+='<div class="isl vsbtn press mini" style="'+slotBox('potions',true)+'" data-pill="1"><img class="fr" alt="Potions" src="'+IV('inv_slot_potions')+'"></div></div>';
+ o+='<div class="isl vsbtn press mini" style="'+slotBox('potions',true)+'" data-pill="1"><img class="fr" alt="Potions" src="'+IV('inv_slot_potions')+'"><div class="pemb"><img alt="" src="'+IV('inv_potion_emblem')+'"></div></div></div>';
  return o}
 /* ---- Backpack ---- */
 const BF=[['all','all'],['type:main','main'],['type:off','off'],['type:helm','helm'],['type:chest','chest'],['type:cloak','cloak'],['type:hands','hands'],['type:feet','feet'],['type:belt','belt'],['type:amulet','amulet'],['type:trinket','trinket'],['type:ring','ring']];
