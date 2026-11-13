@@ -2133,6 +2133,49 @@ const invCss=document.createElement('style');invCss.textContent=`
 .ipp .ppm{padding:6px 6.4% 4px;background:url(assets/inv/ip_edge_l.webp) left top/5.85% 100% no-repeat,url(assets/inv/ip_edge_r.webp) right top/5.85% 100% no-repeat,radial-gradient(ellipse at 50% 0,#1a130c,#0b0907 75%)}
 .ipp .ibr{margin-top:14px}
 .ipp.ipr .ppx{left:88%;top:20%;width:10%;height:75%}.ipp.ipr .ppm{padding:6px 6% 4px;background:url(assets/inv/ipr_edge_l.webp) left top/5.86% 100% no-repeat,url(assets/inv/ipr_edge_r.webp) right top/5.86% 100% no-repeat,radial-gradient(ellipse at 50% 0,#1a130c,#0b0907 75%)}
+/* ---- ring compare popup: sized from the 1024px mockup (--u = 1px of the mockup); text keeps a phone-readable floor ---- */
+.ipi .ibt small svg{width:11px;height:11px;display:inline-block;vertical-align:-1px;margin-right:2px}
+.ipp.ipr{--u:calc(100cqw/1024)}
+.ipr .ppm{padding:calc(var(--u)*4) 6% calc(var(--u)*10)}
+.ipr .ppm .icard{margin-top:calc(var(--u)*42);padding:calc(var(--u)*34) calc(var(--u)*16) calc(var(--u)*24) calc(var(--u)*34);border-width:max(2px,calc(var(--u)*4));border-radius:calc(var(--u)*10)}
+.ipr .ppm .icard.rrow{padding-top:calc(var(--u)*50)}
+.ipr .ppm .rib{top:calc(var(--u)*-27);height:calc(var(--u)*64);width:70%;max-width:none}
+.ipr .ppm .icard:not(.rrow)>.rib{top:calc(var(--u)*-40);width:49%;min-width:150px}
+.ipr .ppm .rib span{inset:max(2px,calc(var(--u)*5));font-size:max(13px,calc(var(--u)*36));gap:calc(var(--u)*14)}
+.ipr .ppm .rib b{font-weight:700}
+.ipr .ppm .inm{font-size:max(15px,calc(var(--u)*38));line-height:1.02}
+.ipr .ppm .ity{font-size:max(12px,calc(var(--u)*30));margin:calc(var(--u)*6) 0 calc(var(--u)*24)}
+.ipr .ppm .ity i{font-weight:700}
+.ipr .ppm .irow{gap:calc(var(--u)*28);align-items:center;margin:0 calc(var(--u)*15) 0 calc(var(--u)*13)}
+.ipr .ppm .ibox{flex:0 0 calc(var(--u)*198);border-width:max(2px,calc(var(--u)*4));border-radius:calc(var(--u)*8);background:radial-gradient(circle at 50% 45%,#1d2a3a,#05070b 75%)}
+.ipr .ppm .ibox img{width:100%;height:100%}
+.ipr .ppm .sts,.ipr .ppm .rs,.ipr .ppm .rp{position:relative;min-width:0;border:max(1px,calc(var(--u)*2.5)) solid #7a5424;border-radius:calc(var(--u)*10);background:linear-gradient(180deg,#0f0b07,#0a0705);box-shadow:inset 0 0 0 1px #2b1c0f,inset 0 0 10px #000}
+.ipr .ppm .sh{font-size:max(12px,calc(var(--u)*30));padding-bottom:calc(var(--u)*6);margin-bottom:calc(var(--u)*4)}
+.ipr .ppm .sr{font-size:max(11px,calc(var(--u)*27));line-height:1.12;padding:calc(var(--u)*9) 0;align-items:center;gap:calc(var(--u)*8)}
+.ipr .ppm .sr b{font-size:max(11px,calc(var(--u)*29))}
+/* top card: Stats sits as a tab on the panel's top edge */
+.ipr .ppm .icard:not(.rrow) .sts{flex:1;padding:calc(var(--u)*40) calc(var(--u)*26) calc(var(--u)*12) calc(var(--u)*24)}
+.ipr .ppm .icard:not(.rrow) .sts .sh{position:absolute;left:17%;right:17%;top:calc(var(--u)*-28);padding:calc(var(--u)*7) 0;margin:0;border:max(1px,calc(var(--u)*2.5)) solid #9a6d2e;border-radius:calc(var(--u)*8);background:linear-gradient(#2a1f12,#120d08);font-size:max(14px,calc(var(--u)*36))}
+.ipr .ppm .icard:not(.rrow) .sr{font-size:max(12px,calc(var(--u)*30));padding:calc(var(--u)*11) 0}
+.ipr .ppm .icard:not(.rrow) .sr b{font-size:max(12px,calc(var(--u)*33))}
+/* ring rows: name + icon | Stats | If Replaced Stats */
+.ipr .rrow .rg{grid-template-columns:calc(var(--u)*205) minmax(0,1fr) minmax(0,1fr);gap:calc(var(--u)*14);align-items:stretch}
+.ipr .rrow .rl{min-width:0}
+.ipr .rrow .rl .inm{font-size:max(13px,calc(var(--u)*34));text-align:left}
+.ipr .rrow .rl .ity{font-size:max(11px,calc(var(--u)*27));margin:calc(var(--u)*6) 0 calc(var(--u)*10);text-align:left}
+.ipr .rrow .rl .ibox{width:calc(var(--u)*168);flex:none;margin:0 0 0 calc(var(--u)*18)}
+.ipr .rrow .rs,.ipr .rrow .rp{padding:calc(var(--u)*12) calc(var(--u)*12) calc(var(--u)*10)}
+.ipr .rrow .sh{text-align:center}
+/* buttons */
+.ipp.ipr .ibr{margin-top:calc(var(--u)*46);gap:calc(var(--u)*14)}
+.ipr .ibt{min-height:calc(var(--u)*118);padding:calc(var(--u)*8) calc(var(--u)*6);gap:calc(var(--u)*12);border-width:max(2px,calc(var(--u)*4));border-radius:calc(var(--u)*10);font-size:max(12px,calc(var(--u)*36))}
+.ipr .ibt>svg{width:max(22px,calc(var(--u)*62));height:max(22px,calc(var(--u)*62))}
+.ipr .ibt span{text-align:center;align-items:center}
+.ipr .ibt small{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*8);font:700 max(12px,calc(var(--u)*36))/1 Georgia,serif;color:#f6e3ae;margin-top:calc(var(--u)*8)}
+.ipr .ibt small svg{width:max(14px,calc(var(--u)*40));height:max(14px,calc(var(--u)*40));margin:0;vertical-align:0}
+.ipr .ibt[data-pa=lock]{background:linear-gradient(180deg,#3a3a3c,#141414);border-color:#8d7a52}
+.ipr .ibt[data-pa=sell]{background:linear-gradient(180deg,#b5231b,#5c0806);border-color:#d9a947;color:#ffe9b8}
+.ipr .ibt[data-pa=sell]>svg{display:none}
 /* ---- potion menu: painted top/bottom/edges cut from the mockup, everything between is live. 1 unit = 1px of the 1254px mockup ---- */
 .ipc.ipo{max-width:430px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;container-type:inline-size}.ipo>.ix{display:none}
 .ipo .pw{--u:calc(100cqw/1254);--c:calc(var(--u)*18);position:relative;color:#f6e3ae;font-family:Georgia,serif}
@@ -2219,7 +2262,7 @@ function compareBody(it){const c=CAT[it.cid],slots=TYPE_SLOT[c.type]||[],slot=sl
  const a=itemVals(it),b=itemVals(old),keys=[...new Set([...Object.keys(a),...Object.keys(b)])];
  return'<table><tr><th></th><th style="color:'+itC(it)+'">'+attrEsc(iname(it))+'<br><small>'+cap(c.rarity)+' · selected</small></th><th style="color:'+itC(old)+'">'+attrEsc(iname(old))+'<br><small>'+cap(CAT[old.cid].rarity)+' · equipped</small></th></tr>'
   +keys.map(k=>{const x=a[k]||0,y=b[k]||0,d=x-y,u=vUnit(k);return'<tr><td>'+attrEsc(vName(k))+'</td><td class="'+(d>0?'up':d<0?'dn':'')+'">'+(x?sgn(x)+u:'–')+(d>0?' ▲':d<0?' ▼':'')+'</td><td>'+(y?sgn(y)+u:'–')+'</td></tr>'}).join('')+'</table>'}
-const SV={shield:'<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z" fill="#e5b04a" stroke="#6a4310" stroke-width="1"/><path d="M12 2v20c4.6-1.7 8-6 8-11V5z" fill="#b97a22" opacity=".65"/></svg>',lock:'<svg viewBox="0 0 24 24"><path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10" fill="none" stroke="#e5b04a" stroke-width="2.4"/><rect x="4.5" y="10" width="15" height="11" rx="2" fill="#e5b04a" stroke="#6a4310" stroke-width="1"/><circle cx="12" cy="15" r="1.7" fill="#4a2e0c"/><rect x="11.2" y="15" width="1.6" height="3.4" fill="#4a2e0c"/></svg>',hammer:'<svg viewBox="0 0 24 24"><g transform="rotate(40 12 12)"><rect x="10.7" y="6" width="2.6" height="16" rx="1" fill="#b97a22" stroke="#6a4310" stroke-width=".8"/><rect x="5" y="2.5" width="14" height="6.5" rx="1.5" fill="#e5b04a" stroke="#6a4310" stroke-width="1"/></g></svg>',ring:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="15" rx="7" ry="6.5" fill="none" stroke="#e5b04a" stroke-width="2.6"/><path d="M8.5 5.5h7l2 3-5.5 4.5L6.5 8.5z" fill="#7fd0ff" stroke="#6a4310" stroke-width="1"/></svg>'};
+const SV={gem:'<svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z" fill="#4fb4ff" stroke="#bfe6ff" stroke-width="1"/><path d="M2 9h20M9 3 7 9l5 12 5-12-2-6" fill="none" stroke="#e9f6ff" stroke-width=".8" opacity=".8"/></svg>',shield:'<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z" fill="#e5b04a" stroke="#6a4310" stroke-width="1"/><path d="M12 2v20c4.6-1.7 8-6 8-11V5z" fill="#b97a22" opacity=".65"/></svg>',lock:'<svg viewBox="0 0 24 24"><path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10" fill="none" stroke="#e5b04a" stroke-width="2.4"/><rect x="4.5" y="10" width="15" height="11" rx="2" fill="#e5b04a" stroke="#6a4310" stroke-width="1"/><circle cx="12" cy="15" r="1.7" fill="#4a2e0c"/><rect x="11.2" y="15" width="1.6" height="3.4" fill="#4a2e0c"/></svg>',hammer:'<svg viewBox="0 0 24 24"><g transform="rotate(40 12 12)"><rect x="10.7" y="6" width="2.6" height="16" rx="1" fill="#b97a22" stroke="#6a4310" stroke-width=".8"/><rect x="5" y="2.5" width="14" height="6.5" rx="1.5" fill="#e5b04a" stroke="#6a4310" stroke-width="1"/></g></svg>',ring:'<svg viewBox="0 0 24 24"><ellipse cx="12" cy="15" rx="7" ry="6.5" fill="none" stroke="#e5b04a" stroke-width="2.6"/><path d="M8.5 5.5h7l2 3-5.5 4.5L6.5 8.5z" fill="#7fd0ff" stroke="#6a4310" stroke-width="1"/></svg>'};
 const IPO=['atk','def','hp','wd'];
 const ipV=it=>{const v=itemVals(it);if(it.extra&&['atk','def','hp'].includes(it.extra.stat))v[it.extra.stat]=(v[it.extra.stat]||0)+(Number(it.extra.val)||0);return v};
 const ipKeys=(...vs)=>{const q=new Set();vs.forEach(v=>Object.keys(v).forEach(k=>q.add(k)));return[...q].sort((x,y)=>{const a=IPO.indexOf(x),b=IPO.indexOf(y);return(a<0?9:a)-(b<0?9:b)})};
@@ -2232,11 +2275,11 @@ const ipCard=(it,rib,cls,hd)=>'<div class="icard"><div class="rib'+(cls?' '+cls:
 const ipEmpty=(type,rib,hd,cls)=>'<div class="icard"><div class="rib '+(cls||'eq')+'"><span>'+rib+'</span></div><div class="inm" style="color:#8d7c5a">Empty</div><div class="ity">'+TN[type]+' slot</div><div class="irow"><div class="ibox"><img alt="" style="opacity:.3" src="'+IV('inv_ico_'+GLY[type])+'"></div><div class="sts"><div class="sh">'+(hd||'Item Stats')+'</div>'+ipNone('Nothing equipped')+'</div></div></div>';
 const ipBtn=(ic,label,attrs,dis)=>'<button class="ibt" '+attrs+(dis?' disabled':'')+'>'+SV[ic]+'<span>'+label+'</span></button>';
 function itemPop(uid){const it=findItem(uid);if(!it)return;ipUid=uid;const c=CAT[it.cid],slot=eqSlotOf(uid),lo=loOf(uid),hold=!!it.lock||lo>=0,ring=c.type==='ring',slots=TYPE_SLOT[c.type]||[],cmp=!slot&&!c.unique&&slots.length>0,a=ipV(it);
- const lk=ipBtn('lock',it.lock?'Unlock':'Lock','data-pa="lock" data-u="'+uid+'"'),ds=ipBtn('hammer',lo>=0?'In loadout':c.unique?'Delete':'Dismantle'+(shardOf(it)?'<small>💠'+shardOf(it)+'</small>':''),'data-pa="sell" data-u="'+uid+'"',hold);
+ const lk=ipBtn('lock',it.lock?'Unlock':'Lock','data-pa="lock" data-u="'+uid+'"'),ds=ipBtn('hammer',lo>=0?'In loadout':c.unique?'Delete':'Dismantle'+(shardOf(it)?'<small>'+SV.gem+shardOf(it)+'</small>':''),'data-pa="sell" data-u="'+uid+'"',hold);
  let h,n=3,eq;
  if(cmp&&ring){
-  const row=(sl,k)=>{const old=H().eq[sl],b=old?ipV(old):{};return'<div class="icard rrow"><div class="rib wide'+(k===2?' r2':' eq')+'"><span><b>Ring '+k+'</b><em>✦ '+(old?'Equipped':'Empty')+' ✦</em></span></div><div class="rg"><div class="rl"><div class="inm">'+(old?ipNm(old):'<span style="color:#8d7c5a">Empty</span>')+'</div><div class="ity">'+(old?ipTy(old):'Ring slot')+'</div><div class="ibox"><img alt="" '+(old?'':'style="opacity:.3" ')+'src="'+(old?itemImg(old):IV('inv_ico_ring'))+'"></div></div><div class="rs"><div class="sh">Stats</div>'+(old?ipRows(b):ipNone('Nothing equipped'))+'</div><div class="rp"><div class="sh">'+(old?'If Replaced<br>Stats':'If Equipped<br>Stats')+'</div>'+ipDiff(a,b)+'</div></div></div>'};
-  h=ipCard(it,'Unequipped','','Stats')+row('ring1',1)+row('ring2',2);n=4;
+  const row=(sl,k)=>{const old=H().eq[sl],b=old?ipV(old):{};return'<div class="icard rrow"><div class="rib wide'+(k===2?' r2':' eq')+'"><span><b>Ring '+k+'</b><em>✦ '+(old?'Equipped':'Empty')+' ✦</em></span></div><div class="rg"><div class="rl"><div class="inm">'+(old?ipNm(old):'<span style="color:#8d7c5a">Empty</span>')+'</div><div class="ity">'+(old?ipTy(old):'Ring slot')+'</div><div class="ibox"><img alt="" '+(old?'':'style="opacity:.3" ')+'src="'+(old?itemImg(old):IV('inv_ico_ring'))+'"></div></div><div class="rs"><div class="sh">Stats</div>'+(old?ipRows(b):ipNone('Nothing equipped'))+'</div><div class="rp"><div class="sh">'+(old?'If Replaced Stats':'If Equipped Stats')+'</div>'+ipDiff(a,b)+'</div></div></div>'};
+  h=ipCard(it,'Unequipped','eq','Stats')+row('ring1',1)+row('ring2',2);n=4;
   eq=ipBtn('ring','Equip<br>Ring 1','data-pa="eq" data-u="'+uid+'" data-slot="ring1"')+ipBtn('ring','Equip<br>Ring 2','data-pa="eq" data-u="'+uid+'" data-slot="ring2"');
  }else if(cmp){
   const sl=slots.find(k=>H().eq[k])||slots[0],old=H().eq[sl],b=old?ipV(old):{};
@@ -2246,7 +2289,7 @@ function itemPop(uid){const it=findItem(uid);if(!it)return;ipUid=uid;const c=CAT
   h='<div class="one">'+ipCard(it,slot?'Equipped':'Unequipped',slot?'eq':'')+'</div>';
   eq=slot?ipBtn('shield','Unequip','data-pa="un" data-u="'+slot+'"'):ipBtn('shield','Equip','data-pa="eq" data-u="'+uid+'"');
  }
- h+='<div class="ibr" style="grid-template-columns:repeat('+n+',1fr)">'+eq+lk+ds+'</div>';
+ h+='<div class="ibr" style="grid-template-columns:'+(n===4?'1.04fr 1fr .85fr 1.1fr':'repeat('+n+',1fr)')+'">'+eq+lk+ds+'</div>';
  const pf=n===4?'ipr_':'ip_';openPop('<div class="ppt"><img alt="" src="'+IV(pf+'top')+'"><div class="ppx" data-pclose="1"></div></div><div class="ppm">'+h+'</div><div class="ppb"><img alt="" src="'+IV(pf+'bot')+'"></div>','ipi ipp'+(n===4?' ipr':''))}
 function pillPop(){const h=H(),ico={h35:'pot_ico_h35',full:'pot_ico_full',res:'pot_ico_res'};
  openPop('<div class="pw"><div class="pt"><img alt="Potions" src="'+IV('pot_top')+'"><div class="px" data-pclose="1"></div></div>'
