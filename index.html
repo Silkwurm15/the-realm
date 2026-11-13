@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.842';window.__BUILD=B;
+(function(){var B='1.843';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2127,6 +2127,11 @@ const invCss=document.createElement('style');invCss.textContent=`
 .ipi .ibt{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 4px;margin:0;border:2px solid #b8863b;border-radius:5px;background:linear-gradient(180deg,#3a2a14,#120d07);box-shadow:inset 0 0 0 1px #4b371d,0 2px 6px #000a;color:#f6e3ae;font:700 13px/1.05 Georgia,serif;cursor:pointer;min-width:0}
 .ipi .ibt svg{width:20px;height:20px;flex:0 0 auto}.ipi .ibt span{display:flex;flex-direction:column;align-items:center;text-align:left}.ipi .ibt small{font:10px Arial,sans-serif;color:#9fd6ff}
 .ipi .ibt:disabled{opacity:.45;filter:grayscale(.7);cursor:default}
+/* ---- painted frame for the item popup (cut from the mockup; 1 unit = 1px of the 1230px mockup) ---- */
+.ipc.ipi.ipp{max-width:460px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;container-type:inline-size}.ipp::before{display:none}.ipp>.ix{display:none}
+.ipp .ppt{position:relative}.ipp .ppt img,.ipp .ppb img{display:block;width:100%;pointer-events:none}.ipp .ppx{position:absolute;left:90%;top:17%;width:9%;height:66%;cursor:pointer}
+.ipp .ppm{padding:6px 6.4% 4px;background:url(assets/inv/ip_edge_l.webp) left top/5.85% 100% no-repeat,url(assets/inv/ip_edge_r.webp) right top/5.85% 100% no-repeat,radial-gradient(ellipse at 50% 0,#1a130c,#0b0907 75%)}
+.ipp .ibr{margin-top:14px}
 /* ---- potion menu: painted top/bottom/edges cut from the mockup, everything between is live. 1 unit = 1px of the 1254px mockup ---- */
 .ipc.ipo{max-width:430px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;container-type:inline-size}.ipo>.ix{display:none}
 .ipo .pw{--u:calc(100cqw/1254);--c:calc(var(--u)*18);position:relative;color:#f6e3ae;font-family:Georgia,serif}
@@ -2241,7 +2246,7 @@ function itemPop(uid){const it=findItem(uid);if(!it)return;ipUid=uid;const c=CAT
   eq=slot?ipBtn('shield','Unequip','data-pa="un" data-u="'+slot+'"'):ipBtn('shield','Equip','data-pa="eq" data-u="'+uid+'"');
  }
  h+='<div class="ibr" style="grid-template-columns:repeat('+n+',1fr)">'+eq+lk+ds+'</div>';
- openPop(h,'ipi')}
+ if(n===4)openPop(h,'ipi');else openPop('<div class="ppt"><img alt="" src="'+IV('ip_top')+'"><div class="ppx" data-pclose="1"></div></div><div class="ppm">'+h+'</div><div class="ppb"><img alt="" src="'+IV('ip_bot')+'"></div>','ipi ipp')}
 function pillPop(){const h=H(),ico={h35:'pot_ico_h35',full:'pot_ico_full',res:'pot_ico_res'};
  openPop('<div class="pw"><div class="pt"><img alt="Potions" src="'+IV('pot_top')+'"><div class="px" data-pclose="1"></div></div>'
   +'<div class="pm"><img class="el" alt="" src="'+IV('pot_edge_l')+'"><img class="er" alt="" src="'+IV('pot_edge_r')+'">'
