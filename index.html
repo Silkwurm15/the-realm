@@ -2192,6 +2192,26 @@ const invCss=document.createElement('style');invCss.textContent=`
 .ipr .ibt[data-pa=lock]{border-image-source:url(assets/inv/ipr_btn_dark.webp);background:linear-gradient(#392b1b,#2f2416 25%,#2d2113 50%,#1b150c 75%,#221910)}
 .ipr .ibt[data-pa=sell]{border-image-source:url(assets/inv/ipr_btn_red.webp);background:linear-gradient(#9c2008,#6d160b 25%,#570a01 50%,#360802 75%,#5b1103)}
 .ipr .ibt:active{filter:brightness(1.15)}
+/* ---- other item popups (trinket, weapon, armour...): same artwork as the ring popup ---- */
+.ipp{--u:calc(100cqw/1024)}
+.ipp:not(.ipr) .icard,.ipp:not(.ipr) .irep{border:solid transparent;border-width:calc(var(--u)*10);border-image:url(assets/inv/ipr_card.webp) 36 stretch;border-image-width:calc(var(--u)*36);border-radius:0;background:linear-gradient(#1d1209,#160e07 50%,#0f0a05);box-shadow:none}
+.ipp:not(.ipr) .icard{padding:calc(var(--u)*52) calc(var(--u)*24) calc(var(--u)*18)}
+.ipp:not(.ipr) .irep{padding:calc(var(--u)*56) calc(var(--u)*30) calc(var(--u)*18)}
+.ipp:not(.ipr) .rib{box-sizing:border-box;width:80%;max-width:none;height:calc(var(--u)*64);top:calc(var(--u)*-31);clip-path:none;background:none;border:solid transparent;border-width:0 calc(var(--u)*60);border-image:url(assets/inv/ipr_rb_dark.webp) 0 62 0 62 fill stretch;border-image-width:0 calc(var(--u)*60) 0 calc(var(--u)*60)}
+.ipp:not(.ipr) .rib.eq{border-image-source:url(assets/inv/ipr_rb_red.webp)}
+.ipp:not(.ipr) .rib.r2{border-image-source:url(assets/inv/ipr_rb_blue.webp)}
+.ipp:not(.ipr) .rib.wide{width:68%}
+.ipp:not(.ipr) .rib span{inset:0;clip-path:none;background:none!important;font-size:max(12px,calc(var(--u)*34));text-shadow:0 2px 3px #000;overflow:hidden}
+.ipp:not(.ipr) .ibox{border-width:max(2px,calc(var(--u)*4));border-radius:calc(var(--u)*8);background:radial-gradient(circle at 50% 45%,#1d2a3a,#05070b 75%)}
+.ipp:not(.ipr) .ibr{gap:calc(var(--u)*14)}
+.ipp:not(.ipr) .ibt{border:solid transparent;border-width:calc(var(--u)*10);border-image:url(assets/inv/ipr_btn_gold.webp) 22 stretch;border-image-width:calc(var(--u)*22);border-radius:0;box-shadow:none;min-height:calc(var(--u)*118);background:linear-gradient(#9c600f,#724608 25%,#542d01 50%,#472703 75%,#713f04);color:#f6e3ae;text-shadow:0 2px 3px #000}
+.ipp:not(.ipr) .ibt[data-pa=lock]{border-image-source:url(assets/inv/ipr_btn_dark.webp);background:linear-gradient(#392b1b,#2f2416 25%,#2d2113 50%,#1b150c 75%,#221910)}
+.ipp:not(.ipr) .ibt[data-pa=sell]{border-image-source:url(assets/inv/ipr_btn_red.webp);background:linear-gradient(#9c2008,#6d160b 25%,#570a01 50%,#360802 75%,#5b1103);color:#ffe9b8}
+.ipp:not(.ipr) .ibt[data-pa=sell]>svg{display:none}
+.ipp:not(.ipr) .ibt small{font:700 max(11px,calc(var(--u)*30))/1 Georgia,serif;color:#f6e3ae;display:flex;align-items:center;gap:4px;margin-top:3px}
+.ipp:not(.ipr) .ibt small svg{width:max(12px,calc(var(--u)*34));height:max(12px,calc(var(--u)*34));margin:0}
+.ipp:not(.ipr) .ibt:active{filter:brightness(1.15)}
+
 
 /* ---- potion menu: painted top/bottom/edges cut from the mockup, everything between is live. 1 unit = 1px of the 1254px mockup ---- */
 .ipc.ipo{max-width:430px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;container-type:inline-size}.ipo>.ix{display:none}
