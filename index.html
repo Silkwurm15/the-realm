@@ -2136,46 +2136,63 @@ const invCss=document.createElement('style');invCss.textContent=`
 /* ---- ring compare popup: sized from the 1024px mockup (--u = 1px of the mockup); text keeps a phone-readable floor ---- */
 .ipi .ibt small svg{width:11px;height:11px;display:inline-block;vertical-align:-1px;margin-right:2px}
 .ipp.ipr{--u:calc(100cqw/1024)}
-.ipr .ppm{padding:calc(var(--u)*4) 6% calc(var(--u)*10)}
-.ipr .ppm .icard{margin-top:calc(var(--u)*42);padding:calc(var(--u)*34) calc(var(--u)*16) calc(var(--u)*24) calc(var(--u)*34);border-width:max(2px,calc(var(--u)*4));border-radius:calc(var(--u)*10)}
+.ipr .ppm{padding:0 6% 0}
+.ipr .ppm .icard{margin-top:calc(var(--u)*36);padding:calc(var(--u)*34) calc(var(--u)*16) calc(var(--u)*24) calc(var(--u)*34);border-width:max(2px,calc(var(--u)*4));border-radius:calc(var(--u)*10)}
 .ipr .ppm .icard.rrow{padding-top:calc(var(--u)*50)}
 .ipr .ppm .rib{top:calc(var(--u)*-27);height:calc(var(--u)*64);width:70%;max-width:none}
 .ipr .ppm .icard:not(.rrow)>.rib{top:calc(var(--u)*-40);width:49%;min-width:150px}
-.ipr .ppm .rib span{inset:max(2px,calc(var(--u)*5));font-size:max(13px,calc(var(--u)*36));gap:calc(var(--u)*14)}
+.ipr .ppm .rib span{inset:max(2px,calc(var(--u)*5));font-size:max(9px,calc(var(--u)*36));gap:calc(var(--u)*14)}
 .ipr .ppm .rib b{font-weight:700}
-.ipr .ppm .inm{font-size:max(15px,calc(var(--u)*38));line-height:1.02}
-.ipr .ppm .ity{font-size:max(12px,calc(var(--u)*30));margin:calc(var(--u)*6) 0 calc(var(--u)*24)}
+.ipr .ppm .inm{font-size:max(9px,calc(var(--u)*38));line-height:1.02}
+.ipr .ppm .ity{font-size:max(9px,calc(var(--u)*30));margin:calc(var(--u)*6) 0 calc(var(--u)*24)}
 .ipr .ppm .ity i{font-weight:700}
 .ipr .ppm .irow{gap:calc(var(--u)*28);align-items:center;margin:0 calc(var(--u)*15) 0 calc(var(--u)*13)}
 .ipr .ppm .ibox{flex:0 0 calc(var(--u)*198);border-width:max(2px,calc(var(--u)*4));border-radius:calc(var(--u)*8);background:radial-gradient(circle at 50% 45%,#1d2a3a,#05070b 75%)}
 .ipr .ppm .ibox img{width:100%;height:100%}
 .ipr .ppm .sts,.ipr .ppm .rs,.ipr .ppm .rp{position:relative;min-width:0;border:max(1px,calc(var(--u)*2.5)) solid #7a5424;border-radius:calc(var(--u)*10);background:linear-gradient(180deg,#0f0b07,#0a0705);box-shadow:inset 0 0 0 1px #2b1c0f,inset 0 0 10px #000}
-.ipr .ppm .sh{font-size:max(12px,calc(var(--u)*30));padding-bottom:calc(var(--u)*6);margin-bottom:calc(var(--u)*4)}
-.ipr .ppm .sr{font-size:max(11px,calc(var(--u)*27));line-height:1.12;padding:calc(var(--u)*9) 0;align-items:center;gap:calc(var(--u)*8)}
-.ipr .ppm .sr b{font-size:max(11px,calc(var(--u)*29))}
+.ipr .ppm .sh{font-size:max(9px,calc(var(--u)*30));padding-bottom:calc(var(--u)*6);margin-bottom:calc(var(--u)*4)}
+.ipr .ppm .sr{font-size:max(9px,calc(var(--u)*27));line-height:1.12;padding:calc(var(--u)*9) 0;align-items:center;gap:calc(var(--u)*8)}
+.ipr .ppm .sr b{font-size:max(9px,calc(var(--u)*29))}
 /* top card: Stats sits as a tab on the panel's top edge */
 .ipr .ppm .icard:not(.rrow) .sts{flex:1;padding:calc(var(--u)*40) calc(var(--u)*26) calc(var(--u)*12) calc(var(--u)*24)}
-.ipr .ppm .icard:not(.rrow) .sts .sh{position:absolute;left:17%;right:17%;top:calc(var(--u)*-28);padding:calc(var(--u)*7) 0;margin:0;border:max(1px,calc(var(--u)*2.5)) solid #9a6d2e;border-radius:calc(var(--u)*8);background:linear-gradient(#2a1f12,#120d08);font-size:max(14px,calc(var(--u)*36))}
-.ipr .ppm .icard:not(.rrow) .sr{font-size:max(12px,calc(var(--u)*30));padding:calc(var(--u)*11) 0}
-.ipr .ppm .icard:not(.rrow) .sr b{font-size:max(12px,calc(var(--u)*33))}
+.ipr .ppm .icard:not(.rrow) .sts .sh{position:absolute;left:17%;right:17%;top:calc(var(--u)*-28);padding:calc(var(--u)*7) 0;margin:0;border:max(1px,calc(var(--u)*2.5)) solid #9a6d2e;border-radius:calc(var(--u)*8);background:linear-gradient(#2a1f12,#120d08);font-size:max(9px,calc(var(--u)*36))}
+.ipr .ppm .icard:not(.rrow) .sr{font-size:max(9px,calc(var(--u)*30));padding:calc(var(--u)*11) 0}
+.ipr .ppm .icard:not(.rrow) .sr b{font-size:max(9px,calc(var(--u)*33))}
 /* ring rows: name + icon | Stats | If Replaced Stats */
 .ipr .rrow .rg{grid-template-columns:calc(var(--u)*205) minmax(0,1fr) minmax(0,1fr);gap:calc(var(--u)*14);align-items:stretch}
 .ipr .rrow .rl{min-width:0}
-.ipr .rrow .rl .inm{font-size:max(13px,calc(var(--u)*34));text-align:left}
-.ipr .rrow .rl .ity{font-size:max(11px,calc(var(--u)*27));margin:calc(var(--u)*6) 0 calc(var(--u)*10);text-align:left}
+.ipr .rrow .rl .inm{font-size:max(9px,calc(var(--u)*34));text-align:left}
+.ipr .rrow .rl .ity{font-size:max(9px,calc(var(--u)*27));margin:calc(var(--u)*6) 0 calc(var(--u)*10);text-align:left}
 .ipr .rrow .rl .ibox{width:calc(var(--u)*168);flex:none;margin:0 0 0 calc(var(--u)*18)}
 .ipr .rrow .rs,.ipr .rrow .rp{padding:calc(var(--u)*12) calc(var(--u)*12) calc(var(--u)*10)}
 .ipr .rrow .sh{text-align:center}
 /* buttons */
 .ipp.ipr .ibr{margin-top:calc(var(--u)*46);gap:calc(var(--u)*14)}
-.ipr .ibt{min-height:calc(var(--u)*118);padding:calc(var(--u)*8) calc(var(--u)*6);gap:calc(var(--u)*12);border-width:max(2px,calc(var(--u)*4));border-radius:calc(var(--u)*10);font-size:max(12px,calc(var(--u)*36))}
+.ipr .ibt{min-height:calc(var(--u)*118);padding:calc(var(--u)*8) calc(var(--u)*6);gap:calc(var(--u)*12);border-width:max(2px,calc(var(--u)*4));border-radius:calc(var(--u)*10);font-size:max(9px,calc(var(--u)*36))}
 .ipr .ibt>svg{width:max(22px,calc(var(--u)*62));height:max(22px,calc(var(--u)*62))}
 .ipr .ibt span{text-align:center;align-items:center}
-.ipr .ibt small{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*8);font:700 max(12px,calc(var(--u)*36))/1 Georgia,serif;color:#f6e3ae;margin-top:calc(var(--u)*8)}
-.ipr .ibt small svg{width:max(14px,calc(var(--u)*40));height:max(14px,calc(var(--u)*40));margin:0;vertical-align:0}
+.ipr .ibt small{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*8);font:700 max(9px,calc(var(--u)*36))/1 Georgia,serif;color:#f6e3ae;margin-top:calc(var(--u)*8)}
+.ipr .ibt small svg{width:max(9px,calc(var(--u)*40));height:max(9px,calc(var(--u)*40));margin:0;vertical-align:0}
 .ipr .ibt[data-pa=lock]{background:linear-gradient(180deg,#3a3a3c,#141414);border-color:#8d7a52}
 .ipr .ibt[data-pa=sell]{background:linear-gradient(180deg,#b5231b,#5c0806);border-color:#d9a947;color:#ffe9b8}
 .ipr .ibt[data-pa=sell]>svg{display:none}
+/* ---- ring popup: artwork cut from the mockup (assets/inv/ipr_*.webp) ---- */
+.ipr .ppm .icard{border:solid transparent;border-width:calc(var(--u)*12);border-image:url(assets/inv/ipr_card.webp) 36 stretch;border-image-width:calc(var(--u)*36);background:linear-gradient(#1d1209,#160e07 50%,#0f0a05);border-radius:0;padding:calc(var(--u)*22) calc(var(--u)*22) calc(var(--u)*12) calc(var(--u)*22)}
+.ipr .ppm .icard.rrow{padding-top:calc(var(--u)*38)}
+.ipr .ppm .rib{background:url(assets/inv/ipr_rib_red.webp) 0 0/100% 100% no-repeat;clip-path:none;top:calc(var(--u)*-31);width:calc(var(--u)*635);height:calc(var(--u)*65);max-width:none}
+.ipr .ppm .rib.r2{background-image:url(assets/inv/ipr_rib_blue.webp)}
+.ipr .ppm .icard:not(.rrow)>.rib{background-image:url(assets/inv/ipr_rib_unq.webp);width:calc(var(--u)*455);height:calc(var(--u)*66);top:calc(var(--u)*-54);min-width:0}
+.ipr .ppm .rib span{background:none!important;clip-path:none;inset:0;text-shadow:0 2px 3px #000;color:#f6e3ae}
+.ipr .ppm .icard:not(.rrow){padding-top:calc(var(--u)*36)}
+.ipr .ppm .sts,.ipr .ppm .rs,.ipr .ppm .rp{border:solid transparent;border-width:calc(var(--u)*8);border-image:url(assets/inv/ipr_panel.webp) 18 stretch;border-image-width:calc(var(--u)*18);border-radius:0;box-shadow:none;background:linear-gradient(#1b1006,#160f09 50%,#120d07)}
+.ipr .rrow .rs,.ipr .rrow .rp{padding:calc(var(--u)*6) calc(var(--u)*10) calc(var(--u)*8)}
+.ipr .ppm .icard:not(.rrow) .sts{padding:calc(var(--u)*34) calc(var(--u)*18) calc(var(--u)*8) calc(var(--u)*16)}
+.ipr .ppm .icard:not(.rrow) .sts .sh{background:url(assets/inv/ipr_tab.webp) 0 0/100% 100% no-repeat;border:0;border-radius:0;left:18.5%;right:auto;width:66%;height:calc(var(--u)*52);top:calc(var(--u)*-44);padding:0;display:flex;align-items:center;justify-content:center;text-shadow:0 2px 3px #000}
+.ipr .ibt{border:solid transparent;border-width:calc(var(--u)*10);border-image:url(assets/inv/ipr_btn_gold.webp) 22 stretch;border-image-width:calc(var(--u)*22);border-radius:0;box-shadow:none;background:linear-gradient(#9c600f,#724608 25%,#542d01 50%,#472703 75%,#713f04);color:#f6e3ae;text-shadow:0 2px 3px #000}
+.ipr .ibt[data-pa=lock]{border-image-source:url(assets/inv/ipr_btn_dark.webp);background:linear-gradient(#392b1b,#2f2416 25%,#2d2113 50%,#1b150c 75%,#221910)}
+.ipr .ibt[data-pa=sell]{border-image-source:url(assets/inv/ipr_btn_red.webp);background:linear-gradient(#9c2008,#6d160b 25%,#570a01 50%,#360802 75%,#5b1103)}
+.ipr .ibt:active{filter:brightness(1.15)}
+
 /* ---- potion menu: painted top/bottom/edges cut from the mockup, everything between is live. 1 unit = 1px of the 1254px mockup ---- */
 .ipc.ipo{max-width:430px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;container-type:inline-size}.ipo>.ix{display:none}
 .ipo .pw{--u:calc(100cqw/1254);--c:calc(var(--u)*18);position:relative;color:#f6e3ae;font-family:Georgia,serif}
