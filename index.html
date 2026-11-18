@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.854';window.__BUILD=B;
+(function(){var B='1.855';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2068,6 +2068,7 @@ const invCss=document.createElement('style');invCss.textContent=`
 .ihdr{display:flex;align-items:center;gap:2px;margin:0 0 8px}.ihdr img{width:100%;display:block;pointer-events:none}.ih-hero{flex:304;cursor:pointer}.ih-title{flex:480}.ih-rar{flex:242;cursor:pointer}.ih-hero:active,.ih-rar:active{filter:brightness(1.2)}
 .itabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.itab{cursor:pointer;position:relative}.itab img{width:100%;display:block;pointer-events:none}.itab.on img{filter:drop-shadow(0 0 6px #ff3b1a)}
 .eqg{position:relative;width:100%;aspect-ratio:1150/1189;margin-top:6px}.isl{position:absolute;container-type:inline-size;cursor:pointer}.isl>img.fr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.isl .rf{position:absolute;inset:0;border:9cqw solid transparent;border-image-slice:32;border-image-repeat:stretch;pointer-events:none;text-decoration:none}
 .fr3{position:absolute;inset:0;pointer-events:none}.fr3 span{position:absolute;left:0;right:0;background:var(--u) no-repeat}.fr3 .a{top:0;height:var(--th);background-size:100% auto;background-position:top}.fr3 .c{top:calc(var(--th) - 1px);bottom:calc(var(--bh) - 1px);background-size:100% var(--ms);background-position:0 var(--pos)}.fr3 .b{bottom:0;height:var(--bh);background-size:100% auto;background-position:bottom}
 .isl .isi{position:absolute;left:9%;right:9%;top:7%;bottom:24%;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:4px;pointer-events:none;overflow:hidden}
 .isl .isi img{width:60%;max-height:70%;object-fit:contain;filter:drop-shadow(0 2px 3px #000c)}.isl .isi b{font:700 7cqw/1.1 Georgia,serif;text-align:center;margin-top:2px;padding:0 3%;text-shadow:0 1px 2px #000}
@@ -2263,7 +2264,7 @@ function frameHTML(k,tall){const f=FRAME[k],d=SLC[f];if(!tall||!d)return{h:'<img
  return{h:'<div class="fr3" role="img" aria-label="'+SN[k]+'" style="--u:url('+IV('inv_slot_'+f)+');--th:'+th+'cqw;--bh:'+bh+'cqw;--pos:'+pos+'%;--ms:'+ms+'%"><span class="a"></span><span class="c"></span><span class="b"></span></div>',w:';top:'+(24/w*100).toFixed(3)+'cqw;bottom:'+bh+'cqw'}}
 function slotHTML(k,it,mini,attr,tall){const has=!!it,c=has?itC(it):'',fm=frameHTML(k,tall);
  return'<div class="isl press'+(has?'':' empty')+(mini?' mini':'')+'" style="'+slotBox(k,tall)+'" '+attr+'>'+fm.h
-  +(has?'<div class="isi" style="box-shadow:inset 0 0 0 2px '+c+',inset 0 0 12px '+c+'88;background:radial-gradient(#1c1710cc,#0a0806cc)'+fm.w+'"><img alt="" src="'+itemImg(it)+'">'+(CAT[it.cid].unique?'':'')+(BIGNAME.has(k)?'<b style="color:'+c+'">'+attrEsc(iname(it))+'</b>':'')+(it.lock?'<i>🔒</i>':'')+'</div>':'')+'</div>'}
+  +(has?'<div class="isi" style="background:radial-gradient(#1c1710cc,#0a0806cc)'+fm.w+'"><img alt="" src="'+itemImg(it)+'"><s class="rf" style="border-image-source:url('+IV('inv_rar_'+(['common','uncommon','rare','mythic','legendary','unique'].includes(CAT[it.cid].rarity)?CAT[it.cid].rarity:'common'))+')"></s>'+(CAT[it.cid].unique?'':'')+(BIGNAME.has(k)?'<b style="color:'+c+'">'+attrEsc(iname(it))+'</b>':'')+(it.lock?'<i>🔒</i>':'')+'</div>':'')+'</div>'}
 function eqPage(){const h=H();
  let o='<div class="eqg" style="aspect-ratio:1150/1489">'+'<div class="isl vsbtn press" style="'+slotBox('stats',true)+'" data-vstats="1"><img class="fr" alt="View Stats" src="'+IV('inv_slot_stats')+'"></div>';
  SLOT12.forEach(k=>{const it=h.eq[k]||null;o+=slotHTML(k,it,false,it?'data-it="'+it.uid+'"':(SLOTS.includes(k)?'data-emp="'+k+'"':'data-nosl="'+k+'"'),true)});
