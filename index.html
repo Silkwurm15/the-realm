@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.858';window.__BUILD=B;
+(function(){var B='1.860';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2248,6 +2248,7 @@ const invCss=document.createElement('style');invCss.textContent=`
 .ipu .udm{left:calc(var(--u)*460);top:calc(var(--u)*837);width:calc(var(--u)*398);height:calc(var(--u)*98);display:flex;align-items:center;justify-content:center;font:700 calc(var(--u)*46) Georgia,serif;color:#b98a84;text-shadow:0 2px 2px #000;cursor:default;border-radius:calc(var(--u)*16)}
 .ipu .udm.on{color:#fff0c8;cursor:pointer;background:radial-gradient(ellipse at center,#ff5a3a55,transparent 75%);box-shadow:0 0 calc(var(--u)*26) #ff4a3acc}
 .ipu .ux{left:calc(var(--u)*872);top:0;width:calc(var(--u)*100);height:calc(var(--u)*100)}
+.ipc.ipr{max-width:560px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;filter:drop-shadow(0 10px 28px #000c)}.ipr .ix{top:-14px;right:-8px;width:42px;z-index:3}.ipr img.rg{width:100%;display:block;border-radius:8px}
 
 
 `;document.head.appendChild(invCss);
@@ -2299,8 +2300,8 @@ function loPage(){const L=loList(),n=S.los||LO_BASE,h=H();if(loSel>=n)loSel=0;
  const pg='<div class="lopg"><b class="'+(loPg?'':'off')+'" data-lpg="-1">◀</b><span>'+(loPg*6+1)+'–'+(loPg*6+6)+'</span><b class="'+(loPg<1?'':'off')+'" data-lpg="1">▶</b></div>';
  const l=L[loSel],owned=loSel<n,saved=!!(l&&l.s),nm=esc(l&&l.n?l.n:'Loadout '+(loSel+1));
  const ids=saved?Object.values(l.s):[],isOn=saved&&ids.length>0&&ids.every(u=>wear.has(u))&&wear.size===ids.length;
- let sl='<div class="eqg" style="margin-top:6px">';SLOT12.forEach(k=>{const it=saved&&l.s[k]?findItem(l.s[k]):null;sl+=slotHTML(k,it,true,it?'data-it="'+it.uid+'"':'data-x="1"')});
- sl+='<div class="isl vsbtn press mini" style="'+slotBox('potions')+'" data-pill="1"><img class="fr" alt="Potions" src="'+IV('inv_slot_potions')+'"></div></div>';
+ let sl='<div class="eqg" style="margin-top:6px;aspect-ratio:1150/1489">';SLOT12.forEach(k=>{const it=saved&&l.s[k]?findItem(l.s[k]):null;sl+=slotHTML(k,it,false,it?'data-it="'+it.uid+'"':'data-x="1"',true)});
+ sl+='<div class="isl vsbtn press mini" style="'+slotBox('potions',true)+'" data-pill="1"><img class="fr" alt="Potions" src="'+IV('inv_slot_potions')+'"></div></div>';
  const btn=(a,img,off)=>'<div class="'+(off?'off':'')+'" data-l2="'+a+'"><img alt="" src="'+IV(img)+'"></div>';
  return'<div class="lol"><div><div class="lolist">'+lst+'</div>'+pg+'</div><div class="lopan"><div class="lorib"><img class="rb" alt="" src="'+IV('inv_lo_ribbon')+'"><span>'+nm+'</span></div>'+(saved?'<div class="lopen" data-l2="name"><img alt="Rename" src="'+IV('inv_lo_pencil')+'"></div>':'')+sl+'</div></div>'
   +'<div class="lobtns">'+btn('save','inv_lo_save',!owned)+btn('load','inv_lo_load',!saved||isOn)+btn('del','inv_lo_del',!saved)+'</div>'
@@ -2385,6 +2386,7 @@ function statsPop(){const h=H(),p=parts(),s=p.s,row=(n,v,x)=>'<div class="prow" 
  openPop('<h2>Character Stats</h2><div class="qs" style="margin:0">Level '+S.lvl+' · totals include your equipped gear</div>'
   +row('Health',(h.downed?'DOWNED':Math.floor(h.hp)+' / '+s.hp),'Level base '+p.b.hp+' · gear '+sg(p.g.hp))+row('Attack',s.atk,'Level base '+p.b.atk+' · gear '+sg(p.g.atk))+row('Base Damage',s.weaponDamage,'From your weapon: '+sg(p.g.weaponDamage))+row('Defense',s.def,'Level base '+p.b.def+' · gear '+sg(p.g.def))
   +(at?'<div class="qh" style="margin-top:12px"><span>Gear and combat attributes</span></div>'+at:'<div class="qs" style="margin-top:10px">No gear attributes active.</div>'))}
+function rarityPop(){openPop('<img class="rg" alt="Rarity Guide" src="'+IV('inv_rarity_guide')+'">','ipr')}
 function sortPop(){openPop('<h2>Sort</h2>'+SORTS.map(s=>'<div class="srt'+(invSort===s[0]?' on':'')+'" data-srt="'+s[0]+'"><i>'+(invSort===s[0]?'✔':'')+'</i>'+s[1]+'</div>').join(''))}
 ipop.addEventListener('click',e=>{if(e.target===ipop||e.target.closest('[data-pclose]'))return closePop();
  const t=e.target.closest('[data-ptab]');if(t){ipTab=t.dataset.ptab;return itemPop(ipUid)}
@@ -2399,6 +2401,7 @@ inv.addEventListener('click',e=>{const t=e.target;let b;
  if(b=t.closest('[data-it]'))return itemPop(b.dataset.it);
  if(b=t.closest('[data-emp]')){const k=b.dataset.emp;invFilter='type:'+(k.startsWith('ring')?'ring':k);heroSub.character='backpack';invRender();inv.scrollTop=0;return}
  if(b=t.closest('[data-nosl]'))return toast(SN[b.dataset.nosl]+' gear is coming in a later update.');
+ if(t.closest('[data-rarity]'))return rarityPop();
  if(t.closest('[data-vstats]'))return statsPop();
  if(t.closest('[data-pill]'))return pillPop();
  if(b=t.closest('[data-bf]')){invFilter=b.dataset.bf;try{localStorage.setItem('invFilter',invFilter)}catch(x){}return invRender()}
