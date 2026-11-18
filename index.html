@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.863';window.__BUILD=B;
+(function(){var B='1.864';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2027,7 +2027,7 @@ function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,
  else if(heroSec==='character')o=(sub==='loadouts'?loPage():sub==='backpack'?bpPage():eqPage());
  else if(heroSec==='social')o=sub==='mail'?heroMail():sub==='friends'?heroFriends():heroPH(sub);
  else o=sub==='achievements'?heroAch():sub==='cosmetics'?heroCosm():heroClasses();
- inv.innerHTML=(heroSec==='hub'?'':heroTabs())+o;inv.scrollTop=st}
+ inv.classList.toggle('hubmode',heroSec==='hub');inv.innerHTML=(heroSec==='hub'?'':heroTabs())+o;inv.scrollTop=st}
 /* ---- Hero tab: opens on a hub of buttons; pick Character | Friends | Mailbox | Scores (placeholders for the last three) ---- */
 let heroSec='hub';
 const HERO_IMG={character:"assets/hero/hero_img_character.webp",friends:"assets/hero/hero_img_friends.webp",mail:"assets/hero/hero_img_mail.webp",scores:"assets/hero/hero_img_scores.webp"};
@@ -2259,6 +2259,13 @@ const invCss=document.createElement('style');invCss.textContent=`
 .ipd .dtap{position:absolute;border:0;padding:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .ipd .dcf{left:calc(var(--u)*150);top:calc(var(--u)*1002);width:calc(var(--u)*800);height:calc(var(--u)*140)}
 .ipd .dcn{left:calc(var(--u)*160);top:calc(var(--u)*1172);width:calc(var(--u)*780);height:calc(var(--u)*120)}
+.qpanel.hubmode{padding:0;background:#0d0805;overflow-y:auto}
+.hhwrap{min-height:100%;display:flex;align-items:center;justify-content:center}
+.hhub{container-type:inline-size;position:relative;width:100%;max-width:640px;aspect-ratio:1024/1148;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%)}
+.hhin{position:absolute;inset:0;--u:calc(100cqw/1024)}
+.hhbg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;user-select:none}
+.hhb{position:absolute;left:calc(var(--u)*85);width:calc(var(--u)*865);height:calc(var(--u)*212);cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:calc(var(--u)*30)}.hhb:active{background:#ffd98a26}
+.hhbd{position:absolute;right:calc(var(--u)*20);top:calc(var(--u)*-6);min-width:calc(var(--u)*58);height:calc(var(--u)*58);padding:0 calc(var(--u)*14);box-sizing:border-box;border-radius:calc(var(--u)*29);background:#e5483a;border:calc(var(--u)*4) solid #ffd98a;color:#fff;font:700 calc(var(--u)*34)/calc(var(--u)*50) Arial,sans-serif;font-style:normal;text-align:center;box-shadow:0 2px 6px #000a;pointer-events:none}
 .ipc.ipr{max-width:560px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;filter:drop-shadow(0 10px 28px #000c)}.ipr .ix{top:-14px;right:-8px;width:42px;z-index:3}.ipr img.rg{width:100%;display:block;border-radius:8px}
 
 
@@ -2443,8 +2450,9 @@ inv.addEventListener('click',e=>{const t=e.target;let b;
 function heroRow(k,ic,n,b){
  return'<div class="qcard" data-hs="'+k+'" style="position:relative;display:flex;align-items:center;gap:14px;cursor:pointer;padding:16px 14px"><div style="width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center">'+(HERO_IMG[k]?heroImg(k,52):'<span style="font-size:40px;line-height:1">'+ic+'</span>')+'</div><div class="qt" style="margin:0"><b>'+n+'</b></div>'
   +(b?'<span style="margin-left:auto;min-width:18px;padding:1px 6px;border-radius:9px;background:#e5c77b;color:#241a0c;font:700 11px Arial,sans-serif;text-align:center">'+b+'</span><span style="color:#e5c77b;font-size:20px">›</span>':'<span style="margin-left:auto;color:#e5c77b;font-size:20px">›</span>')+'</div>'}
-function heroHub(){const u=MAILS.filter(x=>!x.read).length+fbN();
- return'<div class="qh" style="margin-top:6px"><span>Hero</span></div>'+heroRow('character','🎒','Inventory',0)+heroRow('social','👥','Social',u)+heroRow('profile','🏅','Profile',achReady())}
+function heroHub(){const u=MAILS.filter(x=>!x.read).length+fbN(),ar=achReady();
+ const row=(k,lbl,top,n)=>'<div class="hhb" data-hs="'+k+'" role="button" aria-label="'+lbl+'" style="top:calc(var(--u)*'+top+')">'+(n?'<i class="hhbd">'+n+'</i>':'')+'</div>';
+ return'<div class="hhwrap"><div class="hhub"><div class="hhin"><img class="hhbg" alt="Hero" draggable="false" src="assets/hero/hero_hub.webp?v='+window.__BUILD+'">'+row('character','Inventory',262,0)+row('social','Social',492,u)+row('profile','Profile',712,ar)+'</div></div></div>'}
 function pickClass(k){if(!CLASSES[k]||k===S.cls||!shopOwned().has(k))return;
  showModal('switch',{icon:'🎭',iconHtml:clsIcon(k),title:'Switch to '+CLASSES[k].n+'?',text:'Do you want to switch to the '+CLASSES[k].n+' class?\n\nEach class keeps its own level.',color:'#e5c77b',primary:'Yes, switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'No',onSecondary:()=>hideModal('switch')})}
 function heroClasses(){
