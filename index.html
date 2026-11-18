@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.860';window.__BUILD=B;
+(function(){var B='1.861';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2256,7 +2256,7 @@ const FRAME={helm:'helm',chest:'chest',feet:'boots',hands:'gloves',main:'main',o
 const GLY={helm:'helm',chest:'chest',feet:'feet',hands:'hands',main:'main',off:'off',amulet:'amulet',ring:'ring',ring1:'ring',ring2:'ring',cloak:'cloak',belt:'belt',trinket:'trinket'};
 const SLOT12=['main','off','helm','chest','belt','hands','feet','ring1','ring2','amulet','cloak','trinket'];   // the 12 gear positions; belt and trinket have no server support yet, so they show empty
 const EQBOX={stats:[53,42,405,245],helm:[429,10,772,256],trinket:[802,41,1175,251],main:[35,261,389,618],off:[824,261,1177,620],chest:[407,262,805,619],ring2:[215,625,399,802],gloves:[420,625,801,842],hands:[420,625,801,842],ring1:[35,626,214,801],cloak:[825,629,1177,1193],amulet:[34,809,215,987],potions:[219,809,402,986],feet:[423,848,801,1195],belt:[33,995,403,1194]};
-const EQTALL={stats:[53,10,405,256],helm:[429,10,772,256],trinket:[802,10,1175,256],main:[35,262,389,840],chest:[407,262,805,840],off:[824,262,1177,840],gloves:[35,846,389,1152],hands:[35,846,389,1152],belt:[407,846,805,1130],boots:[407,1136,805,1495],feet:[407,1136,805,1495],cloak:[825,846,1177,1495],amulet:[35,1158,211,1324],potions:[217,1158,389,1324],ring1:[35,1330,211,1495],ring2:[217,1330,389,1495]};   // Equipped tab only: gloves/boots equal height, lower group slid down 300, main/off/chest lengthened 300
+const EQTALL={stats:[35,10,389,256],helm:[407,10,805,256],trinket:[824,10,1177,256],main:[35,262,389,840],chest:[407,262,805,840],off:[824,262,1177,840],gloves:[35,846,389,1152],hands:[35,846,389,1152],belt:[407,846,805,1130],boots:[407,1136,805,1495],feet:[407,1136,805,1495],cloak:[825,846,1177,1495],amulet:[35,1158,211,1324],potions:[217,1158,389,1324],ring1:[35,1330,211,1495],ring2:[217,1330,389,1495]};   // Equipped tab only: gloves/boots equal height, lower group slid down 300, main/off/chest lengthened 300
 const BIGNAME=new Set(['main','off','chest','cloak','feet']);
 const itC=it=>CAT[it.cid].color||RC[CAT[it.cid].rarity];
 const rarSrc=it=>IV('inv_rar_'+(['common','uncommon','rare','mythic','legendary','unique'].includes(CAT[it.cid].rarity)?CAT[it.cid].rarity:'common'));
