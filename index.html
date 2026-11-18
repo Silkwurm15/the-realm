@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.865';window.__BUILD=B;
+(function(){var B='1.866';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2259,9 +2259,9 @@ const invCss=document.createElement('style');invCss.textContent=`
 .ipd .dtap{position:absolute;border:0;padding:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .ipd .dcf{left:calc(var(--u)*150);top:calc(var(--u)*1002);width:calc(var(--u)*800);height:calc(var(--u)*140)}
 .ipd .dcn{left:calc(var(--u)*160);top:calc(var(--u)*1172);width:calc(var(--u)*780);height:calc(var(--u)*120)}
-.qpanel.hubmode{padding:0;background:#0d0805;overflow-y:auto}
-.hhwrap{position:relative;overflow:hidden;min-height:100%;display:flex;align-items:center;justify-content:center}.hhwrap::before{content:'';position:absolute;inset:-30px;background:var(--hbg) center/cover no-repeat;filter:blur(16px) brightness(.5) saturate(1.1)}.hhub{z-index:1}
-.hhub{container-type:inline-size;position:relative;width:100%;max-width:640px;aspect-ratio:1024/1148;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 5%,#000 95%,transparent 100%)}
+.qpanel.hubmode{padding:0;background:#0d0805;overflow:hidden}
+.hhwrap{position:relative;overflow:hidden;height:100%;container-type:size}
+.hhub{container-type:inline-size;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100cqw,calc(100cqh*1024/1348));aspect-ratio:1024/1348}
 .hhin{position:absolute;inset:0;--u:calc(100cqw/1024)}
 .hhbg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;user-select:none}
 .hhb{position:absolute;left:calc(var(--u)*85);width:calc(var(--u)*865);height:calc(var(--u)*212);cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:calc(var(--u)*30)}.hhb:active{background:#ffd98a26}
@@ -2452,7 +2452,7 @@ function heroRow(k,ic,n,b){
   +(b?'<span style="margin-left:auto;min-width:18px;padding:1px 6px;border-radius:9px;background:#e5c77b;color:#241a0c;font:700 11px Arial,sans-serif;text-align:center">'+b+'</span><span style="color:#e5c77b;font-size:20px">›</span>':'<span style="margin-left:auto;color:#e5c77b;font-size:20px">›</span>')+'</div>'}
 function heroHub(){const u=MAILS.filter(x=>!x.read).length+fbN(),ar=achReady();
  const row=(k,lbl,top,n)=>'<div class="hhb" data-hs="'+k+'" role="button" aria-label="'+lbl+'" style="top:calc(var(--u)*'+top+')">'+(n?'<i class="hhbd">'+n+'</i>':'')+'</div>';
- return'<div class="hhwrap" style="--hbg:url(assets/hero/hero_hub.webp?v='+window.__BUILD+')"><div class="hhub"><div class="hhin"><img class="hhbg" alt="Hero" draggable="false" src="assets/hero/hero_hub.webp?v='+window.__BUILD+'">'+row('character','Inventory',262,0)+row('social','Social',492,u)+row('profile','Profile',712,ar)+'</div></div></div>'}
+ return'<div class="hhwrap"><div class="hhub"><div class="hhin"><img class="hhbg" alt="Hero" draggable="false" src="assets/hero/hero_hub.webp?v='+window.__BUILD+'">'+row('character','Inventory',302,0)+row('social','Social',532,u)+row('profile','Profile',752,ar)+'</div></div></div>'}
 function pickClass(k){if(!CLASSES[k]||k===S.cls||!shopOwned().has(k))return;
  showModal('switch',{icon:'🎭',iconHtml:clsIcon(k),title:'Switch to '+CLASSES[k].n+'?',text:'Do you want to switch to the '+CLASSES[k].n+' class?\n\nEach class keeps its own level.',color:'#e5c77b',primary:'Yes, switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'No',onSecondary:()=>hideModal('switch')})}
 function heroClasses(){
