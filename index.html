@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.868';window.__BUILD=B;
+(function(){var B='1.872';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -311,7 +311,7 @@ html.hc .mk .badge svg{width:24px;height:24px}
 .topbar.has-ttl .eyebrow{display:block!important;position:absolute;left:24.2%;top:41.5%;width:57%;height:3.1cqw;margin:0;font:italic 600 2.8cqw/3.1cqw Georgia,'Palatino Linotype',serif;letter-spacing:.03em;text-transform:none;color:#e6c77e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #000}
 .topbar.has-ttl .hpbar{top:55%;height:13.6%!important}.topbar.has-ttl .xpbar{top:71%;height:13.6%!important}
 .topbar.has-ttl .hptext,.topbar.has-ttl .xptext{font-size:3cqw!important}
-</style><link rel="preload" as="image" href="assets/splash/splash_loading.jpg"><style id="ldCss">
+</style><link rel="preload" as="image" href="assets/splash/splash_loading.jpg"><link rel="preload" as="image" href="assets/splash/loading_box.webp"><style id="ldCss">
 #ldScreen{--ldimg:url(assets/splash/splash_loading.jpg);position:fixed;inset:0;z-index:2500;background:#07050f;display:none;align-items:center;justify-content:center;overflow:hidden;opacity:1;transition:opacity .9s ease}
 #ldScreen.on{display:flex}#ldScreen.out{opacity:0;pointer-events:none}
 #ldScreen .back{position:absolute;inset:-6%;background:var(--ldimg) center/cover;filter:blur(26px) brightness(.55);display:none}
@@ -332,13 +332,14 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #ldScreen .sheen{position:absolute;left:19.5%;top:61.7%;width:61%;height:14.5%;overflow:hidden;mix-blend-mode:soft-light;pointer-events:none}
 #ldScreen .sheen::after{content:"";position:absolute;top:0;bottom:0;width:25%;left:-30%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.9),transparent);animation:ldSweep 6s ease-in-out infinite}
 @keyframes ldSweep{0%{left:-30%}60%,100%{left:120%}}
+#ldScreen .lbox{position:absolute;left:16%;width:68%;top:68.9%;transform:translateY(-50%);pointer-events:none;container-type:inline-size}#ldScreen .lbq{position:absolute;left:13%;width:74%;top:41%;height:21%;display:flex;align-items:center;justify-content:center;text-align:center;font:600 4.9cqw/1.2 Georgia,'Palatino Linotype','Book Antiqua',serif;color:#1a0f05;text-wrap:balance;opacity:0;transition:opacity .45s ease}#ldScreen .lbq.on{opacity:1}#ldScreen .lbox .bx{display:block;width:100%;height:auto}#ldScreen .lbtrack{position:absolute;left:14.99%;width:70.12%;top:68.09%;height:8.91%}#ldScreen .lbfill{width:0%;height:100%;background:url(assets/splash/loading_fill.webp) 0 0/100% 100% no-repeat}
 #ldScreen .mist{position:absolute;left:-25%;width:150%;height:22%;filter:blur(30px);mix-blend-mode:screen;opacity:.35;background:radial-gradient(ellipse at 20% 50%,rgba(170,150,255,.8),transparent 40%),radial-gradient(ellipse at 70% 50%,rgba(130,170,255,.7),transparent 45%)}
 #ldScreen .m1{top:80%;animation:ldDrift 28s linear infinite}#ldScreen .m2{top:40%;opacity:.25;animation:ldDrift 40s linear infinite reverse}
 @keyframes ldDrift{from{translate:-8% 0}to{translate:8% 3%}}
 #ldScreen canvas{position:absolute;inset:0;width:100%;height:100%}
 #ldScreen .vig{background:radial-gradient(ellipse at center,transparent 60%,rgba(5,0,20,.45))}
 </style><style id="mimic-fit">html:root{--ra-top:calc(max(0px,env(safe-area-inset-top)) + var(--hudh) + 4px);--ra-bot:calc(72px + env(safe-area-inset-bottom,0px))}#cbt .ra .ra-stg{width:min(calc(100cqh*2/3),calc(100cqw*1.12))}</style>
-</head><body><div id="ldScreen" aria-hidden="true"><div class="back"></div><div class="stage"><div class="cam"><div class="layer bg"></div><div class="fx"><div class="mist m2"></div><div class="mist m1"></div><div class="orb"></div><div class="ring"></div><div class="ring" style="animation-delay:1.6s"></div><div class="flame"></div><div class="crystal"></div><canvas id="ldC"></canvas></div><div class="sheen"></div></div><div class="layer vig"></div></div></div>
+</head><body><div id="ldScreen" aria-hidden="true"><div class="back"></div><div class="stage"><div class="cam"><div class="layer bg"></div><div class="fx"><div class="mist m2"></div><div class="mist m1"></div><div class="orb"></div><div class="ring"></div><div class="ring" style="animation-delay:1.6s"></div><div class="flame"></div><div class="crystal"></div><canvas id="ldC"></canvas></div><div class="lbox"><img class="bx" alt="" draggable="false" src="assets/splash/loading_box.webp"><div class="lbq" id="ldQ"></div><div class="lbtrack"><div class="lbfill" id="ldFill"></div></div></div><div class="sheen"></div></div><div class="layer vig"></div></div></div>
 <div id="auth"><div class="build-tag" id="buildTag"></div><canvas id="aFx"></canvas>
 <div class="amain">
 <div class="hero"><div class="heroin"><img class="himg" alt="Titan's Path — your next adventure awaits" src="assets/splash/splash_hero.jpg">
@@ -4058,17 +4059,20 @@ addEventListener('resize',()=>{if(ov.classList.contains('open'))rs()});
 <script>
 /* Loading screen: shows when the game starts, leaves 5 s after the map is revealed (45 s safety cap). */
 (function(){var el=document.getElementById('ldScreen'),c=document.getElementById('ldC');if(!el)return;
-var x=c.getContext('2d'),W=0,H=0,P=[],raf=0,shown=0,gone=0,HOLD=5000,CAP=45000;
+var x=c.getContext('2d'),W=0,H=0,P=[],raf=0,shown=0,gone=0,HOLD=2500,CAP=45000,t0=0,fin=0,fs=0,p0=0,pr=0,qv=0,fl=document.getElementById('ldFill'),qe=document.getElementById('ldQ'),qi=-1,qt=0;
+/* Rotating loading lines: edit, add or remove freely. Keep each under about 80 characters. */
+var QUOTES=['Rolling a Patience check... natural 3. Ouch.','Asking Ulfur to wake up. He is not a morning Titan.','Teaching the goblins to stand in line. Results are mixed.','Bribing the bridge troll. He wants exact change.','Dusting off the treasure chests. Mimics included, probably.','Polishing the Oracle\'s crystal ball. She says it is fine.','Untangling the map. Someone folded it wrong.','Counting the dragon\'s coins. Twice. He counts too.','Warming up the Rift. Please do not lick it.','Sharpening the swords. The dull ones are for butter.','Convincing the chickens to cross the road. They have questions.','Feeding the Library\'s books. Do not make eye contact with the cursed ones.','Checking the chest for traps. And for feelings.','Hiding the Rift from the tax collector.','Reminding the dragon that "hoard" is not a hobby.','Rolling initiative. Everyone rolled a 1 except the goblin.','Naming the sword. "Stabby" is taken.','Locating the tavern. For research purposes.','Reading the quest log. It is mostly doodles.','Patience check: 12. You are fine. Probably.','Almost there. The map just wants to look its best.','Sorting the loot by rarity. Everything is a Unique, apparently.','Charting unknown lands. Mostly parking lots.','Preparing your destiny. Terms and conditions may apply.','Almost ready. Try not to adventure too hard.'];
+function qshow(){if(!qe)return;var n;do{n=Math.floor(Math.random()*QUOTES.length)}while(n===qi&&QUOTES.length>1);qi=n;qe.classList.remove('on');setTimeout(function(){qe.textContent=QUOTES[n];qe.classList.add('on')},qt?450:0);qt=1}
 function rs(){W=c.width=c.clientWidth;H=c.height=c.clientHeight}
 function mk(a){return{x:Math.random(),y:a?Math.random():1.05,r:Math.random()*2+.6,vx:(Math.random()-.5)*.0006,vy:-Math.random()*.0008-.0002,a:Math.random()*6,da:Math.random()*.02+.005,h:Math.random()<.5?270:200}}
-function frame(){x.clearRect(0,0,W,H);x.globalCompositeOperation='lighter';
+function frame(){if(fl){if(fin){var k=Math.min(1,(performance.now()-fs)/HOLD);pr=p0+(1-p0)*(1-Math.pow(1-k,2))}else pr=.92*(1-Math.exp(-(performance.now()-t0)/5000));fl.style.width=(pr*100).toFixed(2)+'%'}x.clearRect(0,0,W,H);x.globalCompositeOperation='lighter';
 for(var i=0;i<P.length;i++){var p=P[i];p.x+=p.vx;p.y+=p.vy;p.a+=p.da;if(p.y<-.05||p.x<-.05||p.x>1.05)Object.assign(p,mk(false));
 x.fillStyle='hsla('+p.h+',90%,80%,'+((Math.sin(p.a)+1)/2*.8)+')';x.beginPath();x.arc(p.x*W,p.y*H,p.r*W/900,0,7);x.fill()}
 raf=requestAnimationFrame(frame)}
-function hide(){if(gone)return;gone=1;el.classList.add('out');setTimeout(function(){cancelAnimationFrame(raf);el.remove();var s=document.getElementById('ldCss');if(s)s.remove()},1000)}
-window.showLoadScreen=function(){if(shown||gone)return;shown=1;el.classList.add('on');rs();addEventListener('resize',rs);for(var i=0;i<80;i++)P.push(mk(true));frame();
+function hide(){if(gone)return;gone=1;clearInterval(qv);el.classList.add('out');setTimeout(function(){cancelAnimationFrame(raf);el.remove();var s=document.getElementById('ldCss');if(s)s.remove()},1000)}
+window.showLoadScreen=function(){if(shown||gone)return;shown=1;t0=performance.now();el.classList.add('on');qshow();qv=setInterval(qshow,3000);rs();addEventListener('resize',rs);for(var i=0;i<80;i++)P.push(mk(true));frame();
  var m=document.getElementById('map');
- function armHide(){setTimeout(hide,HOLD)}
+ function armHide(){fin=1;fs=performance.now();p0=pr;setTimeout(hide,HOLD)}
  if(m&&!m.classList.contains('wait'))armHide();
  else if(m){var mo=new MutationObserver(function(){if(!m.classList.contains('wait')){mo.disconnect();armHide()}});mo.observe(m,{attributes:true,attributeFilter:['class']})}
  setTimeout(hide,CAP);
