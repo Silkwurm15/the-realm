@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.872';window.__BUILD=B;
+(function(){var B='1.873';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2263,10 +2263,10 @@ const invCss=document.createElement('style');invCss.textContent=`
 .qpanel.hubmode{padding:0;background:#0d0805;overflow:hidden}
 .hhwrap{position:relative;overflow:hidden;height:100%;container-type:size}
 .hhbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
-.hhstack{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(100cqw*.012);padding-bottom:calc(100cqw*.02);pointer-events:none}
+.hhstack{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;pointer-events:none}.hhbtns{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(100cqw*.012);pointer-events:none}
 .hhi{position:relative;display:block;height:auto;max-width:none;pointer-events:none;user-select:none}
 .hhb{position:relative;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .08s,filter .08s}.hhb:active{transform:scale(.97);filter:brightness(1.18)}
-.hhsign{margin-bottom:calc(100cqw*.02)}
+.hhsign{flex:none}
 .hhbd{position:absolute;right:calc(100cqw*.012);top:calc(100cqw*-.012);min-width:calc(100cqw*.062);height:calc(100cqw*.062);padding:0 calc(100cqw*.016);box-sizing:border-box;border-radius:calc(100cqw*.031);background:#e5483a;border:calc(100cqw*.004) solid #ffd98a;color:#fff;font:700 calc(100cqw*.036)/calc(100cqw*.054) Arial,sans-serif;font-style:normal;text-align:center;box-shadow:0 2px 6px #000a;pointer-events:none;z-index:2}
 .ipc.ipr{max-width:560px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;filter:drop-shadow(0 10px 28px #000c)}.ipr .ix{top:-14px;right:-8px;width:42px;z-index:3}.ipr img.rg{width:100%;display:block;border-radius:8px}
 
@@ -2457,7 +2457,7 @@ function heroHub(){const u=MAILS.filter(x=>!x.read).length+fbN(),ar=achReady();
   return'<div class="hhb" data-hs="'+k+'" role="button" aria-label="'+lbl+'" style="width:'+wd+'cqw;left:'+dx+'cqw"><img class="hhi" alt="'+lbl+'" draggable="false" src="assets/hero/hub_'+k2+'.webp?v='+window.__BUILD+'" style="width:100%">'+(n?'<i class="hhbd">'+n+'</i>':'')+'</div>'};
  return'<div class="hhwrap"><img class="hhbg" alt="" draggable="false" src="assets/hero/hero_hub_bg.webp?v='+window.__BUILD+'"><div class="hhstack">'
   +'<img class="hhi hhsign" alt="Hero" draggable="false" src="assets/hero/hub_hero.webp?v='+window.__BUILD+'" style="width:65.16cqw;left:-0.06cqw">'
-  +bt('character','Inventory',0,'inventory')+bt('social','Social',u,'social')+bt('profile','Profile',ar,'profile')+'</div></div>'}
+  +'<div class="hhbtns">'+bt('character','Inventory',0,'inventory')+bt('social','Social',u,'social')+bt('profile','Profile',ar,'profile')+'</div></div></div>'}
 function pickClass(k){if(!CLASSES[k]||k===S.cls||!shopOwned().has(k))return;
  showModal('switch',{icon:'🎭',iconHtml:clsIcon(k),title:'Switch to '+CLASSES[k].n+'?',text:'Do you want to switch to the '+CLASSES[k].n+' class?\n\nEach class keeps its own level.',color:'#e5c77b',primary:'Yes, switch',onPrimary:()=>{hideModal('switch');act('setclass',{cls:k,owned:[...shopOwned()]}).then(r=>{if(r){invRender();hud();toast('You are now a '+CLASSES[k].n)}})},secondary:'No',onSecondary:()=>hideModal('switch')})}
 function heroClasses(){
