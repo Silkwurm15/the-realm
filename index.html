@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.889';window.__BUILD=B;
+(function(){var B='1.890';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -324,6 +324,28 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #mpanel .mnbk span em{font-style:normal;display:inline-block;white-space:nowrap;line-height:.95}
 #mpanel .mnbk:active{transform:scale(.98);filter:brightness(1.18) drop-shadow(0 1.4cqw 1.6cqw #000c)}
 #bkModal{background:rgba(5,8,6,.5);container-type:size;padding:0}#bkModal .bkpop{position:relative;width:min(97cqw,calc((100cqh - 12px)*.6432));aspect-ratio:1006/1564;container-type:inline-size;filter:drop-shadow(0 10px 22px #000c)}#bkModal .bkimg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}#bkModal .bkhs{position:absolute;padding:0;margin:0;border:0;background:transparent;cursor:pointer;border-radius:3cqw;-webkit-tap-highlight-color:transparent;transition:background .08s}#bkModal .bkhs:active{background:rgba(255,226,150,.28)}#bkModal .bkdyn{position:absolute;display:flex;align-items:center;white-space:nowrap;overflow:hidden;font:700 3.3cqw/1 Georgia,'Times New Roman',serif;color:#2e1708;pointer-events:none}#bkModal .bklnk{position:absolute;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:transparent;font:700 3.4cqw/1 Georgia,'Times New Roman',serif;color:#5a2f0e;text-decoration:underline;cursor:pointer;border-radius:2cqw}#bkModal .bklnk:active{background:rgba(255,226,150,.28)}#bkModal .bkbadge{position:absolute;display:none;align-items:center;justify-content:center;font:700 2.8cqw/1 Georgia,serif;color:#fff0d0;background:linear-gradient(#b3341f,#7d1c10);border:1px solid #f0c060;border-radius:99px;pointer-events:none}
+/* ---- Settings sub-pages on the parchment book (Audio first) ---- */
+#bkModal .bkttl{position:absolute;left:21.8cqw;width:48.8cqw;top:10.4cqw;height:10.4cqw;display:flex;align-items:center;justify-content:center;font:700 8cqw/1 Georgia,'Times New Roman',serif;color:#3a1d0a;text-shadow:0 .15cqw 0 rgba(255,236,190,.55);pointer-events:none;white-space:nowrap}
+#bkModal .bknote{box-sizing:border-box;position:absolute;left:5.5cqw;width:79.4cqw;top:104.3cqw;height:11.6cqw;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 5cqw;font:italic 600 3.2cqw/1.3 Georgia,'Times New Roman',serif;color:#4b2a0d;pointer-events:none}
+#bkModal .bkcol{position:absolute;left:7cqw;width:76.5cqw;top:29cqw;display:flex;flex-direction:column;gap:1cqw}
+#bkModal .plq{position:relative;display:flex;align-items:center;box-sizing:border-box;height:12.7cqw;padding:0 9.6cqw;font:700 3.5cqw/1 Georgia,'Times New Roman',serif;color:#3a1d0a;text-shadow:0 .12cqw 0 rgba(255,236,190,.5);border:0;background:none;margin:0;-webkit-tap-highlight-color:transparent}
+#bkModal .plq::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;border-style:solid;border-width:0 9.9cqw;border-image:url(assets/menu/pop_plaque.webp) 0 100 0 100 fill/0 9.9cqw 0 9.9cqw stretch;filter:drop-shadow(0 .3cqw .5cqw rgba(50,20,0,.45));transition:filter .12s}
+#bkModal .plq>*{position:relative;z-index:1}
+#bkModal .plq label{flex:0 0 27cqw;white-space:nowrap}
+#bkModal .plq b.bkval{flex:0 0 6.4cqw;text-align:right;font-size:3.6cqw}
+#bkModal .bkhd{font:700 3.7cqw/1 Georgia,'Times New Roman',serif;color:#4b2a0d;margin:3.4cqw 0 .6cqw 2.2cqw;text-shadow:0 .12cqw 0 rgba(255,236,190,.5)}
+#bkModal .bkpair{display:flex;gap:2cqw}
+#bkModal .bkpair .plq{flex:1;justify-content:center;height:11cqw;padding:0 7cqw;cursor:pointer}
+#bkModal .bkpair .plq::before{border-width:0 8.6cqw;border-image-width:0 8.6cqw 0 8.6cqw}
+#bkModal .bkpair .plq.on::before{filter:sepia(.3) saturate(1.5) brightness(1.07) drop-shadow(0 0 1cqw rgba(255,190,50,.9)) drop-shadow(0 .3cqw .5cqw rgba(50,20,0,.45))}
+#bkModal .bkpair .plq.on{color:#2a1204}
+#bkModal .bkpair .plq:not(.on){color:#6b4a28;font-weight:600}
+#bkModal .bkpair .plq.on::after{content:'\2726';position:absolute;left:10.4cqw;font-size:3.4cqw;color:#8a4a10}
+#bkModal input.bkrng{-webkit-appearance:none;appearance:none;flex:1 1 0;min-width:0;height:5cqw;margin:0 3cqw 0 0;background:transparent;--p:50%;touch-action:pan-y}
+#bkModal input.bkrng::-webkit-slider-runnable-track{height:1.7cqw;border-radius:99px;border:.25cqw solid #5a300d;background:linear-gradient(90deg,#d99a2b 0,#f0bd4a var(--p),#8d6a3a var(--p),#6e4f2a 100%);box-shadow:inset 0 .2cqw .5cqw rgba(0,0,0,.5)}
+#bkModal input.bkrng::-moz-range-track{height:1.2cqw;border-radius:99px;border:.25cqw solid #5a300d;background:linear-gradient(90deg,#d99a2b 0,#f0bd4a var(--p),#8d6a3a var(--p),#6e4f2a 100%)}
+#bkModal input.bkrng::-webkit-slider-thumb{-webkit-appearance:none;width:4.8cqw;height:4.8cqw;margin-top:-1.8cqw;border-radius:50%;border:.4cqw solid #5a300d;background:radial-gradient(circle at 35% 30%,#fff1b8,#f0b93a 45%,#a8650f);box-shadow:0 .3cqw .8cqw rgba(0,0,0,.6)}
+#bkModal input.bkrng::-moz-range-thumb{width:4cqw;height:4cqw;border-radius:50%;border:.4cqw solid #5a300d;background:radial-gradient(circle at 35% 30%,#fff1b8,#f0b93a 45%,#a8650f)}
 #mpanel .mnstack{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100cqw,calc(100cqh*.8987));aspect-ratio:1189/1323}#mpanel .mnimg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}#mpanel .mnhs{position:absolute;padding:0;margin:0;border:0;background:transparent;cursor:pointer;border-radius:2.5cqw;-webkit-tap-highlight-color:transparent;transition:background .08s}#mpanel .mnhs:active{background:rgba(255,226,150,.24)}
 #mpanel .mn1{z-index:4}#mpanel .mn2{z-index:3}#mpanel .mn3{z-index:2}#mpanel .mn4{z-index:1}
 </style><link rel="preload" as="image" href="assets/splash/splash_loading.jpg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,600;0,700;1,500&display=swap"><style id="ldCss">
@@ -2937,22 +2959,33 @@ const mp=$('mpanel');
 const BKP={
  settings:{w:1006,h:1564,hs:[['back','Back',28,15,150,245],['audio','Audio',70,300,835,410],['video','Video',70,437,835,545],['access','Accessibility',70,573,835,680],['notif','Notifications',70,708,835,815],['dev','Developer Mode',70,843,835,952]]},
  account:{w:1005,h:1565,hs:[['back','Back',28,15,150,255],['pass','Change Password',62,752,862,855],['cc','Clear Cache and Reload',62,900,862,1010],['del','Delete Account',62,1052,862,1165]]},
+ audio:{w:1006,h:1564,img:'pop_blank',hs:[['back','Back',28,15,150,245]]},
  help:{w:1006,h:1564,hs:[['back','Back',28,15,150,255],['sup_new','Contact Support',72,380,850,475],['sup_list','My Tickets',72,497,850,592],['sup_faq','How to Play and FAQ',72,718,850,812],['upd','Check for Updates',72,838,850,932]]}};
 const BK_NAV={sup_new:1,sup_list:1,sup_faq:1};   // these open a screen in the menu, so the popup closes first
 function openBook(k){const c=BKP[k],V='?v='+window.__BUILD,px=(v,t)=>(v/t*100).toFixed(2)+'%';
- let h='<img class="bkimg" alt="" draggable="false" src="assets/menu/pop_'+k+'.webp'+V+'">'
+ let h='<img class="bkimg" alt="" draggable="false" src="assets/menu/'+(c.img||'pop_'+k)+'.webp'+V+'">'
   +c.hs.map(z=>'<button class="bkhs" data-bk="'+z[0]+'" aria-label="'+z[1]+'" style="left:'+px(z[2],c.w)+';top:'+px(z[3],c.h)+';width:'+px(z[4]-z[2],c.w)+';height:'+px(z[5]-z[3],c.h)+'"></button>').join('');
  if(k==='account')h+='<div class="bkdyn" id="bkEmail" style="left:'+px(318,c.w)+';top:'+px(472,c.h)+';width:'+px(535,c.w)+';height:'+px(52,c.h)+'">…</div>'
   +'<div class="bkdyn" id="bkBuild" style="left:'+px(318,c.w)+';top:'+px(590,c.h)+';width:'+px(300,c.w)+';height:'+px(52,c.h)+'">'+esc(String(window.__BUILD||'?'))+'</div>'
   +'<button class="bklnk" data-bk="out" style="left:'+px(352,c.w)+';top:'+px(1186,c.h)+';width:'+px(300,c.w)+';height:'+px(56,c.h)+'">Sign out</button>';
+ if(k==='audio')h+=bkAudioHtml(px,c);
  if(k==='help')h+='<span class="bkbadge" id="bkTk" style="left:'+px(700,c.w)+';top:'+px(522,c.h)+';width:'+px(130,c.w)+';height:'+px(46,c.h)+'"></span>';
- $('bkPop').innerHTML=h;$('bkModal').classList.add('open');
+ $('bkPop').innerHTML=h;$('bkModal').classList.add('open');window.__bkCur=k;
  if(k==='account')(async()=>{try{const{data}=await window.realmCloud.sb.auth.getUser();const e=$('bkEmail');if(!e)return;e.textContent=(data&&data.user&&data.user.email)||'Unknown';let n=0;while(e.scrollWidth>e.clientWidth&&n++<40)e.style.fontSize=(parseFloat(getComputedStyle(e).fontSize)-1)+'px'}catch(x){}})();
  if(k==='help')supCall('support_list').then(r=>{const n=((r&&r.tickets)||[]).filter(t=>t.status==='answered').length,b=$('bkTk');if(b&&n){b.textContent=n+' new';b.style.display='flex'}})}
-function closeBook(){$('bkModal').classList.remove('open')}
+const BK_SUB={audio:1};   // settings pages shown on the book; Back returns to the Settings book
+window.__bkCur='';
+function bkSlider(k,label){const v=SET[k];return '<div class="plq"><label>'+label+'</label><input class="bkrng" type="range" min="0" max="100" step="5" value="'+v+'" data-brk="'+k+'" aria-label="'+label+'" style="--p:'+v+'%"><b class="bkval" id="bsv_'+k+'">'+v+'</b></div>'}
+function bkPair(k,label,on){return '<div class="bkhd">'+label+'</div><div class="bkpair"><button class="plq'+(on?' on':'')+'" data-bsk="'+k+'" data-bsv="1"><span>On</span></button><button class="plq'+(on?'':' on')+'" data-bsk="'+k+'" data-bsv="0"><span>Off</span></button></div>'}
+function bkAudioHtml(px,c){return '<div class="bkttl">Audio</div><div class="bkcol">'+bkSlider('master','Master volume')+bkSlider('music','Music')+bkSlider('sfx','Sound effects')+bkPair('mute','Mute everything',!!SET.mute)+'</div><div class="bknote">'+SET_NOTE+'</div>'}
+function closeBook(){$('bkModal').classList.remove('open');window.__bkCur=''}
+$('bkModal').addEventListener('input',e=>{const r=e.target.closest('[data-brk]');if(!r)return;const k=r.dataset.brk;SET[k]=+r.value;r.style.setProperty('--p',r.value+'%');const o=$('bsv_'+k);if(o)o.textContent=r.value;setSave();Sound.refresh()});
+$('bkModal').addEventListener('change',e=>{const r=e.target.closest('[data-brk]');if(!r)return;if(r.dataset.brk==='music')Sound.music('map');else Sound.sfx('tap')});   // letting go of a slider plays a sample so you can hear the level
 $('bkModal').addEventListener('click',e=>{if(e.target===$('bkModal'))return closeBook();
+ const tb=e.target.closest('[data-bsk]');if(tb){const k=tb.dataset.bsk,v=tb.dataset.bsv==='1';SET[k]=v;setSave();applySettings();tb.parentNode.querySelectorAll('[data-bsk]').forEach(x=>x.classList.toggle('on',(x.dataset.bsv==='1')===v));return}
  const b=e.target.closest('[data-bk]');if(!b)return;const k=b.dataset.bk;
- if(k==='back')return closeBook();
+ if(k==='back')return BK_SUB[window.__bkCur]?openBook('settings'):closeBook();
+ if(BK_SUB[k])return openBook(k);
  if(['audio','video','access','notif','dev'].includes(k)){closeBook();window.__setFromBook=true;return openSettings(k)}
  if(BK_NAV[k])closeBook();
  const t=document.createElement('button');t.dataset.m=k;t.style.display='none';mp.appendChild(t);t.click();t.remove()});   // hand the tap to the menu's own handler
