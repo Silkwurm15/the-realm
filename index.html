@@ -323,6 +323,7 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #mpanel .mnbk span{position:absolute;top:0;bottom:2%;left:27%;right:13%;display:flex;align-items:center;justify-content:center;text-align:center;font:700 8.8cqw/1 'TPMenu','EB Garamond',Georgia,serif;letter-spacing:0;padding:1cqw 0;background:linear-gradient(180deg,#fff1b8 0%,#f3c86a 48%,#c88a2c 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 .5cqw 0 #2a1604) drop-shadow(0 0 1.6cqw #000c);pointer-events:none;white-space:nowrap}
 #mpanel .mnbk span em{font-style:normal;display:inline-block;white-space:nowrap;line-height:.95}
 #mpanel .mnbk:active{transform:scale(.98);filter:brightness(1.18) drop-shadow(0 1.4cqw 1.6cqw #000c)}
+#mpanel .mnstack{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100cqw,calc(100cqh*.8987));aspect-ratio:1189/1323}#mpanel .mnimg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}#mpanel .mnhs{position:absolute;padding:0;margin:0;border:0;background:transparent;cursor:pointer;border-radius:2.5cqw;-webkit-tap-highlight-color:transparent;transition:background .08s}#mpanel .mnhs:active{background:rgba(255,226,150,.24)}
 #mpanel .mn1{z-index:4}#mpanel .mn2{z-index:3}#mpanel .mn3{z-index:2}#mpanel .mn4{z-index:1}
 </style><link rel="preload" as="image" href="assets/splash/splash_loading.jpg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,600;0,700;1,500&display=swap"><style id="ldCss">
 #ldScreen{--ldimg:url(assets/splash/splash_loading.jpg);position:fixed;inset:0;z-index:2500;background:#07050f;display:none;align-items:center;justify-content:center;overflow:hidden;opacity:1;transition:opacity .9s ease}
@@ -2905,8 +2906,10 @@ async function tutFinish(btn){
 
 /* ---- Menu screen (bottom-right tab) ---- */
 const mp=$('mpanel');
-function menuHome(){const V='?v='+window.__BUILD;mp.classList.add('arfull');mp.innerHTML='<div class="mnwrap"><img class="mnbg" alt="" draggable="false" src="assets/menu/menu_bg.webp'+V+'">'
- +[['settings','red','Settings'],['help','blue','Help &amp; Safety'],['account','green','Account Management'],['profile','purple','Profile']].map((x,n)=>'<button class="mnbk mn'+(n+1)+'" data-m="'+x[0]+'" aria-label="'+x[2].replace('&amp;','and')+'"><img alt="" draggable="false" src="assets/menu/menu_book_'+x[1]+'.webp'+V+'"><span><em>'+x[2].replace('Account ','Account<br>')+'</em></span></button>').join('')+'</div>';mnFit();mailBadge()}
+function menuHome(){const V='?v='+window.__BUILD;mp.classList.add('arfull');
+ const Z=[['settings','Settings',21.8,12.8,20.6,56.4],['help','Help and Safety',34.6,10.8,20,58.6],['account','Account Management',45.4,10.4,20.2,59.2],['profile','Profile',55.8,11.6,21,58.5]];   // top%, height%, left%, width% of the menu picture
+ mp.innerHTML='<div class="mnwrap"><div class="mnstack"><img class="mnimg" alt="" draggable="false" src="assets/menu/menu_stack.webp'+V+'">'
+ +Z.map(z=>'<button class="mnhs" data-m="'+z[0]+'" aria-label="'+z[1]+'" style="top:'+z[2]+'%;height:'+z[3]+'%;left:'+z[4]+'%;width:'+z[5]+'%"></button>').join('')+'</div></div>';mailBadge()}
 function mnLayout(){const w=mp.querySelector('.mnwrap');if(!w)return;const W=w.clientWidth,H=w.clientHeight;if(!W||!H)return;
  const bk=[...mp.querySelectorAll('.mnbk')],im=bk.map(b=>b.querySelector('img'));
  if(im.some(i=>!i.naturalWidth)){im.forEach(i=>{if(!i.naturalWidth)i.addEventListener('load',mnLayout,{once:true})});return}
