@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.882';window.__BUILD=B;
+(function(){var B='1.883';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -319,7 +319,7 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #mpanel .mnbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;pointer-events:none;-webkit-user-drag:none}
 #mpanel .mnttl{position:absolute;left:50%;top:3.5cqh;width:86cqw;transform:translateX(-50%);pointer-events:none;filter:drop-shadow(0 1.4cqw 1.6cqw #000b)}
 #mpanel .mnttl img{display:block;width:100%;height:auto}
-#mpanel .mnttl b{position:absolute;left:18%;right:18%;top:12%;height:44%;display:flex;align-items:center;justify-content:center;font:700 15cqw/1 'TPMenu','EB Garamond',Georgia,serif;letter-spacing:1cqw;color:#3b2008;text-shadow:0 .35cqw 0 #f3cf8a99,0 -.2cqw 0 #1a0c0266}
+#mpanel .mnttl b{position:absolute;left:18%;right:18%;top:12%;height:44%;display:flex;align-items:center;justify-content:center;font:700 11cqw/1 'TPMenu1',Georgia,serif;letter-spacing:.9cqw;padding-left:.9cqw;color:#3b2008;text-shadow:0 .3cqw 0 #f3cf8a99,0 -.15cqw 0 #1a0c0255}
 #mpanel .mnbk{position:absolute;width:77cqw;padding:0;margin:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 1.2cqw 1.6cqw #000b);transition:transform .08s,filter .08s}
 #mpanel .mnbk img{display:block;width:100%;height:auto;pointer-events:none;-webkit-user-drag:none}
 #mpanel .mnbk span{position:absolute;top:0;bottom:2%;left:21%;right:9%;display:flex;align-items:center;justify-content:center;text-align:center;font:700 8.8cqw/1 'TPMenu','EB Garamond',Georgia,serif;letter-spacing:0;padding:1cqw 0;background:linear-gradient(180deg,#fff1b8 0%,#f3c86a 48%,#c88a2c 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 .5cqw 0 #2a1604) drop-shadow(0 0 1.6cqw #000c);pointer-events:none;white-space:nowrap}
@@ -327,8 +327,8 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #mpanel .mnbk:active{transform:scale(.975);filter:brightness(1.18) drop-shadow(0 1.2cqw 1.6cqw #000b)}
 #mpanel .mn1{left:3cqw;top:27cqh;z-index:1}#mpanel .mn2{left:20cqw;top:38.8cqh;z-index:2}#mpanel .mn3{left:3cqw;top:50.6cqh;z-index:3}#mpanel .mn4{left:20cqw;top:62.4cqh;z-index:4}
 #mpanel .mn1 span{left:34%;right:19%;font-family:'TPMenu1',Georgia,serif;letter-spacing:.2cqw}
-#mpanel .mn2 span{left:19%;right:30%;font-family:'TPMenu2',Georgia,serif}
-#mpanel .mn3 span{left:34.5%;right:18%;font-family:'TPMenu3',Georgia,serif}
+#mpanel .mn2 span{left:17%;right:32%;font-family:'TPMenu2',Georgia,serif}
+#mpanel .mn3 span{left:34.5%;right:18%;transform:translateY(-7%);font-family:'TPMenu3',Georgia,serif}
 #mpanel .mn4 span{left:21%;right:35%;font-family:'TPMenu4',Georgia,serif}
 </style><link rel="preload" as="image" href="assets/splash/splash_loading.jpg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,600;0,700;1,500&display=swap"><style id="ldCss">
 #ldScreen{--ldimg:url(assets/splash/splash_loading.jpg);position:fixed;inset:0;z-index:2500;background:#07050f;display:none;align-items:center;justify-content:center;overflow:hidden;opacity:1;transition:opacity .9s ease}
