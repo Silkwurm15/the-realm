@@ -326,7 +326,7 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #mpanel .mnbk span{position:absolute;top:0;bottom:2%;left:21%;right:9%;display:flex;align-items:center;justify-content:center;text-align:center;font:700 8.8cqw/1 'TPMenu','EB Garamond',Georgia,serif;letter-spacing:0;padding:1cqw 0;background:linear-gradient(180deg,#fff1b8 0%,#f3c86a 48%,#c88a2c 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 .5cqw 0 #2a1604) drop-shadow(0 0 1.6cqw #000c);pointer-events:none;white-space:nowrap}
 #mpanel .mnbk span em{font-style:normal;display:inline-block;white-space:nowrap;line-height:1}
 #mpanel .mnbk:active{transform:scale(.975);filter:brightness(1.18) drop-shadow(0 1.2cqw 1.6cqw #000b)}
-#mpanel .mn1{left:3cqw;top:27cqh;z-index:1}#mpanel .mn2{left:20cqw;top:38.8cqh;z-index:2}#mpanel .mn3{left:3cqw;top:50.6cqh;z-index:3}#mpanel .mn4{left:20cqw;top:62.4cqh;z-index:4}
+#mpanel .mn1{left:3cqw;top:27cqh;z-index:4}#mpanel .mn2{left:20cqw;top:38.8cqh;z-index:3}#mpanel .mn3{left:3cqw;top:50.6cqh;z-index:2}#mpanel .mn4{left:20cqw;top:62.4cqh;z-index:1}
 #mpanel .mn1 span{left:34%;right:19%;font-family:'TPMenu1',Georgia,serif;letter-spacing:.2cqw}
 #mpanel .mn2 span{left:17%;right:32%;font-family:'TPMenu2',Georgia,serif}
 #mpanel .mn3 span{left:34.5%;right:18%;transform:translateY(-7%);font-family:'TPMenu3',Georgia,serif}
@@ -2475,6 +2475,7 @@ function heroRow(k,ic,n,b){
 function heroHub(){const u=MAILS.filter(x=>!x.read).length+fbN(),ar=achReady();
  const bt=(k,lbl,n,k2)=>{const wd={"inventory": 77.83, "social": 78.82, "hero": 65.16, "profile": 79.3}[k2],dx={"inventory": 0.24, "social": 0.07, "hero": -0.06, "profile": -0.13}[k2];
   const off=k==='profile';   // Codex: placeholder for now, not clickable (no data-hs)
+  if(off)return'<div class="hhb codex" aria-label="Codex" style="width:'+wd+'cqw;left:'+dx+'cqw;cursor:default;pointer-events:none;display:flex;flex-direction:column;align-items:center"><img class="hhi" alt="Codex" draggable="false" src="assets/hero/codex_emblem.webp?v='+window.__BUILD+'" style="width:34cqw"><span style="margin-top:-1.5cqw;font:900 12cqw/1 \'TPMenu5\',\'TPMenu1\',Georgia,serif;letter-spacing:.5cqw;text-indent:.5cqw;background:linear-gradient(180deg,#fff1b8 0%,#f3c86a 48%,#c88a2c 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 .6cqw 0 #2a1604) drop-shadow(0 0 1.6cqw #000c)">Codex</span></div>'
   return'<div class="hhb"'+(off?'':' data-hs="'+k+'" role="button"')+' aria-label="'+lbl+'" style="width:'+wd+'cqw;left:'+dx+'cqw'+(off?';cursor:default;pointer-events:none':'')+'"><img class="hhi" alt="'+lbl+'" draggable="false" src="assets/hero/hub_'+k2+'.webp?v='+window.__BUILD+'" style="width:100%">'+(n?'<i class="hhbd">'+n+'</i>':'')+'</div>'};
  return'<div class="hhwrap"><img class="hhbg" alt="" draggable="false" src="assets/hero/hero_hub_bg.webp?v='+window.__BUILD+'"><div class="hhstack">'
   +'<img class="hhi hhsign" alt="Hero" draggable="false" src="assets/hero/hub_hero.webp?v='+window.__BUILD+'" style="width:65.16cqw;left:-0.06cqw">'
@@ -2914,7 +2915,15 @@ async function tutFinish(btn){
 const mp=$('mpanel');
 function menuHome(){mp.classList.add('arfull');mp.innerHTML='<div class="mnwrap"><img class="mnbg" alt="" draggable="false" src="assets/menu/menu_bg.webp"><div class="mnttl"><img alt="MENU" draggable="false" src="assets/menu/menu_banner.webp"></div>'
  +[['settings','red','Settings'],['help','blue','Help &amp; Safety'],['account','green','Account Management'],['profile','purple','Profile']].map((x,n)=>'<button class="mnbk mn'+(n+1)+' '+(n%2?'fl':'')+'" data-m="'+x[0]+'" aria-label="'+x[2].replace('&amp;','and')+'"><img alt="" draggable="false" src="assets/menu/menu_book_'+x[1]+'.webp"><span><em>'+x[2].replace('Account ','Account<br>')+'</em></span></button>').join('')+'</div>';mnFit();mailBadge()}
-function mnFit(){const run=()=>{const w=mp.querySelector('.mnwrap');if(!w)return;const cw=w.clientWidth;if(!cw)return;mp.querySelectorAll('.mnbk span').forEach(sp=>{const em=sp.firstElementChild;let fs=cw*.095;sp.style.fontSize=fs+'px';let n=0;while(em.getBoundingClientRect().width>sp.clientWidth&&fs>8&&n++<80){fs-=.6;sp.style.fontSize=fs+'px'}})};run();try{document.fonts.ready.then(run)}catch(e){}setTimeout(run,400)}
+function mnLayout(){const w=mp.querySelector('.mnwrap');if(!w)return;const W=w.clientWidth,H=w.clientHeight;if(!W||!H)return;
+ const bk=[...mp.querySelectorAll('.mnbk')],im=bk.map(b=>b.querySelector('img'));
+ if(im.some(i=>!i.naturalWidth)){im.forEach(i=>{if(!i.naturalWidth)i.addEventListener('load',mnLayout,{once:true})});return}
+ const ar=im.map(i=>i.naturalHeight/i.naturalWidth),OV=.04,top0=H*.25,avail=H-top0-H*.05;   // each book overlaps the one below by 4% of its height
+ const total=bw=>ar.reduce((a,r,n)=>a+r*bw*(n<ar.length-1?1-OV:1),0);
+ let bw=W*.9;if(total(bw)>avail)bw=bw*avail/total(bw);   // shrink the whole tower if it would not fit
+ const OFF=[0,-.012,.012,-.005];let y=top0+Math.max(0,(avail-total(bw))/2);
+ bk.forEach((b,n)=>{b.style.width=bw+'px';b.style.top=y+'px';b.style.left=((W-bw)/2+W*OFF[n%4])+'px';y+=ar[n]*bw*(1-OV)})}
+function mnFit(){mnLayout();const run=()=>{const w=mp.querySelector('.mnwrap');if(!w)return;const cw=w.clientWidth;if(!cw)return;mp.querySelectorAll('.mnbk span').forEach(sp=>{const em=sp.firstElementChild;let fs=cw*.095;sp.style.fontSize=fs+'px';let n=0;while(em.getBoundingClientRect().width>sp.clientWidth&&fs>8&&n++<80){fs-=.6;sp.style.fontSize=fs+'px'}})};run();try{document.fonts.ready.then(run)}catch(e){}setTimeout(run,400)}
 window.addEventListener('resize',()=>{try{if(mp.querySelector('.mnwrap'))mnFit()}catch(e){}});
 function menuSub(title,body){mp.classList.remove('arfull');mp.innerHTML='<div class="qh"><span>'+title+'</span></div>'+body+'<div class="qcard"><button class="qbtn" data-m="home">← Back</button></div>'}
 const CLASS_ORDER=['antipaladin','archer','assassin','barbarian','bard','druid','healer','monk','paladin','scout','warrior','wizard'];   // 2 x 6 grid on the Profile screen
