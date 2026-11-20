@@ -323,6 +323,7 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #mpanel .mnbk span{position:absolute;top:0;bottom:2%;left:27%;right:13%;display:flex;align-items:center;justify-content:center;text-align:center;font:700 8.8cqw/1 'TPMenu','EB Garamond',Georgia,serif;letter-spacing:0;padding:1cqw 0;background:linear-gradient(180deg,#fff1b8 0%,#f3c86a 48%,#c88a2c 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 .5cqw 0 #2a1604) drop-shadow(0 0 1.6cqw #000c);pointer-events:none;white-space:nowrap}
 #mpanel .mnbk span em{font-style:normal;display:inline-block;white-space:nowrap;line-height:.95}
 #mpanel .mnbk:active{transform:scale(.98);filter:brightness(1.18) drop-shadow(0 1.4cqw 1.6cqw #000c)}
+#bkModal{background:rgba(5,8,6,.5);container-type:size;padding:0}#bkModal .bkpop{position:relative;width:min(97cqw,calc((100cqh - 12px)*.6432));aspect-ratio:1006/1564;container-type:inline-size;filter:drop-shadow(0 10px 22px #000c)}#bkModal .bkimg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}#bkModal .bkhs{position:absolute;padding:0;margin:0;border:0;background:transparent;cursor:pointer;border-radius:3cqw;-webkit-tap-highlight-color:transparent;transition:background .08s}#bkModal .bkhs:active{background:rgba(255,226,150,.28)}#bkModal .bkdyn{position:absolute;display:flex;align-items:center;white-space:nowrap;overflow:hidden;font:700 3.3cqw/1 Georgia,'Times New Roman',serif;color:#2e1708;pointer-events:none}#bkModal .bklnk{position:absolute;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:transparent;font:700 3.4cqw/1 Georgia,'Times New Roman',serif;color:#5a2f0e;text-decoration:underline;cursor:pointer;border-radius:2cqw}#bkModal .bklnk:active{background:rgba(255,226,150,.28)}#bkModal .bkbadge{position:absolute;display:none;align-items:center;justify-content:center;font:700 2.8cqw/1 Georgia,serif;color:#fff0d0;background:linear-gradient(#b3341f,#7d1c10);border:1px solid #f0c060;border-radius:99px;pointer-events:none}
 #mpanel .mnstack{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100cqw,calc(100cqh*.8987));aspect-ratio:1189/1323}#mpanel .mnimg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}#mpanel .mnhs{position:absolute;padding:0;margin:0;border:0;background:transparent;cursor:pointer;border-radius:2.5cqw;-webkit-tap-highlight-color:transparent;transition:background .08s}#mpanel .mnhs:active{background:rgba(255,226,150,.24)}
 #mpanel .mn1{z-index:4}#mpanel .mn2{z-index:3}#mpanel .mn3{z-index:2}#mpanel .mn4{z-index:1}
 </style><link rel="preload" as="image" href="assets/splash/splash_loading.jpg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,600;0,700;1,500&display=swap"><style id="ldCss">
@@ -448,6 +449,7 @@ requestAnimationFrame(f)})();</script>
 <div class="qpanel" id="qpanel"></div><div class="qpanel" id="mpanel"></div><div class="qpanel" id="spanel"></div><div class="qpanel" id="apanel"></div>
 <div class="bottom-nav"><div class="nav-item active" data-tab="Map"><div class="nav-icon"><img class="ni" alt="" draggable="false" src="assets/nav/nav_map.png"></div><div class="nav-label">Map</div></div><div class="nav-item" data-tab="Quests"><div class="nav-icon"><img class="ni" alt="" draggable="false" src="assets/nav/nav_quests.png"><span class="nav-dot"></span></div><div class="nav-label">Quests</div></div><div class="nav-item" data-tab="Arena"><div class="nav-icon"><img class="ni" alt="" draggable="false" src="assets/nav/nav_arena.png"></div><div class="nav-label">Arena</div></div><div class="nav-item" data-tab="Shop"><div class="nav-icon"><img class="ni" alt="" draggable="false" src="assets/nav/nav_shop.png"></div><div class="nav-label">Shop</div></div><div class="nav-item" data-tab="Character"><div class="nav-icon"><img class="ni" alt="" draggable="false" src="assets/nav/nav_character.png"></div><div class="nav-label">Hero</div><i class="mdot" id="mailDot"></i></div><div class="nav-item" data-tab="Menu"><div class="nav-icon"><img class="ni" alt="" draggable="false" src="assets/nav/nav_menu.png"></div><div class="nav-label">Menu</div></div></div>
 <div class="toast" id="toast" role="status"></div><div class="toolfar" id="toolFar" role="status"></div>
+<div class="modal" id="bkModal" role="dialog" aria-modal="true"><div class="bkpop" id="bkPop"></div></div>
 <div class="modal" id="setModal" role="dialog" aria-modal="true" aria-label="Settings"><div class="panel modal-card" id="setCard"></div></div>
 <div class="modal" id="modal" role="alertdialog" aria-modal="true"><div class="panel modal-card"><div class="m-icon" id="mIcon"></div><h2 id="mTitle"></h2><p id="mText"></p><button class="m-btn" id="mPrimary"></button><button class="m-btn ghost" id="mSecondary"></button></div></div><div class="chaosBack" id="chaosOv" role="dialog" aria-modal="true" aria-label="Chaos"><div class="chaosCard" id="ccard"><div class="chaosDie" id="cdie" role="img" aria-label="Twenty-sided die"></div><div class="chaosNum" id="cnum" aria-live="polite"></div><div class="chaosName" id="cname"></div><div class="chaosBody" id="cbody"></div><button class="chaosGo" id="cgo"></button></div><button class="chaosNo" id="cno">Not Today</button></div>
 
@@ -2737,9 +2739,9 @@ function setPage(p){const card=$('setCard'),modal=$('setModal');let h='';p=p||'h
  else if(p==='notif')h='<h2>Notifications</h2><div class="sdesc">Coming soon.</div><div class="setnote">'+SET_NOTE+'</div><button class="m-btn ghost" data-sp="home">← Back</button>';
  card.innerHTML=h;card.scrollTop=0}
 function openSettings(p){setPage(p||'home');$('setModal').classList.add('open')}
-function closeSettings(){$('setModal').classList.remove('open')}
+function closeSettings(){$('setModal').classList.remove('open');window.__setFromBook=false}
 $('setModal').addEventListener('click',e=>{if(e.target===$('setModal'))return closeSettings();
- const n=e.target.closest('[data-sp]');if(n){Sound.sfx('tap');return n.dataset.sp==='close'?closeSettings():setPage(n.dataset.sp)}
+ const n=e.target.closest('[data-sp]');if(n){Sound.sfx('tap');if(n.dataset.sp==='home'&&window.__setFromBook){closeSettings();return openBook('settings')}return n.dataset.sp==='close'?closeSettings():setPage(n.dataset.sp)}
  const b=e.target.closest('[data-sk]');if(!b)return;const k=b.dataset.sk;let v=b.dataset.sv;
  if(v==='1'||v==='0')v=v==='1';
  if(k==='low'){SET.low=v;if(v){SET.bld=false;SET.fx='low';SET.fps='30'}else{SET.bld=true;SET.fx='full';SET.fps='max'}}
@@ -2906,6 +2908,29 @@ async function tutFinish(btn){
 
 /* ---- Menu screen (bottom-right tab) ---- */
 const mp=$('mpanel');
+/* ---- Menu book popups: the picture is the window, invisible buttons sit on its buttons ---- */
+const BKP={
+ settings:{w:1006,h:1564,hs:[['back','Back',28,15,150,245],['audio','Audio',70,300,835,410],['video','Video',70,437,835,545],['access','Accessibility',70,573,835,680],['notif','Notifications',70,708,835,815],['dev','Developer Mode',70,843,835,952]]},
+ account:{w:1005,h:1565,hs:[['back','Back',28,15,150,255],['pass','Change Password',62,752,862,855],['cc','Clear Cache and Reload',62,900,862,1010],['del','Delete Account',62,1052,862,1165]]},
+ help:{w:1006,h:1564,hs:[['back','Back',28,15,150,255],['sup_new','Contact Support',72,380,850,475],['sup_list','My Tickets',72,497,850,592],['sup_faq','How to Play and FAQ',72,718,850,812],['upd','Check for Updates',72,838,850,932]]}};
+const BK_NAV={sup_new:1,sup_list:1,sup_faq:1};   // these open a screen in the menu, so the popup closes first
+function openBook(k){const c=BKP[k],V='?v='+window.__BUILD,px=(v,t)=>(v/t*100).toFixed(2)+'%';
+ let h='<img class="bkimg" alt="" draggable="false" src="assets/menu/pop_'+k+'.webp'+V+'">'
+  +c.hs.map(z=>'<button class="bkhs" data-bk="'+z[0]+'" aria-label="'+z[1]+'" style="left:'+px(z[2],c.w)+';top:'+px(z[3],c.h)+';width:'+px(z[4]-z[2],c.w)+';height:'+px(z[5]-z[3],c.h)+'"></button>').join('');
+ if(k==='account')h+='<div class="bkdyn" id="bkEmail" style="left:'+px(318,c.w)+';top:'+px(472,c.h)+';width:'+px(535,c.w)+';height:'+px(52,c.h)+'">…</div>'
+  +'<div class="bkdyn" id="bkBuild" style="left:'+px(318,c.w)+';top:'+px(590,c.h)+';width:'+px(300,c.w)+';height:'+px(52,c.h)+'">'+esc(String(window.__BUILD||'?'))+'</div>'
+  +'<button class="bklnk" data-bk="out" style="left:'+px(352,c.w)+';top:'+px(1186,c.h)+';width:'+px(300,c.w)+';height:'+px(56,c.h)+'">Sign out</button>';
+ if(k==='help')h+='<span class="bkbadge" id="bkTk" style="left:'+px(700,c.w)+';top:'+px(522,c.h)+';width:'+px(130,c.w)+';height:'+px(46,c.h)+'"></span>';
+ $('bkPop').innerHTML=h;$('bkModal').classList.add('open');
+ if(k==='account')(async()=>{try{const{data}=await window.realmCloud.sb.auth.getUser();const e=$('bkEmail');if(!e)return;e.textContent=(data&&data.user&&data.user.email)||'Unknown';let n=0;while(e.scrollWidth>e.clientWidth&&n++<40)e.style.fontSize=(parseFloat(getComputedStyle(e).fontSize)-1)+'px'}catch(x){}})();
+ if(k==='help')supCall('support_list').then(r=>{const n=((r&&r.tickets)||[]).filter(t=>t.status==='answered').length,b=$('bkTk');if(b&&n){b.textContent=n+' new';b.style.display='flex'}})}
+function closeBook(){$('bkModal').classList.remove('open')}
+$('bkModal').addEventListener('click',e=>{if(e.target===$('bkModal'))return closeBook();
+ const b=e.target.closest('[data-bk]');if(!b)return;const k=b.dataset.bk;
+ if(k==='back')return closeBook();
+ if(['audio','video','access','notif','dev'].includes(k)){closeBook();window.__setFromBook=true;return openSettings(k)}
+ if(BK_NAV[k])closeBook();
+ const t=document.createElement('button');t.dataset.m=k;t.style.display='none';mp.appendChild(t);t.click();t.remove()});   // hand the tap to the menu's own handler
 function menuHome(){const V='?v='+window.__BUILD;mp.classList.add('arfull');
  const Z=[['settings','Settings',21.8,12.8,20.6,56.4],['help','Help and Safety',34.6,10.8,20,58.6],['account','Account Management',45.4,10.4,20.2,59.2],['profile','Profile',55.8,11.6,21,58.5]];   // top%, height%, left%, width% of the menu picture
  mp.innerHTML='<div class="mnwrap"><div class="mnstack"><img class="mnimg" alt="" draggable="false" src="assets/menu/menu_stack.webp'+V+'">'
@@ -3000,8 +3025,8 @@ async function mailDel(id){const r=await supCall('mail_delete',{id});if(!r||r.er
 
 mp.addEventListener('click',async e=>{const b=e.target.closest('[data-m]');if(!b)return;const m=b.dataset.m;
  if(m==='home')return menuHome();
- if(m==='settings')return openSettings('home');
- if(m==='help')return menuHelp();
+ if(m==='settings')return openBook('settings');
+ if(m==='help')return openBook('help');
  if(m==='mail')return menuMail();
  if(m==='mail_open')return mailOpen(b.dataset.id);
  if(m==='mail_del')return mailDel(b.dataset.id);
@@ -3009,7 +3034,7 @@ mp.addEventListener('click',async e=>{const b=e.target.closest('[data-m]');if(!b
  if(m==='sup_send')return supSend(b);
  if(m==='sup_list')return supList();
  if(m==='sup_faq')return supFaq();
- if(m==='account')return menuAccount();
+ if(m==='account')return openBook('account');
  if(m==='profile'){const ci=document.querySelector('.nav-item[data-tab="Character"]');if(ci)ci.click();heroSec='profile';heroSub.profile='classes';invRender();inv.scrollTop=0;return}   // Menu > Profile opens the Hero > Profile page
  if(m==='rename')return askRename();
  if(m==='pass'){const p=prompt('Choose a new password (8+ characters)');if(p==null)return;if(p.length<8)return toast('Password must be 8+ characters.');const{error}=await window.realmCloud.sb.auth.updateUser({password:p});return toast(error?error.message:'Password updated.')}
