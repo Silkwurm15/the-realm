@@ -2910,12 +2910,13 @@ function menuHome(){const V='?v='+window.__BUILD;mp.classList.add('arfull');mp.i
 function mnLayout(){const w=mp.querySelector('.mnwrap');if(!w)return;const W=w.clientWidth,H=w.clientHeight;if(!W||!H)return;
  const bk=[...mp.querySelectorAll('.mnbk')],im=bk.map(b=>b.querySelector('img'));
  if(im.some(i=>!i.naturalWidth)){im.forEach(i=>{if(!i.naturalWidth)i.addEventListener('load',mnLayout,{once:true})});return}
- // Four books in one tight stack, page edges on the left, sitting on the desk (like the mockup). Each book overlaps the one below by 5% of its height.
- const ar=im.map(i=>i.naturalHeight/i.naturalWidth),OV=.05,SC=[1,1.012,1.03,1.03],OFF=[-.012,-.004,.006,.016],bottom=H*.72,topMin=H*.04;
- const total=bw=>ar.reduce((a,r,n)=>a+r*bw*SC[n]*(n<ar.length-1?1-OV:1),0);
- let bw=W*.9;if(total(bw)>bottom-topMin)bw=bw*(bottom-topMin)/total(bw);   // shrink the whole stack if it would not fit
- let y=bottom-total(bw);
- bk.forEach((b,n)=>{const bn=bw*SC[n];b.style.width=bn+'px';b.style.top=y+'px';b.style.left=((W-bw)/2+W*OFF[n])+'px';y+=ar[n]*bn*(1-OV)})}
+ // Four books in one tight stack. Each image has transparent padding, so measure the VISIBLE edges of every book and line those up (same visible width, same left edge, bottom of one meets top of the next).
+ const bb=im.map(mnBB),vw=bb.map(q=>q.r-q.l),vh=bb.map(q=>q.b-q.t),OVF=.012,bottom=H*.72,topMin=H*.04;
+ const total=w=>vh.reduce((s2,h,n)=>s2+h*(w/vw[n])-(n<vh.length-1?w*OVF:0),0);
+ let bw=W*.88;if(total(bw)>bottom-topMin)bw=bw*(bottom-topMin)/total(bw);   // shrink the whole stack if it would not fit
+ let y=bottom-total(bw);const x0=(W-bw)/2;
+ bk.forEach((b,n)=>{const k=bw/vw[n];b.style.width=im[n].naturalWidth*k+'px';b.style.left=(x0-bb[n].l*k)+'px';b.style.top=(y-bb[n].t*k)+'px';y+=vh[n]*k-bw*OVF})}
+function mnBB(i){if(i._bb)return i._bb;try{const w=i.naturalWidth,h=i.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(i,0,0);const d=x.getImageData(0,0,w,h).data;let l=w,r=0,t=h,b=0;for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++)if(d[(yy*w+xx)*4+3]>200){if(xx<l)l=xx;if(xx>r)r=xx;if(yy<t)t=yy;if(yy>b)b=yy}if(r<=l||b<=t)throw 0;return i._bb={l:l,t:t,r:r+1,b:b+1}}catch(err){return i._bb={l:0,t:0,r:i.naturalWidth,b:i.naturalHeight}}}
 function mnFit(){mnLayout();const run=()=>{const w=mp.querySelector('.mnwrap');if(!w)return;const cw=w.clientWidth;if(!cw)return;mp.querySelectorAll('.mnbk span').forEach(sp=>{const em=sp.firstElementChild;let fs=cw*.095;sp.style.fontSize=fs+'px';let n=0;while(em.getBoundingClientRect().width>sp.clientWidth&&fs>8&&n++<80){fs-=.6;sp.style.fontSize=fs+'px'}})};run();try{document.fonts.ready.then(run)}catch(e){}setTimeout(run,400)}
 window.addEventListener('resize',()=>{try{if(mp.querySelector('.mnwrap'))mnFit()}catch(e){}});
 function menuSub(title,body){mp.classList.remove('arfull');mp.innerHTML='<div class="qh"><span>'+title+'</span></div>'+body+'<div class="qcard"><button class="qbtn" data-m="home">← Back</button></div>'}
