@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.896';window.__BUILD=B;
+(function(){var B='1.898';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2141,6 +2141,27 @@ const invCss=document.createElement('style');invCss.textContent=`
 .pb-body .qcard{background:linear-gradient(180deg,#f9dc9a,#e2b05c);border:2px solid #9a6a2c;border-radius:8px;color:#2a1608;box-shadow:inset 0 0 0 1px #fff2c4aa,0 1px 3px #0006}.pb-body .qcard.rdy{border-color:#7be37a;box-shadow:0 0 10px #7be37a99}
 .pb-body .qt b{color:#2a1608}.pb-body .qs{color:#3a2410;font-size:12px}.pb-body .qt span{color:#f2d795;background:linear-gradient(180deg,#6a4a1e,#3a2610);border:1px solid #e5c77b;border-radius:14px;padding:4px 11px;font-size:12px}.pb-body .qt span[style]{background:none;border:0;padding:2px 0;color:inherit}
 .pb-body .qbar{height:9px;background:#3a2410;border:1px solid #6b4a1c;border-radius:5px}.pb-body .qbar i{background:linear-gradient(90deg,#f4c542,#d79a1c)}
+.pb-body .qh.ah{justify-content:center;align-items:center;gap:0;margin:4cqw 0 2cqw;text-shadow:none;letter-spacing:0}
+.pb-body .qh.ah:first-of-type{margin-top:1cqw}
+.pb-body .qh.ah::before,.pb-body .qh.ah::after{content:"";flex:1;height:5cqw;border-radius:0;background:url(assets/achv/ach_flour_l.webp?v=${window.__BUILD}) right center/auto 5cqw no-repeat}
+.pb-body .qh.ah::after{background:url(assets/achv/ach_flour_r.webp?v=${window.__BUILD}) left center/auto 5cqw no-repeat}
+.pb-body .qh.ah>span{flex:0 0 auto;box-sizing:border-box;height:9cqw;display:flex;align-items:center;justify-content:center;border-style:solid;border-width:0 5cqw;border-image:url(assets/achv/ach_ribbon.webp?v=${window.__BUILD}) 0 40 0 40 fill/0 5cqw/0 stretch;padding:0 .6cqw;font:700 5.6cqw/1 Georgia,'Times New Roman',serif;text-transform:uppercase;color:#2a1204;text-shadow:0 .3cqw 0 rgba(255,236,190,.55);filter:drop-shadow(0 .5cqw .6cqw rgba(60,25,0,.35))}
+.pb-body .qcard.ach{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:2.6cqw;align-items:center;margin-top:2.2cqw;padding:1.4cqw 1.8cqw 1.4cqw 1.2cqw;border:1.6cqw solid transparent;border-radius:0;border-image:url(assets/achv/ach_card.webp?v=${window.__BUILD}) 40/3.6cqw/0 stretch;background:linear-gradient(180deg,#fdcf6a,#fcc96c);box-shadow:none}
+.pb-body .qcard.ach.rdy{filter:drop-shadow(0 0 1.6cqw #7be37a) drop-shadow(0 0 .6cqw #4fbf4f)}
+.pb-body .qcard.ach.done{opacity:.72}
+.ach-em{width:13cqw;height:14.8cqw;display:grid;place-items:center;background:url(assets/achv/ach_shield.webp?v=${window.__BUILD}) center/100% 100% no-repeat;font-size:6.6cqw;line-height:1}
+.ach-em span{margin-top:-1cqw;filter:drop-shadow(0 .3cqw .3cqw #0008)}
+.ach-main{min-width:0}
+.ach-top{display:flex;justify-content:space-between;align-items:flex-start;gap:2cqw}
+.ach-top b{font:700 4.6cqw/1.1 Georgia,'Times New Roman',serif;color:#2a1608}
+.ach-pips{display:flex;gap:1.5cqw;padding-top:.8cqw;flex:0 0 auto}
+.ach-pips i{display:block;width:3.2cqw;height:3.2cqw;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff2a0,#f4c542 60%,#c98a12);box-shadow:0 .2cqw .4cqw rgba(60,25,0,.5)}
+.ach-pips i.off{background:#c9a35e;opacity:.55;box-shadow:none}
+.ach-d{font:3.8cqw/1.2 Georgia,'Times New Roman',serif;color:#3a2410;margin-top:.6cqw}
+.pb-body .qcard.ach .qbar{height:2.6cqw;margin:1.8cqw 0 1.4cqw;border:0;border-radius:1.4cqw;background:#3a2410;box-shadow:inset 0 .3cqw .5cqw #0008}.pb-body .qcard.ach .qbar i{border-radius:1.4cqw;background:linear-gradient(180deg,#ffd75e,#f0a91c)}
+.pb-body .qcard.ach .ach-r{font:3.5cqw/1.25 Georgia,'Times New Roman',serif;color:#3a2410;margin:0}
+.pb-body .qcard.ach .ach-x{grid-column:1/-1}
+.pb-body .qcard.ach .qbtn{grid-column:1/-1}
 .pb-body .qh.cl-h{margin:0 2px 1.6cqw;font-size:4.2cqw}.pb-body .cgrid{height:69cqw;grid-template-rows:repeat(6,1fr);gap:1.6cqw 2cqw;margin-top:0}.pb-body .cgrid .cc{margin:0;min-height:0;padding:0 2.2cqw;gap:2cqw;border-radius:2cqw}.pb-body .cgrid .cc img.emb,.pb-body .cgrid .cc svg{width:7.6cqw;height:7.6cqw;flex:0 0 7.6cqw}.pb-body .cgrid .cc b{font-size:3.7cqw;line-height:1.1}.pb-body .cgrid .cc small{font-size:3cqw;line-height:1.15;margin-top:.4cqw}
 .pb-body .cc{background:linear-gradient(180deg,#a8672a,#5e3414);border:2px solid #e5a93a;border-radius:8px;color:#f6e3ae}.pb-body .cc small{color:#ecd49c}.pb-body .cc .mb{background:#2a160a99}
 .cgrid .cc.on{background:linear-gradient(135deg,#8a2a9e,#3d0a4f);border-color:#ffd24a;box-shadow:inset 0 0 0 1px #f5c542,0 0 10px #ffd24a88}.cgrid .cc.on b{color:#fff}.cgrid .cc.on small{color:#ffe36b;font-style:italic}
@@ -2604,6 +2625,7 @@ const achTier=d=>Math.min(d.t.length,achK()[d.id]|0);
 const achOk=d=>achTier(d)<d.t.length&&achVal(d)>=d.t[achTier(d)];
 const achReady=()=>ACH.reduce((n,d)=>n+Math.max(0,d.t.filter(x=>achVal(d)>=x).length-achTier(d)),0);
 let achCat='All',achSlm=false;
+const ACH_SH={rifts:'rifts',walk:'walk',level:'level',chests:'chests'};   // achievements that have a painted shield (assets/achv/ach_shield_<name>.webp); all others use the empty shield plus an emoji
 const SLM_LOCS_UI=[['tree','Ancient Tree'],['watchtower','Old Watchtower'],['cave','Mountain Cave'],['boulder','Riverside Boulder'],['shrine','Ruined Shrine'],['camp',"Hunter's Camp"],['bridge','Bridge'],['meadow','Meadow'],['cabin','Abandoned Cabin'],['cliff','Cliffside Overlook']];
 // "Let Sleeping Titans Lie": tap the card to open the list of all 10 places. Gray = not found yet, green = Ulfur found there.
 function slmAchList(){const f=(S.ach&&S.ach.f)||{};
@@ -2618,16 +2640,18 @@ function heroAch(){
  let cat='',shown=0;
  ACH.slice().sort((a,b)=>CATS.indexOf(a.cat)-CATS.indexOf(b.cat)).forEach(d=>{
   if(achCat!=='All'&&d.cat!==achCat)return;shown++;
-  if(d.cat!==cat){cat=d.cat;o+='<div class="qh" style="margin-top:18px"><span>'+cat+'</span></div>'}
+  if(d.cat!==cat){cat=d.cat;o+='<div class="qh ah"><span>'+cat+'</span></div>'}
   const t=achTier(d),fin=t>=d.t.length,v=achVal(d),goal=fin?d.t[d.t.length-1]:d.t[t],ready=achOk(d);
   const fmt=x=>d.mi?(Math.round(x*10)/10).toLocaleString():Math.floor(x).toLocaleString();
-  const pips=d.t.map((_,i)=>'<span style="color:'+(i<t?'#e5c77b':'#5b4a2c')+'">●</span>').join(' ');
+  const pips=d.t.map((_,i)=>'<i'+(i<t?'':' class="off"')+'></i>').join('');
   const rw=d.rw?d.rw[Math.min(t,d.rw.length-1)]:ACH_RW[Math.min(t,3)];
-  o+='<div class="qcard'+(ready?' rdy':'')+(fin?' done':'')+'"'+(d.id==='slm'?' data-ax="slm" role="button" tabindex="0" style="cursor:pointer"':'')+'><div class="qt"><b>'+d.ic+' '+d.n+(t&&d.t.length>1?' · '+ROMAN[t-1]:'')+'</b><span style="letter-spacing:2px">'+pips+'</span></div>'
-   +'<div class="qs" style="margin-top:3px">'+d.d+'</div>'
+  o+='<div class="qcard ach'+(ready?' rdy':'')+(fin?' done':'')+'"'+(d.id==='slm'?' data-ax="slm" role="button" tabindex="0" style="cursor:pointer"':'')+'>'
+   +(ACH_SH[d.id]?'<div class="ach-em" style="background-image:url(assets/achv/ach_shield_'+ACH_SH[d.id]+'.webp?v='+window.__BUILD+')"></div>':'<div class="ach-em"><span>'+d.ic+'</span></div>')
+   +'<div class="ach-main"><div class="ach-top"><b>'+d.n+(t&&d.t.length>1?' · '+ROMAN[t-1]:'')+'</b><span class="ach-pips">'+pips+'</span></div>'
+   +'<div class="ach-d">'+d.d+'</div>'
    +'<div class="qbar"><i style="width:'+Math.round(100*Math.min(1,v/goal))+'%"></i></div>'
-   +'<div class="qs">'+(fin?'Complete ✔':fmt(Math.min(v,goal))+' / '+fmt(goal)+' · Reward: '+Math.max(1,Math.round(rw.xp*lvlScale()))+' XP'+(rw.x||'')+(rw.ttl?' + Title: '+TTL[rw.ttl]:''))+'</div>'
-   +(d.id==='slm'?slmAchList():'')+(ready?'<button class="qbtn" data-ac="'+d.id+'">Claim '+d.n+(d.t.length>1?' '+ROMAN[t]:'')+'</button>':'')+'</div>'});
+   +'<div class="ach-r">'+(fin?'Complete ✔':fmt(Math.min(v,goal))+' / '+fmt(goal)+' · Reward: '+Math.max(1,Math.round(rw.xp*lvlScale()))+' XP'+(rw.x||'')+(rw.ttl?' + Title: '+TTL[rw.ttl]:''))+'</div></div>'
+   +(d.id==='slm'?'<div class="ach-x">'+slmAchList()+'</div>':'')+(ready?'<button class="qbtn" data-ac="'+d.id+'">Claim '+d.n+(d.t.length>1?' '+ROMAN[t]:'')+'</button>':'')+'</div>'});
  if(!shown)o+='<div class="qcard"><div class="qs" style="text-align:center">'+(achCat==='Questlines'?'Questline achievements are coming soon.':'No achievements match this filter.')+'</div></div>';
  return o}
 function askTitle(b){const id=b.dataset.tt,rm=!!(S.ach&&S.ach.eq===id),nm=TTL[id]||'this title';
