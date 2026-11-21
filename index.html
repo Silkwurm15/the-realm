@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.893';window.__BUILD=B;
+(function(){var B='1.895';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2128,6 +2128,15 @@ const invCss=document.createElement('style');invCss.textContent=`
 .pb-body .qh{justify-content:center;align-items:center;gap:10px;margin:16px 2px 0;color:#2a1405;font-size:17px;letter-spacing:.5px;text-shadow:0 1px 0 #ffe9b0}.pb-body .qh span{white-space:nowrap}.pb-body .qh span+span{font-size:11px;opacity:.75}
 .pb-body .qh::before,.pb-body .qh::after{content:"";flex:1;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#6b2a14)}.pb-body .qh::after{background:linear-gradient(270deg,transparent,#6b2a14)}
 .pb-body .qaw{color:#4a2a0e;border-color:#8a5a2a}
+.pb-body .ddwrap{margin:0 0 2.6cqw}
+.pb-body .ddbar,.pb-body .ddrow{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;color:#3b1d08;font-family:Georgia,'Times New Roman',serif;font-weight:700;text-shadow:0 .15cqw 0 rgba(255,236,190,.6);cursor:pointer;-webkit-tap-highlight-color:transparent;border-style:solid;border-width:0;background:none;margin:0}
+.pb-body .ddbar{height:10cqw;padding:0 .6cqw 0 1.4cqw;font-size:4.9cqw;border-width:0 6cqw;border-image:url(assets/profile/dd_bar.webp?v=${window.__BUILD}) 0 30 0 30 fill/0 6cqw 0 6cqw stretch;filter:drop-shadow(0 .5cqw .6cqw rgba(60,25,0,.4))}
+.pb-body .ddpanel{margin:-1cqw 1.6cqw 0;padding:2cqw 1.4cqw 1.2cqw;border:.5cqw solid rgba(150,80,20,.85);border-radius:3cqw;background:linear-gradient(180deg,rgba(255,225,150,.38),rgba(225,165,70,.28));box-shadow:inset 0 0 0 .3cqw rgba(255,240,190,.55),0 .6cqw 1.2cqw rgba(70,30,0,.3)}
+.pb-body .ddrow{height:8cqw;margin:0 0 .6cqw;padding:0 .4cqw 0 1.6cqw;font-size:4.3cqw;border-width:0 5cqw;border-image:url(assets/profile/dd_row.webp?v=${window.__BUILD}) 0 26 0 26 fill/0 5cqw 0 5cqw stretch}
+.pb-body .ddrow:last-child{margin-bottom:0}
+.pb-body .ddrow.cur{filter:brightness(1.05) saturate(1.2) drop-shadow(0 0 1cqw rgba(255,190,50,.95))}
+.pb-body .ddbar:active,.pb-body .ddrow:active{filter:brightness(1.12)}
+.pb-body .ddc{width:5cqw;height:5cqw;flex:0 0 5cqw;color:#3b1d08;transition:transform .15s}.pb-body .ddc.up{transform:rotate(180deg)}.pb-body .ddc.rt{transform:rotate(-90deg);width:4.4cqw;height:4.4cqw;flex-basis:4.4cqw}
 .pb-body .qcard{background:linear-gradient(180deg,#f9dc9a,#e2b05c);border:2px solid #9a6a2c;border-radius:8px;color:#2a1608;box-shadow:inset 0 0 0 1px #fff2c4aa,0 1px 3px #0006}.pb-body .qcard.rdy{border-color:#7be37a;box-shadow:0 0 10px #7be37a99}
 .pb-body .qt b{color:#2a1608}.pb-body .qs{color:#3a2410;font-size:12px}.pb-body .qt span{color:#f2d795;background:linear-gradient(180deg,#6a4a1e,#3a2610);border:1px solid #e5c77b;border-radius:14px;padding:4px 11px;font-size:12px}.pb-body .qt span[style]{background:none;border:0;padding:2px 0;color:inherit}
 .pb-body .qbar{height:9px;background:#3a2410;border:1px solid #6b4a1c;border-radius:5px}.pb-body .qbar i{background:linear-gradient(90deg,#f4c542,#d79a1c)}
@@ -2531,12 +2540,38 @@ function heroClasses(){
   +CLASS_ORDER.map(k=>{const on=k===S.cls,t=on?{lvl:S.lvl,xp:S.xp}:(S.cx||{})[k],has=on||!!t||own.has(k),L=t?t.lvl:1,X=t?t.xp:0;
    return'<div class="cc'+(on?' on':'')+'"'+(own.has(k)&&!on?' data-a="clspick" data-k="'+k+'" style="cursor:pointer"':has?'':' style="opacity:.5;filter:grayscale(1)"')+'>'+clsIcon(k)+'<div style="min-width:0;flex:1"><b>'+CLASSES[k].n+'</b><small>'+(has?'Level '+L:'Locked')+'</small>'+'</div></div>'}).join('')+'</div>'
   +(S.classChange?'<button class="qbtn" data-a="cls">🔒 Class Locked</button>':'')}
+/* ---- Profile dropdown menus (Cosmetics + Achievements): bars and rows cut from the mockup art ---- */
+let cosmTop='titles',cosmTopOpen=false,cosmSubOpen=true,cosmSub='',achMenu=false;
+const COSM_TOP=[['interface','Interface'],['looks','Looks'],['titles','Titles']];
+const COSM_SUB={looks:[['colors','Character Colors'],['portrait','Portrait Frames'],['bframes','Banner Frames'],['bemblems','Banner Emblems'],['nameplates','Nameplates'],['markers','Map Markers']],interface:[['health','Health Bars'],['xp','XP Bars'],['notif','Notifications']]};
+const DD_CHEV=d=>'<svg class="ddc'+(d?' '+d:'')+'" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ddBar=(act,label,open)=>'<div class="ddbar" data-dd="'+act+'" role="button" tabindex="0" aria-expanded="'+(open?'true':'false')+'"><span>'+esc(label)+'</span>'+DD_CHEV(open?'up':'')+'</div>';
+const ddRows=(act,list,cur)=>'<div class="ddpanel">'+list.map(r=>'<div class="ddrow'+(r[0]===cur?' cur':'')+'" data-dd="'+act+'" data-v="'+r[0]+'" role="button" tabindex="0"><span>'+esc(r[1])+'</span>'+DD_CHEV('rt')+'</div>').join('')+'</div>';
+function cosmMenu(){
+ const topLbl=(COSM_TOP.find(t=>t[0]===cosmTop)||COSM_TOP[2])[1],sub=COSM_SUB[cosmTop];
+ let o='<div class="ddwrap">'+ddBar('ctop',topLbl,cosmTopOpen);
+ if(cosmTopOpen)o+=ddRows('ctopset',COSM_TOP,cosmTop);
+ else if(sub){o+=ddBar('csub',topLbl+' Options',cosmSubOpen);if(cosmSubOpen)o+=ddRows('csubset',sub,cosmSub)}
+ return o+'</div>'}
+function cosmStub(){const sub=COSM_SUB[cosmTop]||[],r=sub.find(x=>x[0]===cosmSub);
+ return r?'<div class="qcard"><div class="qt"><b>'+esc(r[1])+'</b></div><div class="qs">Nothing here yet. This is coming in a future update.</div></div>':''}
+function ddAct(b){const a=b.dataset.dd,v=b.dataset.v;
+ if(a==='ctop')cosmTopOpen=!cosmTopOpen;
+ else if(a==='ctopset'){cosmTop=v;cosmTopOpen=false;cosmSub='';cosmSubOpen=true}
+ else if(a==='csub')cosmSubOpen=!cosmSubOpen;
+ else if(a==='csubset'){cosmSub=v;cosmSubOpen=false}
+ else if(a==='ach')achMenu=!achMenu;
+ else if(a==='achset'){achCat=v;achMenu=false}
+ else return;
+ invRender()}
+inv.addEventListener('click',e=>{const b=e.target.closest('[data-dd]');if(b)ddAct(b)});
+inv.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const b=e.target.closest&&e.target.closest('[data-dd]');if(b){e.preventDefault();ddAct(b)}});
 function heroCosm(){const own=(S.ach&&S.ach.tt)||{},eq=(S.ach&&S.ach.eq)||'',coming=k=>'<div class="qh" style="margin-top:6px"><span>'+HERO_PH[k][1]+'</span></div><div class="qcard"><div class="qs">'+HERO_PH[k][2]+'</div><div class="qs" style="margin-top:8px;color:#e5c77b"><b>Coming soon</b></div></div>';
- let o='<div class="qh" style="margin-top:6px"><span>Titles</span></div><div class="qcard'+(eq?' tap':'')+'"'+(eq?' data-tt="'+esc(eq)+'" role="button" tabindex="0"':'')+'><div class="qt"><b>'+esc(TTL[eq]||'No title equipped')+'</b><span>'+(eq?'Equipped':'')+'</span></div><div class="qs">'+(eq?'Tap to remove. ':'Tap an owned title below to equip it. ')+'Your title shows under your name, in the Arena and to your friends.</div></div>';
+ let o=cosmMenu();if(cosmTop!=='titles')return o+cosmStub();o+='<div class="qcard'+(eq?' tap':'')+'"'+(eq?' data-tt="'+esc(eq)+'" role="button" tabindex="0"':'')+'><div class="qt"><b>'+esc(TTL[eq]||'No title equipped')+'</b><span>'+(eq?'Equipped':'')+'</span></div><div class="qs">'+(eq?'Tap to remove. ':'Tap an owned title below to equip it. ')+'Your title shows under your name, in the Arena and to your friends.</div></div>';
  if(!TCAT.length)o+='<div class="qcard"><div class="qs" style="text-align:center">Titles load when you are online.</div></div>';
  else for(const g of [...new Set(TCAT.map(t=>t.g))]){const L=TCAT.filter(t=>t.g===g).sort((a,b)=>(own[b.id]?1:0)-(own[a.id]?1:0)),n=L.filter(t=>own[t.id]).length;
   o+='<div class="qh" style="margin-top:6px"><span>'+esc(g)+'</span></div>'+L.map(t=>own[t.id]?'<div class="qcard tap'+(t.id===eq?' rdy':'')+'" data-tt="'+esc(t.id)+'" role="button" tabindex="0"><div class="qt"><b>'+esc(t.n)+'</b><span>'+(t.id===eq?'Equipped ✔':'Owned')+'</span></div><div class="qs">'+esc(t.h)+'</div></div>':'<div class="qcard" style="opacity:.55"><div class="qt"><b>'+esc(t.n)+'</b><span>Locked</span></div><div class="qs">'+esc(t.h)+(t.soon?' <span style="color:#e5c77b">· Coming soon</span>':'')+'</div></div>').join('')}
- return o+coming('flairs')}
+ return o}
 /* ---- Achievements: lifetime counters are kept by the server (S.ach); tiers are claimed once each. Keep ACH / ACH_RW identical to the server copy. ---- */
 const MI_M=1609.344,ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX'];
 const ACH=[
@@ -2578,7 +2613,7 @@ function heroAch(){
  const done=ACH.reduce((n,d)=>n+achTier(d),0),all=ACH.reduce((n,d)=>n+d.t.length,0),rdy=achReady();
  let o='';
   const CATS=['General','Collections','Combat','Arena','Questlines'],cats=['All'].concat(CATS);
- o+='<select id="achCat" aria-label="Achievement category" style="display:block;width:100%;margin-top:10px;padding:12px 10px;border-radius:5px;border:1px solid #e5c77b;background:linear-gradient(180deg,#6a4f22,#2c200f);color:#fff0c6;font:700 14px Georgia,serif;color-scheme:dark">'+cats.map(c=>'<option value="'+c+'"'+(c===achCat?' selected':'')+'>'+(c==='All'?'All Categories':c)+'</option>').join('')+'</select>';
+ o+='<div class="ddwrap">'+ddBar('ach',achCat==='All'?'All Categories':achCat,achMenu)+(achMenu?ddRows('achset',cats.map(c=>[c,c==='All'?'All Categories':c]),achCat):'')+'</div>';
  let cat='',shown=0;
  ACH.slice().sort((a,b)=>CATS.indexOf(a.cat)-CATS.indexOf(b.cat)).forEach(d=>{
   if(achCat!=='All'&&d.cat!==achCat)return;shown++;
@@ -2591,7 +2626,7 @@ function heroAch(){
    +'<div class="qs" style="margin-top:3px">'+d.d+'</div>'
    +'<div class="qbar"><i style="width:'+Math.round(100*Math.min(1,v/goal))+'%"></i></div>'
    +'<div class="qs">'+(fin?'Complete ✔':fmt(Math.min(v,goal))+' / '+fmt(goal)+' · Reward: '+Math.max(1,Math.round(rw.xp*lvlScale()))+' XP'+(rw.x||'')+(rw.ttl?' + Title: '+TTL[rw.ttl]:''))+'</div>'
-   +(d.id==='slm'?slmAchList():'')+(ready?'<button class="qbtn" data-ac="'+d.id+'">Claim '+d.n+(d.t.length>1?' '+ROMAN[t]:'')+'</button>':'')+(d.rw&&fin&&d.t.length===1&&d.rw[0].ttl?'<button class="qbtn" data-tt="'+d.rw[0].ttl+'">'+((S.ach&&S.ach.eq===d.rw[0].ttl)?'Remove Title':'Equip Title: '+TTL[d.rw[0].ttl])+'</button>':'')+'</div>'});
+   +(d.id==='slm'?slmAchList():'')+(ready?'<button class="qbtn" data-ac="'+d.id+'">Claim '+d.n+(d.t.length>1?' '+ROMAN[t]:'')+'</button>':'')+'</div>'});
  if(!shown)o+='<div class="qcard"><div class="qs" style="text-align:center">'+(achCat==='Questlines'?'Questline achievements are coming soon.':'No achievements match this filter.')+'</div></div>';
  return o}
 function askTitle(b){const id=b.dataset.tt,rm=!!(S.ach&&S.ach.eq===id),nm=TTL[id]||'this title';
