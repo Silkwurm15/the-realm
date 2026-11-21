@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.895';window.__BUILD=B;
+(function(){var B='1.896';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2128,6 +2128,7 @@ const invCss=document.createElement('style');invCss.textContent=`
 .pb-body .qh{justify-content:center;align-items:center;gap:10px;margin:16px 2px 0;color:#2a1405;font-size:17px;letter-spacing:.5px;text-shadow:0 1px 0 #ffe9b0}.pb-body .qh span{white-space:nowrap}.pb-body .qh span+span{font-size:11px;opacity:.75}
 .pb-body .qh::before,.pb-body .qh::after{content:"";flex:1;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#6b2a14)}.pb-body .qh::after{background:linear-gradient(270deg,transparent,#6b2a14)}
 .pb-body .qaw{color:#4a2a0e;border-color:#8a5a2a}
+.pb-body .qcard.ttl{padding:9px 14px;margin-top:7px}.pb-body .ttl .qt b{font:700 15.5px Georgia,'Times New Roman',serif}.pb-body .qcard.ttl.rdy{background:linear-gradient(180deg,#ffeaa8,#f3bf4d);border-color:#b97a1c;box-shadow:inset 0 0 0 1px #fff7d0,0 0 10px rgba(255,190,50,.9)}
 .pb-body .ddwrap{margin:0 0 2.6cqw}
 .pb-body .ddbar,.pb-body .ddrow{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;color:#3b1d08;font-family:Georgia,'Times New Roman',serif;font-weight:700;text-shadow:0 .15cqw 0 rgba(255,236,190,.6);cursor:pointer;-webkit-tap-highlight-color:transparent;border-style:solid;border-width:0;background:none;margin:0}
 .pb-body .ddbar{height:10cqw;padding:0 .6cqw 0 1.4cqw;font-size:4.9cqw;border-width:0 6cqw;border-image:url(assets/profile/dd_bar.webp?v=${window.__BUILD}) 0 30 0 30 fill/0 6cqw 0 6cqw stretch;filter:drop-shadow(0 .5cqw .6cqw rgba(60,25,0,.4))}
@@ -2567,10 +2568,10 @@ function ddAct(b){const a=b.dataset.dd,v=b.dataset.v;
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-dd]');if(b)ddAct(b)});
 inv.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const b=e.target.closest&&e.target.closest('[data-dd]');if(b){e.preventDefault();ddAct(b)}});
 function heroCosm(){const own=(S.ach&&S.ach.tt)||{},eq=(S.ach&&S.ach.eq)||'',coming=k=>'<div class="qh" style="margin-top:6px"><span>'+HERO_PH[k][1]+'</span></div><div class="qcard"><div class="qs">'+HERO_PH[k][2]+'</div><div class="qs" style="margin-top:8px;color:#e5c77b"><b>Coming soon</b></div></div>';
- let o=cosmMenu();if(cosmTop!=='titles')return o+cosmStub();o+='<div class="qcard'+(eq?' tap':'')+'"'+(eq?' data-tt="'+esc(eq)+'" role="button" tabindex="0"':'')+'><div class="qt"><b>'+esc(TTL[eq]||'No title equipped')+'</b><span>'+(eq?'Equipped':'')+'</span></div><div class="qs">'+(eq?'Tap to remove. ':'Tap an owned title below to equip it. ')+'Your title shows under your name, in the Arena and to your friends.</div></div>';
- if(!TCAT.length)o+='<div class="qcard"><div class="qs" style="text-align:center">Titles load when you are online.</div></div>';
- else for(const g of [...new Set(TCAT.map(t=>t.g))]){const L=TCAT.filter(t=>t.g===g).sort((a,b)=>(own[b.id]?1:0)-(own[a.id]?1:0)),n=L.filter(t=>own[t.id]).length;
-  o+='<div class="qh" style="margin-top:6px"><span>'+esc(g)+'</span></div>'+L.map(t=>own[t.id]?'<div class="qcard tap'+(t.id===eq?' rdy':'')+'" data-tt="'+esc(t.id)+'" role="button" tabindex="0"><div class="qt"><b>'+esc(t.n)+'</b><span>'+(t.id===eq?'Equipped ✔':'Owned')+'</span></div><div class="qs">'+esc(t.h)+'</div></div>':'<div class="qcard" style="opacity:.55"><div class="qt"><b>'+esc(t.n)+'</b><span>Locked</span></div><div class="qs">'+esc(t.h)+(t.soon?' <span style="color:#e5c77b">· Coming soon</span>':'')+'</div></div>').join('')}
+ let o=cosmMenu();if(cosmTop!=='titles')return o+cosmStub(); if(!TCAT.length)o+='<div class="qcard"><div class="qs" style="text-align:center">Titles load when you are online.</div></div>';
+ else for(const g of [...new Set(TCAT.map(t=>t.g))]){const L=TCAT.filter(t=>t.g===g&&own[t.id]);if(!L.length)continue;
+  o+='<div class="qh"><span>'+esc(g)+'</span></div>'+L.map(t=>'<div class="qcard tap ttl'+(t.id===eq?' rdy':'')+'" data-tt="'+esc(t.id)+'" role="button" tabindex="0"><div class="qt"><b>'+esc(t.n)+'</b></div></div>').join('')}
+ if(TCAT.length&&!TCAT.some(t=>own[t.id]))o+='<div class="qcard"><div class="qs" style="text-align:center">No titles unlocked yet.</div></div>';
  return o}
 /* ---- Achievements: lifetime counters are kept by the server (S.ach); tiers are claimed once each. Keep ACH / ACH_RW identical to the server copy. ---- */
 const MI_M=1609.344,ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX'];
