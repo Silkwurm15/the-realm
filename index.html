@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.902';window.__BUILD=B;
+(function(){var B='1.903';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -345,7 +345,7 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #bkModal input.bkrng::-moz-range-track{height:1.2cqw;border-radius:99px;border:.25cqw solid #5a300d;background:linear-gradient(90deg,#d99a2b 0,#f0bd4a var(--p),#8d6a3a var(--p),#6e4f2a 100%)}
 #bkModal input.bkrng::-webkit-slider-thumb{-webkit-appearance:none;width:4.8cqw;height:4.8cqw;margin-top:-1.8cqw;border-radius:50%;border:.4cqw solid #5a300d;background:radial-gradient(circle at 35% 30%,#fff1b8,#f0b93a 45%,#a8650f);box-shadow:0 .3cqw .8cqw rgba(0,0,0,.6)}
 #bkModal input.bkrng::-moz-range-thumb{width:4cqw;height:4cqw;border-radius:50%;border:.4cqw solid #5a300d;background:radial-gradient(circle at 35% 30%,#fff1b8,#f0b93a 45%,#a8650f)}
-#bkModal .bkcol.bkscroll{left:5cqw;width:80.5cqw;height:73cqw;box-sizing:border-box;padding:1cqw 2cqw 2cqw;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none}
+#bkModal .bkcol.bkscroll{-webkit-mask-image:linear-gradient(transparent 0,#000 2.4cqw,#000 calc(100% - 3cqw),transparent 100%);mask-image:linear-gradient(transparent 0,#000 2.4cqw,#000 calc(100% - 3cqw),transparent 100%);left:5cqw;width:80.5cqw;height:69cqw;box-sizing:border-box;padding:1cqw 2cqw 2cqw;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none}
 #bkModal .bkcol.bkscroll::-webkit-scrollbar{display:none}
 #bkModal .bksub{font:italic 600 2.9cqw/1.25 Georgia,'Times New Roman',serif;color:#5a3a1a;margin:0 0 .6cqw 2.2cqw}
 #bkModal .bkcol.bkscroll>.bkhd:first-child{margin-top:0}
@@ -356,6 +356,24 @@ html.hc .mk .badge svg{width:24px;height:24px}
 #bkModal .bkid b{display:block;margin-top:.8cqw;font:700 3.1cqw/1.3 Georgia,'Times New Roman',serif;font-style:normal;color:#3a1d0a;user-select:all;-webkit-user-select:all;word-break:break-all}
 #bkModal input.bkpass{display:block;width:100%;box-sizing:border-box;margin:2cqw 0 2.4cqw;padding:2.4cqw;font:700 16px Georgia,'Times New Roman',serif;text-align:center;letter-spacing:4px;color:#3a1d0a;background:rgba(255,236,190,.55);border:.4cqw solid #8a5a20;border-radius:2cqw;outline:0}
 #bkModal input.bkpass::placeholder{color:#8a6a40;letter-spacing:1px;font-weight:600}
+#bkModal .plq.bktrow{margin-top:2.6cqw;padding:0 9.6cqw}
+#bkModal .plq.bktrow label{flex:1 1 auto;min-width:0;font-size:3.4cqw;white-space:nowrap}
+#bkModal .bkcol>.bksub+.plq.bktrow{margin-top:1.4cqw}
+#bkModal .bktog{position:relative;flex:0 0 16cqw;height:6.6cqw;margin:0;padding:0;border-radius:99px;border:.25cqw solid #5a300d;background:linear-gradient(90deg,#8d6a3a,#6e4f2a);box-shadow:inset 0 .2cqw .5cqw rgba(0,0,0,.5);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s}
+#bkModal .bktog.on{background:linear-gradient(90deg,#d99a2b,#f0bd4a)}
+#bkModal .bktog i{position:absolute;top:0;bottom:0;display:flex;align-items:center;font:700 2.6cqw/1 Georgia,'Times New Roman',serif;font-style:normal;letter-spacing:.1cqw;transition:opacity .15s}
+#bkModal .bktog i:first-child{left:2.2cqw;color:#2a1204;opacity:0}
+#bkModal .bktog i:nth-child(2){right:2cqw;color:#f3dfae}
+#bkModal .bktog.on i:first-child{opacity:1}
+#bkModal .bktog.on i:nth-child(2){opacity:0}
+#bkModal .bktog s{position:absolute;top:50%;left:.5cqw;box-sizing:border-box;width:5.2cqw;height:5.2cqw;margin-top:-2.6cqw;border-radius:50%;border:.4cqw solid #5a300d;background:radial-gradient(circle at 35% 30%,#fff1b8,#f0b93a 45%,#a8650f);box-shadow:0 .3cqw .8cqw rgba(0,0,0,.6);text-decoration:none;transition:left .15s}
+#bkModal .bktog.on s{left:calc(100% - 5.7cqw)}
+#bkModal .bkstep{position:relative;display:grid;grid-template-columns:repeat(var(--n),1fr);margin:1.4cqw 0 .6cqw}
+#bkModal .bkstep::before{content:'';position:absolute;top:2.15cqw;left:calc(50% / var(--n));right:calc(50% / var(--n));height:1.2cqw;border-radius:99px;border:.25cqw solid #5a300d;background:linear-gradient(90deg,#d99a2b 0,#f0bd4a var(--f),#8d6a3a var(--f),#6e4f2a 100%);box-shadow:inset 0 .2cqw .5cqw rgba(0,0,0,.5)}
+#bkModal .bkst{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:1.6cqw;margin:0;padding:0 0 .4cqw;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;font:600 3.5cqw/1 Georgia,'Times New Roman',serif;color:#6b4a28}
+#bkModal .bkst u{display:block;box-sizing:border-box;width:3.6cqw;height:3.6cqw;margin:1.2cqw 0;border-radius:50%;border:.4cqw solid #3a1d0a;background:radial-gradient(circle at 35% 30%,#8d6a3a,#3a1d0a);text-decoration:none;transition:all .12s}
+#bkModal .bkst.on u{width:6cqw;height:6cqw;margin:0;border:.4cqw solid #5a300d;background:radial-gradient(circle at 35% 30%,#fff1b8,#f0b93a 45%,#a8650f);box-shadow:0 .3cqw .8cqw rgba(0,0,0,.6)}
+#bkModal .bkst.on{color:#2a1204;font-weight:700}
 #mpanel .mnstack{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100cqw,calc(100cqh*.8987));aspect-ratio:1189/1323}#mpanel .mnimg{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}#mpanel .mnhs{position:absolute;padding:0;margin:0;border:0;background:transparent;cursor:pointer;border-radius:2.5cqw;-webkit-tap-highlight-color:transparent;transition:background .08s}#mpanel .mnhs:active{background:rgba(255,226,150,.24)}
 #mpanel .mn1{z-index:4}#mpanel .mn2{z-index:3}#mpanel .mn3{z-index:2}#mpanel .mn4{z-index:1}
 </style><link rel="preload" as="image" href="assets/splash/splash_loading.jpg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,600;0,700;1,500&display=swap"><style id="ldCss">
@@ -3054,26 +3072,34 @@ const BK_SUB={audio:1,video:1,access:1,dev:1};   // settings pages shown on the 
 window.__bkCur='';
 function bkSlider(k,label){const v=SET[k];return '<div class="plq"><label>'+label+'</label><input class="bkrng" type="range" min="0" max="100" step="5" value="'+v+'" data-brk="'+k+'" aria-label="'+label+'" style="--p:'+v+'%"><b class="bkval" id="bsv_'+k+'">'+v+'</b></div>'}
 function bkPair(k,label,on){return '<div class="bkhd">'+label+'</div><div class="bkpair"><button class="plq'+(on?' on':'')+'" data-bsk="'+k+'" data-bsv="1"><span>On</span></button><button class="plq'+(on?'':' on')+'" data-bsk="'+k+'" data-bsv="0"><span>Off</span></button></div>'}
-function bkAudioHtml(px,c){return '<div class="bkttl">Audio</div><div class="bkcol">'+bkSlider('master','Master volume')+bkSlider('music','Music')+bkSlider('sfx','Sound effects')+bkPair('mute','Mute everything',!!SET.mute)+'</div><div class="bknote">'+SET_NOTE+'</div>'}
+function bkAudioHtml(px,c){return '<div class="bkttl">Audio</div><div class="bkcol">'+bkSlider('master','Master volume')+bkSlider('music','Music')+bkSlider('sfx','Sound effects')+bkTog('mute','Mute everything','')+'</div><div class="bknote">'+SET_NOTE+'</div>'}
 function bkSeg(k,label,sub,opts){return '<div class="bkhd">'+label+'</div>'+(sub?'<div class="bksub">'+sub+'</div>':'')+'<div class="bkpair'+(opts.length>2?' bk3':'')+'">'+opts.map(o=>'<button class="plq'+(bkVOn(k,o[0])?' on':'')+'" data-vsk="'+k+'" data-vsv="'+o[0]+'"><span>'+o[1]+'</span></button>').join('')+'</div>'}
+function bkTog(k,label,sub){const on=!!SET[k];return '<div class="plq bktrow"><label>'+label+'</label><button class="bktog'+(on?' on':'')+'" role="switch" aria-checked="'+on+'" aria-label="'+label+'" data-vtk="'+k+'"><i>ON</i><i>OFF</i><s></s></button></div>'+(sub?'<div class="bksub">'+sub+'</div>':'')}
+function bkStep(k,label,sub,opts){const i=Math.max(0,opts.findIndex(o=>bkVOn(k,o[0])));return '<div class="bkhd">'+label+'</div>'+(sub?'<div class="bksub">'+sub+'</div>':'')+'<div class="bkstep" style="--n:'+opts.length+';--f:'+(opts.length>1?i/(opts.length-1)*100:0)+'%">'+opts.map(o=>'<button class="bkst'+(bkVOn(k,o[0])?' on':'')+'" data-vsk="'+k+'" data-vsv="'+o[0]+'"><u></u><span>'+o[1]+'</span></button>').join('')+'</div>'}
+function bkVSet(k,v){if(k==='low'){SET.low=v;if(v){SET.bld=false;SET.fx='low';SET.fps='30'}else{SET.bld=true;SET.fx='full';SET.fps='max'}}
+ else{SET[k]=v;if(k==='bld'||k==='fx'||k==='fps')SET.low=false}
+ setSave();applySettings();if(k==='dev')setTimeout(devApply,0);Sound.sfx('tap');bkVSync()}
+function bkVSync(){document.querySelectorAll('#bkPop [data-vtk]').forEach(x=>{const on=!!SET[x.dataset.vtk];x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});
+ document.querySelectorAll('#bkPop [data-vsk]').forEach(x=>x.classList.toggle('on',bkVOn(x.dataset.vsk,x.dataset.vsv)));
+ document.querySelectorAll('#bkPop .bkstep').forEach(st=>{const b=[...st.children],i=b.findIndex(x=>x.classList.contains('on'));st.style.setProperty('--f',(b.length>1?Math.max(0,i)/(b.length-1)*100:0)+'%')})}
 function bkVOn(k,v){const cur=(k==='bld'||k==='low'||k==='bigtext'||k==='hc'||k==='rm'||k==='dev')?(SET[k]?'1':'0'):String(SET[k]);return cur===v}
-function bkVideoHtml(){const OO=[['1','On'],['0','Off']];return '<div class="bkttl">Video</div><div class="bkcol bkscroll"><div class="bksub" style="margin-top:0">Changes show on the map right away.</div>'
- +bkSeg('bld','3D buildings','Turning this off makes the game faster on older phones.',OO)
- +bkSeg('tilt','Map tilt','',[['angled','Angled'],['flat','Flat']])
- +bkSeg('fx','Visual effects','Marker glow animations and screen overlays.',[['full','Full'],['low','Low'],['off','Off']])
- +bkSeg('fps','Frame rate','Lower saves battery.',[['max','Max'],['45','45'],['30','30']])
- +bkSeg('low','Low-power mode','Turns off 3D buildings, uses Low effects and a 30 frame cap.',OO)
+function bkVideoHtml(){return '<div class="bkttl">Video</div><div class="bkcol bkscroll"><div class="bksub" style="margin-top:0">Changes show on the map right away.</div>'
+ +bkTog('bld','3D buildings','Turning this off makes the game faster on older phones.')
+ +bkStep('tilt','Map tilt','',[['flat','Flat'],['angled','Angled']])
+ +bkStep('fx','Visual effects','Marker glow animations and screen overlays.',[['off','Off'],['low','Low'],['full','Full']])
+ +bkStep('fps','Frame rate','Lower saves battery.',[['30','30'],['45','45'],['max','Max']])
+ +bkTog('low','Low-power mode','Turns off 3D buildings, uses Low effects and a 30 frame cap.')
  +'</div><div class="bknote">'+SET_NOTE+'</div>'}
-function bkAccessHtml(){const OO=[['1','On'],['0','Off']];return '<div class="bkttl" style="font-size:5.4cqw">Accessibility</div><div class="bkcol bkscroll">'
- +bkSeg('bigtext','Larger text','Makes menus and messages bigger.',OO)
- +bkSeg('hc','High-contrast markers','White outlines and brighter beams on map markers.',OO)
- +bkSeg('rm','Reduce motion','Stops animations and screen movement.',OO)
+function bkAccessHtml(){return '<div class="bkttl" style="font-size:5.4cqw">Accessibility</div><div class="bkcol bkscroll">'
+ +bkTog('bigtext','Larger text','Makes menus and messages bigger.')
+ +bkTog('hc','High-contrast markers','White outlines and brighter beams on map markers.')
+ +bkTog('rm','Reduce motion','Stops animations and screen movement.')
  +'</div><div class="bknote">'+SET_NOTE+'</div>'}
 function bkDevHtml(){const T='<div class="bkttl" style="font-size:5.2cqw">Developer Mode</div>';
  if(!SET.devOK)return T+'<div class="bkcol bkscroll"><div class="bksub" style="margin-top:0">Enter the passcode to unlock developer tools.</div><input id="devPass" class="bkpass" type="password" inputmode="numeric" autocomplete="off" maxlength="16" placeholder="Passcode"><div class="bkpair"><button class="plq bkone" data-bdev="unlock"><span>Unlock</span></button></div></div><div class="bknote">'+SET_NOTE+'</div>';
  let uid='not signed in';try{uid=realmCloud.uid()||uid}catch(e){}
  return T+'<div class="bkcol bkscroll"><div class="bksub" style="margin-top:0">Ignores real GPS and frees the camera. Move with the on-screen pad, arrow keys or WASD, or double-tap the map to jump there. Walking here earns no step credit.</div>'
- +bkSeg('dev','Developer Mode','',[['1','On'],['0','Off']])
+ +bkTog('dev','Developer Mode','')
  +'<div class="bkid">Player ID (for the server\'s DEV_UIDS secret, so spawned markers can be claimed):<b>'+esc(String(uid))+'</b></div>'
  +'<div class="bkpair"><button class="plq bkone" data-bdev="lock"><span>Lock &amp; Forget Passcode</span></button></div></div><div class="bknote">'+SET_NOTE+'</div>'}
 function bkDevUnlock(){const v=($('devPass')||{}).value||'';if(devHash(v)===DEV_HASH){SET.devOK=true;setSave();Sound.sfx('tap');openBook('dev')}else{toast('Incorrect passcode.');const i=$('devPass');if(i)i.value=''}}
@@ -3083,10 +3109,8 @@ $('bkModal').addEventListener('input',e=>{const r=e.target.closest('[data-brk]')
 $('bkModal').addEventListener('change',e=>{const r=e.target.closest('[data-brk]');if(!r)return;if(r.dataset.brk==='music')Sound.music('map');else Sound.sfx('tap')});   // letting go of a slider plays a sample so you can hear the level
 $('bkModal').addEventListener('click',e=>{if(e.target===$('bkModal'))return closeBook();
  const bd=e.target.closest('[data-bdev]');if(bd){if(bd.dataset.bdev==='unlock')return bkDevUnlock();SET.dev=false;SET.devOK=false;setSave();devApply();Sound.sfx('tap');return openBook('dev')}
- const vb=e.target.closest('[data-vsk]');if(vb){const k=vb.dataset.vsk;let v=vb.dataset.vsv;if(v==='1'||v==='0')v=v==='1';
-  if(k==='low'){SET.low=v;if(v){SET.bld=false;SET.fx='low';SET.fps='30'}else{SET.bld=true;SET.fx='full';SET.fps='max'}}
-  else{SET[k]=v;if(k==='bld'||k==='fx'||k==='fps')SET.low=false}
-  setSave();applySettings();if(k==='dev')setTimeout(devApply,0);Sound.sfx('tap');document.querySelectorAll('#bkPop [data-vsk]').forEach(x=>x.classList.toggle('on',bkVOn(x.dataset.vsk,x.dataset.vsv)));return}
+ const vt=e.target.closest('[data-vtk]');if(vt){bkVSet(vt.dataset.vtk,!SET[vt.dataset.vtk]);return}
+ const vb=e.target.closest('[data-vsk]');if(vb){let v=vb.dataset.vsv;if(v==='1'||v==='0')v=v==='1';bkVSet(vb.dataset.vsk,v);return}
  const tb=e.target.closest('[data-bsk]');if(tb){const k=tb.dataset.bsk,v=tb.dataset.bsv==='1';SET[k]=v;setSave();applySettings();tb.parentNode.querySelectorAll('[data-bsk]').forEach(x=>x.classList.toggle('on',(x.dataset.bsv==='1')===v));return}
  const b=e.target.closest('[data-bk]');if(!b)return;const k=b.dataset.bk;
  if(k==='back')return BK_SUB[window.__bkCur]?openBook('settings'):closeBook();
