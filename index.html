@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.903';window.__BUILD=B;
+(function(){var B='1.905';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -3252,13 +3252,87 @@ const KEY_SRC='assets/items/item_key.webp';
 const keyImg=(h,st)=>'<img alt="Key" draggable="false" src="'+KEY_SRC+'" style="height:'+h+';width:auto;vertical-align:middle;filter:drop-shadow(0 0 5px #ff3b2f99) drop-shadow(0 2px 3px #000a) brightness(1.25);'+(st||'')+'">';
 const BUNDLES=[1,3,5,10],SHOP_PRICE2={bag:0,lo:0,key:{1:0,3:0,5:0,10:0},coin:{1:0,3:0,5:0,10:0}};   // Rift Shards, 0 = FREE for now (the server holds the real prices)
 const bal=()=>'💠 '+(S.shards||0).toLocaleString()+' · '+keyImg('1.6em')+' '+keysN()+' · '+coinImg('1.4em')+' '+coinsN();
-function shopHome(){const T=[['shards','Rift Shards','Buy shards, spend them anywhere in the Shop.','shards','sb'],['coins','Arena Coins','Fight in the Arena. 3 free coins every day.','coins',''],['unlocks','Player Unlocks','Name change, class change, loadouts, backpack and cosmetics.','unlocks',''],['boost','Boosts','Short boosts for XP, luck and more.','boost',''],['gift','Friend Gift Packs','Send a gift to a friend.','gift',''],['keys','Keys of the Forsaken','Each key opens one Dark Lair.','keys','kr']];
- sp.innerHTML='<div class="qh"><span>Shop</span><span>'+bal()+'</span></div><div class="sg fit">'+T.map(([i,t,d,k,c])=>'<div class="st '+c+'" data-s="'+k+'" role="button" tabindex="0"><img alt="" draggable="false" src="'+ICO[i]+'"><b>'+t+'</b><small>'+d+'</small></div>').join('')+'</div>'}
-function shopSoon(ic,t,d){sp.innerHTML='<div class="qh"><span>'+t+'</span><span>'+bal()+'</span></div><div class="qcard ms" style="text-align:center;padding:26px 16px"><div style="font-size:54px;line-height:1">'+ic+'</div><div class="qt" style="justify-content:center;margin-top:8px"><b>'+t+'</b></div><div class="qs" style="margin-top:8px">'+d+'</div><div class="qs" style="margin-top:14px;color:#e5c77b"><b>Coming soon</b></div></div>'+shopBack('home')}
+function shopCurr(){const T=[['shards','Rift Shards','Buy shards, spend them anywhere in the Shop.','shards','sb'],['coins','Arena Coins','Fight in the Arena. 3 free coins every day.','coins',''],['unlocks','Player Unlocks','Name change, class change, loadouts, backpack and cosmetics.','unlocks',''],['boost','Boosts','Short boosts for XP, luck and more.','boost',''],['gift','Friend Gift Packs','Send a gift to a friend.','gift',''],['keys','Keys of the Forsaken','Each key opens one Dark Lair.','keys','kr']];
+ sp.innerHTML='<div class="qh"><span>Currencies</span><span>'+bal()+'</span></div><div class="sg fit">'+T.map(([i,t,d,k,c])=>'<div class="st '+c+'" data-s="'+k+'" role="button" tabindex="0"><img alt="" draggable="false" src="'+ICO[i]+'"><b>'+t+'</b><small>'+d+'</small></div>').join('')+'</div>'+shopBack('home')}
+/* ---- Potions & Buffs (Shop art screens): 1 shop home (shopHome) -> 2 Potions & Buffs window (shopPotions) -> 3 category screen (shopCategory) ----
+   SHOP_POTS below holds the real potion names and effects (from the Potion System spec): edit name (n), description (d) and price here. price 0 = FREE for now.
+   Icons are assets/shop/shp_pot_<id>.webp; replace a file with the same name to swap that potion's art. */
+const SHA=n=>'assets/shop/'+n+'.webp?v='+window.__BUILD;
+const SHOP_CATS=[['health','Health'],['utility','Utility'],['offensive','Offensive'],['defensive','Defensive']];
+const SHOP_POTS=[
+ {id:'health_1',cat:'health',n:'Small Health Potion',d:'Instantly restores 35% of your Maximum HP. Cannot heal above 100%.',price:0},
+ {id:'health_2',cat:'health',n:'Full Health Potion',d:'Instantly restores your HP to 100%.',price:0},
+ {id:'health_3',cat:'health',n:'Mending Potion',d:'Adds +2% Maximum HP regeneration per minute for 15 minutes (4% per minute in total). Only one can be active at a time.',price:0},
+ {id:'health_4',cat:'health',n:'Resurrection Potion',d:'Revives a downed player at 50% HP. Can only be used when below 25% HP.',price:0},
+ {id:'utility_1',cat:'utility',n:'XP Bonus Potion',d:'+20% XP for 60 minutes.',price:0},
+ {id:'utility_2',cat:'utility',n:'Discovery Bonus Potion',d:'+20 percentage points to the chance of discovering map content (nature, chests, monsters and other points of interest) for 60 minutes.',price:0},
+ {id:'utility_3',cat:'utility',n:'Loot Chance Potion',d:'+10 percentage points Rare Loot Chance for 60 minutes.',price:0},
+ {id:'utility_4',cat:'utility',n:'Rift Shard Bonus Potion',d:'+20% Rift Shard earnings from eligible sources for 60 minutes.',price:0},
+ {id:'offensive_1',cat:'offensive',n:'Bonus Damage Potion',d:'+10% Bonus Damage for 30 minutes.',price:0},
+ {id:'offensive_2',cat:'offensive',n:'Critical Chance Potion',d:'+10 percentage points Critical Chance for 30 minutes.',price:0},
+ {id:'offensive_3',cat:'offensive',n:'Lifesteal Potion',d:'+5 percentage points Lifesteal for 30 minutes.',price:0},
+ {id:'offensive_4',cat:'offensive',n:'Armor Penetration Potion',d:'+10 percentage points Armor Penetration for 30 minutes.',price:0},
+ {id:'defensive_1',cat:'defensive',n:'Maximum HP Potion',d:'+15% Maximum HP for 30 minutes. Current HP rises proportionally when you drink it.',price:0},
+ {id:'defensive_2',cat:'defensive',n:'Defense Potion',d:'+15% Defense for 30 minutes.',price:0},
+ {id:'defensive_3',cat:'defensive',n:'Elemental Resistance Potion',d:'+10 percentage points Elemental Resistance for 30 minutes.',price:0},
+ {id:'defensive_4',cat:'defensive',n:'Status Resistance Potion',d:'+10 percentage points Status Resistance for 30 minutes.',price:0}];
+const SHOP_QMAX=20;   // most of one potion per purchase
+const shopPotsOf=c=>SHOP_POTS.filter(p=>p.cat===c);
+let shopPicks=[],shopCat='',shopQ={};
+function shopRoll(){shopPicks=SHOP_CATS.map(([c])=>{const g=shopPotsOf(c);return g[Math.floor(Math.random()*g.length)]}).filter(Boolean)}   // one random potion per category
+const shopArtCss=document.createElement('style');shopArtCss.textContent='.shw{position:absolute;inset:0;overflow:hidden;background:#0d0805;container-type:size}'
+ +'.shw.dim::before{content:"";position:absolute;inset:-12px;background:url('+SHA('shp_home')+') center/cover no-repeat;filter:blur(6px) brightness(.5)}'
+ +'.shb,.shsq{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background-position:center;background-size:100% 100%;background-repeat:no-repeat;container-type:inline-size}'
+ +'.shb{width:max(100cqw,66.667cqh);aspect-ratio:1024/1536}.shsq{width:min(100cqw,100cqh);aspect-ratio:1}'
+ +'.shz{position:absolute;cursor:pointer;border-radius:12px}.shz:active{background:rgba(255,230,160,.14)}.shz.round{border-radius:50%}'
+ +'.shpk{position:absolute;bottom:27.4%;width:19%;transform:translateX(-50%);pointer-events:none;filter:drop-shadow(0 3px 3px #000a)}'
+ +'.shbal{position:absolute;left:50%;bottom:2.4%;transform:translateX(-50%);padding:.8cqw 3cqw;background:rgba(10,7,3,.72);border:1px solid #8a6a2c;border-radius:99px;color:#ead8ac;font:700 3.4cqw Georgia,serif;white-space:nowrap;display:flex;align-items:center;gap:1.2cqw}'
+ +'.shr{position:absolute;display:flex;align-items:center;justify-content:center;box-sizing:border-box;font-family:Georgia,serif;font-weight:700;user-select:none}'
+ +'.shr.nm{justify-content:flex-start;gap:1.2cqw;padding:0 2.2cqw 0 1.6cqw;cursor:pointer}.shr.nm img{height:112%;margin:-6% 0;width:auto;flex:0 0 auto;pointer-events:none}'
+ +'.shr.nm span{flex:1;min-width:0;font-size:2.6cqw;line-height:1.08;color:#3b1f0a;text-align:left;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}'
+ +'.shr.pr{font-size:3cqw;color:#f2d795;text-shadow:0 1px 2px #000}.shr.ct{font-size:4.4cqw;color:#fff;text-shadow:0 1px 3px #000}'
+ +'.shr.bt{cursor:pointer;border-radius:22%}.shr.bt:active{background:rgba(255,255,255,.2)}.shr.bt.off{background:rgba(20,10,4,.55);cursor:default}'
+ +'.shr.tot{font-size:3.6cqw;color:#f2d795;text-shadow:0 1px 2px #000}.shr.cap{font-size:2.7cqw;color:#f2d795;text-shadow:0 1px 3px #000,0 0 8px #000;letter-spacing:.3cqw;text-transform:uppercase}';
+document.head.appendChild(shopArtCss);
+function shopHome(keep){if(!keep||!shopPicks.length)shopRoll();const X=[19,40,61,82],Z=(k,l,t,w,h)=>'<div class="shz" data-sh="'+k+'" role="button" tabindex="0" style="left:'+l+'%;top:'+t+'%;width:'+w+'%;height:'+h+'%"></div>';
+ sp.innerHTML='<div class="shw"><div class="shb" style="background-image:url('+SHA('shp_home')+')">'
+  +Z('curr',6,15,88,22)+Z('unl',6,37,88,23)+Z('pot',6,60.5,88,26)
+  +shopPicks.map((p,i)=>'<img class="shpk" alt="" draggable="false" src="'+SHA('shp_pot_'+p.id)+'" style="left:'+X[i]+'%">').join('')
+  +'<div class="shbal">'+bal()+'</div></div></div>'}
+function shopPotions(){const Z=(i,c)=>'<div class="shz" data-sh="cat" data-c="'+c+'" role="button" tabindex="0" style="left:'+(i%2?51:13.2)+'%;top:'+(i<2?30.3:59)+'%;width:36.3%;height:'+(i<2?25.5:26.7)+'%"></div>';
+ sp.innerHTML='<div class="shw dim"><div class="shsq" style="background-image:url('+SHA('shp_window')+')">'+SHOP_CATS.map(([c],i)=>Z(i,c)).join('')
+  +'<div class="shz round" data-sh="home" role="button" aria-label="Close" style="left:85.5%;top:9.2%;width:10%;height:10%"></div></div></div>'}
+function shopCategory(c,keep){if(!keep){shopCat=c;shopQ={}}
+ const ROW=[416,556,700,846],p=v=>(v/12.54).toFixed(2)+'%',B=(k,id,l,t,w,h,x)=>'<div class="shr bt'+(x||'')+'" data-sh="'+k+'" data-id="'+id+'" role="button" style="left:'+p(l)+';top:'+p(t)+';width:'+p(w)+';height:'+p(h)+'"></div>';
+ let h='<div class="shw dim"><div class="shsq" style="background-image:url('+SHA('shp_cat')+')">'
+  +'<div class="shr cap" style="left:'+p(245)+';top:'+p(301)+';width:'+p(765)+';height:'+p(42)+'">'+esc((SHOP_CATS.find(x=>x[0]===shopCat)||['',''])[1])+'</div>';
+ shopPotsOf(shopCat).slice(0,4).forEach((o,i)=>{const t=ROW[i]-45,q=shopQ[o.id]||0;
+  h+='<div class="shr nm" data-sh="info" data-id="'+o.id+'" role="button" style="left:'+p(153)+';top:'+p(t)+';width:'+p(472)+';height:'+p(91)+'"><img alt="" src="'+SHA('shp_pot_'+o.id)+'"><span>'+esc(o.n)+'</span></div>'
+   +'<div class="shr pr" style="left:'+p(642)+';top:'+p(t)+';width:'+p(203)+';height:'+p(91)+'">'+priceTxt(o.price)+'</div>'
+   +B('dec',o.id,868,t,72,91,q?'':' off')+'<div class="shr ct" id="shq_'+o.id+'" style="left:'+p(942)+';top:'+p(t)+';width:'+p(92)+';height:'+p(91)+'">'+q+'</div>'+B('inc',o.id,1034,t,74,91,q>=SHOP_QMAX?' off':'')});
+ h+='<div class="shr tot" id="shTot" style="left:'+p(655)+';top:'+p(960)+';width:'+p(280)+';height:'+p(75)+'"></div>'
+  +B('buy','',400,1072,455,97)+'<div class="shz round" data-sh="back" role="button" aria-label="Back" style="left:'+p(60)+';top:'+p(116)+';width:'+p(128)+';height:'+p(128)+'"></div>'
+  +'<div class="shz round" data-sh="home" role="button" aria-label="Close" style="left:'+p(1071)+';top:'+p(116)+';width:'+p(128)+';height:'+p(128)+'"></div></div></div>';
+ sp.innerHTML=h;shopTotalDraw()}
+function shopTotals(){let t=0,n=0;shopPotsOf(shopCat).slice(0,4).forEach(o=>{const q=shopQ[o.id]||0;t+=q*o.price;n+=q});return{t,n}}
+function shopTotalDraw(){const e=document.getElementById('shTot');if(!e)return;const T=shopTotals();e.textContent=T.n?priceTxt(T.t):'-'}
+function shopQty(id,d){const o=SHOP_POTS.find(x=>x.id===id);if(!o)return;const q=Math.max(0,Math.min(SHOP_QMAX,(shopQ[id]||0)+d));if(q===(shopQ[id]||0))return;shopQ[id]=q;
+ const e=document.getElementById('shq_'+id);if(e){e.textContent=q;const r=e.previousElementSibling,n=e.nextElementSibling;if(r)r.classList.toggle('off',!q);if(n)n.classList.toggle('off',q>=SHOP_QMAX)}shopTotalDraw()}
+function shopPotInfo(id){const o=SHOP_POTS.find(x=>x.id===id);if(!o)return;
+ showModal('shopdone',{icon:'🧪',iconHtml:'<img alt="" draggable="false" src="'+SHA('shp_pot_'+o.id)+'" style="height:84px;width:auto;filter:drop-shadow(0 2px 4px #000a)">',title:o.n,text:o.d+'\n\nPrice: '+priceTxt(o.price),color:'#e5c77b',primary:'Close',onPrimary:()=>hideModal('shopdone')})}
+function shopPotionBuy(list){toast('Potion purchases go live with the next server update.')}   // HOOK: potions are server-authoritative. Call the server here (like act('buy',...)) once it knows these potion ids; list = [{id,n,q}]
+function shopCatBuy(){const T=shopTotals();if(!T.n)return toast('Pick at least one potion first.');
+ const list=shopPotsOf(shopCat).filter(o=>shopQ[o.id]).map(o=>({id:o.id,n:o.n,q:shopQ[o.id]}));
+ showModal('shop',{icon:'🧪',title:'Buy potions?',text:list.map(l=>l.q+' x '+l.n).join('\n')+'\n\nPrice: '+priceTxt(T.t),color:'#e5c77b',primary:T.t>0?'Buy ('+priceTxt(T.t)+')':'Get (Free)',onPrimary:()=>{hideModal('shop');if(shopSpend(T.t))shopPotionBuy(list)},secondary:'Cancel',onSecondary:()=>hideModal('shop')})}
+sp.addEventListener('click',e=>{const b=e.target.closest('[data-sh]');if(!b||b.classList.contains('off'))return;const a=b.dataset.sh;
+ if(a==='curr')return shopCurr();if(a==='unl')return shopUnlocks();if(a==='pot')return shopPotions();if(a==='home')return shopHome(true);
+ if(a==='cat')return shopCategory(b.dataset.c);if(a==='back')return shopPotions();if(a==='info')return shopPotInfo(b.dataset.id);
+ if(a==='inc')return shopQty(b.dataset.id,1);if(a==='dec')return shopQty(b.dataset.id,-1);if(a==='buy')return shopCatBuy()});
+function shopSoon(ic,t,d){sp.innerHTML='<div class="qh"><span>'+t+'</span><span>'+bal()+'</span></div><div class="qcard ms" style="text-align:center;padding:26px 16px"><div style="font-size:54px;line-height:1">'+ic+'</div><div class="qt" style="justify-content:center;margin-top:8px"><b>'+t+'</b></div><div class="qs" style="margin-top:8px">'+d+'</div><div class="qs" style="margin-top:14px;color:#e5c77b"><b>Coming soon</b></div></div>'+shopBack('curr')}
 function shopServer(item,n,o){showModal('shop',{icon:o.icon,iconHtml:o.iconHtml,title:o.title,text:o.text+'\n\nPrice: '+priceTxt(o.price),color:'#e5c77b',primary:o.price>0?'Buy ('+priceTxt(o.price)+')':'Get (Free)',onPrimary:()=>{hideModal('shop');act('buy',{item,n}).then(r=>{if(r)o.after()})},secondary:'Cancel',onSecondary:()=>hideModal('shop')})}
 function shopBundles(item,ic,t,desc,have,price,after){const full=n=>have+n>HOLD_CAP;
  sp.innerHTML='<div class="qh"><span>'+t+'</span><span>'+bal()+'</span></div><div class="qcard ms"><div class="qt"><b>You have '+have+'</b><span>Limit '+HOLD_CAP+' for now</span></div><div class="qs">'+desc+'</div></div><div class="cgrid">'
-  +BUNDLES.map(n=>'<div class="cc pk'+(full(n)?' off':'')+'"'+(full(n)?'':' data-s="buy" data-i="'+item+'" data-n="'+n+'" role="button" tabindex="0"')+'><div class="pi">'+(ic==='KEY'?keyImg('68px'):ic)+'</div><b>'+n+' '+(item==='key'?(n>1?'Keys':'Key'):(n>1?'Coins':'Coin'))+'</b><span class="ps">'+(full(n)?'Over the limit':'Bundle of '+n)+'</span><span class="pp">'+priceTxt(price[n])+'</span></div>').join('')+'</div>'+shopBack('home')}
+  +BUNDLES.map(n=>'<div class="cc pk'+(full(n)?' off':'')+'"'+(full(n)?'':' data-s="buy" data-i="'+item+'" data-n="'+n+'" role="button" tabindex="0"')+'><div class="pi">'+(ic==='KEY'?keyImg('68px'):ic)+'</div><b>'+n+' '+(item==='key'?(n>1?'Keys':'Key'):(n>1?'Coins':'Coin'))+'</b><span class="ps">'+(full(n)?'Over the limit':'Bundle of '+n)+'</span><span class="pp">'+priceTxt(price[n])+'</span></div>').join('')+'</div>'+shopBack('curr')}
 function shopKeys(){shopBundles('key','KEY','Keys of the Forsaken','Each key opens one Dark Lair. You also earn 1 free key every day by completing the Complete Dailies! quest.',keysN(),SHOP_PRICE2.key)}
 function shopCoins(){shopBundles('coin',coinImg('68px'),'Arena Coins','Each Arena challenge costs the challenger 1 coin. Coins top up to 3 every daily reset. Coins you buy never expire.',coinsN(),SHOP_PRICE2.coin)}
 function shopUnlocks(){const lo=S.los||LO_BASE,cap=bagCap();
@@ -3303,7 +3377,7 @@ function buyPack(key){const o=shopOwned();let list;
  if(key==='mass'){list=shopLocked();if(!list.length)return toast('You already own every class.');
   return shopConfirm({icon:'🌟',title:'Mass Unlock?',text:'You will unlock all '+list.length+' classes you do not own yet:\n'+list.map(k=>'• '+CLASSES[k].n).join('\n'),price:SHOP_PRICE.mass,ok:()=>{const g=shopLocked();if(!g.length)return;shopGrant(g);shopDone('Every class unlocked!',g);shopPacks()}})}}
 sp.addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b||b.disabled)return;const a=b.dataset.s;
- if(a==='home')return shopHome();if(a==='cc')return shopCC();if(a==='shards')return shopSoon('💠','Rift Shards','Shard packs are on the way. For now you earn shards by selling gear, clearing Dark Lairs and Arcane Rifts. Your balance can hold up to 100,000.');if(a==='boost')return shopSoon('⚡','Boosts','Short XP, luck and Nature Discovery boosts are coming.');if(a==='gift')return shopSoon('🎁','Friend Gift Packs','Send gift packs to your friends once the Friends screen is live.');if(a==='coins')return shopCoins();if(a==='keys')return shopKeys();if(a==='unlocks')return shopUnlocks();if(a==='buy')return shopBuy(b.dataset.i,+b.dataset.n||1);if(a==='single')return shopSingle();if(a==='packs')return shopPacks();
+ if(a==='home')return shopHome(true);if(a==='curr')return shopCurr();if(a==='cc')return shopCC();if(a==='shards')return shopSoon('💠','Rift Shards','Shard packs are on the way. For now you earn shards by selling gear, clearing Dark Lairs and Arcane Rifts. Your balance can hold up to 100,000.');if(a==='boost')return shopSoon('⚡','Boosts','Short XP, luck and Nature Discovery boosts are coming.');if(a==='gift')return shopSoon('🎁','Friend Gift Packs','Send gift packs to your friends once the Friends screen is live.');if(a==='coins')return shopCoins();if(a==='keys')return shopKeys();if(a==='unlocks')return shopUnlocks();if(a==='buy')return shopBuy(b.dataset.i,+b.dataset.n||1);if(a==='single')return shopSingle();if(a==='packs')return shopPacks();
  if(a==='rename')return askRename();if(a==='buy1')return buySingle(b.dataset.k);if(a==='pack')return buyPack(b.dataset.p)});
 
 
