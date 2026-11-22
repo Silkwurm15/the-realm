@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.906';window.__BUILD=B;
+(function(){var B='1.907';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -3282,9 +3282,10 @@ const shopPotsOf=c=>SHOP_POTS.filter(p=>p.cat===c);
 let shopPicks=[],shopCat='',shopQ={};
 function shopRoll(){shopPicks=SHOP_CATS.map(([c])=>{const g=shopPotsOf(c);return g[Math.floor(Math.random()*g.length)]}).filter(Boolean)}   // one random potion per category
 const shopArtCss=document.createElement('style');shopArtCss.textContent='.shw{position:absolute;inset:0;overflow:hidden;background:#0d0805;container-type:size}'
- +'.shw.dim::before{content:"";position:absolute;inset:-12px;background:url('+SHA('shp_home')+') center/cover no-repeat;filter:blur(6px) brightness(.5)}'
+ +'.shw.dim::before{content:"";position:absolute;inset:0;background:url('+SHA('shp_home')+') center/cover no-repeat}'
  +'.shb,.shsq{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background-position:center;background-size:100% 100%;background-repeat:no-repeat;container-type:inline-size}'
- +'.shb{width:max(100cqw,66.667cqh);aspect-ratio:1024/1536}.shsq{top:0;bottom:0;transform:translateX(-50%);width:min(100cqw,620px)}'
+ +'.shb{width:max(100cqw,66.667cqh);aspect-ratio:1024/1536}'
+ +'.shb.fit{width:min(100cqw,66.667cqh)}.shpw{position:absolute;width:9.4%;height:11%;transform:translateX(-50%);pointer-events:none;display:flex;align-items:flex-end;justify-content:center}.shpw img{max-width:100%;max-height:100%;width:auto;height:auto;filter:drop-shadow(0 3px 3px #000a)}.shsq{top:0;bottom:0;transform:translateX(-50%);width:min(100cqw,620px)}'
  +'.shz{position:absolute;cursor:pointer;border-radius:12px}.shz:active{background:rgba(255,230,160,.14)}.shz.round{border-radius:50%}'
  +'.shpk{position:absolute;bottom:27.4%;width:19%;transform:translateX(-50%);pointer-events:none;filter:drop-shadow(0 3px 3px #000a)}'
  +'.shbal{position:absolute;left:50%;bottom:2.4%;transform:translateX(-50%);padding:.8cqw 3cqw;background:rgba(10,7,3,.72);border:1px solid #8a6a2c;border-radius:99px;color:#ead8ac;font:700 3.4cqw Georgia,serif;white-space:nowrap;display:flex;align-items:center;gap:1.2cqw}'
@@ -3300,9 +3301,10 @@ function shopHome(keep){if(!keep||!shopPicks.length)shopRoll();const X=[19,40,61
   +Z('curr',6,15,88,22)+Z('unl',6,37,88,23)+Z('pot',6,60.5,88,26)
   +shopPicks.map((p,i)=>'<img class="shpk" alt="" draggable="false" src="'+SHA('shp_pot_'+p.id)+'" style="left:'+X[i]+'%">').join('')
   +'<div class="shbal">'+bal()+'</div></div></div>'}
-function shopPotions(){const Z=(i,c)=>'<div class="shz" data-sh="cat" data-c="'+c+'" role="button" tabindex="0" style="left:'+(i%2?51:13.2)+'%;top:'+(i<2?30.3:59)+'%;width:36.3%;height:'+(i<2?25.5:26.7)+'%"></div>';
- sp.innerHTML='<div class="shw dim"><div class="shsq" style="background-image:url('+SHA('shp_window')+')">'+SHOP_CATS.map(([c],i)=>Z(i,c)).join('')
-  +'<div class="shz round" data-sh="home" role="button" aria-label="Close" style="left:85.5%;top:9.2%;width:10%;height:10%"></div></div></div>'}
+function shopPotions(){const Z=(i,c)=>'<div class="shz" data-sh="cat" data-c="'+c+'" role="button" tabindex="0" style="left:'+(i%2?50.98:8.79)+'%;top:'+(i<2?31.58:55.79)+'%;width:'+(i%2?40.33:40.23)+'%;height:'+(i<2?22.46:22.33)+'%"></div>';
+ sp.innerHTML='<div class="shw dim"><div class="shb fit" style="background-image:url('+SHA('shp_window')+')">'+SHOP_CATS.map(([c],i)=>Z(i,c)).join('')
+  +SHOP_CATS.map(([c],i)=>shopPotsOf(c).slice(0,4).map((o,j)=>{const x0=i%2?549:124,cx=(x0+(j+.5)*356/4)/10.24,bt=i<2?53.6:29.6;return'<div class="shpw" style="left:'+cx.toFixed(2)+'%;bottom:'+bt+'%"><img alt="" draggable="false" src="'+SHA('shp_potw_'+o.id)+'"></div>'}).join('')).join('')
+  +'<div class="shz round" data-sh="home" role="button" aria-label="Close" style="left:85.55%;top:9.31%;width:12.11%;height:8.07%"></div></div></div>'}
 function shopCategory(c,keep){if(!keep){shopCat=c;shopQ={}}
  const ROW=[416,556,700,846],p=v=>(v/12.54).toFixed(2)+'%',B=(k,id,l,t,w,h,x)=>'<div class="shr bt'+(x||'')+'" data-sh="'+k+'" data-id="'+id+'" role="button" style="left:'+p(l)+';top:'+p(t)+';width:'+p(w)+';height:'+p(h)+'"></div>';
  let h='<div class="shw dim"><div class="shsq" style="background-image:url('+SHA('shp_cat')+')">'
