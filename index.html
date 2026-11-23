@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.908';window.__BUILD=B;
+(function(){var B='1.909';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -1967,8 +1967,8 @@ const COIN_SRC='assets/items/item_arena_coin.webp';
 const coinImg=(h,st)=>'<img alt="Arena Coin" draggable="false" src="'+COIN_SRC+'" style="height:'+h+';width:'+h+';vertical-align:middle;'+(st||'')+'">';
 const aps2=document.createElement('style');aps2.textContent='#apanel .npcg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#apanel .npct{position:relative;display:block;width:100%;padding:0;margin:0;border:1px solid #77552b;border-radius:6px;overflow:hidden;background:#0b0a08;cursor:pointer;aspect-ratio:1/2;-webkit-tap-highlight-color:rgba(229,199,123,.3)}#apanel .npct img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none}#apanel .npct:active{filter:brightness(1.2)}#apanel .npct.off{filter:grayscale(.7) brightness(.6)}#apanel .arcoin{display:flex;align-items:center;gap:6px}#apanel .arcoin2{margin-left:auto;display:flex;align-items:center;gap:7px;padding:5px 12px 5px 6px;border:1px solid #77552b;border-radius:20px;background:linear-gradient(145deg,#34291b,#0b0b09);color:#e5c77b;font:700 17px Georgia,serif;cursor:pointer}#apanel .chimg{flex:0 0 64px;width:64px;aspect-ratio:2/3;border:1px solid #ffd27a;border-radius:6px;overflow:hidden;background:#0b0a08;padding:0;margin:0;cursor:pointer}#apanel .chimg img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none}#apanel .arcoin2 i{font-style:normal;color:#fff0c6;background:linear-gradient(180deg,#6a4f22,#2c200f);border:1px solid #e5c77b;border-radius:50%;width:20px;height:20px;line-height:17px;text-align:center;font-size:15px}';document.head.appendChild(aps2);
 const AR_IMG='assets/arena/ar_img.webp';
-const AR_CHAMP_IMG={"calaun": "assets/npcs/ar_champ_img_calaun.webp", "selora": "assets/npcs/ar_champ_img_selora.webp"};   // Arena champion portraits, keyed by champion id (calaun, selora)
-const AR_CHAMP_NAME={'Sir Calaun Dawnblight':'calaun','Sterling Dread Pirate Selora Dawnblight':'selora'};const arChampArt=o=>o&&AR_CHAMP_IMG[o.ref||AR_CHAMP_NAME[o.name]]||'';
+const AR_CHAMP_IMG={"calaun": "assets/npcs/ar_champ_img_calaun.webp", "selora": "assets/npcs/ar_champ_img_selora.webp", "ulfur": "assets/npcs/ar_champ_img_ulfur.webp"};   // Arena champion portraits, keyed by champion id (calaun, selora, ulfur)
+const AR_CHAMP_NAME={'Sir Calaun Dawnblight':'calaun','Sterling Dread Pirate Selora Dawnblight':'selora','Titan Ulfur':'ulfur'};const arChampArt=o=>o&&AR_CHAMP_IMG[o.ref||AR_CHAMP_NAME[o.name]]||'';
 function arenaOpen(){AR.view='home';arenaLoad()}
 async function arenaLoad(){if(AR.state!=='ok')AR.state='loading';arenaDraw();
  const r=await act('arena_list',{quiet:true}),a=r&&r.result&&r.result.arena;
@@ -2643,24 +2643,29 @@ const ACH=[
  {id:'friendpoc',cat:'Arena',ic:'💥',n:'Friendslopocalypse',d:'Beat friends in the Arena',c:'arenaFriend',t:[1,5,10,25,50,100],rw:[{xp:60,ttl:'friendlyfire'},{xp:100,pot:'full',ttl:'foebuster',x:' + Full Health Potion'},{xp:160,ttl:'unfriender'},{xp:260,key:1,ttl:'palpulv',x:' + Key of the Forsaken'},{xp:400,ttl:'socialmenace'},{xp:600,pot:'res',ttl:'friendreaper',x:' + Resurrect Potion'}]},
  {id:'dethcal',cat:'Arena',ic:'🐉',n:'Dethrone Calaun',d:'Defeat Sir Calaun Dawnblight in the Arena',c:'arenaCal',t:[1,5,10,25],rw:[{xp:100},{xp:200,pot:'full',x:' + Full Health Potion'},{xp:350,key:1,x:' + Key of the Forsaken'},{xp:600,pot:'res',ttl:'pubenemy',x:' + Resurrect Potion'}]},
  {id:'dethsel',cat:'Arena',ic:'😼',n:'Dethrone Selora',d:'Defeat Sterling Dread Pirate Selora Dawnblight in the Arena',c:'arenaSel',t:[1,5,10,25],rw:[{xp:100},{xp:200,pot:'full',x:' + Full Health Potion'},{xp:350,key:1,x:' + Key of the Forsaken'},{xp:600,pot:'res',ttl:'scourge',x:' + Resurrect Potion'}]},
- {id:'league',cat:'Arena',ic:'👑',n:'A League of Their Own',d:'Defeat every Arena champion at least once',c:'champs',t:[2],rw:[{xp:500,pot:'res',ttl:'champbreak',x:' + Resurrect Potion'}]}];
+ {id:'dethulf',cat:'Arena',ic:'🔨',n:'Dethrone Titan',d:'Defeat Titan Ulfur in the Arena',c:'arenaUlf',t:[1,5,10,25],rw:[{xp:100},{xp:200,pot:'full',x:' + Full Health Potion'},{xp:350,key:1,x:' + Key of the Forsaken'},{xp:600,pot:'res',ttl:'rudeawake',x:' + Resurrect Potion'}]},
+ {id:'league',cat:'Arena',ic:'👑',n:'A League of Their Own',d:'Defeat every Arena champion at least once',c:'champs',t:[3],rw:[{xp:500,pot:'res',ttl:'champbreak',x:' + Resurrect Potion'}]}];
 const TTL={ulfur:"Ulfur's Wake-Up Crew",calaun:"Dawnblight's Co-Conspirator",selora:"Clawbound"};let TCAT=[];   // TTL = id -> name, TCAT = ordered catalog; both are filled from the server (r.titles)
 function setTitles(l){if(!Array.isArray(l)||!l.length)return;TCAT=l;for(const k in TTL)delete TTL[k];l.forEach(t=>{TTL[t.id]=t.n});try{localStorage.setItem('realm_tcat',JSON.stringify(l))}catch(e){}}
 try{setTitles(JSON.parse(localStorage.getItem('realm_tcat')||'null'))}catch(e){}
 const ACH_RW=[{xp:40,x:''},{xp:90,x:' + Full Health Potion'},{xp:180,x:' + Key of the Forsaken'},{xp:350,x:' + Resurrect Potion'}];
 const achC=()=>(S.ach&&S.ach.c)||{},achK=()=>(S.ach&&S.ach.k)||{};
-const achVal=d=>d.c==='champs'?((achC().arenaCal>0?1:0)+(achC().arenaSel>0?1:0)):d.c==='lvl'?(S.lvl|0):d.c==='m'?(achC().m||0)/MI_M:d.c==='slm'?Object.keys((S.ach&&S.ach.f)||{}).length:d.c==='cal'?((S.cal&&S.cal.n)|0):d.c==='sel'?((S.sel&&S.sel.n)|0):(achC()[d.c]||0);
+const achVal=d=>d.c==='champs'?((achC().arenaCal>0?1:0)+(achC().arenaSel>0?1:0)+(achC().arenaUlf>0?1:0)):d.c==='lvl'?(S.lvl|0):d.c==='m'?(achC().m||0)/MI_M:d.c==='slm'?Object.keys((S.ach&&S.ach.f)||{}).length:d.c==='cal'?((S.cal&&S.cal.n)|0):d.c==='sel'?((S.sel&&S.sel.n)|0):(achC()[d.c]||0);
 const achTier=d=>Math.min(d.t.length,achK()[d.id]|0);
 const achOk=d=>achTier(d)<d.t.length&&achVal(d)>=d.t[achTier(d)];
 const achReady=()=>ACH.reduce((n,d)=>n+Math.max(0,d.t.filter(x=>achVal(d)>=x).length-achTier(d)),0);
-let achCat='All',achSlm=false;
+let achCat='All',achX={};   // achX[id] = true while that achievement's drop-down list is open (slm, league)
 const ACH_SH={rifts:'rifts',walk:'walk',level:'level',chests:'chests'};   // achievements that have a painted shield (assets/achv/ach_shield_<name>.webp); all others use the empty shield plus an emoji
 const SLM_LOCS_UI=[['tree','Ancient Tree'],['watchtower','Old Watchtower'],['cave','Mountain Cave'],['boulder','Riverside Boulder'],['shrine','Ruined Shrine'],['camp',"Hunter's Camp"],['bridge','Bridge'],['meadow','Meadow'],['cabin','Abandoned Cabin'],['cliff','Cliffside Overlook']];
-// "Let Sleeping Titans Lie": tap the card to open the list of all 10 places. Gray = not found yet, green = Ulfur found there.
-function slmAchList(){const f=(S.ach&&S.ach.f)||{};
- let h='<div class="qs" style="margin-top:6px;opacity:.85">'+(achSlm?'▴ Hide locations':'▾ Tap to see locations')+'</div>';
- if(achSlm)h+='<div style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:5px">'+SLM_LOCS_UI.map(x=>{const on=!!f[x[0]];return '<div style="padding:7px 8px;border-radius:5px;border:1px solid '+(on?'#7be37a':'#4a4030')+';background:'+(on?'#143a1f':'#171510')+';color:'+(on?'#9bf59a':'#7d7360')+';font:700 12px Georgia,serif">'+(on?'✔ ':'')+x[1]+'</div>'}).join('')+'</div>';
- return h}
+// Drop-down lists on an achievement card: tap the card to open it. Gray = not done yet, green with a check = done.
+// "Let Sleeping Titans Lie" lists the 10 places Ulfur was found; "A League of Their Own" lists the 3 Arena champions.
+const ACH_CHAMPS_UI=[['arenaCal','Sir Calaun Dawnblight'],['arenaSel','Selora Dawnblight'],['arenaUlf','Titan Ulfur']];
+function achListRows(rows,cols){return '<div style="margin-top:6px;display:grid;grid-template-columns:'+(cols>1?'1fr 1fr':'1fr')+';gap:5px">'+rows.map(x=>{const on=x[0];return '<div style="padding:7px 8px;border-radius:5px;border:1px solid '+(on?'#7be37a':'#4a4030')+';background:'+(on?'#143a1f':'#171510')+';color:'+(on?'#9bf59a':'#7d7360')+';font:700 12px Georgia,serif">'+(on?'✔ ':'')+x[1]+'</div>'}).join('')+'</div>'}
+function achList(id){if(id!=='slm'&&id!=='league')return '';
+ const open=!!achX[id];let h='<div class="qs" style="margin-top:6px;opacity:.85">'+(open?'▴ Hide ':'▾ Tap to see ')+(id==='slm'?'locations':'champions')+'</div>';
+ if(!open)return h;
+ if(id==='slm'){const f=(S.ach&&S.ach.f)||{};return h+achListRows(SLM_LOCS_UI.map(x=>[!!f[x[0]],x[1]]),2)}
+ const c=achC();return h+achListRows(ACH_CHAMPS_UI.map(x=>[c[x[0]]>0,x[1]]),1)}
 function heroAch(){
  const done=ACH.reduce((n,d)=>n+achTier(d),0),all=ACH.reduce((n,d)=>n+d.t.length,0),rdy=achReady();
  let o='';
@@ -2674,13 +2679,13 @@ function heroAch(){
   const fmt=x=>d.mi?(Math.round(x*10)/10).toLocaleString():Math.floor(x).toLocaleString();
   const pips=d.t.map((_,i)=>'<i'+(i<t?'':' class="off"')+'></i>').join('');
   const rw=d.rw?d.rw[Math.min(t,d.rw.length-1)]:ACH_RW[Math.min(t,3)];
-  o+='<div class="qcard ach'+(ready?' rdy':'')+(fin?' done':'')+'"'+(d.id==='slm'?' data-ax="slm" role="button" tabindex="0" style="cursor:pointer"':'')+'>'
+  o+='<div class="qcard ach'+(ready?' rdy':'')+(fin?' done':'')+'"'+(d.id==='slm'||d.id==='league'?' data-ax="'+d.id+'" role="button" tabindex="0" style="cursor:pointer"':'')+'>'
    +(ACH_SH[d.id]?'<div class="ach-em" style="background-image:url(assets/achv/ach_shield_'+ACH_SH[d.id]+'.webp?v='+window.__BUILD+')"></div>':'<div class="ach-em"><span>'+d.ic+'</span></div>')
    +'<div class="ach-main"><div class="ach-top"><b>'+d.n+(t&&d.t.length>1?' · '+ROMAN[t-1]:'')+'</b><span class="ach-pips">'+pips+'</span></div>'
    +'<div class="ach-d">'+d.d+'</div>'
    +'<div class="qbar"><i style="width:'+Math.round(100*Math.min(1,v/goal))+'%"></i></div>'
    +'<div class="ach-r">'+(fin?'Complete ✔':fmt(Math.min(v,goal))+' / '+fmt(goal)+' · Reward: '+Math.max(1,Math.round(rw.xp*lvlScale()))+' XP'+(rw.x||'')+(rw.ttl?' + Title: '+TTL[rw.ttl]:''))+'</div></div>'
-   +(d.id==='slm'?'<div class="ach-x">'+slmAchList()+'</div>':'')+(ready?'<button class="qbtn" data-ac="'+d.id+'">Claim '+d.n+(d.t.length>1?' '+ROMAN[t]:'')+'</button>':'')+'</div>'});
+   +(d.id==='slm'||d.id==='league'?'<div class="ach-x">'+achList(d.id)+'</div>':'')+(ready?'<button class="qbtn" data-ac="'+d.id+'">Claim '+d.n+(d.t.length>1?' '+ROMAN[t]:'')+'</button>':'')+'</div>'});
  if(!shown)o+='<div class="qcard"><div class="qs" style="text-align:center">'+(achCat==='Questlines'?'Questline achievements are coming soon.':'No achievements match this filter.')+'</div></div>';
  return o}
 function askTitle(b){const id=b.dataset.tt,rm=!!(S.ach&&S.ach.eq===id),nm=TTL[id]||'this title';
@@ -2689,9 +2694,9 @@ function askTitle(b){const id=b.dataset.tt,rm=!!(S.ach&&S.ach.eq===id),nm=TTL[id
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-tt]');if(b)askTitle(b)});
 inv.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const b=e.target.closest&&e.target.closest('[data-tt]');if(b&&b.getAttribute('role')==='button'){e.preventDefault();askTitle(b)}});
 inv.addEventListener('change',e=>{if(e.target&&e.target.id==='achCat'){achCat=e.target.value;invRender()}});
-function achSlmToggle(){const par=inv.parentElement,a=par?par.scrollTop:0,b=inv.scrollTop;achSlm=!achSlm;invRender();if(par)par.scrollTop=a;inv.scrollTop=b}
-inv.addEventListener('click',e=>{const c=e.target.closest('[data-ax]');if(c&&!e.target.closest('button'))achSlmToggle()});
-inv.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const c=e.target.closest&&e.target.closest('[data-ax]');if(c&&e.target===c){e.preventDefault();achSlmToggle()}});
+function achSlmToggle(id){const par=inv.parentElement,a=par?par.scrollTop:0,b=inv.scrollTop;achX[id]=!achX[id];invRender();if(par)par.scrollTop=a;inv.scrollTop=b}
+inv.addEventListener('click',e=>{const c=e.target.closest('[data-ax]');if(c&&!e.target.closest('button'))achSlmToggle(c.dataset.ax)});
+inv.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const c=e.target.closest&&e.target.closest('[data-ax]');if(c&&e.target===c){e.preventDefault();achSlmToggle(c.dataset.ax)}});
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-ac]');if(!b)return;b.disabled=true;
  act('ach',b.dataset.ac==='all'?{op:'claimall'}:{op:'claim',id:b.dataset.ac}).then(r=>{if(r&&r.result&&r.result.lines)toast(r.result.title+': '+r.result.lines.join(', '));try{invRender()}catch(x){}})});
 function heroPH(k){const d=HERO_PH[k];return d?'<div class="qcard ms" style="text-align:center;padding:30px 16px"><div style="display:grid;place-items:center">'+(HERO_IMG[k]?heroImg(k,84):'<span style="font-size:60px;line-height:1">'+d[0]+'</span>')+'</div><div class="qt" style="justify-content:center;margin-top:8px"><b>'+d[1]+'</b></div><div class="qs" style="margin-top:8px">'+d[2]+'</div><div class="qs" style="margin-top:14px;color:#e5c77b"><b>Coming soon</b></div></div>':''}
