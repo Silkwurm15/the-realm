@@ -1947,7 +1947,7 @@ function cbShow(f){cbLast=f;fighting=true;try{if(f.phase==='intro')Sound.music(f
  else if(f.phase==='choice')cbDraw('Your move!',[['Attack',()=>cbOp('attack')],['Flee',()=>cbOp('flee'),1]],true);
  else if(f.phase==='fallen')cbDraw('You have fallen!',[['Use Resurrect Potion ('+f.res+')',()=>cbOp('res')],['Give Up',()=>cbOp('giveup'),1]],true);
  else cbDraw(f.title,[['Continue',()=>{cb.style.display='none';C=null;fighting=false;hud();if(inv.classList.contains('open'))invRender();if(f.bonusChoice)showBonusChoice(f.bonusChoice,f.log,false)}]],true)}
-function cbClose(){cb.style.display='none';C=null;cbLast=null;fighting=false;try{Sound.music('map')}catch(e){}}
+function cbClose(){cb.style.display='none';try{window.RealmAnim&&RealmAnim.battleOff()}catch(e){}C=null;cbLast=null;fighting=false;try{Sound.music('map')}catch(e){}}
 async function cbRecover(op){const err=String(act.err||'');
  if(/no fight in progress|fight is over/i.test(err))return cbClose();
  try{
@@ -2004,10 +2004,11 @@ async function arStart(kind,id){if(AR.busy)return;AR.busy=true;const r=await act
 function arShow(f){fighting=true;AR.on=true;
  try{if(f.phase==='end'){Sound.music('map');Sound.sfx(f.result==='win'?'win':f.result==='loss'?'lose':'tap')}else Sound.music('battle_arena')}catch(e){}
  arDraw(f)}
-function arClose(){cb.style.display='none';fighting=false;AR.on=false;try{Sound.music('map')}catch(e){}hud();if(inv.classList.contains('open'))invRender();if(ap.classList.contains('open'))arenaLoad()}
+function arClose(){cb.style.display='none';try{window.RealmAnim&&RealmAnim.battleOff()}catch(e){}fighting=false;AR.on=false;try{Sound.music('map')}catch(e){}hud();if(inv.classList.contains('open'))invRender();if(ap.classList.contains('open'))arenaLoad()}
 /* An opponent's equipped title (a catalog id from the server), shown under their name. Nothing at all when they have none or the id is unknown to this client. */
 function arTtl(id,big){const n=id&&typeof TTL!=='undefined'&&TTL[id];return n?'<div style="font-style:italic;color:#e6c77e;font-size:'+(big?'13':'12')+'px;line-height:1.25;overflow-wrap:anywhere">'+arEsc(n)+'</div>':''}
 function arDraw(f){
+ try{window.RealmAnim&&RealmAnim.battleOff()}catch(e){}   // the arena reuses #cbt: switch the animated mimic screen off (it hides .cbb)
  const champ=f.opp.kind==='champ',pot=k=>{const n=(f.pots&&f.pots[k])|0;return n>0&&f.hp<f.mhp?['<span>'+POTS[k].icon+'</span> '+POTS[k].name+' ('+n+')',()=>arOp('pot',k),1]:null};
  $('cbT').textContent=f.title||'';
  $('cbA').innerHTML=(champ&&arChampArt(f.opp)?'<div style="width:132px;height:198px;margin:4px auto 6px;border:2px solid #ffd27a;border-radius:8px;overflow:hidden;background:#0e0c09"><img src="'+arChampArt(f.opp)+'" alt="" draggable="false" style="width:100%;height:100%;object-fit:cover;display:block"></div>':'<div style="width:112px;height:112px;margin:4px auto 6px;display:flex;align-items:center;justify-content:center;border:2px solid '+(champ?'#ffd27a':'#6b5a33')+';border-radius:8px;background:radial-gradient(#3a2d18,#0e0c09)"><div style="width:84px">'+clsIcon(f.opp.cls)+'</div></div>')+'<div style="font-weight:700;color:#fff0c6">'+arEsc(f.opp.name)+(champ?' (Champion)':'')+'</div>'+arTtl(f.opp.ttl,1)+'<div style="font-size:12px;color:#c9b88a">'+arEsc(f.opp.cn)+'</div>';
