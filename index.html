@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.913';window.__BUILD=B;
+(function(){var B='1.914';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2108,10 +2108,11 @@ function invRender(){const h=H(),p=parts(),s=p.s,c=CLASSES[S.cls],row=(it,btn,a,
  if(heroSec==='hub')o=heroHub();
  else if(heroSec==='character')o=(sub==='loadouts'?loPage():sub==='backpack'?bpPage():eqPage());
  else if(heroSec==='social')o=sub==='mail'?heroMail():sub==='friends'?heroFriends():heroPH(sub);
+ else if(heroSec==='codex')o=codexPage();
  else o=sub==='achievements'?heroAch():sub==='cosmetics'?heroCosm():heroClasses();
- inv.classList.toggle('hubmode',heroSec==='hub');inv.classList.toggle('profmode',heroSec==='profile');
+ inv.classList.toggle('hubmode',heroSec==='hub');inv.classList.toggle('profmode',heroSec==='profile');inv.classList.toggle('codexmode',heroSec==='codex');
  if(heroSec==='profile'){const ob=inv.querySelector('.pb-body'),ps=ob?ob.scrollTop:0;inv.innerHTML=profBook(o,sub);const nb=inv.querySelector('.pb-body');if(nb)nb.scrollTop=ps;inv.scrollTop=0;return}
- inv.innerHTML=(heroSec==='hub'?'':heroTabs())+o;inv.scrollTop=st}
+ inv.innerHTML=(heroSec==='hub'||heroSec==='codex'?'':heroTabs())+o;inv.scrollTop=st}
 /* ---- Hero tab: opens on a hub of buttons; pick Character | Friends | Mailbox | Scores (placeholders for the last three) ---- */
 let heroSec='hub';
 const HERO_IMG={character:"assets/hero/hero_img_character.webp",friends:"assets/hero/hero_img_friends.webp",mail:"assets/hero/hero_img_mail.webp",scores:"assets/hero/hero_img_scores.webp"};
@@ -2405,6 +2406,15 @@ const invCss=document.createElement('style');invCss.textContent=`
 .hhi{position:relative;display:block;height:auto;max-width:none;pointer-events:none;user-select:none}
 .hhb{position:relative;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .08s,filter .08s}.hhb:active{transform:scale(.97);filter:brightness(1.18)}
 .hhsign{flex:none}
+.qpanel.codexmode{padding:0;background:#1a0f08;overflow-x:hidden}
+.cxwrap{position:relative;width:100%;min-height:100%;display:flex;flex-direction:column;container-type:inline-size}
+.cxbox{position:relative;flex:0 0 auto;width:100%;aspect-ratio:1024/1536;background:center/100% 100% no-repeat}
+.cxfill{flex:1 0 0;background:top/100% auto repeat-y}
+.cx-b{position:absolute;cursor:pointer;-webkit-tap-highlight-color:transparent}.cx-b:active{background:rgba(255,230,160,.16)}
+.cx-t{position:absolute;left:0;right:0;transform:translateY(-50%);text-align:center;font:700 3.5cqw/1 Georgia,'Times New Roman',serif;color:#2a1408;text-shadow:0 .2cqw 0 rgba(255,236,190,.55);white-space:nowrap;pointer-events:none}
+.cx-bar{position:absolute;left:20.2%;width:58.7%;top:17.78%;height:1.5%;pointer-events:none}.cx-bar i{display:block;height:100%;border-radius:1.5cqw;background:linear-gradient(180deg,#ffe27a,#f0a91c 60%,#c4780c);box-shadow:inset 0 .2cqw .3cqw rgba(255,255,255,.55)}
+.cx-c{position:absolute;left:35.2%;width:32.6%;transform:translateY(-50%);text-align:center;font:700 2.9cqw/1 Georgia,'Times New Roman',serif;color:#2b1a0c;text-shadow:0 .2cqw 0 rgba(255,236,190,.5);white-space:nowrap;pointer-events:none}
+.cx-p{position:absolute;left:36.3%;display:flex;pointer-events:none}.cx-p i{flex:0 0 3.38cqw;height:3.38cqw;background:url(assets/codex/pip_off.webp) center/100% 100% no-repeat}.cx-p i.on{background-image:url(assets/codex/pip_on.webp)}
 .hhbd{position:absolute;right:calc(100cqw*.012);top:calc(100cqw*-.012);min-width:calc(100cqw*.062);height:calc(100cqw*.062);padding:0 calc(100cqw*.016);box-sizing:border-box;border-radius:calc(100cqw*.031);background:#e5483a;border:calc(100cqw*.004) solid #ffd98a;color:#fff;font:700 calc(100cqw*.036)/calc(100cqw*.054) Arial,sans-serif;font-style:normal;text-align:center;box-shadow:0 2px 6px #000a;pointer-events:none;z-index:2}
 .ipc.ipr{max-width:560px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;filter:drop-shadow(0 10px 28px #000c)}.ipr .ix{top:-14px;right:-8px;width:42px;z-index:3}.ipr img.rg{width:100%;display:block;border-radius:8px}
 
@@ -2590,10 +2600,29 @@ inv.addEventListener('click',e=>{const t=e.target;let b;
 function heroRow(k,ic,n,b){
  return'<div class="qcard" data-hs="'+k+'" style="position:relative;display:flex;align-items:center;gap:14px;cursor:pointer;padding:16px 14px"><div style="width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center">'+(HERO_IMG[k]?heroImg(k,52):'<span style="font-size:40px;line-height:1">'+ic+'</span>')+'</div><div class="qt" style="margin:0"><b>'+n+'</b></div>'
   +(b?'<span style="margin-left:auto;min-width:18px;padding:1px 6px;border-radius:9px;background:#e5c77b;color:#241a0c;font:700 11px Arial,sans-serif;text-align:center">'+b+'</span><span style="color:#e5c77b;font-size:20px">›</span>':'<span style="margin-left:auto;color:#e5c77b;font-size:20px">›</span>')+'</div>'}
+/* ---- Codex hub: art cut from the approved mockup; the counts, gems and top bar are live ---- */
+const CODEX_TOT={bestiary:null,fauna:null,landmarks:null,artifacts:null,legends:null};   // null shows "??" until the real entry counts are filled in
+const CODEX_SEC=[['bestiary','Bestiary',332,527,438.5,481.5],['fauna','Fauna',546,742,653.5,696.5],['landmarks','Landmarks',762,955,863,908.5],['artifacts','Artifacts',972,1160,1070.5,1113.5],['legends','Legends',1170,1360,1268.5,1312.5]];   // key, name, panel top/bottom, count y, gem-row y (px on the 1024x1536 art)
+const codexFound=k=>{const v=S.codex&&S.codex[k];return Array.isArray(v)?v.length:Math.max(0,+v||0)};
+function codexPage(){
+ const y=n=>(n/15.36).toFixed(3)+'%',A='assets/codex/',B=window.__BUILD;
+ const f=CODEX_SEC.map(c=>codexFound(c[0])),t=CODEX_SEC.map(c=>+CODEX_TOT[c[0]]||0),known=t.every(n=>n>0);
+ const sum=f.reduce((a,b)=>a+b,0),tot=known?t.reduce((a,b)=>a+b,0):0;
+ let o='<div class="cxwrap"><div class="cxbox" style="background-image:url('+A+'codex_bg.webp?v='+B+')">'
+  +'<div class="cx-b" data-hback="1" role="button" aria-label="Back to Hero" style="left:2%;top:'+y(8)+';width:9.6%;height:'+y(96)+'"></div>'
+  +'<div class="cx-b" data-hback="1" role="button" aria-label="Close Codex" style="left:88.6%;top:'+y(8)+';width:9.6%;height:'+y(96)+'"></div>'
+  +'<div class="cx-t" style="top:'+y(249)+'">Realm Discoveries&nbsp; '+sum+' / '+(known?tot:'??')+'</div>'
+  +'<div class="cx-bar"><i style="width:'+(known&&tot?Math.min(100,sum/tot*100):0).toFixed(2)+'%"></i></div>';
+ CODEX_SEC.forEach((c,i)=>{
+  const lit=!t[i]?0:f[i]>=t[i]?9:f[i]>0?Math.max(1,Math.round(f[i]/t[i]*9)):0;
+  o+='<div class="cx-b" data-cx="'+c[0]+'" role="button" aria-label="'+c[1]+'" style="left:4.4%;width:91.3%;top:'+y(c[2])+';height:'+y(c[3]-c[2])+'"></div>'
+   +'<div class="cx-c" style="top:'+y(c[4])+'">'+f[i]+' / '+(t[i]||'??')+' discovered</div>'
+   +'<div class="cx-p" style="top:'+y(c[5]-17)+'">'+Array.from({length:9},(_,j)=>'<i'+(j<lit?' class="on"':'')+'></i>').join('')+'</div>'});
+ return o+'</div><div class="cxfill" style="background-image:url('+A+'codex_wood.webp?v='+B+')"></div></div>'}
 function heroHub(){const u=MAILS.filter(x=>!x.read).length+fbN(),ar=achReady();
  const bt=(k,lbl,n,k2)=>{const wd={"inventory": 77.83, "social": 78.82, "hero": 65.16, "profile": 79.3}[k2],dx={"inventory": 0.24, "social": 0.07, "hero": -0.06, "profile": -0.13}[k2];
-  const off=k==='profile';   // Codex: placeholder for now, not clickable (no data-hs)
-  return'<div class="hhb"'+(off?'':' data-hs="'+k+'" role="button"')+' aria-label="'+lbl+'" style="width:'+wd+'cqw;left:'+dx+'cqw'+(off?';cursor:default;pointer-events:none':'')+'"><img class="hhi" alt="'+lbl+'" draggable="false" src="assets/hero/hub_'+k2+'.webp?v='+window.__BUILD+'" style="width:100%">'+(n?'<i class="hhbd">'+n+'</i>':'')+'</div>'};
+  const off=false;
+  return'<div class="hhb"'+(off?'':' data-hs="'+(k==='profile'?'codex':k)+'" role="button"')+' aria-label="'+lbl+'" style="width:'+wd+'cqw;left:'+dx+'cqw'+(off?';cursor:default;pointer-events:none':'')+'"><img class="hhi" alt="'+lbl+'" draggable="false" src="assets/hero/hub_'+k2+'.webp?v='+window.__BUILD+'" style="width:100%">'+(n?'<i class="hhbd">'+n+'</i>':'')+'</div>'};
  return'<div class="hhwrap"><img class="hhbg" alt="" draggable="false" src="assets/hero/hero_hub_bg.webp?v='+window.__BUILD+'"><div class="hhstack">'
   +'<img class="hhi hhsign" alt="Hero" draggable="false" src="assets/hero/hub_hero.webp?v='+window.__BUILD+'" style="width:65.16cqw;left:-0.06cqw">'
   +'<div class="hhbtns">'+bt('character','Inventory',0,'inventory')+bt('social','Social',u,'social')+bt('profile','Codex',0,'profile')+'</div></div></div>'}
@@ -2812,6 +2841,7 @@ inv.addEventListener('click',async e=>{const b=e.target.closest('[data-hm]');if(
  if(a==='open'){const m=MAILS.find(x=>String(x.id)===String(b.dataset.id));if(!m)return;mailOpenId=m.id;invRender();inv.scrollTop=0;if(!m.read){m.read=true;mailDot();supCall('mail_read',{id:m.id})}return}
  if(a==='del'){const r=await supCall('mail_delete',{id:b.dataset.id});if(!r||r.error||!r.ok)return toast((r&&r.error)||'Could not delete.');MAILS=MAILS.filter(x=>String(x.id)!==String(b.dataset.id));mailOpenId=null;mailDot();invRender()}});
 inv.addEventListener('click',e=>{if(e.target.closest('[data-hback]')){heroSec='hub';invRender();inv.scrollTop=0;return}
+ const cxb=e.target.closest('[data-cx]');if(cxb){const sc=CODEX_SEC.find(x=>x[0]===cxb.dataset.cx);return toast((sc?sc[1]:'This section')+' entries are coming in a later update.')}
  const h=e.target.closest('[data-hs]');if(h){heroSec=h.dataset.hs;invRender();inv.scrollTop=0;if(heroSec==='social'&&heroSub.social==='friends')friendsLoad();return}
  const b=e.target.closest('[data-hsub]');if(!b)return;heroSub[heroSec]=b.dataset.hsub;invRender();inv.scrollTop=0;if(heroSec==='social'&&heroSub.social==='mail')heroMailLoad();if(heroSec==='social'&&heroSub.social==='friends')friendsLoad()});
 inv.addEventListener('change',e=>{if(e.target&&e.target.id==='sellSel'){sellPick=e.target.value;invRender()}if(e.target&&e.target.id==='invFilter'){invFilter=e.target.value;try{localStorage.setItem('invFilter',invFilter)}catch(x){}invRender()}});
