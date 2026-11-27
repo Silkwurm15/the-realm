@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.920';window.__BUILD=B;
+(function(){var B='1.921';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2367,21 +2367,16 @@ const invCss=document.createElement('style');invCss.textContent=`
 
 /* ---- potion menu: painted top/bottom/edges cut from the mockup, everything between is live. 1 unit = 1px of the 1254px mockup ---- */
 .ipc.ipo{max-width:430px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;container-type:inline-size}.ipo>.ix{display:none}
-.ipo .pw{--u:calc(100cqw/1254);--c:calc(var(--u)*18);position:relative;color:#f6e3ae;font-family:Georgia,serif}
-.ipo .pt img,.ipo .pb img{display:block;width:100%;pointer-events:none}.ipo .px{position:absolute;left:calc(var(--u)*1090);top:calc(var(--u)*125);width:calc(var(--u)*135);height:calc(var(--u)*130);cursor:pointer}
-.ipo .pm{position:relative;height:calc(var(--u)*654);background:linear-gradient(#0e0c0c,#0e0c0c) no-repeat center/calc(100% - var(--u)*100) 100%}.ipo .pm .el,.ipo .pm .er{position:absolute;top:0;height:100%;width:calc(var(--u)*96);pointer-events:none}.ipo .pm .el{left:0}.ipo .pm .er{right:0}
-.ipo .psub{position:absolute;top:calc(var(--u)*6);left:0;right:0;text-align:center;font-size:calc(var(--u)*37);line-height:1.2;text-shadow:0 2px 3px #000}
-.ipo .pdv{position:absolute;top:calc(var(--u)*62);left:calc(var(--u)*110);right:calc(var(--u)*110);height:calc(var(--u)*3);background:linear-gradient(90deg,transparent,#b8863b 22%,#f0cd85 50%,#b8863b 78%,transparent)}.ipo .pdv::after{content:"";position:absolute;left:50%;top:50%;width:calc(var(--u)*16);height:calc(var(--u)*16);transform:translate(-50%,-50%) rotate(45deg);background:#f0cd85}
-.ipo .prs{position:absolute;top:calc(var(--u)*91);left:calc(var(--u)*95);right:calc(var(--u)*94);display:flex;flex-direction:column;gap:calc(var(--u)*21)}
-.ipo .prw{position:relative;height:calc(var(--u)*172)}.ipo .prb{position:absolute;inset:0;background:linear-gradient(135deg,#f0cd85,#8a5a2a 50%,#d9a947);clip-path:polygon(var(--c) 0,calc(100% - var(--c)) 0,100% var(--c),100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,var(--c) 100%,0 calc(100% - var(--c)),0 var(--c))}
-.ipo .prb::before{content:"";position:absolute;inset:calc(var(--u)*4);background:#130d09;clip-path:polygon(var(--c) 0,calc(100% - var(--c)) 0,100% var(--c),100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,var(--c) 100%,0 calc(100% - var(--c)),0 var(--c))}
-.ipo .prw::after{content:"";position:absolute;inset:calc(var(--u)*12);border:1px solid #b8863b66;pointer-events:none;z-index:1}
-.ipo .pri{z-index:3;position:absolute;left:calc(var(--u)*50);top:50%;width:calc(var(--u)*140);transform:translateY(-50%);-webkit-mask-image:radial-gradient(ellipse at center,#000 55%,transparent 80%);mask-image:radial-gradient(ellipse at center,#000 55%,transparent 80%)}.ipo .pri img{display:block;width:100%}
-.ipo .prn{z-index:2;position:absolute;left:calc(var(--u)*230);right:calc(var(--u)*380);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*8);min-width:0}
-.ipo .prn b{font-size:calc(var(--u)*46);line-height:1.05;color:#f6e3ae;text-shadow:0 2px 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ipo .prn small{font-size:calc(var(--u)*31);line-height:1.1;color:#e8dcc0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ipo .prq,.ipo .pub{z-index:2;position:absolute;top:50%;transform:translateY(-50%);height:calc(var(--u)*100);display:flex;align-items:center;justify-content:center;box-sizing:border-box;border:calc(var(--u)*4) solid #b8863b;border-radius:calc(var(--u)*10);font:700 calc(var(--u)*50) Georgia,serif}
-.ipo .prq{left:calc(var(--u)*690);width:calc(var(--u)*140);background:#0d0907;color:#f6e3ae;box-shadow:inset 0 0 calc(var(--u)*10) #000}
-.ipo .pub{left:calc(var(--u)*853);width:calc(var(--u)*187);margin:0;padding:0;background:linear-gradient(180deg,#b5231b,#5c0806);color:#ffe9b8;text-shadow:0 2px 2px #000;box-shadow:inset 0 0 0 calc(var(--u)*2) #d9a94799,0 2px 6px #000a;cursor:pointer}.ipo .pub:disabled{opacity:.45;filter:grayscale(.7);cursor:default}
+.ipo .ph,.ipo .pc{position:relative;display:block;color:#f6e3ae;font-family:Georgia,serif}.ipo .ph{--u:calc(100cqw/1199)}.ipo .pc{--u:calc(100cqw/1052)}
+.ipo .ph>img,.ipo .pc>img{display:block;width:100%;pointer-events:none}.ipo .ph>div,.ipo .pc>div,.ipo .pc>button{position:absolute;box-sizing:border-box}
+.ipo .px{cursor:pointer}.ipo .pz{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:calc(var(--u)*34)}.ipo .pz:active{background:#ffe9a226}
+.ipo .pct{display:flex;align-items:center;justify-content:center;left:calc(var(--u)*306);top:calc(var(--u)*296);width:calc(var(--u)*440);height:calc(var(--u)*100);font:700 calc(var(--u)*52)/1 Georgia,serif;color:#f6e3ae;text-shadow:0 2px 4px #000,0 0 calc(var(--u)*14) #1a3a9a;white-space:nowrap}
+.ipo .pci{display:flex;align-items:center;justify-content:center;left:calc(var(--u)*95);width:calc(var(--u)*140);height:calc(var(--u)*138)}.ipo .pci img{display:block;max-width:86%;max-height:86%;object-fit:contain;filter:drop-shadow(0 2px 3px #000a)}
+.ipo .pcn{left:calc(var(--u)*250);width:calc(var(--u)*400);height:calc(var(--u)*140);display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*10);min-width:0}
+.ipo .pcn b{font-size:calc(var(--u)*42);line-height:1.05;color:#f6e3ae;text-shadow:0 2px 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ipo .pcn b.lg{font-size:calc(var(--u)*34)}
+.ipo .pcn small{font-size:calc(var(--u)*29);line-height:1.1;color:#e8dcc0;text-shadow:0 1px 2px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ipo .pcq{left:calc(var(--u)*665);width:calc(var(--u)*105);height:calc(var(--u)*98);display:flex;align-items:center;justify-content:center;font:700 calc(var(--u)*44) Georgia,serif;color:#f6e3ae;text-shadow:0 2px 3px #000}.ipo .pcq.m{font-size:calc(var(--u)*36)}.ipo .pcq.s{font-size:calc(var(--u)*28)}
+.ipo .pcu{left:calc(var(--u)*788);width:calc(var(--u)*167);height:calc(var(--u)*90);margin:0;padding:0;border:0;border-radius:calc(var(--u)*12);background:transparent;font:700 calc(var(--u)*48) Georgia,serif;color:#ffe9b8;text-shadow:0 2px 2px #000;cursor:pointer;-webkit-tap-highlight-color:transparent}.ipo .pcu:active:not(:disabled){background:#00000040}.ipo .pcu:disabled{background:#0c0707b3;color:#bda57a;cursor:default}
 
 
 .ipc.ipu{max-width:440px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;container-type:inline-size}.ipu>.ix{display:none}
@@ -2562,14 +2557,21 @@ function itemPop(uid){const it=findItem(uid);if(!it)return;ipUid=uid;const c=CAT
  }
  h+='<div class="ibr" style="grid-template-columns:'+(n===4?'1.04fr 1fr .85fr 1.1fr':'repeat('+n+',1fr)')+'">'+eq+lk+ds+'</div>';
  const pf=n===4?'ipr_':'ip_';openPop('<div class="ppt"><img alt="" src="'+IV(pf+'top')+'"><div class="ppx" data-pclose="1"></div></div><div class="ppm">'+h+'</div><div class="ppb"><img alt="" src="'+IV(pf+'bot')+'"></div>','ipi ipp'+(n===4?' ipr':''))}
-function pillPop(){const h=H(),ico={h35:'pot_ico_h35',full:'pot_ico_full',res:'pot_ico_res'};
- openPop('<div class="pw"><div class="pt"><img alt="Potions" src="'+IV('pot_top')+'"><div class="px" data-pclose="1"></div></div>'
-  +'<div class="pm"><img class="el" alt="" src="'+IV('pot_edge_l')+'"><img class="er" alt="" src="'+IV('pot_edge_r')+'">'
-  +'<div class="psub">Your potions. Earned potions stop at '+POT_CAP+' each.</div><div class="pdv"></div>'
-  +'<div class="prs">'+Object.keys(POTS).map(k=>'<div class="prw"><div class="prb"></div><div class="pri"><img alt="" src="'+IV(ico[k]||'pot_ico_h35')+'"></div>'
-   +'<div class="prn"><b>'+POTS[k].name+'</b><small>Earned '+(h.pot[k]||0)+' / '+POT_CAP+' · Bought '+(h.buy[k]||0)+'</small></div>'
-   +'<div class="prq">x'+potN(k)+'</div><button class="pub" data-pa="pot" data-u="'+k+'"'+(potN(k)?'':' disabled')+'>Use</button></div>').join('')+'</div></div>'
-  +'<div class="pb"><img alt="" src="'+IV('pot_bot')+'"></div></div>','ipo')}
+let potCur=null;   // null = Potions hub open, otherwise the open category
+const POT_MAP={health_1:'h35',health_2:'full',health_4:'res'};   // shop potion id -> the potion key the server already knows; the other potions have no server stock yet
+const POT_CATS=[['health','Health',78,392,526,353],['utility','Utility',612,375,503,355],['offensive','Offensive',78,758,526,377],['defensive','Defensive',606,738,509,397]];
+function pillPop(){potCur=null;const pc=(x,y,w,h)=>'left:'+(x/11.99).toFixed(2)+'%;top:'+(y/12.46).toFixed(2)+'%;width:'+(w/11.99).toFixed(2)+'%;height:'+(h/12.46).toFixed(2)+'%';
+ openPop('<div class="ph"><img alt="Potions" src="'+IV('pot_hub')+'"><div class="px" data-pclose="1" style="'+pc(1040,78,115,110)+'"></div>'
+  +POT_CATS.map(c=>'<div class="pz" data-pcat="'+c[0]+'" role="button" aria-label="'+c[1]+' potions" style="'+pc(c[2],c[3],c[4],c[5])+'"></div>').join('')+'</div>','ipo')}
+function potCatPop(cat){potCur=cat;const h=H(),c=POT_CATS.find(x=>x[0]===cat);if(!c)return pillPop();
+ openPop('<div class="pc"><img alt="'+c[1]+' Potions" src="'+IV('pot_cat')+'"><div class="px" data-pback="1" style="left:calc(var(--u)*880);top:calc(var(--u)*145);width:calc(var(--u)*140);height:calc(var(--u)*130)"></div>'
+  +'<div class="pct">'+c[1]+' Potions</div>'
+  +shopPotsOf(cat).slice(0,4).map((o,i)=>{const k=POT_MAP[o.id],er=k?(h.pot[k]||0):0,bu=k?(h.buy[k]||0):0,n=er+bu,y=i*200.5,qs=('x'+n).length;
+   return'<div class="pci" style="top:calc(var(--u)*'+(530+y).toFixed(1)+')"><img alt="" draggable="false" src="'+SHA('shp_pot_'+o.id)+'"></div>'
+    +'<div class="pcn" style="top:calc(var(--u)*'+(530+y).toFixed(1)+')"><b'+(o.n.length>15?' class="lg"':'')+'>'+esc(o.n)+'</b><small>Earned '+er+' / '+POT_CAP+' · Bought '+bu+'</small></div>'
+    +'<div class="pcq'+(qs>5?' s':qs>3?' m':'')+'" style="top:calc(var(--u)*'+(550+y).toFixed(1)+')">x'+n+'</div>'
+    +'<button class="pcu" data-pa="pot" data-u="'+(k||'')+'" style="top:calc(var(--u)*'+(552+y).toFixed(1)+')"'+(k&&n?'':' disabled')+'>Use</button>'}).join('')+'</div>','ipo')}
+function potRefresh(){if(potCur)potCatPop(potCur);else pillPop()}
 function statsPop(){const h=H(),p=parts(),s=p.s,row=(n,v,x)=>'<div class="prow" style="padding:8px 10px"><div class="pn">'+n+(x?'<small>'+x+'</small>':'')+'</div><div class="pc" style="font-size:16px">'+v+'</div></div>';
  const at=Object.keys(ATTR).filter(k=>!['atk','def','maxHp'].includes(k)&&s[k]).map(k=>{const d=ATTR[k],v=s[k];return'<div class="prow" style="padding:6px 10px"><div class="pn" style="font-size:12px">'+attrEsc(d.name)+'</div><div class="pc '+(v<0?'dn':'up')+'" style="font-size:14px">'+(v>0?'+':'')+v+(d.unit||'')+'</div></div>'}).join('');
  openPop('<h2>Character Stats</h2><div class="qs" style="margin:0">Level '+S.lvl+' · totals include your equipped gear</div>'
@@ -2578,12 +2580,13 @@ function statsPop(){const h=H(),p=parts(),s=p.s,row=(n,v,x)=>'<div class="prow" 
 function rarityPop(){openPop('<img class="rg" alt="Rarity Guide" src="'+IV('inv_rarity_guide')+'">','ipr')}
 function sortPop(){openPop('<h2>Sort</h2>'+SORTS.map(s=>'<div class="srt'+(invSort===s[0]?' on':'')+'" data-srt="'+s[0]+'"><i>'+(invSort===s[0]?'✔':'')+'</i>'+s[1]+'</div>').join(''))}
 ipop.addEventListener('click',e=>{if(e.target===ipop||e.target.closest('[data-pclose]'))return closePop();
+ const pcg=e.target.closest('[data-pcat]');if(pcg)return potCatPop(pcg.dataset.pcat);if(e.target.closest('[data-pback]'))return pillPop();
  const t=e.target.closest('[data-ptab]');if(t){ipTab=t.dataset.ptab;return itemPop(ipUid)}
  const s=e.target.closest('[data-srt]');if(s){invSort=s.dataset.srt;try{localStorage.setItem('invSort',invSort)}catch(x){}closePop();return invRender()}
  const b=e.target.closest('[data-pa]');if(!b||b.disabled)return;const a=b.dataset.pa,u=b.dataset.u;
  if(a==='sell'){closePop();const sl=eqSlotOf(u);return sl?dismantleEq(sl,u):sellItems([u],null,false,true)}
  b.disabled=true;
- if(a==='pot')return void act('usepot',{k:u}).then(()=>{if(ipop.classList.contains('open'))pillPop()});
+ if(a==='pot')return void act('usepot',{k:u}).then(()=>{if(ipop.classList.contains('open'))potRefresh()});
  const p=a==='eq'?act('equip',b.dataset.slot?{uid:u,slot:b.dataset.slot}:{uid:u}):a==='un'?act('unequip',{slot:u}):act('lock',{uid:u,on:!(findItem(u)||{}).lock});
  Promise.resolve(p).then(()=>{if(a==='lock'&&ipop.classList.contains('open'))itemPop(u);else closePop();invRender()},()=>{b.disabled=false})});
 inv.addEventListener('click',e=>{const t=e.target;let b;
