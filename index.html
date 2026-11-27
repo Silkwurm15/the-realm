@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.914';window.__BUILD=B;
+(function(){var B='1.915';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -2415,6 +2415,8 @@ const invCss=document.createElement('style');invCss.textContent=`
 .cx-bar{position:absolute;left:20.2%;width:58.7%;top:17.78%;height:1.5%;pointer-events:none}.cx-bar i{display:block;height:100%;border-radius:1.5cqw;background:linear-gradient(180deg,#ffe27a,#f0a91c 60%,#c4780c);box-shadow:inset 0 .2cqw .3cqw rgba(255,255,255,.55)}
 .cx-c{position:absolute;left:35.2%;width:32.6%;transform:translateY(-50%);text-align:center;font:700 2.9cqw/1 Georgia,'Times New Roman',serif;color:#2b1a0c;text-shadow:0 .2cqw 0 rgba(255,236,190,.5);white-space:nowrap;pointer-events:none}
 .cx-p{position:absolute;left:36.3%;display:flex;pointer-events:none}.cx-p i{flex:0 0 3.38cqw;height:3.38cqw;background:url(assets/codex/pip_off.webp) center/100% 100% no-repeat}.cx-p i.on{background-image:url(assets/codex/pip_on.webp)}
+.cx-i{position:absolute;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.cx-rib{position:absolute;left:28.5%;width:43%;top:12.25%;height:2.7%;display:flex;align-items:center;justify-content:center;pointer-events:none;white-space:nowrap;font:700 2.7cqw/1 Georgia,'Times New Roman',serif;text-transform:uppercase;letter-spacing:.02em;background:linear-gradient(180deg,#fff0b8,#f3b94a 55%,#c87a18);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 .25cqw .2cqw rgba(0,0,0,.75))}
 .hhbd{position:absolute;right:calc(100cqw*.012);top:calc(100cqw*-.012);min-width:calc(100cqw*.062);height:calc(100cqw*.062);padding:0 calc(100cqw*.016);box-sizing:border-box;border-radius:calc(100cqw*.031);background:#e5483a;border:calc(100cqw*.004) solid #ffd98a;color:#fff;font:700 calc(100cqw*.036)/calc(100cqw*.054) Arial,sans-serif;font-style:normal;text-align:center;box-shadow:0 2px 6px #000a;pointer-events:none;z-index:2}
 .ipc.ipr{max-width:560px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;filter:drop-shadow(0 10px 28px #000c)}.ipr .ix{top:-14px;right:-8px;width:42px;z-index:3}.ipr img.rg{width:100%;display:block;border-radius:8px}
 
@@ -2604,7 +2606,7 @@ function heroRow(k,ic,n,b){
 const CODEX_TOT={bestiary:null,fauna:null,landmarks:null,artifacts:null,legends:null};   // null shows "??" until the real entry counts are filled in
 const CODEX_SEC=[['bestiary','Bestiary',332,527,438.5,481.5],['fauna','Fauna',546,742,653.5,696.5],['landmarks','Landmarks',762,955,863,908.5],['artifacts','Artifacts',972,1160,1070.5,1113.5],['legends','Legends',1170,1360,1268.5,1312.5]];   // key, name, panel top/bottom, count y, gem-row y (px on the 1024x1536 art)
 const codexFound=k=>{const v=S.codex&&S.codex[k];return Array.isArray(v)?v.length:Math.max(0,+v||0)};
-function codexPage(){
+function codexMain(){
  const y=n=>(n/15.36).toFixed(3)+'%',A='assets/codex/',B=window.__BUILD;
  const f=CODEX_SEC.map(c=>codexFound(c[0])),t=CODEX_SEC.map(c=>+CODEX_TOT[c[0]]||0),known=t.every(n=>n>0);
  const sum=f.reduce((a,b)=>a+b,0),tot=known?t.reduce((a,b)=>a+b,0):0;
@@ -2619,6 +2621,42 @@ function codexPage(){
    +'<div class="cx-c" style="top:'+y(c[4])+'">'+f[i]+' / '+(t[i]||'??')+' discovered</div>'
    +'<div class="cx-p" style="top:'+y(c[5]-17)+'">'+Array.from({length:9},(_,j)=>'<i'+(j<lit?' class="on"':'')+'></i>').join('')+'</div>'});
  return o+'</div><div class="cxfill" style="background-image:url('+A+'codex_wood.webp?v='+B+')"></div></div>'}
+/* ---- Bestiary (Codex > Bestiary): habitat list -> habitat page -> creature page. Art is the approved mockups; the ??? areas get filled in later ---- */
+let cxView={v:'main'};   // v: main (Codex hub) | best (habitat list) | hab (one habitat; h = key) | cre (one creature page; s = slot 0-4)
+const BA='assets/codex/bestiary/';
+const BEST_PREVIEW=true;   // true = every creature that has art shows as discovered; set false once map encounters + win-to-unlock exist (then S.codex.bestiary holds the ids found)
+const BEST_HAB=[['forest','Forests & Woodlands'],['graveyard','Graveyards & Crypts'],['cave','Caves & Caverns'],['swamp','Swamps & Wetlands'],['mountain','Mountains & Highlands']];
+const BEST_ROWS=[[148,372,915,530],[148,547,915,697],[148,713,915,865],[148,885,915,1038],[148,1053,915,1208]];   // habitat list rows on the 1024x1536 art
+const BEST_SLOT=[[118,437,906,589],[114,598,913,749],[110,761,919,914],[104,977,936,1128],[103,1139,941,1302]];   // creature rows on the habitat page: 3 Regional Variants, then 2 Unique Creatures
+const BEST_CRE={forest:['wolf','beetle','wisp','rabbit','boar']};   // creature art ids per habitat in slot order; habitats not listed stay on the blank template until creatures are added
+const BEST_BANNER=[128,196,888,378];   // habitat banner slot on the habitat page
+const bestSeen=id=>{const v=S.codex&&S.codex.bestiary;return BEST_PREVIEW||(Array.isArray(v)&&v.indexOf(id)>=0)};
+function bestPage(){
+ const X=n=>(n/10.24).toFixed(3)+'%',Y=n=>(n/15.36).toFixed(3)+'%',B=window.__BUILD,v=cxView;
+ const img=(f,x0,y0,x1,y1)=>'<img class="cx-i" alt="" draggable="false" src="'+BA+f+'?v='+B+'" style="left:'+X(x0)+';top:'+Y(y0)+';width:'+X(x1-x0)+';height:'+Y(y1-y0)+'">';
+ const hit=(a,k,x0,y0,x1,y1,lbl)=>'<div class="cx-b" data-bz="'+a+'"'+(k!=null?' data-k="'+k+'"':'')+' role="button" aria-label="'+lbl+'" style="left:'+X(x0)+';top:'+Y(y0)+';width:'+X(x1-x0)+';height:'+Y(y1-y0)+'"></div>';
+ const nav=hit('back',null,8,6,130,132,'Back')+hit('home',null,894,6,1016,132,'Codex home');
+ const hab=BEST_HAB.find(h=>h[0]===v.h)||BEST_HAB[0];
+ let bg,o='';
+ if(v.v==='best'){bg='hub.webp';
+  o+=img('btn_back.webp',15,12,108,94)+img('btn_home.webp',916,12,1008,94)+nav;
+  BEST_HAB.forEach((h,i)=>{const r=BEST_ROWS[i];o+=hit('hab',h[0],r[0],r[1],r[2],r[3],h[1])})}
+ else if(v.v==='hab'){bg='habitat.webp';
+  o+=img('hab_'+hab[0]+'.webp',BEST_BANNER[0],BEST_BANNER[1],BEST_BANNER[2],BEST_BANNER[3]);
+  const cs=BEST_CRE[hab[0]]||[];
+  BEST_SLOT.forEach((s,i)=>{const id=cs[i],on=id&&bestSeen(id);if(on)o+=img('cre_'+id+'.webp',s[0]-3,s[1]-3,s[2]+3,s[3]+3);
+   o+=hit('cre',i,s[0],s[1],s[2],s[3],on?id:'Undiscovered creature')});
+  o+=nav}
+ else{bg=v.s<3?'creature_variant.webp':'creature_unique.webp';
+  o+='<div class="cx-rib">'+esc(hab[1])+'</div>'+nav}
+ return'<div class="cxwrap"><div class="cxbox" style="background-image:url('+BA+bg+'?v='+B+')">'+o+'</div><div class="cxfill" style="background-image:url(assets/codex/codex_wood.webp?v='+B+')"></div></div>'}
+function bestNav(a,k){const v=cxView;
+ if(a==='home')cxView={v:'main'};
+ else if(a==='back')cxView=v.v==='cre'?{v:'hab',h:v.h}:v.v==='hab'?{v:'best'}:{v:'main'};
+ else if(a==='hab')cxView={v:'hab',h:k};
+ else if(a==='cre')cxView={v:'cre',h:v.h,s:+k,id:((BEST_CRE[v.h]||[])[+k])||null};
+ invRender();inv.scrollTop=0}
+function codexPage(){return cxView.v==='main'?codexMain():bestPage()}
 function heroHub(){const u=MAILS.filter(x=>!x.read).length+fbN(),ar=achReady();
  const bt=(k,lbl,n,k2)=>{const wd={"inventory": 77.83, "social": 78.82, "hero": 65.16, "profile": 79.3}[k2],dx={"inventory": 0.24, "social": 0.07, "hero": -0.06, "profile": -0.13}[k2];
   const off=false;
@@ -2840,9 +2878,10 @@ inv.addEventListener('click',async e=>{const b=e.target.closest('[data-hm]');if(
  if(a==='list'){mailOpenId=null;invRender();return}
  if(a==='open'){const m=MAILS.find(x=>String(x.id)===String(b.dataset.id));if(!m)return;mailOpenId=m.id;invRender();inv.scrollTop=0;if(!m.read){m.read=true;mailDot();supCall('mail_read',{id:m.id})}return}
  if(a==='del'){const r=await supCall('mail_delete',{id:b.dataset.id});if(!r||r.error||!r.ok)return toast((r&&r.error)||'Could not delete.');MAILS=MAILS.filter(x=>String(x.id)!==String(b.dataset.id));mailOpenId=null;mailDot();invRender()}});
-inv.addEventListener('click',e=>{if(e.target.closest('[data-hback]')){heroSec='hub';invRender();inv.scrollTop=0;return}
- const cxb=e.target.closest('[data-cx]');if(cxb){const sc=CODEX_SEC.find(x=>x[0]===cxb.dataset.cx);return toast((sc?sc[1]:'This section')+' entries are coming in a later update.')}
- const h=e.target.closest('[data-hs]');if(h){heroSec=h.dataset.hs;invRender();inv.scrollTop=0;if(heroSec==='social'&&heroSub.social==='friends')friendsLoad();return}
+inv.addEventListener('click',e=>{if(e.target.closest('[data-hback]')){heroSec='hub';cxView={v:'main'};invRender();inv.scrollTop=0;return}
+ const bz=e.target.closest('[data-bz]');if(bz)return bestNav(bz.dataset.bz,bz.dataset.k);
+ const cxb=e.target.closest('[data-cx]');if(cxb){if(cxb.dataset.cx==='bestiary'){cxView={v:'best'};invRender();inv.scrollTop=0;return}const sc=CODEX_SEC.find(x=>x[0]===cxb.dataset.cx);return toast((sc?sc[1]:'This section')+' entries are coming in a later update.')}
+ const h=e.target.closest('[data-hs]');if(h){heroSec=h.dataset.hs;if(heroSec==='codex')cxView={v:'main'};invRender();inv.scrollTop=0;if(heroSec==='social'&&heroSub.social==='friends')friendsLoad();return}
  const b=e.target.closest('[data-hsub]');if(!b)return;heroSub[heroSec]=b.dataset.hsub;invRender();inv.scrollTop=0;if(heroSec==='social'&&heroSub.social==='mail')heroMailLoad();if(heroSec==='social'&&heroSub.social==='friends')friendsLoad()});
 inv.addEventListener('change',e=>{if(e.target&&e.target.id==='sellSel'){sellPick=e.target.value;invRender()}if(e.target&&e.target.id==='invFilter'){invFilter=e.target.value;try{localStorage.setItem('invFilter',invFilter)}catch(x){}invRender()}});
 inv.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,i=b.dataset.i;if(a==='bonusResume'){const q=pendingBonusClient();if(q)showBonusChoice(q,['A bonus upgrade is waiting for '+q.itemName+'.'],false);return}if(a==='clspick')return pickClass(b.dataset.k);if(a==='switch')return openSwitch();if(a==='cls')return toast('Your class is locked. Use a Class Unlock from the Shop to change it.');   // unlock flow arrives with the Shop
