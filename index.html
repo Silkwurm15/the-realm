@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><script>try{var __s=JSON.parse(localStorage.getItem('tp_settings_v1')||'{}'),__r=document.documentElement.classList;if(__s.bigtext)__r.add('bigtext');if(__s.hc)__r.add('hc');if(__s.rm)__r.add('rm');if(__s.fx==='low')__r.add('fx-low');if(__s.fx==='off')__r.add('fx-off')}catch(e){}</script><meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>TITAN'S PATH — 3D Map Prototype</title>
 <script>
 /* Build stamp + cache self-heal: if an older copy was cached by the service worker, clear it once and reload. */
-(function(){var B='1.921';window.__BUILD=B;
+(function(){var B='1.922';window.__BUILD=B;
 try{if(localStorage.getItem('tp_build')!==B){localStorage.setItem('tp_build',B);
  var jobs=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)jobs.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));
  if(window.caches&&caches.keys)jobs.push(caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}));
@@ -931,7 +931,7 @@ if(S.xpv!==2){S.lvl=Math.min(100,Math.max(1,S.lvl|0));S.need=needFor(S.lvl);S.xp
 S.chaos=S.chaos||{last:0,fx:null};S.rift=S.rift||{fx:null,run:null};S.shards=S.shards||0;S.sq=S.sq||{list:[],n:0};
 S.taken=S.taken||{};S.hashes=S.hashes||[];S.rnd=S.rnd||{n:0,done:[]};S.loot=S.loot||{claimed:{}};S.hero=S.hero||{hp:100,eq:{},inv:[],pot:{h35:0,full:0,res:0}};S.hero.buy=S.hero.buy||{h35:0,full:0,res:0};   // pot = earned stack (cap 20 each), buy = purchased stack (separate, never capped)
 /* ---- server-authoritative state: XP, level, loot, claims, potions, quests and Tempt Fate live on the server ---- */
-const CORE_KEYS=['xpv','xp','need','lvl','cls','hero','loot','chaos','enc','k','daily','weekly','monthly','claimed','rnd','lairs','rift','shards','sq','name','look','onboarded','cx','cu','tut','bag','keys','coins','cd','lo','los','ach','slm','cal','sel','gf'];
+const CORE_KEYS=['xpv','xp','need','lvl','cls','hero','loot','chaos','enc','k','daily','weekly','monthly','claimed','rnd','lairs','rift','shards','sq','name','look','onboarded','cx','cu','tut','bag','keys','coins','cd','lo','los','ach','slm','cal','sel','gf','pbuf'];
 let fighting=false,actChain=Promise.resolve();
 function applyCore(c){if(!c)return;setTimeout(refreshLook,0);const pLvl=S.lvl,pCls=S.cls;CORE_KEYS.forEach(k=>{if(c[k]===undefined)return;if(!c[k]&&S[k]&&(k==='name'||k==='look'||k==='onboarded'))return;S[k]=c[k]});if(pLvl&&pCls&&S.cls===pCls&&S.lvl>pLvl){try{Sound.levelUp()}catch(e){}}try{localStorage.setItem(QK,JSON.stringify(S))}catch(e){}hud();render();try{if(inv.classList.contains('open'))invRender()}catch(e){}}
 function act(action,args){return actChain=actChain.then(async()=>{let fixed=false;try{fixed=gotFirst}catch(e){}
@@ -2376,7 +2376,7 @@ const invCss=document.createElement('style');invCss.textContent=`
 .ipo .pcn b{font-size:calc(var(--u)*42);line-height:1.05;color:#f6e3ae;text-shadow:0 2px 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ipo .pcn b.lg{font-size:calc(var(--u)*34)}
 .ipo .pcn small{font-size:calc(var(--u)*29);line-height:1.1;color:#e8dcc0;text-shadow:0 1px 2px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ipo .pcq{left:calc(var(--u)*665);width:calc(var(--u)*105);height:calc(var(--u)*98);display:flex;align-items:center;justify-content:center;font:700 calc(var(--u)*44) Georgia,serif;color:#f6e3ae;text-shadow:0 2px 3px #000}.ipo .pcq.m{font-size:calc(var(--u)*36)}.ipo .pcq.s{font-size:calc(var(--u)*28)}
-.ipo .pcu{left:calc(var(--u)*788);width:calc(var(--u)*167);height:calc(var(--u)*90);margin:0;padding:0;border:0;border-radius:calc(var(--u)*12);background:transparent;font:700 calc(var(--u)*48) Georgia,serif;color:#ffe9b8;text-shadow:0 2px 2px #000;cursor:pointer;-webkit-tap-highlight-color:transparent}.ipo .pcu:active:not(:disabled){background:#00000040}.ipo .pcu:disabled{background:#0c0707b3;color:#bda57a;cursor:default}
+.ipo .pcu{left:calc(var(--u)*788);width:calc(var(--u)*167);height:calc(var(--u)*90);margin:0;padding:0;border:0;border-radius:calc(var(--u)*12);background:transparent;font:700 calc(var(--u)*48) Georgia,serif;color:#ffe9b8;text-shadow:0 2px 2px #000;cursor:pointer;-webkit-tap-highlight-color:transparent}.ipo .pcu:active:not(:disabled){background:#00000040}.ipo .pcu:disabled{background:#0c0707b3;color:#bda57a;cursor:default}.ipo .pcu.t{font-size:calc(var(--u)*40)}
 
 
 .ipc.ipu{max-width:440px;padding:0;border:0;background:none;box-shadow:none;overflow:visible;max-height:none;container-type:inline-size}.ipu>.ix{display:none}
@@ -2566,12 +2566,15 @@ function pillPop(){potCur=null;const pc=(x,y,w,h)=>'left:'+(x/11.99).toFixed(2)+
 function potCatPop(cat){potCur=cat;const h=H(),c=POT_CATS.find(x=>x[0]===cat);if(!c)return pillPop();
  openPop('<div class="pc"><img alt="'+c[1]+' Potions" src="'+IV('pot_cat')+'"><div class="px" data-pback="1" style="left:calc(var(--u)*880);top:calc(var(--u)*145);width:calc(var(--u)*140);height:calc(var(--u)*130)"></div>'
   +'<div class="pct">'+c[1]+' Potions</div>'
-  +shopPotsOf(cat).slice(0,4).map((o,i)=>{const k=POT_MAP[o.id],er=k?(h.pot[k]||0):0,bu=k?(h.buy[k]||0):0,n=er+bu,y=i*200.5,qs=('x'+n).length;
+  +shopPotsOf(cat).slice(0,4).map((o,i)=>{const k=POT_MAP[o.id]||o.id,er=h.pot[k]||0,bu=h.buy[k]||0,n=er+bu,y=i*200.5,qs=('x'+n).length,lf=potLeft(o.id);
    return'<div class="pci" style="top:calc(var(--u)*'+(530+y).toFixed(1)+')"><img alt="" draggable="false" src="'+SHA('shp_pot_'+o.id)+'"></div>'
     +'<div class="pcn" style="top:calc(var(--u)*'+(530+y).toFixed(1)+')"><b'+(o.n.length>15?' class="lg"':'')+'>'+esc(o.n)+'</b><small>Earned '+er+' / '+POT_CAP+' · Bought '+bu+'</small></div>'
     +'<div class="pcq'+(qs>5?' s':qs>3?' m':'')+'" style="top:calc(var(--u)*'+(550+y).toFixed(1)+')">x'+n+'</div>'
-    +'<button class="pcu" data-pa="pot" data-u="'+(k||'')+'" style="top:calc(var(--u)*'+(552+y).toFixed(1)+')"'+(k&&n?'':' disabled')+'>Use</button>'}).join('')+'</div>','ipo')}
+    +'<button class="pcu'+(lf?' t':'')+'" data-pa="pot" data-pt="'+o.id+'" data-u="'+o.id+'" style="top:calc(var(--u)*'+(552+y).toFixed(1)+')"'+(n&&!lf?'':' disabled')+'>'+(lf?potClock(lf):'Use')+'</button>'}).join('')+'</div>','ipo')}
 function potRefresh(){if(potCur)potCatPop(potCur);else pillPop()}
+const potLeft=id=>{const e=S.pbuf&&S.pbuf[id],t=Date.now();return e>t?e-t:0};   // ms left on an active timed potion (S.pbuf = potion id -> server end time; the server owns it)
+const potClock=ms=>{const s=Math.ceil(ms/1e3);return Math.floor(s/60)+':'+('0'+s%60).slice(-2)};
+setInterval(()=>{if(!ipop.classList.contains('open'))return;let done=false;ipop.querySelectorAll('.pcu[data-pt]').forEach(b=>{const l=potLeft(b.dataset.pt);if(l)b.textContent=potClock(l);else if(b.classList.contains('t'))done=true});if(done)potRefresh()},1000);   // counts the Use buttons down; when a timer ends the list redraws and Use comes back
 function statsPop(){const h=H(),p=parts(),s=p.s,row=(n,v,x)=>'<div class="prow" style="padding:8px 10px"><div class="pn">'+n+(x?'<small>'+x+'</small>':'')+'</div><div class="pc" style="font-size:16px">'+v+'</div></div>';
  const at=Object.keys(ATTR).filter(k=>!['atk','def','maxHp'].includes(k)&&s[k]).map(k=>{const d=ATTR[k],v=s[k];return'<div class="prow" style="padding:6px 10px"><div class="pn" style="font-size:12px">'+attrEsc(d.name)+'</div><div class="pc '+(v<0?'dn':'up')+'" style="font-size:14px">'+(v>0?'+':'')+v+(d.unit||'')+'</div></div>'}).join('');
  openPop('<h2>Character Stats</h2><div class="qs" style="margin:0">Level '+S.lvl+' · totals include your equipped gear</div>'
